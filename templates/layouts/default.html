@@ -1,17 +1,25 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link
+      href="{% static 'styles/app.css'%}"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="{% static "scripts/app.js" %}" defer></script>
     <title>truepay首頁</title>
   </head>
   <body>
     <nav>
-      <ul>
-        <li><a href="">首頁</a></li>
-        <li><a href="">關於</a></li>
-        <li><a href="">聯絡</a></li>
+      <ul class="flex bg-red-500 gap-5 text-white text-xl">
+        <li><a href="{%url 'pages:home'%}">首頁</a></li>
+        <li><a href="{%url 'pages:about'%}">關於</a></li>
+        <li><a href="{%url 'pages:contact'%}">聯絡</a></li>
       </ul>
     </nav>
+    {% block content %}{% endblock  %}
   </body>
 </html>

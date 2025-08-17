@@ -1,0 +1,33 @@
+{
+  "name": "20th-truepay",
+  "version": "1.0.0",
+  "description": "## 系統需求",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build",
+    "watch": "vite build --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/astrocamp/20th-TruePay.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/astrocamp/20th-TruePay/issues"
+  },
+  "homepage": "https://github.com/astrocamp/20th-TruePay#readme",
+  "devDependencies": {
+    "daisyui": "^5.0.50",
+    "vite": "^7.1.2"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.12",
+    "alpinejs": "^3.14.9",
+    "htmx.org": "^2.0.6",
+    "tailwindcss": "^4.1.12"
+  }
+}
