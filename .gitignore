@@ -1,13 +1,41 @@
-# Python-generated files
+# Django
+*.log
+*.pot
+*.pyc
 __pycache__/
-*.py[oc]
-build/
-dist/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
 wheels/
-*.egg-info
 
-# Virtual environments
-.venv
+# Environment variables
+.env
 
-# Project-specific files
-commit_message_rule.md
+# Virtual environment
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+
+# Python
+*.egg-info/
+dist/
+build/
+
+# uv
+.python-version
