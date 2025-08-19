@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}TrustPay 廠商儀表板{% endblock %}</title>
+  <!-- 建議使用專案編譯後的 Tailwind CSS -->
+  <!-- <link rel="stylesheet" href="/static/css/tailwind.css"> -->
+  <!-- 臨時預覽可用 CDN（上線前請改用本機編譯檔） -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* 自訂滾動條（與 Apple 風格接近，低存在感）*/
+    ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#D2D2D7;border-radius:999px}::-webkit-scrollbar-track{background:transparent}
+  </style>
+</head>
+<body class="bg-[#F5F5F7] text-black font-sans">
+  <!-- 無 JS 的側欄開關（checkbox hack）；若用 JS，請以 data-action="toggle-sidebar" 綁定 -->
+  <input id="sidebarToggle" type="checkbox" class="peer hidden" />
+
+  <!-- 整體容器：側欄 + 內容區 -->
+  <div class="min-h-screen grid grid-cols-1 md:grid-cols-[260px_1fr]">
+
+    <!-- 側欄（Desktop 固定，Mobile 抽屜） -->
+    <aside class="fixed md:static inset-y-0 left-0 z-50 w-72 md:w-auto translate-x-[-100%] peer-checked:translate-x-0 md:translate-x-0 transition-transform bg-white border-r border-[#D2D2D7]">
+      <div class="h-full flex flex-col">
+        <!-- Logo -->
+        <div class="px-6 h-16 flex items-center border-b border-[#D2D2D7]">
+          <a href="/" class="text-xl font-bold text-[#0056B3]">TrustPay</a>
+          <label for="sidebarToggle" class="ml-auto md:hidden cursor-pointer p-2 rounded-lg hover:bg-[#F5F5F7]" aria-label="關閉選單">✕</label>
+        </div>
+        <!-- 導覽選單 -->
+        <nav class="flex-1 overflow-y-auto py-4">
+          <ul class="px-2 space-y-1 text-sm">
+            <li>
+              <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-[#0056B3] font-medium">
+                <!-- home icon -->
+                <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
+                  <path d="M3 10.5l9-7 9 7"/>
+                  <path d="M5 10v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9"/>
+                </svg>
+                廠商總覽 Overview
+              </a>
+            </li>
+            <li>
+              <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+                <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
+                  <path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>
+                </svg>
+                新增商品 Create Product
+              </a>
+            </li>
+            <li>
+              <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+                <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
+                  <path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>
+                </svg>
+                交易紀錄 Transactions
+              </a>
+            </li>
+            
+            <li>
+              <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+                <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
+                  <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V22a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H2a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06A2 2 0 1 1 6.04 3.4l.06.06c.48.48 1.17.62 1.82.33H8a1.65 1.65 0 0 0 1-1.51V2a2 2 0 1 1 4 0v.09c0 .66.39 1.26 1 1.51h.08c.64.29 1.34.15 1.82-.33l.06-.06A2 2 0 1 1 20.6 6.04l-.06.06a1.65 1.65 0 0 0-.33 1.82v.08c.25.61.85 1 1.51 1H22a2 2 0 1 1 0 4h-.09c-.66 0-1.26.39-1.51 1z"/>
+                </svg>
+                設定 Settings
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <!-- 登出 -->
+        <div class="p-4 border-t border-[#D2D2D7]">
+          <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-red-600">
+            <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
+              <path d="M10 17l5-5-5-5"/><path d="M15 12H3"/>
+            </svg>
+            登出 Log out
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 右側主要區域 -->
+
+    <!-- Footer -->
+      <footer class="mt-auto border-t border-[#D2D2D7] bg-white">
+        <div class="max-w-6xl mx-auto px-4 md:px-6 py-6 text-xs text-gray-500 flex items-center justify-between">
+          <p>© 2025 TrustPay</p>
+          <nav class="flex items-center gap-4">
+            <a href="#" class="hover:text-[#0056B3]">使用條款</a>
+            <a href="#" class="hover:text-[#0056B3]">隱私權政策</a>
+          </nav>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- 預留：頁面專用 JS（請放在 /static/js/dashboard_consumer.js） -->
+  {% block scripts %}
+  <!-- <script src="/static/js/dashboard_consumer.js" defer></script> -->
+  {% endblock %}
+</body>
+</html>

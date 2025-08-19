@@ -1,0 +1,45 @@
+{# templates/layouts/register_base.html #}
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link href="{% static 'styles/app.css' %}" rel="stylesheet" type="text/css" />
+    <script src="{% static 'scripts/app.js' %}" defer></script>
+
+    <title>{% block title %}建立帳號 - TrustPay{% endblock %}</title>
+  </head>
+  <body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+
+    <!-- 簡化導覽：只留品牌 -->
+    <nav class="bg-white border-b border-gray-200 px-4 py-3">
+      <div class="max-w-screen-sm mx-auto flex items-center justify-center">
+        <a href="{% url 'pages:home' %}" class="text-xl font-bold text-black">TrustPay</a>
+      </div>
+    </nav>
+
+    <!-- 主內容：註冊卡片置中 -->
+    <main class="flex-1 flex items-center justify-center px-4 py-12">
+      <div class="w-full max-w-md bg-white rounded-2xl shadow-md p-8">
+        {% block content %}
+        {# 各頁的註冊表單內容放這裡 #}
+        {% endblock %}
+
+        {# 底部輔助連結（可在子頁覆寫或保留預設） #}
+        <div class="mt-6 text-center text-sm text-gray-600">
+          已有帳號嗎？
+          <a href="{% url 'pages:selectrole' %}"
+             class="font-medium text-[#007AFF] hover:underline">前往登入</a>
+        </div>
+      </div>
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="bg-gray-100 text-center text-sm text-gray-500 py-6">
+      &copy; {{ now|date:"Y" }} TrustPay. All rights reserved.
+    </footer>
+
+  </body>
+</html>

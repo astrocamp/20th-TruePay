@@ -13,40 +13,40 @@
 
     <title>{% block title %}TrustPay 首頁{% endblock %}</title>
   </head>
-  <body class="bg-white text-gray-800 font-sans">
+  <body class="bg-brand-white text-brand-grayDark font-sans">
 
     <!-- 導覽列 -->
      
-  <nav class="bg-white border-b border-gray-200 px-4 py-3">
+  <nav class="bg-brand-white border-b border-brand-grayBorder px-4 py-3">
     <div class="max-w-screen-xl mx-auto flex items-center justify-between">
       <!-- 左側：手機時顯示漢堡 + 品牌 -->
       <div class="flex items-center gap-3">
         <!-- 漢堡按鈕 (手機版) -->
-        <button id="menu-toggle" class="md:hidden p-2 text-gray-800 focus:outline-none">
+        <button id="menu-toggle" class="md:hidden p-2 text-brand-grayDark focus:outline-none">
           ☰
         </button>
         <!-- 品牌名稱 (桌機版才顯示 / 手機展開時隱藏) -->
-        <a id="nav-brand" href="{% url 'pages:home' %}" class="text-lg font-bold text-black md:text-xl">TrustPay</a>
+        <a id="nav-brand" href="{% url 'pages:home' %}" class="text-lg font-bold text-brand-black md:text-xl">TrustPay</a>
       </div>
 
       <!-- 桌機版選單 -->
       <ul class="hidden md:flex items-center gap-6 text-sm font-medium">
-        <li><a href="{% url 'pages:home' %}" class="text-[#007AFF] hover:underline">首頁</a></li>
-        <li><a href="{% url 'pages:about' %}" class="hover:text-[#007AFF]">關於</a></li>
-        <li><a href="{% url 'pages:contact' %}" class="hover:text-[#007AFF]">聯絡</a></li>
-        <li><a href="{% url 'pages:contact' %}" class="hover:text-[#007AFF]">登入/註冊</a></li>
+        <li><a href="{% url 'pages:home' %}" class="text-brand-blue hover:underline">首頁</a></li>
+        <li><a href="{% url 'pages:about' %}" class="text-brand-grayDark hover:text-brand-blue">關於</a></li>
+        <li><a href="{% url 'pages:contact' %}" class="text-brand-grayDark hover:text-brand-blue">聯絡</a></li>
+        <li><a href="{% url 'pages:selectrole' %}" class="text-brand-grayDark hover:text-brand-blue">登入/註冊</a></li>
       </ul>
     </div>
 
     <!-- 手機版選單 (預設隱藏) -->
-    <div id="mobile-menu" class="hidden md:hidden mt-4 border-t border-gray-200">
+    <div id="mobile-menu" class="hidden md:hidden mt-4 border-t border-brand-grayBorder">
       <!-- 展開後的品牌名稱 -->
-      <div class="px-4 py-2 font-bold text-black text-lg">TrustPay</div>
+      <div class="px-4 py-2 font-bold text-brand-black text-lg">TrustPay</div>
       <ul class="flex flex-col gap-2 px-4 py-2 text-sm font-medium">
-        <li><a href="{% url 'pages:home' %}" class="block text-[#007AFF] hover:underline">首頁</a></li>
-        <li><a href="{% url 'pages:about' %}" class="block hover:text-[#007AFF]">關於</a></li>
-        <li><a href="{% url 'pages:contact' %}" class="block hover:text-[#007AFF]">聯絡</a></li>
-        <li><a href="{% url 'pages:contact' %}" class="block hover:text-[#007AFF]">登入/註冊</a></li>
+        <li><a href="{% url 'pages:home' %}" class="block text-brand-blue hover:underline">首頁</a></li>
+        <li><a href="{% url 'pages:about' %}" class="block text-brand-grayDark hover:text-brand-blue">關於</a></li>
+        <li><a href="{% url 'pages:contact' %}" class="block text-brand-grayDark hover:text-brand-blue">聯絡</a></li>
+        <li><a href="{% url 'pages:selectrole' %}" class="block text-brand-grayDark hover:text-brand-blue">登入/註冊</a></li>
         
       </ul>
     </div>
@@ -60,7 +60,7 @@
     </main>
 
     <!-- 頁尾（可加上 components/footer.html） -->
-    <footer class="bg-gray-100 text-center text-sm text-gray-500 py-6">
+    <footer class="bg-brand-grayLight text-center text-sm text-gray-500 py-6">
       &copy; {{ now|date:"Y" }} TrustPay. All rights reserved.
     </footer>
 

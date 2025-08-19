@@ -11,3 +11,6 @@ def about(req):
 
 def contact(req):
     return render(req, "pages/contact.html")
+
+def selectrole(req):
+    return render(req, "pages/selectrole.html")
