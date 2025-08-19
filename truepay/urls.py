@@ -6,5 +6,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("pages.urls")),
     path("merchant_account/", include("merchant_account.urls")),
-    path("Merchant/", include("Merchant.urls")),
+    path("Merchant/", include("merchant.urls")),
 ] + debug_toolbar_urls()

@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "debug_toolbar",
     "pages",
-    "Merchant",
+    "merchant",
     "merchant_account",
 ]
 
