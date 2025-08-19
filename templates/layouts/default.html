@@ -14,10 +14,21 @@
   </head>
   <body>
     <nav>
-      <ul class="flex bg-red-500 gap-5 text-white text-xl">
-        <li><a href="{%url 'pages:home'%}">首頁</a></li>
-        <li><a href="{%url 'pages:about'%}">關於</a></li>
-        <li><a href="{%url 'pages:contact'%}">聯絡</a></li>
+      <ul class="flex bg-red-500 gap-5 text-white text-xl justify-between items-center px-4 py-2">
+        <div class="flex gap-5">
+          <li><a href="{%url 'pages:home'%}">首頁</a></li>
+          <li><a href="{%url 'pages:about'%}">關於</a></li>
+          <li><a href="{%url 'pages:contact'%}">聯絡</a></li>
+        </div>
+        <div class="flex gap-3">
+          {% if request.session.customer_id %}
+            <li><span class="text-yellow-200">歡迎，{{ request.session.customer_name }}</span></li>
+            <li><a href="{% url 'customers_account:logout' %}" class="hover:text-yellow-200">登出</a></li>
+          {% else %}
+            <li><a href="{% url 'customers_account:login' %}" class="hover:text-yellow-200">登入</a></li>
+            <li><a href="{% url 'customers_account:register' %}" class="hover:text-yellow-200">註冊</a></li>
+          {% endif %}
+        </div>
       </ul>
     </nav>
     {% block content %}{% endblock  %}
