@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "pages",
     "Merchant",
-    "MerchantAcount",
+    "merchant_account",
 ]
 
 MIDDLEWARE = [
