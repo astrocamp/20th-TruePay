@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "Merchant",
     "merchant_account",
     "customers_account",
+    "MerchantAcount",
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,40 @@
+{% extends "layouts/default.html" %} 
+{% block content %}
+<h1>商家註冊</h1>
+<form action="" method="post">
+    {% csrf_token %}
+    <div>
+        <label>商家名稱</label>
+        <input type="text" name="ShopName" class="input"/>
+    </div>
+    <div>
+        <label>電子郵件</label>
+        <input type="text" name="Email" class="input"/>
+    </div>
+    <div>
+        <label>密碼</label>
+        <input type="text" name="Password"  class="input"/>
+    </div>
+     <div>
+        <label>負責人姓名</label>
+        <input type="text" name="Name"class="input"/>
+    </div>
+    <div>
+        <label>身分證字號</label>
+        <input type="text" name="NationalNumber"class="input"/>
+    </div>
+    <div>
+        <label>通訊地址</label>
+        <input type="Address" name="Address"class="input"/>
+    </div>
+     <div>
+        <label>統一編號</label>
+        <input type="text" name="UnifiedNumber"  class="input"/>
+    </div>
+    <div>
+        <label>手機號碼</label>
+        <input type="text" name="Cellphone"  class="input"/>
+    </div>
+    <button class="btn btn-primary">註冊</button>
+</form>
+{% endblock  %}
