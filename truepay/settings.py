@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "pages",
     "Merchant",
     "merchant_account",
+    "customers_account",
 ]
 
 MIDDLEWARE = [
