@@ -36,8 +36,9 @@ def login(req):
 
                 if merchant.Password == password:
                     req.session["merchant_id"] = merchant.id
+                    req.session["merchant_name"] = merchant.Name
                     messages.success(req, "歡迎進入！！！")
-                    return redirect("Merchant:home")
+                    return redirect("merchant:home")
                 else:
                     messages.error(req, "密碼錯誤")
             except Merchant.DoesNotExist:
@@ -51,11 +52,12 @@ def login(req):
 def logout(req):
     if "merchant_id" in req.session:
         del req.session["merchant_id"]
+    if "merchant_name" in req.session:
+        del req.session["merchant_name"]
 
     storage = messages.get_messages(req)
     for message in storage:
         pass
 
-    messages.success(req, "已登出")
-
+    messages.success(req, "已成功登出")
     return redirect("merchant_account:session")
