@@ -3,7 +3,7 @@ from django.contrib import messages
 from .forms import CustomerRegistrationForm, CustomerLoginForm
 
 
-def customer_register(request):
+def register(request):
     if request.method == "POST":
         form = CustomerRegistrationForm(request.POST)
         if form.is_valid():
@@ -20,10 +20,10 @@ def customer_register(request):
     else:
         form = CustomerRegistrationForm()
 
-    return render(request, "customers/customer_register.html", {"form": form})
+    return render(request, "customers/register.html", {"form": form})
 
 
-def customer_login(request):
+def login(request):
     if request.method == "POST":
         form = CustomerLoginForm(request.POST)
         if form.is_valid():
@@ -41,10 +41,10 @@ def customer_login(request):
     else:
         form = CustomerLoginForm()
 
-    return render(request, "customers/customer_login.html", {"form": form})
+    return render(request, "customers/login.html", {"form": form})
 
 
-def customer_logout(request):
+def logout(request):
     # 清除 session
     if "customer_id" in request.session:
         del request.session["customer_id"]

@@ -4,7 +4,7 @@ from . import views
 app_name = "merchant_account"
 
 urlpatterns = [
-    path("session/", views.login, name="session"),
     path("register/", views.register, name="register"),
+    path("login/", views.login, name="login"),
     path("logout/", views.logout, name="logout"),
 ]
