@@ -47,16 +47,20 @@ class RegisterForm(ModelForm):
 
 class LoginForm(Form):
     email = EmailField(
-        widget=EmailInput(attrs={
-            'class': 'w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
-            'placeholder': '請輸入電子郵件'
-        }),
-        label="電子郵件"
+        widget=EmailInput(
+            attrs={
+                "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "placeholder": "請輸入電子郵件",
+            }
+        ),
+        label="電子郵件",
     )
     password = CharField(
-        widget=PasswordInput(attrs={
-            'class': 'w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
-            'placeholder': '請輸入密碼'
-        }),
-        label="密碼"
+        widget=PasswordInput(
+            attrs={
+                "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "placeholder": "請輸入密碼",
+            }
+        ),
+        label="密碼",
     )
