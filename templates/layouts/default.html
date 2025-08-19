@@ -13,11 +13,15 @@
     <title>truepay首頁</title>
   </head>
   <body>
-    <nav>
-      <ul class="flex bg-red-500 gap-5 text-white text-xl">
+    <nav class="flex bg-red-500 justify-between items-center p-2 ">
+      <ul class="flex gap-5 text-white text-xl">
         <li><a href="{%url 'pages:home'%}">首頁</a></li>
         <li><a href="{%url 'pages:about'%}">關於</a></li>
         <li><a href="{%url 'pages:contact'%}">聯絡</a></li>
+      </ul>
+      <ul class="flex gap-5 text-white text-xl">
+        <li><a href="{%url 'MerchantAcount:session'%}">登入</a></li>
+        <li><a href="{%url 'MerchantAcount:register'%}">註冊</a></li>
       </ul>
     </nav>
     {% block content %}{% endblock  %}
