@@ -6,6 +6,9 @@ __pycache__/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+
+# Media files (using AWS S3)
+products/
 wheels/
 node_modules
 
