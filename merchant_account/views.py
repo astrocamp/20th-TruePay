@@ -13,7 +13,7 @@ def register(req):
             form.save()
 
             messages.success(req, "註冊成功！")
-            return redirect("merchant_account:session")
+            return redirect("merchant_account:login")
         else:
             messages.error(req, "註冊失敗，請重新再試")
             pass
@@ -38,7 +38,7 @@ def login(req):
                     req.session["merchant_id"] = merchant.id
                     req.session["merchant_name"] = merchant.Name
                     messages.success(req, "歡迎進入！！！")
-                    return redirect("merchant:home")
+                    return redirect("pages:home")
                 else:
                     messages.error(req, "密碼錯誤")
             except Merchant.DoesNotExist:
@@ -46,7 +46,7 @@ def login(req):
     else:
         form = LoginForm()
 
-    return render(req, "merchant_account/Session.html", {"form": form})
+    return render(req, "merchant_account/login.html", {"form": form})
 
 
 def logout(req):
@@ -60,4 +60,4 @@ def logout(req):
         pass
 
     messages.success(req, "已成功登出")
-    return redirect("merchant_account:session")
+    return redirect("merchant_account:login")
