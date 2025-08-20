@@ -1,0 +1,151 @@
+{% extends "layouts/default.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
+    <div class="mb-6">
+        <a href="{% url 'merchant_marketplace:detail' product.id %}" class="text-blue-600 hover:text-blue-800 flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            返回商品詳情
+        </a>
+    </div>
+    
+    <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">編輯商品</h1>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mb-4 p-3 rounded {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <form action="{% url 'merchant_marketplace:edit' product.id %}" method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+        
+        <div>
+            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                商品名稱 <span class="text-red-500">*</span>
+            </label>
+            <input type="text" id="name" name="name" value="{{ product.name }}" required
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+        </div>
+        
+        <div>
+            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                商品描述 <span class="text-red-500">*</span>
+            </label>
+            <textarea id="description" name="description" rows="5" required
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">{{ product.description }}</textarea>
+        </div>
+        
+        <div>
+            <label for="price" class="block text-sm font-medium text-gray-700 mb-2">
+                商品價格 <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+                <span class="absolute left-3 top-2 text-gray-500">$</span>
+                <input type="number" id="price" name="price" step="0.01" min="0" value="{{ product.price }}" required
+                       class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+            </div>
+        </div>
+        
+        <div>
+            <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
+                商品圖片
+            </label>
+            <input type="file" id="image" name="image" accept="image/*"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+            <p class="text-sm text-gray-500 mt-1">選擇新圖片將覆蓋現有圖片，檔案將自動上傳至 AWS S3</p>
+            
+            {% if product.image %}
+                <div class="mt-2">
+                    <p class="text-sm text-gray-600 mb-2">目前圖片：</p>
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-32 h-32 object-cover rounded-lg border">
+                </div>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-2">
+                聯絡電話 <span class="text-red-500">*</span>
+            </label>
+            <input type="tel" id="phone_number" name="phone_number" value="{{ product.phone_number }}" required
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+        </div>
+        
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h3 class="text-sm font-medium text-yellow-800 mb-2">編輯提醒：</h3>
+            <ul class="text-sm text-yellow-700 space-y-1">
+                <li>• 修改後的資訊將立即生效</li>
+                <li>• 請確保所有資訊都是最新且正確的</li>
+                <li>• 如需下架商品，請返回詳情頁面刪除</li>
+                <li>• 圖片會自動上傳至 AWS S3</li>
+            </ul>
+        </div>
+        
+        <div class="flex flex-col space-y-4">
+            <button type="submit" class="bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200">
+                更新商品
+            </button>
+            <div class="flex space-x-4">
+                <a href="{% url 'merchant_marketplace:detail' product.id %}" class="flex-1 text-center bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition duration-200">
+                    取消
+                </a>
+                <button type="button" onclick="confirmDelete()" class="flex-1 bg-red-100 text-red-700 hover:bg-red-200 transition duration-200 py-3 px-4 rounded-lg border border-red-300">
+                    刪除商品
+                </button>
+            </div>
+        </div>
+    </form>
+    
+    <!-- 隱藏的刪除表單 -->
+    <form id="deleteForm" action="{% url 'merchant_marketplace:detail' product.id %}" method="post" style="display: none;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="delete">
+    </form>
+    
+    <!-- 商品資訊預覽 -->
+    <div class="mt-8 p-4 bg-gray-50 rounded-lg">
+        <h3 class="text-sm font-medium text-gray-700 mb-2">商品資訊：</h3>
+        <div class="text-sm text-gray-600 space-y-1">
+            <p>建立時間：{{ product.created_at|date:"Y/m/d H:i" }}</p>
+            <p>最後更新：{{ product.updated_at|date:"Y/m/d H:i" }}</p>
+            <p>商家：{{ product.merchant.ShopName }}</p>
+            <p>狀態：{% if product.is_active %}上架中{% else %}已下架{% endif %}</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// 圖片檔案預覽功能
+document.getElementById('image').addEventListener('change', function() {
+    const file = this.files[0];
+    const preview = document.getElementById('new_image_preview');
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            if (!preview) {
+                const previewDiv = document.createElement('div');
+                previewDiv.id = 'new_image_preview';
+                previewDiv.className = 'mt-2';
+                previewDiv.innerHTML = '<p class="text-sm text-gray-600 mb-2">新圖片預覽：</p><img class="w-32 h-32 object-cover rounded-lg border" alt="新圖片預覽">';
+                document.getElementById('image').parentNode.appendChild(previewDiv);
+            }
+            document.querySelector('#new_image_preview img').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    } else if (preview) {
+        preview.remove();
+    }
+});
+
+// 刪除確認功能
+function confirmDelete() {
+    if (confirm('確定要刪除這個商品嗎？此操作無法復原。')) {
+        document.getElementById('deleteForm').submit();
+    }
+}
+</script>
+{% endblock %}
