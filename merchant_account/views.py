@@ -10,13 +10,18 @@ def register(req):
         form = RegisterForm(req.POST)
 
         if form.is_valid():
-            form.save()
-
-            messages.success(req, "註冊成功！")
-            return redirect("merchant_account:login")
+            subdomain = form.cleaned_data["subdomain"]
+            if Merchant.objects.filter(subdomain=subdomain).exists():
+                form.add_error(
+                    "subdomain", "此網址已被其他商家註冊了，請重新設定其他網址"
+                )
+                messages.error(req, "註冊失敗，請重新再試")
+            else:
+                form.save()
+                messages.success(req, "註冊成功！")
+                return redirect("merchant_account:login")
         else:
             messages.error(req, "註冊失敗，請重新再試")
-            pass
     else:
         form = RegisterForm()
 

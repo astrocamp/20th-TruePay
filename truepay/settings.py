@@ -30,7 +30,11 @@ SECRET_KEY = "django-insecure-iip1xgbl_eh&cl1p81i9*nuvl)qlb$#gj1e+f1it-a!xu1qjio
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    ".truepay.local",
+]
 
 
 # Application definition
@@ -48,6 +52,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "truepay.middleware.subdomain_middleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
