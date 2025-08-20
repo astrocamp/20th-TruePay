@@ -43,7 +43,7 @@ def login(req):
                     req.session["merchant_id"] = merchant.id
                     req.session["merchant_name"] = merchant.Name
                     messages.success(req, "歡迎進入！！！")
-                    return redirect("pages:home")
+                    return redirect("merchant_marketplace:index")
                 else:
                     messages.error(req, "密碼錯誤")
             except Merchant.DoesNotExist:
