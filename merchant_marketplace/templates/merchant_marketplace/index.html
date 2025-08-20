@@ -1,0 +1,56 @@
+{% extends "layouts/default.html" %}
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">商品市集</h1>
+        <a href="{% url 'merchant_marketplace:new' %}" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+            新增商品
+        </a>
+    </div>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mb-4 p-3 rounded {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    {% if products %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for product in products %}
+                <div class="bg-white border rounded-lg p-4 shadow hover:shadow-md">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-48 object-cover rounded mb-4">
+                    {% else %}
+                        <div class="w-full h-48 bg-gray-200 rounded mb-4 flex items-center justify-center">
+                            <span class="text-gray-500">無圖片</span>
+                        </div>
+                    {% endif %}
+                    
+                    <h3 class="text-lg font-semibold mb-2">{{ product.name }}</h3>
+                    <p class="text-gray-600 text-sm mb-3">{{ product.description|truncatewords:15 }}</p>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xl font-bold text-blue-600">${{ product.price }}</span>
+                        <span class="text-sm text-gray-500">{{ product.merchant.ShopName }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">{{ product.phone_number }}</span>
+                        <a href="{% url 'merchant_marketplace:detail' product.id %}" class="text-blue-600 hover:text-blue-800">
+                            查看詳情
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-12">
+            <h3 class="text-xl text-gray-600 mb-2">目前沒有商品</h3>
+            <p class="text-gray-500 mb-4">成為第一個新增商品的商家吧！</p>
+            <a href="{% url 'merchant_marketplace:new' %}" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+                新增第一個商品
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
