@@ -7,7 +7,7 @@ class subdomain_middleware:
 
     def __call__(self, request):
         # 方式1: 檢查URL參數 ?shop=subdomain (用於測試)
-        shop_param = request.GET.get('shop')
+        shop_param = request.GET.get("shop")
         if shop_param:
             try:
                 merchant = Merchant.objects.get(subdomain=shop_param)
@@ -15,7 +15,7 @@ class subdomain_middleware:
                 return self.get_response(request)
             except Merchant.DoesNotExist:
                 pass
-        
+
         # 方式2: 檢查真實subdomain
         host = request.META.get("HTTP_HOST", "")
         subdomain = host.split(".")[0]
