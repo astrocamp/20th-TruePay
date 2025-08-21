@@ -6,8 +6,13 @@ class MediaStorage(S3Boto3Storage):
     bucket_name = settings.AWS_STORAGE_BUCKET_NAME
     region_name = settings.AWS_S3_REGION_NAME
     file_overwrite = False
+<<<<<<< HEAD
     default_acl = 'public-read'  # 使用 ACL 設為公開讀取
     querystring_auth = False
     object_parameters = {
         'CacheControl': 'max-age=86400',
     }
+=======
+    default_acl = None
+    querystring_auth = False
+>>>>>>> c9babb9 (feat: Add subdomain multi-tenant functionality and marketplace app)

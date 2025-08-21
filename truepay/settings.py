@@ -150,13 +150,18 @@ AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
 AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'ap-northeast-1')
 AWS_S3_SIGNATURE_VERSION = 's3v4'
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
+<<<<<<< HEAD
 AWS_DEFAULT_ACL = 'public-read'  # 使用 ACL 設為公開讀取
+=======
+AWS_DEFAULT_ACL = None
+>>>>>>> c9babb9 (feat: Add subdomain multi-tenant functionality and marketplace app)
 AWS_QUERYSTRING_AUTH = False
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
 
 # Media files (uploads)
+<<<<<<< HEAD
 STORAGES = {
     "default": {
         "BACKEND": "merchant_marketplace.storage_backends.MediaStorage",
@@ -165,4 +170,7 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
+=======
+DEFAULT_FILE_STORAGE = 'merchant_marketplace.storage_backends.MediaStorage'
+>>>>>>> c9babb9 (feat: Add subdomain multi-tenant functionality and marketplace app)
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
