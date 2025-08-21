@@ -38,8 +38,6 @@ def new(request):
                 return redirect('merchant_account:login')
             
             merchant = get_object_or_404(Merchant, id=merchant_id)
-
-            
             product = Product.objects.create(
                 name=request.POST.get('name'),
                 description=request.POST.get('description'),
