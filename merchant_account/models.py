@@ -12,6 +12,7 @@ class Merchant(models.Model):
     Address = models.CharField(max_length=50, null=False)
     Cellphone = models.CharField(max_length=15, null=False)
     Password = models.CharField(max_length=128, null=False)
+    subdomain = models.SlugField(max_length=50, unique=True, null=True, blank=True)
 
     def __str__(self):
         return self.ShopName

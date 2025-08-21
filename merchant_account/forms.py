@@ -6,15 +6,23 @@ from django.forms import (
     PasswordInput,
     Form,
     EmailField,
+    SlugField,
 )
 from .models import Merchant
 
 
 class RegisterForm(ModelForm):
+    subdomain = SlugField(
+        max_length=50,
+        help_text="商家專屬網址，例如：ownshop會變成－ownshop.truepay.com",
+        widget=TextInput(attrs={"class": "input"}),
+    )
+
     class Meta:
         model = Merchant
         fields = [
             "ShopName",
+            "subdomain",
             "UnifiedNumber",
             "NationalNumber",
             "Email",
@@ -25,6 +33,7 @@ class RegisterForm(ModelForm):
         ]
         labels = {
             "ShopName": "商店名稱",
+            "subdomain": "專屬網址",
             "UnifiedNumber": "統一編號",
             "NationalNumber": "身分證號",
             "Email": "電子郵件",
