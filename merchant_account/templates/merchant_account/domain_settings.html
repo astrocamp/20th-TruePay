@@ -1,0 +1,77 @@
+{% extends "layouts/default.html" %}
+{% block content %}
+<div class="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold text-center text-gray-800 
+  mb-6">自訂域名設定</h1>
+
+    {% if messages %}
+      {% for message in messages %}
+    <div class="mb-4 p-3 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 
+  text-red-700{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <form action="{% url 'merchant_account:domain_settings' %}" method="post" 
+  class="space-y-4">
+      {% csrf_token %}
+
+      <div>
+        <label for="{{ form.merchant_domain.id_for_label }}" class="block text-sm
+   font-medium text-gray-700 mb-1">
+          {{ form.merchant_domain.label }}
+        </label>
+        {{ form.merchant_domain }}
+        {% if form.merchant_domain.help_text %}
+          <p class="text-gray-500 text-sm mt-1">{{ form.merchant_domain.help_text}}</p>
+        {% endif %}
+        {% if form.merchant_domain.errors %}
+          {% for error in form.merchant_domain.errors %}
+            <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <div class="flex items-center">
+        {{ form.use_merchant_domain }}
+        <label for="{{ form.use_merchant_domain.id_for_label }}" class="ml-2 text-sm text-gray-700">
+          {{ form.use_merchant_domain.label }}
+        </label>
+        {% if form.use_merchant_domain.help_text %}
+          <p class="text-gray-500 text-sm mt-1">{{form.use_merchant_domain.help_text }}</p>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="w-full bg-[#0056B3] text-white py-3 px-4 
+  rounded-lg hover:bg-[#00408A] focus:outline-none focus:ring-2 
+  focus:ring-[#0056B3] focus:ring-offset-2 transition duration-200">
+        儲存設定
+      </button>
+    </form>
+
+    <!-- DNS 設定說明 -->
+    <div class="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+      <h3 class="text-lg font-semibold text-blue-800 mb-2">DNS 設定說明</h3>
+      <p class="text-blue-700 text-sm 
+  mb-2">如果您想使用自訂域名，請在您的域名商設定以下 DNS 記錄：</p>
+      <div class="bg-white p-2 rounded border text-sm font-mono">
+        類型: CNAME<br>
+        名稱: www<br>
+        值: truepay.com
+      </div>
+      <p class="text-blue-600 text-sm mt-2">
+        設定完成後，等待 DNS
+  生效（通常需要幾分鐘到幾小時），然後勾選「啟用自訂域名」即可使用。
+      </p>
+    </div>
+
+    <div class="mt-6 text-center">
+      <a href="{% url 'merchant_marketplace:index' %}" class="text-blue-600 
+  hover:text-blue-800 font-medium">
+        返回商品管理
+      </a>
+    </div>
+  </div>
+
+{% endblock %}
