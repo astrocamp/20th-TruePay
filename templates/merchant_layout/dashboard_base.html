@@ -42,7 +42,15 @@
               </a>
             </li>
             <li>
-              <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+              <a href="{% url 'merchant_marketplace:index' %}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+                <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
+                  <path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>
+                </svg>
+                商品列表 Product List
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'merchant_marketplace:new' %}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
                 <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
                   <path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>
                 </svg>
@@ -82,6 +90,15 @@
     </aside>
 
     <!-- 右側主要區域 -->
+     <main class="flex flex-col min-h-screen">
+    <!-- 主內容 -->
+    <div class="flex-1 p-6">
+      {% block content %}
+      <!-- 子頁面會注入這裡 -->
+
+
+      {% endblock %}
+    </div>
 
     <!-- Footer -->
       <footer class="mt-auto border-t border-[#D2D2D7] bg-white">
