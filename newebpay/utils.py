@@ -53,98 +53,72 @@ class NewebPayUtils:
         """
         AES 解密 - 用來解密藍新金流回傳的資料
         藍新金流回傳的資料是十六進制格式
+        改進版：智能處理不同長度的 TradeInfo (notify: 1024, return: 1088)
         """
         try:
-            print(f"開始解密，原始加密資料長度: {len(encrypted_data)}")
-            print(f"加密資料前 100 字元: {encrypted_data[:100]}")
-
             # 檢查是否為有效十六進制
             if not all(c in "0123456789abcdefABCDEF" for c in encrypted_data):
                 print(f"錯誤：不是有效的十六進制字串")
                 return None
 
-            # 十六進制字串轉換為 bytes
+            # 十六進制字串轉換為 bytes 並解密
             encrypted_bytes = bytes.fromhex(encrypted_data)
-            print(f"轉換後 bytes 長度: {len(encrypted_bytes)}")
-
-            # AES 解密
             cipher = AES.new(
                 self.hash_key.encode("utf-8"),
                 AES.MODE_CBC,
                 self.hash_iv.encode("utf-8"),
             )
             decrypted = cipher.decrypt(encrypted_bytes)
-            print(f"解密後原始 bytes 長度: {len(decrypted)}")
-
-            # 移除 PKCS7 填充 - 如果失敗，嘗試截斷多餘資料
+            
+            # 智能解密策略：嘗試不同解密方法
+            decrypted_data = None
+            
+            # 方法1：標準 PKCS7 解密
             try:
                 decrypted_data = unpad(decrypted, AES.block_size).decode("utf-8")
-                print(f"解密原始資料: {decrypted_data}")
-            except ValueError as padding_error:
-                print(f"標準解密失敗: {padding_error}")
-                # 嘗試截斷到正確的長度（基於 notify 成功的長度 512）
-                if len(decrypted) > 512:
-                    print(f"嘗試截斷資料從 {len(decrypted)} 到 512 bytes")
-                    truncated_data = decrypted[:512]
-                    try:
-                        decrypted_data = unpad(truncated_data, AES.block_size).decode(
-                            "utf-8"
-                        )
-                        print(f"截斷後解密成功: {decrypted_data}")
-                    except ValueError:
-                        # 如果還是失敗，手動移除填充
-                        print("嘗試手動移除填充")
-                        # 檢查最後 16 個字節的填充模式
-                        for i in range(1, 17):  # PKCS7 填充長度 1-16
+                print(f"標準 PKCS7 解密成功")
+            except ValueError:
+                # 方法2：智能 JSON 邊界檢測（針對藍新金流 return 回調）
+                try:
+                    full_text = decrypted.decode("utf-8", errors="ignore")
+                    last_brace = full_text.rfind("}")
+                    if last_brace != -1:
+                        json_candidate = full_text[:last_brace + 1]
+                        # 驗證是否為有效 JSON
+                        import json
+                        json.loads(json_candidate)
+                        decrypted_data = json_candidate
+                        print(f"JSON 邊界解密成功")
+                except (UnicodeDecodeError, json.JSONDecodeError, ValueError):
+                    pass
+                
+                # 方法3：嘗試常見長度截斷
+                if not decrypted_data:
+                    for target_length in [512, 496, 480, 464, 448]:
+                        if len(decrypted) >= target_length:
                             try:
-                                # 檢查是否所有填充字節都是相同的
-                                padding_bytes = truncated_data[-i:]
-                                if all(b == i for b in padding_bytes):
-                                    decrypted_data = truncated_data[:-i].decode("utf-8")
-                                    print(
-                                        f"手動去填充成功 (長度 {i}): {decrypted_data[:100]}..."
-                                    )
-                                    break
-                            except (UnicodeDecodeError, IndexError):
+                                truncated = decrypted[:target_length]
+                                decrypted_data = unpad(truncated, AES.block_size).decode("utf-8")
+                                print(f"截斷解密成功 ({target_length} bytes)")
+                                break
+                            except (ValueError, UnicodeDecodeError):
                                 continue
-                        else:
-                            # 如果所有填充嘗試都失敗，嘗試不同的截斷長度
-                            print("嘗試不同的截斷長度")
-                            for length in [496, 480, 464, 448]:  # 32 bytes 的倍數
-                                try:
-                                    alt_truncated = decrypted[:length]
-                                    decrypted_data = unpad(
-                                        alt_truncated, AES.block_size
-                                    ).decode("utf-8")
-                                    print(
-                                        f"截斷到 {length} bytes 成功: {decrypted_data[:100]}..."
-                                    )
-                                    break
-                                except (ValueError, UnicodeDecodeError):
-                                    continue
-                            else:
-                                raise padding_error
-                else:
-                    raise padding_error
+            
+            if not decrypted_data:
+                print("解密失敗：所有方法都無效")
+                return None
 
-            # 藍新金流回傳的是 JSON 格式，不是 query string
+            # 解析為 JSON 或 query string
             import json
-
             try:
                 json_data = json.loads(decrypted_data)
-                print(f"成功解析為 JSON")
                 return json_data
             except json.JSONDecodeError:
-                print(f"不是 JSON 格式，嘗試解析為 query string")
                 # 如果不是 JSON，嘗試解析為 query string
                 return dict(parse_qs(decrypted_data, keep_blank_values=True))
 
         except Exception as e:
-            print(f"解密失敗: {e}")
-            print(f"錯誤類型: {type(e).__name__}")
-            import traceback
-
-            print(f"完整錯誤: {traceback.format_exc()}")
+            print(f"解密錯誤: {e}")
             return None
 
     def generate_trade_info(self, payment_data):

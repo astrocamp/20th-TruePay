@@ -34,7 +34,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
     ".truepay.local",
-    "a9f858987bb6.ngrok-free.app",
+    "5e71c318323f.ngrok-free.app",
 ]
 
 
@@ -182,14 +182,14 @@ CURRENT_GATEWAY_URL = NEWEBPAY_GATEWAY_URL
 
 # 付款回調 URLs（需要是完整的 URL）
 # 使用 ngrok URL - 請在藍新後台設定相同的 URL
-PAYMENT_RETURN_URL = "https://a9f858987bb6.ngrok-free.app/newebpay/payment/return/"
-PAYMENT_NOTIFY_URL = "https://a9f858987bb6.ngrok-free.app/newebpay/payment/notify/"
-PAYMENT_CANCEL_URL = "https://a9f858987bb6.ngrok-free.app/newebpay/payment/cancel/"
+PAYMENT_RETURN_URL = "https://5e71c318323f.ngrok-free.app/newebpay/payment/return/"
+PAYMENT_NOTIFY_URL = "https://5e71c318323f.ngrok-free.app/newebpay/payment/notify/"
+PAYMENT_CANCEL_URL = "https://5e71c318323f.ngrok-free.app/newebpay/payment/cancel/"
 
 # CSRF 豁免設定（金流回調需要）
 CSRF_TRUSTED_ORIGINS = [
     "https://ccore.newebpay.com",
     "http://127.0.0.1:8000",
     "http://localhost:8000",
-    "https://a9f858987bb6.ngrok-free.app",
+    "https://5e71c318323f.ngrok-free.app",
 ]

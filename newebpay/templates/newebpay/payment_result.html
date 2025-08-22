@@ -89,6 +89,12 @@
                 <div class="icon">❌</div>
                 <h1>付款失敗</h1>
                 <p>{{ message }}</p>
+                {% if support_info %}
+                    <div class="info-group" style="background: #fff3cd; border: 1px solid #ffeaa7;">
+                        <p><strong>📞 需要協助？</strong></p>
+                        <p>{{ support_info }}</p>
+                    </div>
+                {% endif %}
             </div>
         {% endif %}
         
