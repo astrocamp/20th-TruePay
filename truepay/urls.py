@@ -8,4 +8,5 @@ urlpatterns = [
     path("customers/", include("customers_account.urls")),
     path("marketplace/", include("merchant_marketplace.urls")),
     path("pay/", include("merchant_marketplace.public_urls")),
+    path("newebpay/", include("newebpay.urls")),
 ]
