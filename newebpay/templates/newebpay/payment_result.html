@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if success %}付款成功{% else %}付款失敗{% endif %}</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .success {
+            color: #28a745;
+        }
+        .error {
+            color: #dc3545;
+        }
+        .icon {
+            font-size: 4em;
+            margin: 20px 0;
+        }
+        .info-group {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #555;
+            display: inline-block;
+            width: 120px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.8;
+            text-decoration: none;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% if success %}
+            <div class="success">
+                <div class="icon">✅</div>
+                <h1>付款成功！</h1>
+                <p>{{ message }}</p>
+                
+                {% if payment %}
+                <div class="info-group">
+                    <div><span class="info-label">訂單編號：</span>{{ payment.merchant_order_no }}</div>
+                    <div><span class="info-label">付款金額：</span>NT$ {{ payment.amt }}</div>
+                    <div><span class="info-label">商品說明：</span>{{ payment.item_desc }}</div>
+                    <div><span class="info-label">付款狀態：</span>{{ payment.get_status_display }}</div>
+                </div>
+                
+                <a href="{% url 'newebpay:payment_status' payment.id %}" class="btn btn-success">📋 查看詳細資訊</a>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="error">
+                <div class="icon">❌</div>
+                <h1>付款失敗</h1>
+                <p>{{ message }}</p>
+            </div>
+        {% endif %}
+        
+        <a href="{% url 'pages:home' %}" class="btn btn-primary">🏠 返回首頁</a>
+    </div>
+</body>
+</html>
