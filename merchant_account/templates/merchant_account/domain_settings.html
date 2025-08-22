@@ -1,4 +1,4 @@
-{% extends "layouts/default.html" %}
+{% extends "merchant_layout/dashboard_base.html" %}
 {% block content %}
 <div class="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
     <h1 class="text-2xl font-bold text-center text-gray-800 
@@ -64,13 +64,6 @@
         設定完成後，等待 DNS
   生效（通常需要幾分鐘到幾小時），然後勾選「啟用自訂域名」即可使用。
       </p>
-    </div>
-
-    <div class="mt-6 text-center">
-      <a href="{% url 'merchant_marketplace:index' %}" class="text-blue-600 
-  hover:text-blue-800 font-medium">
-        返回商品管理
-      </a>
     </div>
   </div>
 
