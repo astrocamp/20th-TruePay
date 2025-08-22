@@ -1,0 +1,115 @@
+{% extends "layouts/default.html" %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="md:flex">
+                <!-- 商品圖片 -->
+                <div class="md:w-1/2">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-96 object-cover">
+                    {% else %}
+                        <div class="w-full h-96 bg-gray-200 flex items-center justify-center">
+                            <span class="text-gray-500 text-lg">無圖片</span>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- 商品資訊 -->
+                <div class="md:w-1/2 p-8">
+                    <div class="mb-6">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ product.name }}</h1>
+                        <p class="text-4xl font-bold text-[#0056B3] mb-6">NT$ {{ product.price }}</p>
+                    </div>
+                    
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-center">
+                            <span class="text-gray-600 font-medium w-20">商家：</span>
+                            <span class="text-gray-800">{{ product.merchant.ShopName }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gray-600 font-medium w-20">聯絡：</span>
+                            <span class="text-gray-800">{{ product.phone_number }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 藍星金流 -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-4">
+                        <h3 class="text-lg font-bold text-blue-800 mb-4">藍新金流</h3>
+                        <button class="w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium">
+                            藍新金流 NT$ {{ product.price }}
+                        </button>
+                        <p class="text-sm text-blue-600 text-center mt-3">
+                            安全付款 | 24小時客服支援
+                        </p>
+                    </div>
+                    
+                    <!-- LINE PAY -->
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-4">
+                        <h3 class="text-lg font-bold text-blue-800 mb-4">LINE PAY</h3>
+                        <button class="w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium">
+                            LINE PAY NT$ {{ product.price }}
+                        </button>
+                        <p class="text-sm text-blue-600 text-center mt-3">
+                            安全付款 | 24小時客服支援
+                        </p>
+                    </div>
+                    
+                    <!-- 聯絡資訊 -->
+                    <div class="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
+                        <p class="text-green-800 font-medium mb-2">💬 有問題嗎？</p>
+                        <p class="text-green-600">
+                            直接聯絡商家：{{ product.phone_number }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 商品描述 -->
+            <div class="p-8 border-t border-gray-200">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">商品詳情</h3>
+                <div class="text-gray-700 leading-relaxed whitespace-pre-line">{{ product.description }}</div>
+            </div>
+            
+            <!-- 商家資訊 -->
+            <div class="p-8 border-t border-gray-200 bg-gray-50">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">商家資訊</h3>
+                <div class="flex items-center space-x-4">
+                    <div class="bg-[#0056B3] text-white w-12 h-12 rounded-full flex items-center justify-center font-bold">
+                        {{ product.merchant.ShopName|first }}
+                    </div>
+                    <div>
+                        <p class="font-medium text-gray-800">{{ product.merchant.ShopName }}</p>
+                        <p class="text-gray-600">聯絡電話：{{ product.phone_number }}</p>
+                        <p class="text-sm text-gray-500">商品發布時間：{{ product.created_at|date:"Y年m月d日" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 信任標章 -->
+        <div class="mt-8 text-center">
+            <div class="flex justify-center items-center space-x-6 text-gray-500">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                    </svg>
+                    安全加密
+                </div>
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    TruePay 認證
+                </div>
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                    </svg>
+                    客服支援
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
