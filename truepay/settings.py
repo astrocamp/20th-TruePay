@@ -171,3 +171,11 @@ STORAGES = {
 }
 DEFAULT_FILE_STORAGE = "merchant_marketplace.storage_backends.MediaStorage"
 MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.resend.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "resend"
+EMAIL_HOST_PASSWORD = os.getenv("RESEND_API_KEY")
+DEFAULT_FROM_EMAIL = "TruePay <onboarding@resend.dev>"
