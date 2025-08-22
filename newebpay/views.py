@@ -120,33 +120,28 @@ def payment_return(request):
             except Payment.DoesNotExist:
                 pass  # 找不到訂單，繼續嘗試其他方法
 
-        # 如果解密失敗，嘗試從 URL 參數或其他方式取得訂單號
-        # 檢查是否有已完成的付款記錄
-        from datetime import datetime, timedelta
-
-        recent_payments = Payment.objects.filter(
-            status="paid",
-            pay_time__gte=datetime.now() - timedelta(minutes=5),  # 最近5分鐘內的付款
-        ).order_by("-pay_time")
-
-        if recent_payments.exists():
-            payment = recent_payments.first()
-            payment.return_received = True
-            payment.save()
-
-            return render(
-                request,
-                "newebpay/payment_result.html",
-                {"success": True, "payment": payment, "message": "付款處理完成"},
-            )
-
-        # 如果都找不到，顯示錯誤
+        # 如果解密失敗或找不到訂單，記錄錯誤並顯示明確訊息
+        import logging
+        from django.utils import timezone
+        logger = logging.getLogger(__name__)
+        
+        error_info = {
+            "trade_info_length": len(trade_info) if trade_info else 0,
+            "trade_sha": trade_sha,
+            "decrypt_result": result if not is_valid else "N/A",
+            "user_ip": request.META.get('REMOTE_ADDR'),
+            "timestamp": timezone.now().isoformat()
+        }
+        
+        logger.error(f"付款回調驗證失敗: {error_info}")
+        
         return render(
             request,
             "newebpay/payment_result.html",
             {
                 "success": False,
-                "message": f"資料驗證失敗，但付款可能已成功。請聯繫客服確認。",
+                "message": "付款資料驗證失敗。如果您已完成付款，請聯繫客服並提供訂單資訊以協助查詢。",
+                "support_info": "客服將協助您確認付款狀態並處理相關事宜。"
             },
         )
 
