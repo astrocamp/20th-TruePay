@@ -7,6 +7,7 @@ from django.forms import (
     Form,
     EmailField,
     SlugField,
+    CheckboxInput,
 )
 from .models import Merchant
 
@@ -73,3 +74,23 @@ class LoginForm(Form):
         ),
         label="密碼",
     )
+
+
+class domain_settings_form(ModelForm):
+    class Meta:
+        model = Merchant
+        fields = ["merchant_domain", "use_merchant_domain"]
+        labels = {
+            "merchant_domain": "自訂網域名稱",
+            "use_merchant_domain": "啟用自訂網域",
+        }
+        widgets = {
+            "merchant_domain": TextInput(
+                attrs={"class": "input", "placeholder": "例如：bakery.com(不要加 www)"}
+            ),
+            "use_merchant_domain": CheckboxInput(attrs={"class": "checkbox"}),
+        }
+        help_texts = {
+            "merchant_domain": "請輸入您的網域名稱，不需要加上 www",
+            "use_merchant_domain": "勾選後就使用您自訂的網域名稱",
+        }
