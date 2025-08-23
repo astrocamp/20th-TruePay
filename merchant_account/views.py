@@ -2,6 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import RegisterForm, LoginForm, domain_settings_form
 from .models import Merchant
+from django.views.decorators.csrf import csrf_exempt
+from merchant_marketplace.models import Product
+
+
+
+
 
 
 # Create your views here.

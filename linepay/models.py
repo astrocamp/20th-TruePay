@@ -1,6 +1,6 @@
 from django.db import models
 from django.db import models
-from products.models import Product  # 假設你已經有 Product model
+from merchant_marketplace.models import Product
 
 class Order(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)  # 關聯商品
