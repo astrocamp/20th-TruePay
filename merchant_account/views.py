@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .forms import RegisterForm, LoginForm
+from .forms import RegisterForm, LoginForm, domain_settings_form
 from .models import Merchant
 
 
@@ -66,3 +66,22 @@ def logout(req):
 
     messages.success(req, "已成功登出")
     return redirect("merchant_account:login")
+
+
+def domain_settings(request):
+    merchant_id = request.session.get("merchant_id")
+    if not merchant_id:
+        messages.error(request, "請先登入")
+        return redirect("merchant_account:login")
+    merchant = get_object_or_404(Merchant, id=merchant_id)
+    if request.method == "POST":
+        form = domain_settings_form(request.POST, instance=merchant)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "網域名稱已更新")
+            return redirect("merchant_account:domain_settings")
+        else:
+            messages.error(request, "設定失敗，請檢查內容")
+    else:
+        form = domain_settings_form(instance=merchant)
+    return render(request, "merchant_account/domain_settings.html", {"form": form})

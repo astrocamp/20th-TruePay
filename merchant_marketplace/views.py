@@ -6,14 +6,18 @@ from merchant_account.models import Merchant
 
 def index(request):
     # 優先使用 subdomain/URL參數指定的商家
-    if hasattr(request, 'tenant') and request.tenant:
-        products = Product.objects.filter(merchant=request.tenant, is_active=True).order_by("-created_at")
+    if hasattr(request, "tenant") and request.tenant:
+        products = Product.objects.filter(
+            merchant=request.tenant, is_active=True
+        ).order_by("-created_at")
     else:
         # 沒有tenant時，檢查session中的登入商家
         merchant_id = request.session.get("merchant_id")
         if merchant_id:
             merchant = get_object_or_404(Merchant, id=merchant_id)
-            products = Product.objects.filter(merchant=merchant, is_active=True).order_by("-created_at")
+            products = Product.objects.filter(
+                merchant=merchant, is_active=True
+            ).order_by("-created_at")
         else:
             # 都沒有就顯示所有商品
             products = Product.objects.filter(is_active=True).order_by("-created_at")
@@ -23,7 +27,6 @@ def index(request):
 
 def detail(request, id):
     product = get_object_or_404(Product, id=id, is_active=True)
-
     if request.method == "POST" and request.POST.get("action") == "delete":
         merchant_id = request.session.get("merchant_id")
         if not merchant_id or product.merchant.id != merchant_id:
@@ -65,11 +68,21 @@ def new(request):
         except Exception as e:
             messages.error(request, f"新增失敗：{str(e)}")
             return render(request, "merchant_marketplace/new.html")
+    if request.method == "POST" and request.POST.get("action") == "delete":
+        merchant_id = request.session.get("merchant_id")
+        if not merchant_id or product.merchant.id != merchant_id:
+            messages.error(request, "無權限刪除此商品")
+            return redirect("merchant_marketplace:index")
+        product.is_active = False
+        product.save()
+        messages.success(request, "商品已刪除")
+        return redirect("merchant_marketplace:index")
+
+    return render(request, "merchant_marketplace/detail.html", {"product": product})
 
 
 def edit(request, id):
     product = get_object_or_404(Product, id=id)
-
     merchant_id = request.session.get("merchant_id")
     if not merchant_id or product.merchant.id != merchant_id:
         messages.error(request, "無權限編輯此商品")
