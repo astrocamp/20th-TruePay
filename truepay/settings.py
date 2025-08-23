@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "customers_account",
     "merchant_marketplace",
     "storages",
+    "linepay"
 ]
 
 MIDDLEWARE = [
