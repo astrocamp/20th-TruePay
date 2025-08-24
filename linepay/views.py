@@ -1,5 +1,5 @@
 from django.shortcuts import render
-import os, uuid, requests, hmac, hashlib, base64, json
+import os, uuid, requests, hmac, hashlib, base64, json, time, logging
 from django.shortcuts import redirect, get_object_or_404
 from django.http import JsonResponse
 from linepay.models import Order
@@ -13,20 +13,26 @@ LINEPAY_API_URL = os.getenv("LINEPAY_API_URL", "https://sandbox-api-pay.line.me"
 LINEPAY_CONFIRM_URL = os.getenv("LINEPAY_CONFIRM_URL")
 LINEPAY_CANCEL_URL = os.getenv("LINEPAY_CANCEL_URL")
 
+logger = logging.getLogger(__name__)
+
 def generate_line_pay_signature(channel_secret, uri, request_body, nonce):
-    """生成 LINE Pay API 所需的 HMAC-SHA256 簽名"""
+    """生成 LINE Pay API 所需的 HMAC-SHA256 簽名
+    authMacText = channelSecret + uri + queryOrBody + nonce
+    """
     auth_mac_text = channel_secret + uri + request_body + nonce
     signature = base64.b64encode(
         hmac.new(
-            channel_secret.encode('utf-8'),
-            auth_mac_text.encode('utf-8'),
-            digestmod=hashlib.sha256
+            channel_secret.encode('utf-8'), 
+            auth_mac_text.encode('utf-8'), 
+            hashlib.sha256
         ).digest()
     ).decode('utf-8')
     return signature
 
 def reserve(request, order_id):
+    print(">>> DEBUG: reserve 函數被呼叫了")
     order = get_object_or_404(Order, id=order_id)
+    print(f">>> DEBUG: 找到訂單 {order.id}, 金額 {order.total_price}")
 
     body = {
         "amount": order.total_price,
@@ -54,8 +60,8 @@ def reserve(request, order_id):
 
     # 生成 nonce 和簽名
     uri = "/v3/payments/request"
-    request_body = json.dumps(body, separators=(',', ':'))
-    nonce = str(uuid.uuid4())
+    request_body = json.dumps(body, separators=(',', ':'), ensure_ascii=True)
+    nonce = str(int(time.time() * 1000))
     signature = generate_line_pay_signature(LINEPAY_CHANNEL_SECRET, uri, request_body, nonce)
     
     headers = {
@@ -65,11 +71,15 @@ def reserve(request, order_id):
         "X-LINE-Authorization-Nonce": nonce,
     }
 
+    print(">>> request_body:", request_body)
+    
     response = requests.post(
         f"{LINEPAY_API_URL}/v3/payments/request",
         headers=headers,
-        json=body
+        data=request_body
     )
+    
+    print(">>> response.request.body:", response.request.body)
     data = response.json()
 
     if data["returnCode"] == "0000":
@@ -93,8 +103,8 @@ def confirm(request):
 
     # 生成 nonce 和簽名
     uri = f"/v3/payments/{transaction_id}/confirm"
-    request_body = json.dumps(body, separators=(',', ':'))
-    nonce = str(uuid.uuid4())
+    request_body = json.dumps(body, separators=(',', ':'), ensure_ascii=True)
+    nonce = str(int(time.time() * 1000))
     signature = generate_line_pay_signature(LINEPAY_CHANNEL_SECRET, uri, request_body, nonce)
     
     headers = {
@@ -107,7 +117,7 @@ def confirm(request):
     r = requests.post(
         f"{LINEPAY_API_URL}/v3/payments/{transaction_id}/confirm",
         headers=headers,
-        json=body
+        data=request_body
     )
     data = r.json()
 
