@@ -34,7 +34,12 @@
         <li><a href="{% url 'pages:home' %}" class="text-[#0056B3] hover:underline">首頁</a></li>
         <li><a href="{% url 'pages:about' %}" class="text-brand-grayDark hover:text-[#0056B3]">關於</a></li>
         <li><a href="{% url 'pages:contact' %}" class="text-brand-grayDark hover:text-[#0056B3]">聯絡</a></li>
-        <li><a href="{% url 'pages:selectrole' %}" class="text-brand-grayDark hover:text-[#0056B3]">登入/註冊</a></li>
+        {% if request.session.customer_id %}
+          <li><a href="{% url 'customers_account:purchase_history' %}" class="text-brand-grayDark hover:text-[#0056B3]">購買記錄</a></li>
+          <li><a href="{% url 'customers_account:logout' %}" class="text-brand-grayDark hover:text-[#0056B3]">登出</a></li>
+        {% else %}
+          <li><a href="{% url 'pages:selectrole' %}" class="text-brand-grayDark hover:text-[#0056B3]">登入/註冊</a></li>
+        {% endif %}
       </ul>
     </div>
 
@@ -46,8 +51,12 @@
         <li><a href="{% url 'pages:home' %}" class="block text-[#0056B3] hover:underline">首頁</a></li>
         <li><a href="{% url 'pages:about' %}" class="block text-brand-grayDark hover:text-[#0056B3]">關於</a></li>
         <li><a href="{% url 'pages:contact' %}" class="block text-brand-grayDark hover:text-[#0056B3]">聯絡</a></li>
-        <li><a href="{% url 'pages:selectrole' %}" class="block text-brand-grayDark hover:text-[#0056B3]">登入/註冊</a></li>
-        
+        {% if request.session.customer_id %}
+          <li><a href="{% url 'customers_account:purchase_history' %}" class="block text-brand-grayDark hover:text-[#0056B3]">購買記錄</a></li>
+          <li><a href="{% url 'customers_account:logout' %}" class="block text-brand-grayDark hover:text-[#0056B3]">登出</a></li>
+        {% else %}
+          <li><a href="{% url 'pages:selectrole' %}" class="block text-brand-grayDark hover:text-[#0056B3]">登入/註冊</a></li>
+        {% endif %}
       </ul>
     </div>
   </nav>

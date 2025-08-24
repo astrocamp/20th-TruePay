@@ -58,7 +58,6 @@ class NewebPayUtils:
         try:
             # 檢查是否為有效十六進制
             if not all(c in "0123456789abcdefABCDEF" for c in encrypted_data):
-                print(f"錯誤：不是有效的十六進制字串")
                 return None
 
             # 十六進制字串轉換為 bytes 並解密
@@ -76,7 +75,6 @@ class NewebPayUtils:
             # 方法1：標準 PKCS7 解密
             try:
                 decrypted_data = unpad(decrypted, AES.block_size).decode("utf-8")
-                print(f"標準 PKCS7 解密成功")
             except ValueError:
                 # 方法2：智能 JSON 邊界檢測（針對藍新金流 return 回調）
                 try:
@@ -88,7 +86,6 @@ class NewebPayUtils:
                         import json
                         json.loads(json_candidate)
                         decrypted_data = json_candidate
-                        print(f"JSON 邊界解密成功")
                 except (UnicodeDecodeError, json.JSONDecodeError, ValueError):
                     pass
                 
@@ -99,13 +96,11 @@ class NewebPayUtils:
                             try:
                                 truncated = decrypted[:target_length]
                                 decrypted_data = unpad(truncated, AES.block_size).decode("utf-8")
-                                print(f"截斷解密成功 ({target_length} bytes)")
                                 break
                             except (ValueError, UnicodeDecodeError):
                                 continue
             
             if not decrypted_data:
-                print("解密失敗：所有方法都無效")
                 return None
 
             # 解析為 JSON 或 query string
@@ -117,8 +112,7 @@ class NewebPayUtils:
                 # 如果不是 JSON，嘗試解析為 query string
                 return dict(parse_qs(decrypted_data, keep_blank_values=True))
 
-        except Exception as e:
-            print(f"解密錯誤: {e}")
+        except Exception:
             return None
 
     def generate_trade_info(self, payment_data):

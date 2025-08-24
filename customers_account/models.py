@@ -65,3 +65,55 @@ class Customer(models.Model):
         """重設登入失敗次數"""
         self.login_failed_count = 0
         self.save(update_fields=['login_failed_count'])
+
+
+class PurchaseRecord(models.Model):
+    """消費者購買記錄"""
+    
+    payment = models.ForeignKey(
+        'newebpay.Payment', 
+        on_delete=models.CASCADE,
+        to_field='merchant_order_no',
+        verbose_name="訂單編號"
+    )
+    customer = models.ForeignKey(
+        Customer, 
+        on_delete=models.CASCADE, 
+        verbose_name="消費者",
+        null=True,
+        blank=True
+    )
+    product = models.ForeignKey(
+        'merchant_marketplace.Product', 
+        on_delete=models.CASCADE, 
+        verbose_name="商品"
+    )
+    quantity = models.PositiveIntegerField(verbose_name="數量")
+    unit_price = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        verbose_name="單價"
+    )
+    total_price = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        verbose_name="總價"
+    )
+    
+    class Meta:
+        verbose_name = "購買記錄"
+        verbose_name_plural = "購買記錄"
+        ordering = ['-payment__created_at']
+    
+    def __str__(self):
+        return f"{self.product.name} x{self.quantity}"
+    
+    @property
+    def purchase_time(self):
+        """購買時間"""
+        return self.payment.created_at
+        
+    @property
+    def merchant_name(self):
+        """商家名稱"""
+        return self.product.merchant.ShopName

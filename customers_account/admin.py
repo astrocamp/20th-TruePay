@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Customer
+from .models import Customer, PurchaseRecord
 
 
 @admin.register(Customer)
@@ -25,3 +25,11 @@ class CustomerAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         # 可以根據需求限制刪除權限
         return request.user.is_superuser
+
+
+@admin.register(PurchaseRecord)
+class PurchaseRecordAdmin(admin.ModelAdmin):
+    list_display = ['payment', 'product', 'quantity', 'unit_price', 'total_price', 'purchase_time']
+    list_filter = ['payment__status', 'payment__created_at']
+    search_fields = ['payment__merchant_order_no', 'product__name']
+    readonly_fields = ['purchase_time', 'merchant_name']
