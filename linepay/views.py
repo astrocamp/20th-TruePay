@@ -1,5 +1,5 @@
 from django.shortcuts import render
-import os, uuid, requests
+import os, uuid, requests, hmac, hashlib, base64, json
 from django.shortcuts import redirect, get_object_or_404
 from django.http import JsonResponse
 from linepay.models import Order
@@ -13,13 +13,20 @@ LINEPAY_API_URL = os.getenv("LINEPAY_API_URL", "https://sandbox-api-pay.line.me"
 LINEPAY_CONFIRM_URL = os.getenv("LINEPAY_CONFIRM_URL")
 LINEPAY_CANCEL_URL = os.getenv("LINEPAY_CANCEL_URL")
 
+def generate_line_pay_signature(channel_secret, uri, request_body, nonce):
+    """生成 LINE Pay API 所需的 HMAC-SHA256 簽名"""
+    auth_mac_text = channel_secret + uri + request_body + nonce
+    signature = base64.b64encode(
+        hmac.new(
+            channel_secret.encode('utf-8'),
+            auth_mac_text.encode('utf-8'),
+            digestmod=hashlib.sha256
+        ).digest()
+    ).decode('utf-8')
+    return signature
+
 def reserve(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    headers = {
-        "Content-Type": "application/json",
-        "X-LINE-ChannelId": LINEPAY_CHANNEL_ID,
-        "X-LINE-ChannelSecret": LINEPAY_CHANNEL_SECRET,
-    }
 
     body = {
         "amount": order.total_price,
@@ -45,6 +52,19 @@ def reserve(request, order_id):
         },
     }
 
+    # 生成 nonce 和簽名
+    uri = "/v3/payments/request"
+    request_body = json.dumps(body, separators=(',', ':'))
+    nonce = str(uuid.uuid4())
+    signature = generate_line_pay_signature(LINEPAY_CHANNEL_SECRET, uri, request_body, nonce)
+    
+    headers = {
+        "Content-Type": "application/json",
+        "X-LINE-ChannelId": LINEPAY_CHANNEL_ID,
+        "X-LINE-Authorization": signature,
+        "X-LINE-Authorization-Nonce": nonce,
+    }
+
     response = requests.post(
         f"{LINEPAY_API_URL}/v3/payments/request",
         headers=headers,
@@ -65,14 +85,23 @@ def confirm(request):
         return HttpResponseBadRequest("缺少參數")
 
     order = get_object_or_404(Order, id=order_id)
-    headers = {
-        "Content-Type": "application/json",
-        "X-LINE-ChannelId": LINEPAY_CHANNEL_ID,
-        "X-LINE-ChannelSecret": LINEPAY_CHANNEL_SECRET,
-    }
+    
     body = {
         "amount": order.total_price,
         "currency": "TWD",
+    }
+
+    # 生成 nonce 和簽名
+    uri = f"/v3/payments/{transaction_id}/confirm"
+    request_body = json.dumps(body, separators=(',', ':'))
+    nonce = str(uuid.uuid4())
+    signature = generate_line_pay_signature(LINEPAY_CHANNEL_SECRET, uri, request_body, nonce)
+    
+    headers = {
+        "Content-Type": "application/json",
+        "X-LINE-ChannelId": LINEPAY_CHANNEL_ID,
+        "X-LINE-Authorization": signature,
+        "X-LINE-Authorization-Nonce": nonce,
     }
 
     r = requests.post(
