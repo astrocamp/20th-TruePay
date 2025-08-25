@@ -17,4 +17,5 @@ urlpatterns = [
     # 相容性重導向
     path("accounts/login/", accounts_login_redirect),
     path("orders/", include("orders.urls")),
+    path("linepay/", include("linepay.urls", namespace="linepay"))
 ]

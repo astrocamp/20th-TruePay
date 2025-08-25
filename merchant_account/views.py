@@ -4,6 +4,12 @@ from django.core.paginator import Paginator
 from .forms import RegisterForm, LoginForm, domain_settings_form
 from .models import Merchant
 from orders.models import OrderItem
+from django.views.decorators.csrf import csrf_exempt
+from merchant_marketplace.models import Product
+
+
+
+
 
 
 # Create your views here.

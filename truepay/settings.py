@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "storages",
     "newebpay",
     "orders",
+    "linepay"
 ]
 
 MIDDLEWARE = [
