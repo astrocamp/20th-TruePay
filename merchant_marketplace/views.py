@@ -22,6 +22,7 @@ def index(request):
             # 都沒有就顯示所有商品
             products = Product.objects.filter(is_active=True).order_by("-created_at")
 
+    products = Product.objects.filter(is_active=True).order_by("-created_at")
     return render(request, "merchant_marketplace/index.html", {"products": products})
 
 
@@ -119,4 +120,6 @@ def edit(request, id):
 def payment_page(request, id):
     """公開的商品收款頁面，任何人都可以查看"""
     product = get_object_or_404(Product, id=id, is_active=True)
-    return render(request, "merchant_marketplace/payment_page.html", {"product": product})
+    return render(
+        request, "merchant_marketplace/payment_page.html", {"product": product}
+    )
