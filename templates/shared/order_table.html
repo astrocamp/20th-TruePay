@@ -1,0 +1,127 @@
+{% load static %}
+
+<!-- 公版訂單記錄表格 -->
+<div class="overflow-x-auto">
+    <table class="min-w-full bg-white border border-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    訂單編號
+                </th>
+                {% if role == 'merchant' %}
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    交易序號
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    消費者
+                </th>
+                {% endif %}
+                {% if role == 'customer' %}
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    商家
+                </th>
+                {% endif %}
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    商品名稱
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    數量
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    總金額
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    訂單狀態
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    付款方式
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    建立時間
+                </th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for item in order_items %}
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {{ item.payment.merchant_order_no }}
+                </td>
+                {% if role == 'merchant' %}
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ item.payment.trade_no|default:"-" }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ item.customer.name }}
+                </td>
+                {% endif %}
+                {% if role == 'customer' %}
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ item.merchant_name }}
+                </td>
+                {% endif %}
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ item.product.name }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ item.quantity }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    NT$ {{ item.total_amount|floatformat:0 }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                        {% if item.payment.status == 'paid' %}bg-green-100 text-green-800
+                        {% elif item.payment.status == 'pending' %}bg-yellow-100 text-yellow-800
+                        {% elif item.payment.status == 'failed' %}bg-red-100 text-red-800
+                        {% elif item.payment.status == 'refunded' %}bg-gray-100 text-gray-800
+                        {% endif %}">
+                        {{ item.payment.get_status_display }}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ item.get_payment_method_display }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ item.purchase_time|date:"Y/m/d H:i" }}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="{% if role == 'merchant' %}10{% else %}8{% endif %}" class="px-6 py-8 text-center text-gray-500">
+                    {% if role == 'merchant' %}
+                        目前沒有交易記錄
+                    {% else %}
+                        目前沒有購買記錄
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- 分頁 -->
+{% if page_obj.has_other_pages %}
+    <div class="flex justify-center mt-8">
+        <nav class="flex space-x-2">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" 
+                   class="px-3 py-2 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    上一頁
+                </a>
+            {% endif %}
+            
+            <span class="px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-md">
+                第 {{ page_obj.number }} 頁，共 {{ page_obj.paginator.num_pages }} 頁
+            </span>
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" 
+                   class="px-3 py-2 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    下一頁
+                </a>
+            {% endif %}
+        </nav>
+    </div>
+{% endif %}

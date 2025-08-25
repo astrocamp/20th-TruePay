@@ -1,7 +1,7 @@
-{% extends "customers_layout/dashboard_base.html" %}
+{% extends "merchant_layout/dashboard_base.html" %}
 {% block content %}
 <div class="max-w-7xl mx-auto mt-8 p-6 bg-brand-white rounded-lg shadow-md">
-    <h1 class="text-2xl font-bold text-center text-brand-black mb-6">購買記錄</h1>
+    <h1 class="text-2xl font-bold text-center text-brand-black mb-6">交易記錄</h1>
     
     {% if messages %}
         {% for message in messages %}
@@ -12,13 +12,13 @@
     {% endif %}
     
     {% if order_items %}
-        {% include 'shared/order_table.html' with role='customer' %}
+        {% include 'shared/order_table.html' with role='merchant' %}
         
     {% else %}
         <div class="text-center py-8">
-            <p class="text-gray-500 text-lg">目前沒有購買記錄</p>
-            <a href="{% url 'pages:home' %}" class="mt-4 inline-block bg-[#0056B3] text-white px-6 py-2 rounded-lg hover:bg-[#00408A] transition duration-200">
-                回到首頁購物
+            <p class="text-gray-500 text-lg">目前沒有交易記錄</p>
+            <a href="{% url 'merchant_marketplace:index' %}" class="mt-4 inline-block bg-[#0056B3] text-white px-6 py-2 rounded-lg hover:bg-[#00408A] transition duration-200">
+                管理商品
             </a>
         </div>
     {% endif %}

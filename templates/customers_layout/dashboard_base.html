@@ -32,7 +32,7 @@
         <nav class="flex-1 overflow-y-auto py-4">
           <ul class="px-2 space-y-1 text-sm">
             <li>
-              <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-[#0056B3] font-medium">
+              <a href="{% url 'customers_account:dashboard' %}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-[#0056B3] font-medium">
                 <!-- home icon -->
                 <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
                   <path d="M3 10.5l9-7 9 7"/>
@@ -63,7 +63,7 @@
         </nav>
         <!-- 登出 -->
         <div class="p-4 border-t border-[#D2D2D7]">
-          <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-red-600">
+          <a href="{% url 'customers_account:logout' %}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-red-600">
             <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
               <path d="M10 17l5-5-5-5"/><path d="M15 12H3"/>
             </svg>
@@ -74,8 +74,15 @@
     </aside>
 
     <!-- 右側主要區域 -->
+    <main class="flex flex-col min-h-screen">
+      <!-- 主內容 -->
+      <div class="flex-1 p-6">
+        {% block content %}
+        <!-- 子頁面會注入這裡 -->
+        {% endblock %}
+      </div>
 
-    <!-- Footer -->
+      <!-- Footer -->
       <footer class="mt-auto border-t border-[#D2D2D7] bg-white">
         <div class="max-w-6xl mx-auto px-4 md:px-6 py-6 text-xs text-gray-500 flex items-center justify-between">
           <p>© 2025 TrustPay</p>

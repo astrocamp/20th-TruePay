@@ -10,7 +10,8 @@ from django.urls import reverse
 from .models import Payment
 from .utils import NewebPayUtils
 from customers_account.decorators import customer_login_required
-from customers_account.models import Customer, PurchaseRecord
+from customers_account.models import Customer
+from orders.models import OrderItem
 from merchant_marketplace.models import Product
 
 
@@ -161,7 +162,7 @@ def payment_return(request):
                 
                 # 如果付款成功且還沒有建立購買記錄，現在建立
                 if payment.status == "paid":
-                    existing_record = PurchaseRecord.objects.filter(payment=payment).exists()
+                    existing_record = OrderItem.objects.filter(payment=payment).exists()
                     
                     if not existing_record:
                         try:
@@ -179,14 +180,14 @@ def payment_return(request):
                             if product_id:
                                 product = Product.objects.get(id=int(product_id))
                                 
-                                # 建立購買記錄
-                                PurchaseRecord.objects.create(
+                                # 建立訂單項目
+                                OrderItem.objects.create(
                                     payment=payment,
                                     customer=customer,
                                     product=product,
                                     quantity=1,  # 固定為1個
                                     unit_price=payment.amt,
-                                    total_price=payment.amt
+                                    payment_provider='newebpay'  # 藍新金流
                                 )
                             
                         except (Customer.DoesNotExist, Product.DoesNotExist, Exception):

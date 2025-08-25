@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.core.paginator import Paginator
 from .forms import RegisterForm, LoginForm, domain_settings_form
 from .models import Merchant
+from orders.models import OrderItem
 
 
 # Create your views here.
@@ -85,3 +87,35 @@ def domain_settings(request):
     else:
         form = domain_settings_form(instance=merchant)
     return render(request, "merchant_account/domain_settings.html", {"form": form})
+
+
+def transaction_history(request):
+    """廠商交易記錄頁面"""
+    # 檢查商家是否已登入
+    merchant_id = request.session.get("merchant_id")
+    if not merchant_id:
+        messages.error(request, "請先登入")
+        return redirect("merchant_account:login")
+    
+    merchant = get_object_or_404(Merchant, id=merchant_id)
+    
+    # 查詢該商家的所有交易記錄
+    order_items = OrderItem.objects.select_related(
+        'payment', 'customer', 'product'
+    ).filter(
+        product__merchant=merchant
+    ).order_by('-payment__created_at')
+    
+    # 分頁處理
+    paginator = Paginator(order_items, 10)  # 每頁顯示10筆記錄
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'merchant': merchant,
+        'page_obj': page_obj,
+        'order_items': page_obj,
+        'role': 'merchant'  # 指定角色給模板使用
+    }
+    
+    return render(request, 'merchant_account/transaction_history.html', context)
