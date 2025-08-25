@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.conf import settings
 from django.utils import timezone
+
 from django.urls import reverse
 
 from .models import Payment
@@ -14,7 +15,9 @@ from merchant_marketplace.models import Product
 
 
 
+
 def create_payment(request):
+
     """建立付款訂單視圖 - 需要登入"""
     if request.method == "POST":
         # 如果未登入，將 POST 資料存到 session 後重導向到登入
@@ -28,6 +31,7 @@ def create_payment(request):
             return redirect(f"{login_url}?next={next_url}")
         
         # 已登入，處理付款
+
         amt_str = request.POST.get("amt", "0")
         try:
             # 將字串轉為浮點數再轉為整數（藍新金流需要整數金額）
@@ -36,6 +40,7 @@ def create_payment(request):
             return JsonResponse({"error": "金額格式錯誤"}, status=400)
             
         item_desc = request.POST.get("item_desc", "測試商品")
+
         
         # 使用登入客戶的資訊
         customer_id = request.session.get('customer_id')
@@ -43,10 +48,12 @@ def create_payment(request):
         email = customer.email
         customer_name = customer.name
 
+
         if amt <= 0:
             return JsonResponse({"error": "金額必須大於 0"}, status=400)
 
-        # 建立付款記錄（純金流資訊）
+
+        # 建立付款記錄
         payment = Payment.objects.create(
             amt=amt,
             item_desc=item_desc,
@@ -105,6 +112,7 @@ def payment_status(request, payment_id):
     payment = get_object_or_404(Payment, id=payment_id)
     
     # 確保用戶只能查看自己的付款記錄
+
 
     context = {
         "payment": payment,
@@ -246,6 +254,7 @@ def payment_notify(request):
             if not is_valid:
                 return HttpResponse("validation failed", status=400)
 
+
             # 更新付款記錄
             if isinstance(result, dict) and "Result" in result:
                 # JSON 格式回傳
@@ -300,6 +309,7 @@ def payment_notify(request):
                     pass
                 except Exception:
                     pass
+
 
             # 回傳 SUCCESS 給藍新金流
             return HttpResponse("1|OK")

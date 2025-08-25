@@ -39,7 +39,10 @@
                         <form method="post" action="{% url 'newebpay:create_payment' %}">
                             {% csrf_token %}
                             <input type="hidden" name="amt" value="{{ product.price }}">
+
                             <input type="hidden" name="item_desc" value="{{ product.name }}|ProductID:{{ product.id }}">
+
+                           
                             <button type="submit" class="w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium">
                                 藍新金流 NT$ {{ product.price }}
                             </button>
