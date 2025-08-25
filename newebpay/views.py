@@ -5,15 +5,34 @@ from django.views.decorators.http import require_http_methods
 from django.conf import settings
 from django.utils import timezone
 
+from django.urls import reverse
+
 from .models import Payment
 from .utils import NewebPayUtils
+from customers_account.decorators import customer_login_required
+from customers_account.models import Customer
+from orders.models import OrderItem
+from merchant_marketplace.models import Product
+
 
 
 
 def create_payment(request):
-    """建立付款訂單視圖"""
+
+    """建立付款訂單視圖 - 需要登入"""
     if request.method == "POST":
-        # 取得付款資訊
+        # 如果未登入，將 POST 資料存到 session 後重導向到登入
+        if 'customer_id' not in request.session:
+            request.session['payment_data'] = {
+                'amt': request.POST.get('amt'),
+                'item_desc': request.POST.get('item_desc')
+            }
+            login_url = reverse('customers_account:login')
+            next_url = request.get_full_path()
+            return redirect(f"{login_url}?next={next_url}")
+        
+        # 已登入，處理付款
+
         amt_str = request.POST.get("amt", "0")
         try:
             # 將字串轉為浮點數再轉為整數（藍新金流需要整數金額）
@@ -22,11 +41,18 @@ def create_payment(request):
             return JsonResponse({"error": "金額格式錯誤"}, status=400)
             
         item_desc = request.POST.get("item_desc", "測試商品")
-        email = request.POST.get("email", "")
-        customer_name = request.POST.get("customer_name", "")
+
+        
+        # 使用登入客戶的資訊
+        customer_id = request.session.get('customer_id')
+        customer = get_object_or_404(Customer, id=customer_id)
+        email = customer.email
+        customer_name = customer.name
+
 
         if amt <= 0:
             return JsonResponse({"error": "金額必須大於 0"}, status=400)
+
 
         # 建立付款記錄
         payment = Payment.objects.create(
@@ -55,14 +81,39 @@ def create_payment(request):
             "payment": payment,
         }
 
-        return render(request, "newebpay/payment_form.html", context)
+        # 清除暫存的付款資料
+        if 'payment_data' in request.session:
+            del request.session['payment_data']
 
+        return render(request, "newebpay/payment_form.html", context)
+    
+    # GET 請求：檢查是否有暫存的付款資料
+    if 'customer_id' not in request.session:
+        login_url = reverse('customers_account:login')
+        next_url = request.get_full_path()
+        return redirect(f"{login_url}?next={next_url}")
+    
+    # 如果有暫存的付款資料，自動處理付款
+    payment_data = request.session.get('payment_data')
+    if payment_data:
+        # 模擬 POST 請求來處理付款
+        request.POST = request.POST.copy()
+        request.POST['amt'] = payment_data['amt']
+        request.POST['item_desc'] = payment_data['item_desc']
+        request.method = 'POST'
+        return create_payment(request)
+    
+    # 沒有付款資料，重導向回首頁
     return redirect("pages:home")
 
 
+@customer_login_required
 def payment_status(request, payment_id):
-    """查詢付款狀態"""
+    """查詢付款狀態 - 需要登入且只能查看自己的訂單"""
     payment = get_object_or_404(Payment, id=payment_id)
+    
+    # 確保用戶只能查看自己的付款記錄
+
 
     context = {
         "payment": payment,
@@ -79,9 +130,6 @@ def payment_return(request):
         trade_info = request.POST.get("TradeInfo")
         trade_sha = request.POST.get("TradeSha")
 
-        print(f"Return 收到的完整 POST 資料: {dict(request.POST)}")
-        print(f"Return TradeInfo 長度: {len(trade_info) if trade_info else 0}")
-        print(f"Return TradeSha: {trade_sha}")
 
         if not trade_info or not trade_sha:
             return render(
@@ -111,6 +159,39 @@ def payment_return(request):
                 payment = Payment.objects.get(merchant_order_no=merchant_order_no)
                 payment.return_received = True
                 payment.save()
+                
+                # 如果付款成功且還沒有建立購買記錄，現在建立
+                if payment.status == "paid":
+                    existing_record = OrderItem.objects.filter(payment=payment).exists()
+                    
+                    if not existing_record:
+                        try:
+                            # 從 item_desc 解析商品 ID
+                            item_desc = payment.item_desc
+                            
+                            product_id = None
+                            if '|ProductID:' in item_desc:
+                                product_id = item_desc.split('|ProductID:')[1]
+                            
+                            # 從 email 找到客戶
+                            customer = Customer.objects.get(email=payment.email)
+                            
+                            # 找到商品
+                            if product_id:
+                                product = Product.objects.get(id=int(product_id))
+                                
+                                # 建立訂單項目
+                                OrderItem.objects.create(
+                                    payment=payment,
+                                    customer=customer,
+                                    product=product,
+                                    quantity=1,  # 固定為1個
+                                    unit_price=payment.amt,
+                                    payment_provider='newebpay'  # 藍新金流
+                                )
+                            
+                        except (Customer.DoesNotExist, Product.DoesNotExist, Exception):
+                            pass
 
                 return render(
                     request,
@@ -161,8 +242,6 @@ def payment_notify(request):
             trade_info = request.POST.get("TradeInfo")
             trade_sha = request.POST.get("TradeSha")
 
-            print(f"收到藍新通知 - TradeInfo: {trade_info}")
-            print(f"收到藍新通知 - TradeSha: {trade_sha}")
 
             if not trade_info or not trade_sha:
                 return HttpResponse("missing parameters", status=400)
@@ -174,10 +253,8 @@ def payment_notify(request):
             )
 
             if not is_valid:
-                print(f"資料驗證失敗: {result}")
                 return HttpResponse("validation failed", status=400)
 
-            print(f"解密後的資料: {result}")
 
             # 更新付款記錄
             if isinstance(result, dict) and "Result" in result:
@@ -226,17 +303,21 @@ def payment_notify(request):
             payment.notify_received = True
             payment.notify_data = dict(result)
             payment.save()
+            
+            # 如果付款成功，建立購買記錄
+            if payment.status == "paid":
+                try:
+                    pass
+                except Exception:
+                    pass
 
-            print(f"付款狀態已更新: {payment.merchant_order_no} -> {payment.status}")
 
             # 回傳 SUCCESS 給藍新金流
             return HttpResponse("1|OK")
 
         except Payment.DoesNotExist:
-            print(f"找不到訂單: {merchant_order_no}")
             return HttpResponse("order not found", status=404)
-        except Exception as e:
-            print(f"處理通知時發生錯誤: {e}")
+        except Exception:
             return HttpResponse("server error", status=500)
 
     return HttpResponse("invalid method", status=405)

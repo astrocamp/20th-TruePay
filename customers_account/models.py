@@ -65,3 +65,5 @@ class Customer(models.Model):
         """重設登入失敗次數"""
         self.login_failed_count = 0
         self.save(update_fields=['login_failed_count'])
+
+
