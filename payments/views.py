@@ -31,8 +31,6 @@ def _extract_payment_parameters(request, payment_data=None):
         amt = request.POST.get('amt')
         item_desc = request.POST.get('item_desc')
     
-    # 調試日誌
-    logger.info(f"Parameters: provider={provider}, product_id={product_id}, amt={amt}")
     
     return provider, product_id, amt, item_desc
 
@@ -176,7 +174,3 @@ def payment_status(request, order_id):
         "order": order,
     }
     return render(request, "payments/payment_status.html", context)
-
-
-
-

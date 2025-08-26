@@ -63,6 +63,7 @@ def process_linepay(order, request):
         if result.get('returnCode') == '0000':
             # 儲存交易資訊
             order.provider_transaction_id = result['info']['transactionId']
+            order.linepay_payment_url = result['info']['paymentUrl']['web']
             order.save()
             
             # 重導向到 LINE Pay
@@ -82,7 +83,6 @@ def linepay_confirm(request):
         transaction_id = request.GET.get('transactionId')
         order_id = request.GET.get('orderId')
         
-        logger.info(f"LINE Pay 回調收到: transaction_id={transaction_id}, order_id={order_id}")
         
         if not transaction_id or not order_id:
             return render(request, 'payments/linepay/payment_result.html', {
@@ -116,7 +116,6 @@ def linepay_confirm(request):
         response = requests.post(f"{api_url}{uri}", headers=headers, json=confirm_data)
         result = response.json()
         
-        logger.info(f"LINE Pay 確認回應: {result}")
         
         if result.get('returnCode') == '0000':
             order.status = 'paid'
@@ -124,7 +123,6 @@ def linepay_confirm(request):
             order.paid_at = timezone.now()
             order.save()
             
-            logger.info(f"訂單 {order_id} 狀態已更新為 paid")
             
             return render(request, 'payments/linepay/payment_success.html', {
                 'success': True,
