@@ -5,7 +5,7 @@ from merchant_account.models import Merchant
 class Product(models.Model):
     name = models.CharField(max_length=200, verbose_name="商品名稱")
     description = models.TextField(verbose_name="商品介紹")
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="商品價格")
+    price = models.PositiveIntegerField(verbose_name="商品價格")
     image = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name="商品圖片")
     phone_number = models.CharField(max_length=20, verbose_name="電話號碼")
     merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE, verbose_name="商家")

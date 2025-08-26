@@ -1,0 +1,118 @@
+{% extends "layouts/default.html" %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6">付款狀態查詢</h1>
+            
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <span class="text-gray-600 font-medium">訂單編號：</span>
+                        <span class="text-gray-800">{{ payment.provider_order_id }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600 font-medium">付款方式：</span>
+                        <span class="text-gray-800">{{ payment.get_payment_method_display }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600 font-medium">付款狀態：</span>
+                        <span class="
+                            {% if payment.status == 'paid' %}text-green-600
+                            {% elif payment.status == 'pending' %}text-yellow-600
+                            {% elif payment.status == 'failed' %}text-red-600
+                            {% else %}text-gray-600{% endif %}
+                            font-medium
+                        ">
+                            {{ payment.get_status_display }}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600 font-medium">付款金額：</span>
+                        <span class="text-gray-800 font-medium">NT$ {{ payment.amount }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600 font-medium">建立時間：</span>
+                        <span class="text-gray-800">{{ payment.created_at|date:"Y-m-d H:i:s" }}</span>
+                    </div>
+                    {% if payment.paid_at %}
+                    <div>
+                        <span class="text-gray-600 font-medium">付款時間：</span>
+                        <span class="text-gray-800">{{ payment.paid_at|date:"Y-m-d H:i:s" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <h3 class="font-medium text-blue-800 mb-2">商品資訊</h3>
+                <div class="text-sm text-blue-700 space-y-1">
+                    <div class="flex justify-between">
+                        <span>商品名稱：</span>
+                        <span>{{ payment.product.name }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>商家：</span>
+                        <span>{{ payment.product.merchant.ShopName }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>商品描述：</span>
+                        <span>{{ payment.item_description|truncatechars:50 }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            {% if payment.provider == 'newebpay' %}
+                <!-- 藍新金流特定資訊 -->
+                {% if payment.newebpay_trade_no or payment.newebpay_payment_type or payment.newebpay_card_info %}
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <h3 class="font-medium text-blue-800 mb-2">藍新金流詳情</h3>
+                    <div class="text-sm text-blue-700 space-y-1">
+                        {% if payment.newebpay_trade_no %}
+                        <div class="flex justify-between">
+                            <span>交易序號：</span>
+                            <span>{{ payment.newebpay_trade_no }}</span>
+                        </div>
+                        {% endif %}
+                        {% if payment.newebpay_payment_type %}
+                        <div class="flex justify-between">
+                            <span>付款類型：</span>
+                            <span>{{ payment.newebpay_payment_type }}</span>
+                        </div>
+                        {% endif %}
+                        {% if payment.newebpay_card_info %}
+                        <div class="flex justify-between">
+                            <span>信用卡號：</span>
+                            <span>{{ payment.newebpay_card_info }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            {% elif payment.provider == 'linepay' %}
+                <!-- LINE Pay 特定資訊 -->
+                {% if payment.provider_transaction_id %}
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                    <h3 class="font-medium text-green-800 mb-2">LINE Pay 詳情</h3>
+                    <div class="text-sm text-green-700 space-y-1">
+                        <div class="flex justify-between">
+                            <span>LINE Pay 交易ID：</span>
+                            <span>{{ payment.provider_transaction_id }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endif %}
+            
+            <div class="flex space-x-4">
+                <a href="{% url 'pages:home' %}" class="flex-1 bg-gray-500 text-white py-3 px-6 rounded-lg hover:bg-gray-600 transition duration-200 font-medium text-center">
+                    返回首頁
+                </a>
+                <a href="{% url 'customers_account:purchase_history' %}" class="flex-1 bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium text-center">
+                    購買記錄
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
