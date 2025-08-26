@@ -60,7 +60,7 @@
               </a>
             </li>
             <li>
-              <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+              <a href="{% url 'merchant_account:transaction_history' %}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
                 <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
                   <path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>
                 </svg>
@@ -78,7 +78,7 @@
             </li>
             <li>
               {% if current_merchant.subdomain %}
-                <a href="{% url 'shop_overview' current_merchant.subdomain %}" 
+                <a href="{% url 'merchant_account:shop_overview' current_merchant.subdomain %}" 
                 target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl 
               hover:bg-[#F5F5F7]">
               {% else %}
@@ -96,7 +96,7 @@
                 </a>
             </li>
             <li>
-              <a href="{%url 'merchant_account:qrscan'%}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+              <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
                   <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
                     <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
                     <path d="m21 7V5a2 2 0 0 0-2-2h-2"/>

@@ -3,14 +3,13 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
-from django.utils import timezone
-import json
 
 from .forms import RegisterForm, LoginForm, domain_settings_form
 from .models import Merchant
+from django.views.decorators.csrf import csrf_exempt
 from merchant_marketplace.models import Product
-from .services.ticket_service import TicketService
-from .services.exceptions import TicketError
+from payments.models import Order
+from django.core.paginator import Paginator
 
 
 # Create your views here.
@@ -111,90 +110,36 @@ def shop_overview(request, subdomain):
         return redirect("pages:home")
 
 
-def merchant_required(view_func):
-    """確保商家已登入的裝飾器"""
-    def wrapper(request, *args, **kwargs):
-        if not request.session.get('merchant_id'):
-            return JsonResponse({'success': False, 'message': '請先登入'}, status=401)
-        return view_func(request, *args, **kwargs)
-    return wrapper
-
-def qrscan(request):
-    """QR掃描頁面"""
-    merchant_id = request.session.get('merchant_id')
+def transaction_history(request):
+    """廠商交易記錄頁面"""
+    # 檢查商家是否已登入
+    merchant_id = request.session.get("merchant_id")
     if not merchant_id:
         messages.error(request, "請先登入")
         return redirect("merchant_account:login")
-    
+
     merchant = get_object_or_404(Merchant, id=merchant_id)
-    return render(request, "merchant_account/qrscan.html", {'merchant': merchant})
 
-@csrf_exempt
-@merchant_required
-@require_http_methods(["POST"])
-def validate_ticket(request):
-    """驗證票券API - 返回HTML片段"""
-    try:
-        # 取得請求數據
-        qr_data = _get_qr_data_from_request(request)
-        merchant_id = request.session.get('merchant_id')
-        
-        # Debug 輸出
-        print(f"Debug: qr_data={qr_data}, merchant_id={merchant_id}")
-        
-        # 呼叫服務層處理業務邏輯
-        result = TicketService.validate_qr_code(qr_data, merchant_id)
-        
-        print(f"Debug: Service result={result}")
-        
-        # 返回成功模板
-        return render(request, 'merchant_account/partials/ticket_success.html', result)
-        
-    except TicketError as e:
-        print(f"Debug: TicketError={str(e)}")
-        return _render_error(request, str(e))
-    except Exception as e:
-        print(f"Debug: Exception={str(e)}")
-        import traceback
-        print(traceback.format_exc())
-        return _render_error(request, f'系統錯誤: {str(e)}')
+    # 查詢該商家的所有交易記錄（使用統一的 Order 模型）
+    orders = (
+        Order.objects.select_related("customer", "product")
+        .filter(product__merchant=merchant)
+        .order_by("-created_at")
+    )
 
-@csrf_exempt
-@merchant_required
-@require_http_methods(["POST"])
-def use_ticket(request):
-    """使用票券API - 返回HTML片段"""
-    try:
-        ticket_code = request.POST.get('ticket_code')
-        merchant_id = request.session.get('merchant_id')
-        
-        # 呼叫服務層處理業務邏輯
-        result = TicketService.use_ticket(ticket_code, merchant_id)
-        
-        # 返回使用成功模板
-        return render(request, 'merchant_account/partials/ticket_used.html', result)
-        
-    except TicketError as e:
-        return _render_error(request, str(e))
-    except Exception as e:
-        return _render_error(request, '使用失敗，系統錯誤')
+    # 為了向後兼容，我們仍然使用 order_items 這個變數名
+    order_items = orders
 
-@csrf_exempt
-def restart_scan(request):
-    """重新開始掃描 - 返回初始HTML"""
-    return render(request, 'merchant_account/partials/scan_ready.html')
+    # 分頁處理
+    paginator = Paginator(order_items, 10)  # 每頁顯示10筆記錄
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
-# 輔助函數
-def _get_qr_data_from_request(request):
-    """從請求中取得QR數據"""
-    if request.content_type == 'application/json':
-        data = json.loads(request.body)
-        return data.get('qr_data')
-    else:
-        return request.POST.get('qr_data')
+    context = {
+        "merchant": merchant,
+        "page_obj": page_obj,
+        "order_items": page_obj,
+        "role": "merchant",  # 指定角色給模板使用
+    }
 
-def _render_error(request, error_message):
-    """渲染錯誤模板"""
-    return render(request, 'merchant_account/partials/ticket_error.html', {
-        'error_message': error_message
-    })
+    return render(request, "merchant_account/transaction_history.html", context)

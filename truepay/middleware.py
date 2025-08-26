@@ -1,5 +1,4 @@
 from merchant_account.models import Merchant
-from django.shortcuts import redirect
 from django.conf import settings
 from merchant_account.views import shop_overview
 
