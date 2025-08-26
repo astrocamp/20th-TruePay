@@ -6,10 +6,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}TrustPay 廠商儀表板{% endblock %}</title>
-  <!-- 建議使用專案編譯後的 Tailwind CSS -->
-  <!-- <link rel="stylesheet" href="/static/css/tailwind.css"> -->
-  <!-- 臨時預覽可用 CDN（上線前請改用本機編譯檔） -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 使用專案編譯的 Tailwind CSS -->
+  {% load static %}
+  <link href="{% static 'styles/app.css' %}" rel="stylesheet" type="text/css" />
+  <script src="{% static 'scripts/app.js' %}" defer></script>
   <style>
     /* 自訂滾動條（與 Apple 風格接近，低存在感）*/
     ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#D2D2D7;border-radius:999px}::-webkit-scrollbar-track{background:transparent}
@@ -95,6 +95,18 @@
                    商品總覽頁面 Shop Overview
                 </a>
             </li>
+            <li>
+              <a href="{%url 'merchant_account:qrscan'%}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+                  <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
+                    <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+                    <path d="m21 7V5a2 2 0 0 0-2-2h-2"/>
+                    <path d="M3 17v2a2 2 0 0 0 2 2h2"/>
+                    <path d="m21 17v2a2 2 0 0 1-2 2h-2"/>
+                    <circle cx="12" cy="12" r="1"/>
+                  </svg>
+                掃描QR
+              </a>
+            </li>
             
             <li>
               <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
@@ -142,10 +154,5 @@
       </footer>
     </div>
   </div>
-
-  <!-- 預留：頁面專用 JS（請放在 /static/js/dashboard_consumer.js） -->
-  {% block scripts %}
-  <!-- <script src="/static/js/dashboard_consumer.js" defer></script> -->
-  {% endblock %}
 </body>
 </html>

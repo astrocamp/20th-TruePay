@@ -27,7 +27,9 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.12",
     "alpinejs": "^3.14.9",
+    "axios": "^1.11.0",
     "htmx.org": "^2.0.6",
+    "jsqr": "^1.4.0",
     "tailwindcss": "^4.1.12"
   }
 }
