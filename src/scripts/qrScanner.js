@@ -1,7 +1,3 @@
-/**
- * 簡化版QR掃描器 - 只處理攝像頭邏輯
- * UI更新全部由HTMX + Django模板處理
- */
 import jsQR from 'jsqr';
 
 export class QRScanner {
@@ -10,10 +6,6 @@ export class QRScanner {
         this.isScanning = false;
         this.stream = null;
     }
-
-    /**
-     * 初始化QR掃描器
-     */
     init() {
         this.video = document.getElementById('qr-video');
         if (this.video) {
@@ -21,10 +13,6 @@ export class QRScanner {
             this.setupEventListeners();
         }
     }
-
-    /**
-     * 啟動攝像頭
-     */
     async startCamera() {
         try {
             this.stream = await navigator.mediaDevices.getUserMedia({ 
