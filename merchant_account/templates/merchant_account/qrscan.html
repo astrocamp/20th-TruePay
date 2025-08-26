@@ -1,0 +1,238 @@
+{% extends "merchant_layout/dashboard_base.html" %}
+{% block title %}QR 票券掃描器 - {{ merchant.ShopName }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-4xl mx-auto">
+    <!-- 商家資訊標題區塊 -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+      <div class="p-6 bg-gray-50 border-b border-gray-200">
+        <div class="flex items-center space-x-4">
+          <div
+            class="bg-[#0056B3] text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl"
+          >
+            <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
+                <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+                <path d="m21 7V5a2 2 0 0 0-2-2h-2"/>
+                <path d="M3 17v2a2 2 0 0 0 2 2h2"/>
+                <path d="m21 17v2a2 2 0 0 1-2 2h-2"/>
+                <circle cx="12" cy="12" r="1"/>
+            </svg>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h4"
+              />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-800">QR 票券掃描器</h1>
+            <p class="text-gray-600">{{ merchant.ShopName }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 掃描區塊 -->
+    <div class="grid lg:grid-cols-2 gap-8">
+      <!-- 左側：攝像頭區域 -->
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div class="p-6">
+          <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 mr-2 text-[#0056B3]"
+              fill="currentColor"
+              viewBox="0
+   0 20 20"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M4 3a2 2 0 00-2 2v2.5a.5.5 0 001 0V5a1 1
+   0 011-1h2.5a.5.5 0 000-1H4zM16 4a1 1 0 011 1v2.5a.5.5 0 001 0V5a2 2 0 
+  00-2-2h-2.5a.5.5 0 000 1H16zM4 16a1 1 0 01-1-1v-2.5a.5.5 0 00-1 0V15a2 2 0 002 
+  2h2.5a.5.5 0 000-1H4zM16 16a1 1 0 001-1v-2.5a.5.5 0 001 0V15a2 2 0 01-2 2h-2.5a.5.5
+   0 000-1H16z"
+              />
+            </svg>
+            攝像頭掃描
+          </h2>
+
+          <!-- 攝像頭畫面 -->
+          <div class="camera-container bg-gray-100 rounded-lg mb-4">
+            <video
+              id="qr-video"
+              class="w-full h-64 object-cover rounded-lg bg-gray-800"
+              autoplay
+            ></video>
+          </div>
+
+          <!-- 掃描狀態 -->
+          <div class="text-center">
+            <div
+              id="scan-status"
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-[#0056B3]"
+            >
+              <svg
+                class="w-4 h-4 mr-1 animate-pulse"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M5.05 4.05a7 7 0 119.9 9.9L10 
+  18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                />
+              </svg>
+              準備掃描中...
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右側：結果顯示區域 -->
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div class="p-6">
+          <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 mr-2 text-[#0056B3]"
+              fill="currentColor"
+              viewBox="0
+   0 20 20"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 
+  1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+              />
+            </svg>
+            掃描結果
+          </h2>
+
+          <!-- 結果顯示區域 -->
+          <div
+            id="scan-result"
+            class="result-container min-h-64 border-2 border-dashed border-gray-200 rounded-lg p-6"
+          >
+            <div class="text-center text-gray-500">
+              <svg
+                class="w-16 h-16 mx-auto mb-4 text-gray-300"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M4 3a2 2 0 00-2 2v2.5a.5.5 0 001 0V5a1
+   1 0 011-1h2.5a.5.5 0 000-1H4zM16 4a1 1 0 011 1v2.5a.5.5 0 001 0V5a2 2 0 
+  00-2-2h-2.5a.5.5 0 000 1H16z"
+                />
+              </svg>
+              <p class="text-lg">請將QR Code對準攝像頭</p>
+              <p class="text-sm text-gray-400 mt-2">票券資訊將在此顯示</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 測試按鈕區域（開發用） -->
+    <div class="mt-8 bg-white border border-gray-200 rounded-lg p-6">
+      <h3 class="text-lg font-bold text-gray-800 mb-4">測試功能</h3>
+      <div class="flex flex-wrap gap-3">
+        <!-- 測試成功案例 -->
+        <button hx-post="{% url 'merchant_account:validate_ticket' %}" 
+                hx-vals='{"qr_data": "TEST123"}'
+                hx-target="#scan-result" 
+                hx-swap="innerHTML"
+                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm">
+          測試成功票券
+        </button>
+        
+        <!-- 測試已使用票券 -->
+        <button hx-post="{% url 'merchant_account:validate_ticket' %}" 
+                hx-vals='{"qr_data": "USED456"}'
+                hx-target="#scan-result" 
+                hx-swap="innerHTML"
+                class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded text-sm">
+          測試已使用票券
+        </button>
+        
+        <!-- 測試過期票券 -->
+        <button hx-post="{% url 'merchant_account:validate_ticket' %}" 
+                hx-vals='{"qr_data": "EXPIRED789"}'
+                hx-target="#scan-result" 
+                hx-swap="innerHTML"
+                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm">
+          測試過期票券
+        </button>
+        
+        <!-- 重置掃描 -->
+        <button hx-post="{% url 'merchant_account:restart_scan' %}"
+                hx-target="#scan-result"
+                hx-swap="innerHTML"
+                class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm">
+          重置掃描
+        </button>
+      </div>
+    </div>
+
+    <!-- 使用說明 -->
+    <div class="mt-8 bg-white border border-gray-200 rounded-lg p-6">
+      <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+        <svg
+          class="w-5 h-5 mr-2 text-[#0056B3]"
+          fill="currentColor"
+          viewBox="0 0 
+  20 20"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 
+  0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 
+  00-1-1H9z"
+          />
+        </svg>
+        使用說明
+      </h3>
+
+      <div class="grid md:grid-cols-3 gap-4 text-sm text-gray-600">
+        <div class="flex items-start">
+          <div
+            class="bg-[#0056B3] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5"
+          >
+            1
+          </div>
+          <div>
+            <p class="font-medium text-gray-800">掃描QR Code</p>
+            <p>將客戶的票券QR Code對準攝像頭，或使用上方測試按鈕</p>
+          </div>
+        </div>
+
+        <div class="flex items-start">
+          <div
+            class="bg-[#0056B3] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5"
+          >
+            2
+          </div>
+          <div>
+            <p class="font-medium text-gray-800">確認票券</p>
+            <p>檢查票券資訊是否正確</p>
+          </div>
+        </div>
+
+        <div class="flex items-start">
+          <div
+            class="bg-[#0056B3] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5"
+          >
+            3
+          </div>
+          <div>
+            <p class="font-medium text-gray-800">使用票券</p>
+            <p>點擊確認按鈕完成票券核銷</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
