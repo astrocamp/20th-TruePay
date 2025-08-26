@@ -6,10 +6,6 @@ from django.views.decorators.csrf import csrf_exempt
 from merchant_marketplace.models import Product
 
 
-
-
-
-
 # Create your views here.
 def register(req):
     if req.method == "POST":
@@ -49,7 +45,10 @@ def login(req):
                     req.session["merchant_id"] = merchant.id
                     req.session["merchant_name"] = merchant.Name
                     messages.success(req, "歡迎進入！！！")
-                    return redirect("merchant_marketplace:index")
+                    if merchant.subdomain:
+                        return redirect(f"/marketplace/?shop={merchant.subdomain}")
+                    else:
+                        return redirect(f"/marketplace/?shop_id={merchant.id}")
                 else:
                     messages.error(req, "密碼錯誤")
             except Merchant.DoesNotExist:
@@ -91,3 +90,15 @@ def domain_settings(request):
     else:
         form = domain_settings_form(instance=merchant)
     return render(request, "merchant_account/domain_settings.html", {"form": form})
+
+
+def shop_overview(request, subdomain):
+    try:
+        merchant = Merchant.objects.get(subdomain=subdomain)
+        products = Product.objects.filter(merchant=merchant, is_active=True).order_by(
+            "-created_at"
+        )
+        context = {"merchant": merchant, "products": products}
+        return render(request, "merchant_account/shop_overview.html", context)
+    except Merchant.DoesNotExist:
+        return redirect("pages:home")

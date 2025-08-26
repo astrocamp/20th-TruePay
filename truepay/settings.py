@@ -54,11 +54,10 @@ INSTALLED_APPS = [
     "merchant_marketplace",
     "storages",
     "newebpay",
-    "linepay"
+    "linepay",
 ]
 
 MIDDLEWARE = [
-    "truepay.middleware.subdomain_middleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -66,6 +65,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "truepay.middleware.subdomain_middleware",
 ]
 
 ROOT_URLCONF = "truepay.urls"

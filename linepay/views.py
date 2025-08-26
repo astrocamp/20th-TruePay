@@ -80,11 +80,21 @@ def reserve(request, order_id):
     )
     
     print(">>> response.request.body:", response.request.body)
-    data = response.json()
+    print(">>> response.status_code:", response.status_code)
+    print(">>> response.text:", response.text)
+    
+    try:
+        data = response.json()
+        print(">>> LINE PAY API Response:", data)
+    except Exception as e:
+        print(">>> JSON 解析錯誤:", e)
+        return JsonResponse({"error": "API 回應格式錯誤", "response": response.text})
 
-    if data["returnCode"] == "0000":
+    if data.get("returnCode") == "0000":
         return redirect(data["info"]["paymentUrl"]["web"])
-    return JsonResponse(data)
+    else:
+        print(">>> LINE PAY 錯誤:", data.get("returnMessage"))
+        return JsonResponse({"error": data.get("returnMessage", "未知錯誤"), "data": data})
 
 @csrf_exempt
 def confirm(request):

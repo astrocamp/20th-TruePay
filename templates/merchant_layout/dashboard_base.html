@@ -1,3 +1,5 @@
+{% load merchant_tags %}
+{% get_current_merchant as current_merchant %}
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -73,6 +75,25 @@
                 </svg>
                 網域設定 Domain Settings
               </a>
+            </li>
+            <li>
+              {% if current_merchant.subdomain %}
+                <a href="{% url 'shop_overview' current_merchant.subdomain %}" 
+                target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl 
+              hover:bg-[#F5F5F7]">
+              {% else %}
+                <a href="#" onclick="alert('請先在網域設定中設定子網域')" class="flex 
+                items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] opacity-50">
+              {% endif %}
+                <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" 
+                stroke="currentColor">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 
+                8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+                <line x1="12" y1="22.08" x2="12" y2="12"/>
+                </svg>
+                   商品總覽頁面 Shop Overview
+                </a>
             </li>
             
             <li>
