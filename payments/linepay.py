@@ -75,12 +75,14 @@ def process_linepay(order, request):
         return JsonResponse({"error": "LINE Pay 處理失敗"}, status=500)
 
 
-@csrf_exempt
+@csrf_exempt  
 def linepay_confirm(request):
     """LINE Pay 確認付款"""
     try:
         transaction_id = request.GET.get('transactionId')
         order_id = request.GET.get('orderId')
+        
+        logger.info(f"LINE Pay 回調收到: transaction_id={transaction_id}, order_id={order_id}")
         
         if not transaction_id or not order_id:
             return render(request, 'payments/linepay/payment_result.html', {
@@ -114,11 +116,15 @@ def linepay_confirm(request):
         response = requests.post(f"{api_url}{uri}", headers=headers, json=confirm_data)
         result = response.json()
         
+        logger.info(f"LINE Pay 確認回應: {result}")
+        
         if result.get('returnCode') == '0000':
             order.status = 'paid'
             order.provider_transaction_id = transaction_id
             order.paid_at = timezone.now()
             order.save()
+            
+            logger.info(f"訂單 {order_id} 狀態已更新為 paid")
             
             return render(request, 'payments/linepay/payment_success.html', {
                 'success': True,
@@ -126,6 +132,7 @@ def linepay_confirm(request):
                 'message': '付款成功'
             })
         else:
+            logger.warning(f"LINE Pay 確認失敗: returnCode={result.get('returnCode')}, message={result.get('returnMessage')}")
             return render(request, 'payments/linepay/payment_result.html', {
                 'success': False,
                 'message': result.get('returnMessage', '付款確認失敗')
