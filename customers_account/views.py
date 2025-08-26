@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth import login as django_login, logout as django_logout
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from .forms import CustomerRegistrationForm, CustomerLoginForm
 from .models import Customer
-from orders.models import OrderItem
+from payments.models import Order
 
 
 def register(request):
@@ -33,9 +36,18 @@ def login(request):
             customer = form.cleaned_data["customer"]
             customer.update_last_login()
 
-            # 在這裡可以設定 session 或其他登入狀態管理
-            request.session["customer_id"] = customer.id
-            request.session["customer_name"] = customer.name
+            # 建立或取得對應的 Django User
+            user, created = User.objects.get_or_create(
+                username=customer.email,
+                defaults={
+                    'email': customer.email,
+                    'first_name': customer.name,
+                    'is_active': customer.account_status == 'active'
+                }
+            )
+            
+            # 使用 Django 認證系統登入
+            django_login(request, user)
 
             # 檢查是否有 next 參數（登入後要重導向的頁面）
             next_url = request.GET.get('next') or request.POST.get('next')
@@ -55,32 +67,32 @@ def login(request):
 
 
 def logout(request):
-    # 清除 session
-    if "customer_id" in request.session:
-        del request.session["customer_id"]
-    if "customer_name" in request.session:
-        del request.session["customer_name"]
+    # 使用 Django 登出
+    django_logout(request)
 
     messages.success(request, "已成功登出")
     return redirect("pages:home")
 
 
+@login_required(login_url='/customers/login/')
 def purchase_history(request):
     """消費者購買記錄頁面"""
-    # 檢查用戶是否已登入
-    if 'customer_id' not in request.session:
-        messages.error(request, "請先登入以查看購買記錄")
-        return redirect("customers_account:login")
+    # 透過 email 找到對應的 Customer
+    try:
+        customer = Customer.objects.get(email=request.user.email)
+    except Customer.DoesNotExist:
+        messages.error(request, "客戶資料不存在")
+        return redirect("pages:home")
     
-    customer_id = request.session['customer_id']
-    customer = get_object_or_404(Customer, id=customer_id)
-    
-    # 根據 customer 查詢購買記錄（使用新的 OrderItem 模型）
-    order_items = OrderItem.objects.select_related(
-        'payment', 'product__merchant'
+    # 根據 customer 查詢購買記錄（使用統一的 Order 模型）
+    orders = Order.objects.select_related(
+        'product__merchant'
     ).filter(
         customer=customer
-    ).order_by('-payment__created_at')
+    ).order_by('-created_at')
+    
+    # 為了向後兼容，我們仍然使用 order_items 這個變數名
+    order_items = orders
     
     # 分頁處理
     paginator = Paginator(order_items, 10)  # 每頁顯示10筆記錄
@@ -97,28 +109,28 @@ def purchase_history(request):
     return render(request, 'customers/purchase_history.html', context)
 
 
+@login_required(login_url='/customers/login/')
 def dashboard(request):
     """消費者儀表板頁面"""
-    # 檢查用戶是否已登入
-    if 'customer_id' not in request.session:
-        messages.error(request, "請先登入")
-        return redirect("customers_account:login")
+    # 透過 email 找到對應的 Customer
+    try:
+        customer = Customer.objects.get(email=request.user.email)
+    except Customer.DoesNotExist:
+        messages.error(request, "客戶資料不存在")
+        return redirect("pages:home")
     
-    customer_id = request.session['customer_id']
-    customer = get_object_or_404(Customer, id=customer_id)
-    
-    # 取得該客戶的訂單統計
-    order_items = OrderItem.objects.select_related(
-        'payment', 'product__merchant'
+    # 取得該客戶的訂單記錄統計
+    orders = Order.objects.select_related(
+        'product__merchant'
     ).filter(customer=customer)
     
     # 統計資料
-    total_orders = order_items.count()
-    total_amount = sum(item.total_amount for item in order_items)
-    pending_orders = order_items.filter(payment__status='pending').count()
+    total_orders = orders.count()
+    total_amount = sum(order.amount for order in orders)
+    pending_orders = orders.filter(status='pending').count()
     
     # 最近5筆購買記錄
-    recent_orders = order_items.order_by('-payment__created_at')[:5]
+    recent_orders = orders.order_by('-created_at')[:5]
     
     context = {
         'customer': customer,

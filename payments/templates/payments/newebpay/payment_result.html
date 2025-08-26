@@ -1,0 +1,50 @@
+{% extends "layouts/default.html" %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-md mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+            {% if success %}
+                <div class="text-green-500 mb-4">
+                    <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                
+                <h1 class="text-2xl font-bold text-gray-800 mb-2">付款完成</h1>
+                <p class="text-gray-600 mb-6">{{ message }}</p>
+                
+                <a href="{% url 'pages:home' %}" class="block w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium">
+                    返回首頁
+                </a>
+                
+            {% else %}
+                <div class="text-red-500 mb-4">
+                    <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                
+                <h1 class="text-2xl font-bold text-gray-800 mb-2">付款發生問題</h1>
+                <p class="text-gray-600 mb-6">{{ message }}</p>
+                
+                {% if support_info %}
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                    <p class="text-sm text-yellow-800">{{ support_info }}</p>
+                </div>
+                {% endif %}
+                
+                <div class="space-y-3">
+                    <a href="{% url 'pages:home' %}" class="block w-full bg-gray-500 text-white py-3 px-6 rounded-lg hover:bg-gray-600 transition duration-200 font-medium">
+                        返回首頁
+                    </a>
+                    {% if order %}
+                    <a href="{% url 'customers_account:purchase_history' %}" class="block w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-200 transition duration-200 font-medium">
+                        查看購買記錄
+                    </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -45,11 +45,11 @@
             {% for item in order_items %}
             <tr>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {{ item.payment.merchant_order_no }}
+                    {{ item.provider_order_id }}
                 </td>
                 {% if role == 'merchant' %}
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ item.payment.trade_no|default:"-" }}
+                    {{ item.get_transaction_id_display|default:"-" }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {{ item.customer.name }}
@@ -57,7 +57,7 @@
                 {% endif %}
                 {% if role == 'customer' %}
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ item.merchant_name }}
+                    {{ item.product.merchant.ShopName }}
                 </td>
                 {% endif %}
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -67,23 +67,23 @@
                     {{ item.quantity }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    NT$ {{ item.total_amount|floatformat:0 }}
+                    NT$ {{ item.amount|floatformat:0 }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        {% if item.payment.status == 'paid' %}bg-green-100 text-green-800
-                        {% elif item.payment.status == 'pending' %}bg-yellow-100 text-yellow-800
-                        {% elif item.payment.status == 'failed' %}bg-red-100 text-red-800
-                        {% elif item.payment.status == 'refunded' %}bg-gray-100 text-gray-800
+                        {% if item.status == 'paid' %}bg-green-100 text-green-800
+                        {% elif item.status == 'pending' %}bg-yellow-100 text-yellow-800
+                        {% elif item.status == 'failed' %}bg-red-100 text-red-800
+                        {% elif item.status == 'refunded' %}bg-gray-100 text-gray-800
                         {% endif %}">
-                        {{ item.payment.get_status_display }}
+                        {{ item.get_status_display }}
                     </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {{ item.get_payment_method_display }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ item.purchase_time|date:"Y/m/d H:i" }}
+                    {{ item.created_at|date:"Y/m/d H:i" }}
                 </td>
             </tr>
             {% empty %}

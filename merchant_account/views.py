@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from .forms import RegisterForm, LoginForm, domain_settings_form
 from .models import Merchant
-from orders.models import OrderItem
+from payments.models import Order
 from django.views.decorators.csrf import csrf_exempt
 from merchant_marketplace.models import Product
 
@@ -105,12 +105,15 @@ def transaction_history(request):
     
     merchant = get_object_or_404(Merchant, id=merchant_id)
     
-    # 查詢該商家的所有交易記錄
-    order_items = OrderItem.objects.select_related(
-        'payment', 'customer', 'product'
+    # 查詢該商家的所有交易記錄（使用統一的 Order 模型）
+    orders = Order.objects.select_related(
+        'customer', 'product'
     ).filter(
         product__merchant=merchant
-    ).order_by('-payment__created_at')
+    ).order_by('-created_at')
+    
+    # 為了向後兼容，我們仍然使用 order_items 這個變數名
+    order_items = orders
     
     # 分頁處理
     paginator = Paginator(order_items, 10)  # 每頁顯示10筆記錄

@@ -57,28 +57,28 @@
                         {% for item in recent_orders %}
                         <tr>
                             <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ item.payment.merchant_order_no }}
+                                {{ item.provider_order_id }}
                             </td>
                             <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ item.product.name }}
                             </td>
                             <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ item.merchant_name }}
+                                {{ item.product.merchant.ShopName }}
                             </td>
                             <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                NT$ {{ item.total_amount|floatformat:0 }}
+                                NT$ {{ item.amount|floatformat:0 }}
                             </td>
                             <td class="px-4 py-4 whitespace-nowrap text-sm">
                                 <span class="px-2 py-1 text-xs rounded-full 
-                                    {% if item.payment.status == 'paid' %}bg-green-100 text-green-800
-                                    {% elif item.payment.status == 'pending' %}bg-yellow-100 text-yellow-800
-                                    {% elif item.payment.status == 'failed' %}bg-red-100 text-red-800
+                                    {% if item.status == 'paid' %}bg-green-100 text-green-800
+                                    {% elif item.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                    {% elif item.status == 'failed' %}bg-red-100 text-red-800
                                     {% endif %}">
-                                    {{ item.payment.get_status_display }}
+                                    {{ item.get_status_display }}
                                 </span>
                             </td>
                             <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ item.purchase_time|date:"m/d H:i" }}
+                                {{ item.created_at|date:"m/d H:i" }}
                             </td>
                         </tr>
                         {% endfor %}

@@ -34,8 +34,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
     ".truepay.local",
-    "b97b168e0cfb.ngrok-free.app",
-
+    "5d9f7bcf5902.ngrok-free.app",
 ]
 
 
@@ -53,9 +52,7 @@ INSTALLED_APPS = [
     "customers_account",
     "merchant_marketplace",
     "storages",
-    "newebpay",
-    "orders",
-    "linepay"
+    "payments",  # 統一付款應用
 ]
 
 MIDDLEWARE = [
@@ -197,20 +194,32 @@ NEWEBPAY_GATEWAY_URL = "https://ccore.newebpay.com/MPG/mpg_gateway"  # 統一網
 # 統一使用同一個網關，環境由商店ID決定
 CURRENT_GATEWAY_URL = NEWEBPAY_GATEWAY_URL
 
-# 付款回調 URLs（需要是完整的 URL）
-# 使用 ngrok URL - 請在藍新後台設定相同的 URL
+# LINE Pay 設定
+LINEPAY_CHANNEL_ID = os.getenv("LINEPAY_CHANNEL_ID")
+LINEPAY_CHANNEL_SECRET = os.getenv("LINEPAY_CHANNEL_SECRET")
+LINEPAY_API_URL = os.getenv("LINEPAY_API_URL", "https://sandbox-api-pay.line.me")
 
-PAYMENT_RETURN_URL = "https://b97b168e0cfb.ngrok-free.app/newebpay/payment/return/"
-PAYMENT_NOTIFY_URL = "https://b97b168e0cfb.ngrok-free.app/newebpay/payment/notify/"
-PAYMENT_CANCEL_URL = "https://b97b168e0cfb.ngrok-free.app/newebpay/payment/cancel/"
+# 付款回調 URLs（需要是完整的 URL）
+# 使用 ngrok URL - 請在金流後台設定相同的 URL
+
+# 統一付款系統的回調 URLs
+PAYMENT_RETURN_URL = "https://5d9f7bcf5902.ngrok-free.app/payments/newebpay/return/"
+PAYMENT_NOTIFY_URL = "https://5d9f7bcf5902.ngrok-free.app/payments/newebpay/notify/"
+PAYMENT_CANCEL_URL = "https://5d9f7bcf5902.ngrok-free.app/payments/newebpay/cancel/"
+
+# LINE Pay 回調 URLs
+LINEPAY_CONFIRM_URL = "https://5d9f7bcf5902.ngrok-free.app/payments/linepay/confirm/"
+LINEPAY_CANCEL_URL = "https://5d9f7bcf5902.ngrok-free.app/payments/linepay/cancel/"
+
+# 向後兼容：保留舊的 URLs（重導向到新系統）
+# 如果已經在藍新後台設定舊的 URL，可以透過重導向來處理
 
 # CSRF 豁免設定（金流回調需要）
 CSRF_TRUSTED_ORIGINS = [
     "https://ccore.newebpay.com",
     "http://127.0.0.1:8000",
-    "https://b97b168e0cfb.ngrok-free.app",
+    "https://5d9f7bcf5902.ngrok-free.app",
 ]
 
 # 登入相關設定
 LOGIN_URL = "/customers/login/"
-
