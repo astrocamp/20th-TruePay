@@ -9,6 +9,8 @@ def accounts_login_redirect(request):
     return redirect("/customers/login/", permanent=True)
 
 
+from django.views.generic import RedirectView
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("pages.urls")),
@@ -17,6 +19,9 @@ urlpatterns = [
     path("marketplace/", include("merchant_marketplace.urls")),
     path("pay/", include("merchant_marketplace.public_urls")),
     path("payments/", include("payments.urls")),
-    # 相容性重導向
-    path("accounts/login/", accounts_login_redirect),
+    # 相容性重導向：舊的 accounts/login/ 重導向到新的 customers/login/
+    path(
+        "accounts/login/",
+        RedirectView.as_view(pattern_name="customers_account:login", permanent=True),
+    ),
 ]
