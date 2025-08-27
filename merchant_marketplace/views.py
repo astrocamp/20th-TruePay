@@ -68,17 +68,6 @@ def new(request):
         except Exception as e:
             messages.error(request, f"新增失敗：{str(e)}")
             return render(request, "merchant_marketplace/new.html")
-    if request.method == "POST" and request.POST.get("action") == "delete":
-        merchant_id = request.session.get("merchant_id")
-        if not merchant_id or product.merchant.id != merchant_id:
-            messages.error(request, "無權限刪除此商品")
-            return redirect("merchant_marketplace:index")
-        product.is_active = False
-        product.save()
-        messages.success(request, "商品已刪除")
-        return redirect("merchant_marketplace:index")
-
-    return render(request, "merchant_marketplace/detail.html", {"product": product})
 
 
 def edit(request, id):

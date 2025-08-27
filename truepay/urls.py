@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -8,5 +9,7 @@ urlpatterns = [
     path("customers/", include("customers_account.urls")),
     path("marketplace/", include("merchant_marketplace.urls")),
     path("pay/", include("merchant_marketplace.public_urls")),
-    path("newebpay/", include("newebpay.urls")),
+    path("payments/", include("payments.urls")),
+    # 相容性重導向：舊的 accounts/login/ 重導向到新的 customers/login/
+    path("accounts/login/", RedirectView.as_view(pattern_name='customers_account:login', permanent=True)),
 ]

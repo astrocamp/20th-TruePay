@@ -36,14 +36,14 @@
                     <!-- 藍新金流 -->
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-4">
                         <h3 class="text-lg font-bold text-blue-800 mb-4">藍新金流</h3>
-                        <form method="post" action="{% url 'newebpay:create_payment' %}">
+                        <form method="post" action="{% url 'payments:create_payment' %}">
                             {% csrf_token %}
+                            <input type="hidden" name="provider" value="newebpay">
                             <input type="hidden" name="amt" value="{{ product.price }}">
-                            <input type="hidden" name="item_desc" value="{{ product.name }}">
-                            <input type="hidden" name="email" value="">
-                            <input type="hidden" name="customer_name" value="">
-                            <button type="submit" class="w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium">
-                                藍新金流 NT$ {{ product.price }}
+                            <input type="hidden" name="item_desc" value="{{ product.name }}|ProductID:{{ product.id }}">
+                           
+                            <button type="submit" class="w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium text-lg">
+                                💳 藍新金流 NT$ {{ product.price }}
                             </button>
                         </form>
                         <p class="text-sm text-blue-600 text-center mt-3">
@@ -53,11 +53,16 @@
                     
                     <!-- LINE PAY -->
                     <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-4">
-                        <h3 class="text-lg font-bold text-blue-800 mb-4">LINE PAY</h3>
-                        <button class="w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium">
-                            LINE PAY NT$ {{ product.price }}
-                        </button>
-                        <p class="text-sm text-blue-600 text-center mt-3">
+                        <h3 class="text-lg font-bold text-green-800 mb-4">LINE PAY</h3>
+                        <form method="post" action="{% url 'payments:create_payment' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="provider" value="linepay">
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <button type="submit" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition duration-200 font-medium text-lg">
+                                💳 LINE PAY NT$ {{ product.price }}
+                            </button>
+                        </form>
+                        <p class="text-sm text-green-600 text-center mt-3">
                             安全付款 | 24小時客服支援
                         </p>
                     </div>
@@ -71,6 +76,7 @@
                     </div>
                 </div>
             </div>
+            
             
             <!-- 商品描述 -->
             <div class="p-8 border-t border-gray-200">
