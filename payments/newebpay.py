@@ -9,11 +9,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.utils import timezone
-from django.template.loader import render_to_string
-<<<<<<< HEAD
-=======
 from django.shortcuts import render
->>>>>>> bc8991e290a939e3bdf900b2b71d5064854e590f
 
 from .models import Order
 
@@ -27,66 +23,6 @@ def process_newebpay(order, request):
         merchant_id = settings.NEWEBPAY_MERCHANT_ID
         hash_key = settings.NEWEBPAY_HASH_KEY
         hash_iv = settings.NEWEBPAY_HASH_IV
-<<<<<<< HEAD
-        
-        # 準備付款資料
-        trade_info_data = {
-            'MerchantID': merchant_id,
-            'RespondType': 'JSON',
-            'TimeStamp': str(int(order.created_at.timestamp())),
-            'Version': '2.0',
-            'MerchantOrderNo': order.provider_order_id,  # 使用短格式訂單編號
-            'Amt': str(int(order.amount)),
-            'ItemDesc': order.item_description,
-            'ReturnURL': settings.PAYMENT_RETURN_URL,
-            'NotifyURL': settings.PAYMENT_NOTIFY_URL,
-            'Email': order.customer.email,
-        }
-        
-        # 生成 TradeInfo 和 TradeSha
-        trade_info_str = '&'.join([f'{k}={v}' for k, v in trade_info_data.items()])
-        logger.info(f"Before encrypt: {trade_info_str}")
-        
-        trade_info = aes_encrypt(trade_info_str, hash_key, hash_iv)
-        trade_sha = generate_sha256(f'HashKey={hash_key}&{trade_info}&HashIV={hash_iv}')
-        
-        logger.info(f"TradeInfo: {trade_info}")
-        logger.info(f"TradeSha: {trade_sha}")
-        
-        # 直接重導向到藍新金流
-        form_html = f'''
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>正在跳轉到藍新金流...</title>
-        </head>
-        <body>
-            <div style="text-align: center; padding: 50px;">
-                <h3>正在跳轉到藍新金流付款頁面...</h3>
-                <p>如果頁面沒有自動跳轉，請點擊下方按鈕</p>
-                <form id="newebpay_form" method="POST" action="{settings.NEWEBPAY_GATEWAY_URL}">
-                    <input type="hidden" name="MerchantID" value="{merchant_id}">
-                    <input type="hidden" name="TradeInfo" value="{trade_info}">
-                    <input type="hidden" name="TradeSha" value="{trade_sha}">
-                    <input type="hidden" name="Version" value="2.0">
-                    <button type="submit" style="background: #0056B3; color: white; padding: 10px 20px; border: none; border-radius: 5px;">
-                        前往付款
-                    </button>
-                </form>
-                <script>
-                    document.getElementById('newebpay_form').submit();
-                </script>
-            </div>
-        </body>
-        </html>
-        '''
-        
-        return HttpResponse(form_html)
-        
-    except Exception as e:
-        logger.error(f"藍新金流處理失敗: {e}")
-        from django.http import JsonResponse
-=======
 
         # 準備付款資料
         trade_info_data = {
@@ -128,7 +64,6 @@ def process_newebpay(order, request):
         logger.error(f"藍新金流處理失敗: {e}")
         from django.http import JsonResponse
 
->>>>>>> bc8991e290a939e3bdf900b2b71d5064854e590f
         return JsonResponse({"error": "藍新金流處理失敗"}, status=500)
 
 
@@ -136,51 +71,6 @@ def process_newebpay(order, request):
 def newebpay_return(request):
     """藍新金流付款完成返回處理"""
     try:
-<<<<<<< HEAD
-        trade_info = request.POST.get('TradeInfo')
-        trade_sha = request.POST.get('TradeSha')
-        
-        logger.info(f"Received TradeInfo: {trade_info}")
-        logger.info(f"Received TradeSha: {trade_sha}")
-        
-        # 解密交易資料
-        hash_key = settings.NEWEBPAY_HASH_KEY
-        hash_iv = settings.NEWEBPAY_HASH_IV
-        
-        # 驗證簽名
-        check_value = generate_sha256(f'HashKey={hash_key}&{trade_info}&HashIV={hash_iv}')
-        if check_value.upper() != trade_sha.upper():
-            logger.error(f"簽名驗證失敗 - Expected: {check_value.upper()}, Got: {trade_sha.upper()}")
-            from django.shortcuts import render
-            return render(request, 'payments/newebpay/payment_result.html', {
-                'success': False,
-                'message': '簽名驗證失敗'
-            })
-        
-        # 解密資料
-        decrypted_data = aes_decrypt(trade_info, hash_key, hash_iv)
-        logger.info(f"Decrypted data: {decrypted_data}")
-        result_data = json.loads(decrypted_data)
-        logger.info(f"Parsed result: {result_data}")
-        
-        if result_data['Status'] == 'SUCCESS':
-            # 更新付款狀態
-            merchant_order_no = result_data['Result']['MerchantOrderNo']
-            order = get_object_or_404(Order, provider_order_id=merchant_order_no)
-            order.status = 'paid'
-            order.provider_transaction_id = result_data['Result']['TradeNo']
-            order.newebpay_trade_no = result_data['Result']['TradeNo']
-            
-            # 儲存詳細付款資訊 (如果有的話)
-            result = result_data['Result']
-            if 'PaymentType' in result:
-                order.newebpay_payment_type = result['PaymentType']
-            if 'CardInfo' in result and result['CardInfo']:
-                card_info = result['CardInfo']
-                if 'Card6No' in card_info and 'Card4No' in card_info:
-                    order.newebpay_card_info = f"{card_info['Card6No']}******{card_info['Card4No']}"
-            
-=======
         trade_info = request.POST.get("TradeInfo")
         trade_sha = request.POST.get("TradeSha")
 
@@ -226,108 +116,10 @@ def newebpay_return(request):
                     f"{result['Card6No']}******{result['Card4No']}"
                 )
 
->>>>>>> bc8991e290a939e3bdf900b2b71d5064854e590f
             # 儲存完整原始資料
             order.provider_raw_data = result_data
             order.paid_at = timezone.now()
             order.save()
-<<<<<<< HEAD
-            
-            from django.shortcuts import render
-            return render(request, 'payments/newebpay/payment_success.html', {
-                'success': True,
-                'order': order,
-                'message': '付款成功'
-            })
-        else:
-            from django.shortcuts import render
-            return render(request, 'payments/newebpay/payment_result.html', {
-                'success': False,
-                'message': result_data.get('Message', '付款失敗')
-            })
-            
-    except Exception as e:
-        logger.error(f"藍新金流回調處理失敗: {e}")
-        from django.shortcuts import render
-        return render(request, 'payments/newebpay/payment_result.html', {
-            'success': False,
-            'message': '付款處理失敗'
-        })
-
-
-@csrf_exempt 
-def newebpay_notify(request):
-    """藍新金流後台通知處理"""
-    try:
-        # 記錄收到的原始資料
-        trade_info = request.POST.get('TradeInfo')
-        trade_sha = request.POST.get('TradeSha')
-        
-        logger.info(f"藍新金流通知 - TradeInfo: {trade_info}")
-        logger.info(f"藍新金流通知 - TradeSha: {trade_sha}")
-        logger.info(f"藍新金流通知 - 所有 POST 資料: {dict(request.POST)}")
-        
-        if not trade_info:
-            logger.error("藍新金流通知缺少 TradeInfo")
-            return HttpResponse('0|Missing TradeInfo')
-        
-        hash_key = settings.NEWEBPAY_HASH_KEY
-        hash_iv = settings.NEWEBPAY_HASH_IV
-        
-        if not hash_key or not hash_iv:
-            logger.error("藍新金流設定不完整 - 缺少 hash_key 或 hash_iv")
-            return HttpResponse('0|Config Error')
-        
-        # 記錄加密設定（不記錄實際值）
-        logger.info(f"Key 長度: {len(hash_key) if hash_key else 0}, IV 長度: {len(hash_iv) if hash_iv else 0}")
-        
-        # 如果有 TradeSha，先驗證簽名
-        if trade_sha:
-            check_value = generate_sha256(f'HashKey={hash_key}&{trade_info}&HashIV={hash_iv}')
-            if check_value.upper() != trade_sha.upper():
-                logger.error(f"藍新金流通知簽名驗證失敗 - Expected: {check_value.upper()}, Got: {trade_sha.upper()}")
-                return HttpResponse('0|Invalid Signature')
-        
-        # 嘗試解密
-        try:
-            decrypted_data = aes_decrypt(trade_info, hash_key, hash_iv)
-            logger.info(f"藍新金流通知解密成功: {decrypted_data}")
-        except Exception as decrypt_error:
-            logger.error(f"AES 解密失敗: {decrypt_error}")
-            logger.error(f"TradeInfo 長度: {len(trade_info)}")
-            logger.error(f"TradeInfo 內容 (前50字符): {trade_info[:50]}...")
-            return HttpResponse('0|Decrypt Error')
-        
-        # 解析 JSON 資料
-        try:
-            result_data = json.loads(decrypted_data)
-            logger.info(f"藍新金流通知解析 JSON 成功: {result_data}")
-        except json.JSONDecodeError as json_error:
-            logger.error(f"JSON 解析失敗: {json_error}")
-            logger.error(f"解密後的資料: {decrypted_data}")
-            return HttpResponse('0|JSON Parse Error')
-        
-        # 處理付款結果
-        if result_data.get('Status') == 'SUCCESS':
-            try:
-                merchant_order_no = result_data['Result']['MerchantOrderNo']
-                order = Order.objects.get(provider_order_id=merchant_order_no)
-                
-                if order.status == 'pending':
-                    order.status = 'paid'
-                    order.provider_transaction_id = result_data['Result']['TradeNo']
-                    order.newebpay_trade_no = result_data['Result']['TradeNo']
-                    
-                    # 儲存詳細付款資訊 (如果有的話)
-                    result = result_data['Result']
-                    if 'PaymentType' in result:
-                        order.newebpay_payment_type = result['PaymentType']
-                    if 'CardInfo' in result and result['CardInfo']:
-                        card_info = result['CardInfo']
-                        if 'Card6No' in card_info and 'Card4No' in card_info:
-                            order.newebpay_card_info = f"{card_info['Card6No']}******{card_info['Card4No']}"
-                    
-=======
 
             from django.shortcuts import render
 
@@ -423,33 +215,10 @@ def newebpay_notify(request):
                             f"{result['Card6No']}******{result['Card4No']}"
                         )
 
->>>>>>> bc8991e290a939e3bdf900b2b71d5064854e590f
                     # 儲存完整原始資料
                     order.provider_raw_data = result_data
                     order.paid_at = timezone.now()
                     order.save()
-<<<<<<< HEAD
-                    
-                    logger.info(f"藍新金流通知處理成功 - 訂單 {merchant_order_no} 已更新為已付款")
-                else:
-                    logger.info(f"藍新金流通知 - 訂單 {merchant_order_no} 狀態已是 {order.status}")
-                
-                return HttpResponse('1|OK')
-                
-            except Order.DoesNotExist:
-                logger.error(f"藍新金流通知 - 找不到訂單: {merchant_order_no}")
-                return HttpResponse('0|Order Not Found')
-            except Exception as order_error:
-                logger.error(f"藍新金流通知處理訂單時發生錯誤: {order_error}")
-                return HttpResponse('0|Order Update Error')
-        else:
-            logger.warning(f"藍新金流通知 - 付款失敗: {result_data}")
-            return HttpResponse('0|Payment Failed')
-            
-    except Exception as e:
-        logger.error(f"藍新金流通知處理失敗: {e}")
-        return HttpResponse('0|System Error')
-=======
 
                     logger.info(
                         f"藍新金流通知處理成功 - 訂單 {merchant_order_no} 已更新為已付款"
@@ -470,68 +239,19 @@ def newebpay_notify(request):
     except Exception as e:
         logger.error(f"藍新金流通知處理失敗: {e}")
         return HttpResponse("0|System Error")
->>>>>>> bc8991e290a939e3bdf900b2b71d5064854e590f
 
 
 # 工具函數
 def aes_encrypt(data, key, iv):
     """AES 加密 - 藍新金流使用十六進制格式"""
-<<<<<<< HEAD
-    cipher = AES.new(key.encode('utf-8'), AES.MODE_CBC, iv.encode('utf-8'))
-    padded_data = pad(data.encode('utf-8'), AES.block_size)
-=======
     cipher = AES.new(key.encode("utf-8"), AES.MODE_CBC, iv.encode("utf-8"))
     padded_data = pad(data.encode("utf-8"), AES.block_size)
->>>>>>> bc8991e290a939e3bdf900b2b71d5064854e590f
     encrypted_data = cipher.encrypt(padded_data)
     return encrypted_data.hex()  # 使用十六進制，不是 Base64
 
 
 def aes_decrypt(encrypted_data, key, iv):
     """AES 解密 - 自動檢測編碼格式"""
-<<<<<<< HEAD
-    cipher = AES.new(key.encode('utf-8'), AES.MODE_CBC, iv.encode('utf-8'))
-    
-    # 記錄輸入資料資訊（不記錄實際內容以保護安全）
-    logger.info(f"解密輸入資料長度: {len(encrypted_data)}")
-    logger.info(f"Key/IV 長度: {len(key)}/{len(iv)}")
-    
-    # 先嘗試十六進制解碼（發送給藍新的格式）
-    try:
-        logger.info("嘗試十六進制解密...")
-        decrypted_data = cipher.decrypt(bytes.fromhex(encrypted_data))
-        result = unpad(decrypted_data, AES.block_size).decode('utf-8')
-        logger.info("十六進制解密成功")
-        return result
-    except ValueError as hex_error:
-        logger.warning(f"十六進制解密失敗: {hex_error}")
-    except Exception as hex_error:
-        logger.warning(f"十六進制解密過程出錯: {hex_error}")
-    
-    # 如果失敗，嘗試 Base64 解碼（回調可能使用的格式）
-    try:
-        logger.info("嘗試 Base64 解密...")
-        decrypted_data = cipher.decrypt(base64.b64decode(encrypted_data))
-        result = unpad(decrypted_data, AES.block_size).decode('utf-8')
-        logger.info("Base64 解密成功")
-        return result
-    except ValueError as b64_error:
-        logger.error(f"Base64 解密失敗: {b64_error}")
-    except Exception as b64_error:
-        logger.error(f"Base64 解密過程出錯: {b64_error}")
-    
-    # 如果兩種方式都失敗，嘗試直接解碼（以防是其他格式）
-    try:
-        logger.info("嘗試直接二進制解密...")
-        decrypted_data = cipher.decrypt(encrypted_data.encode('utf-8'))
-        result = unpad(decrypted_data, AES.block_size).decode('utf-8')
-        logger.info("直接二進制解密成功")
-        return result
-    except Exception as direct_error:
-        logger.error(f"直接二進制解密失敗: {direct_error}")
-    
-    # 所有方法都失敗
-=======
     cipher = AES.new(key.encode("utf-8"), AES.MODE_CBC, iv.encode("utf-8"))
 
     # 先嘗試十六進制解碼（發送給藍新的格式）
@@ -560,14 +280,9 @@ def aes_decrypt(encrypted_data, key, iv):
 
     # 所有方法都失敗，記錄一次錯誤日誌
     logger.error("AES 解密失敗 - 所有解密方法都無法解密資料")
->>>>>>> bc8991e290a939e3bdf900b2b71d5064854e590f
     raise ValueError("所有解密方法都失敗了 - 可能是加密格式、Key 或 IV 不正確")
 
 
 def generate_sha256(data):
     """生成 SHA256"""
-<<<<<<< HEAD
-    return hashlib.sha256(data.encode('utf-8')).hexdigest().upper()
-=======
     return hashlib.sha256(data.encode("utf-8")).hexdigest().upper()
->>>>>>> bc8991e290a939e3bdf900b2b71d5064854e590f

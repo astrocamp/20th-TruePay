@@ -29,8 +29,7 @@
       <p class="text-gray-500 text-sm mt-1">
         {{ form.merchant_domain.help_text }}
       </p>
-      {% endif %} {% if form.merchant_domain.errors %} {% for error in
-      form.merchant_domain.errors %}
+      {% endif %} {% if form.merchant_domain.errors %} {% for error in form.merchant_domain.errors %}
       <p class="text-red-500 text-sm mt-1">{{ error }}</p>
       {% endfor %} {% endif %}
     </div>
@@ -43,8 +42,7 @@
       </label>
       {{ form.subdomain }} {% if form.subdomain.help_text %}
       <p class="text-gray-500 text-sm mt-1">{{ form.subdomain.help_text }}</p>
-      {% endif %} {% if form.subdomain.errors %} {% for error in
-      form.subdomain.errors %}
+      {% endif %} {% if form.subdomain.errors %} {% for error in form.subdomain.errors %}
       <p class="text-red-500 text-sm mt-1">{{ error }}</p>
       {% endfor %} {% endif %}
     </div>
