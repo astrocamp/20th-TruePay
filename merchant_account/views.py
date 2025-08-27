@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> bc8991e290a939e3bdf900b2b71d5064854e590f
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
@@ -11,6 +14,8 @@ from django.views.decorators.csrf import csrf_exempt
 from merchant_marketplace.models import Product
 from payments.models import Order
 from django.core.paginator import Paginator
+<<<<<<< HEAD
+=======
 =======
 from django.core.paginator import Paginator
 from .forms import RegisterForm, LoginForm, domain_settings_form
@@ -23,6 +28,7 @@ from merchant_marketplace.models import Product
 
 
 >>>>>>> origin/develop
+>>>>>>> bc8991e290a939e3bdf900b2b71d5064854e590f
 
 
 # Create your views here.
@@ -112,6 +118,9 @@ def domain_settings(request):
 
 
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> bc8991e290a939e3bdf900b2b71d5064854e590f
 def shop_overview(request, subdomain):
     try:
         merchant = Merchant.objects.get(subdomain=subdomain)
@@ -124,8 +133,11 @@ def shop_overview(request, subdomain):
         return redirect("pages:home")
 
 
+<<<<<<< HEAD
+=======
 =======
 >>>>>>> origin/develop
+>>>>>>> bc8991e290a939e3bdf900b2b71d5064854e590f
 def transaction_history(request):
     """廠商交易記錄頁面"""
     # 檢查商家是否已登入
@@ -134,6 +146,9 @@ def transaction_history(request):
         messages.error(request, "請先登入")
         return redirect("merchant_account:login")
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> bc8991e290a939e3bdf900b2b71d5064854e590f
 
     merchant = get_object_or_404(Merchant, id=merchant_id)
 
@@ -160,6 +175,8 @@ def transaction_history(request):
     }
 
     return render(request, "merchant_account/transaction_history.html", context)
+<<<<<<< HEAD
+=======
 =======
     
     merchant = get_object_or_404(Merchant, id=merchant_id)
@@ -188,3 +205,4 @@ def transaction_history(request):
     
     return render(request, 'merchant_account/transaction_history.html', context)
 >>>>>>> origin/develop
+>>>>>>> bc8991e290a939e3bdf900b2b71d5064854e590f
