@@ -44,7 +44,7 @@ def _create_order_for_payment(customer, provider, product_id, amount, item_desc)
             product_id = item_desc.split('|ProductID:')[1]
         else:
             raise ValueError("商品資訊錯誤")
-        amount = int(float(amount))
+        amount = int(amount)
         
     elif provider == 'linepay':
         # LINE Pay：直接使用 product_id
