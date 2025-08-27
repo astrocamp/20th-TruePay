@@ -1,143 +1,98 @@
-<!DOCTYPE html>
-<html lang="zh-TW" data-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>用戶中心 - {{ customer.name }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.0/dist/full.min.css" rel="stylesheet" type="text/css" />
-</head>
-<body class="bg-base-200">
-    <div class="container mx-auto p-4">
-        <!-- Header -->
-        <div class="hero bg-gradient-to-r from-primary to-secondary text-primary-content rounded-lg mb-6">
-            <div class="hero-content text-center py-8">
-                <div>
-                    <h1 class="text-4xl font-bold">歡迎回來，{{ customer.name }}！</h1>
-                    <p class="py-2 opacity-90">電子郵件：{{ customer.email }} | 會員編號：{{ customer.id }}</p>
-                </div>
+{% extends "customers_layout/dashboard_base.html" %}
+{% block title %}消費者儀表板 - TrustPay{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">歡迎回來，{{ customer.name }}！</h1>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mb-4 p-3 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% endif %}">
+                {{ message }}
             </div>
+        {% endfor %}
+    {% endif %}
+    
+    <!-- 快速統計 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-xl border border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900 mb-2">總購買次數</h3>
+            <p class="text-3xl font-bold text-blue-600">{{ total_orders }}</p>
         </div>
-
-        <!-- Navigation -->
-        <div class="tabs tabs-boxed mb-6">
-            <a class="tab tab-active">購買記錄</a>
-            <a class="tab">個人資料</a>
-            <a class="tab">帳戶設定</a>
-            <a href="{% url 'customers_account:logout' %}" class="tab">登出</a>
+        
+        <div class="bg-white p-6 rounded-xl border border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900 mb-2">總消費金額</h3>
+            <p class="text-3xl font-bold text-green-600">NT$ {{ total_amount|floatformat:0 }}</p>
         </div>
-
-        <!-- Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="stat bg-base-100 shadow rounded-lg">
-                <div class="stat-figure text-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-8 h-8 stroke-current">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <div class="stat-title">總購買筆數</div>
-                <div class="stat-value text-primary">{{ total_orders }}</div>
-            </div>
-
-            <div class="stat bg-base-100 shadow rounded-lg">
-                <div class="stat-figure text-secondary">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-8 h-8 stroke-current">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
-                    </svg>
-                </div>
-                <div class="stat-title">成功訂單</div>
-                <div class="stat-value text-secondary">{% if order_details %}{{ order_details|length }}{% else %}0{% endif %}</div>
-            </div>
-
-            <div class="stat bg-base-100 shadow rounded-lg">
-                <div class="stat-figure text-accent">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-8 h-8 stroke-current">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h1.586a1 1 0 01.707.293l1.414 1.414a1 1 0 00.707.293H19a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
-                    </svg>
-                </div>
-                <div class="stat-title">總消費金額</div>
-                <div class="stat-value text-accent">
-                    NT$ {{ total_amount|default:0|floatformat:0 }}
-                </div>
-            </div>
-        </div>
-
-        <!-- Orders Section -->
-        <div class="card bg-base-100 shadow-lg">
-            <div class="card-body">
-                <h2 class="card-title text-2xl mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-6 h-6 stroke-current">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                    </svg>
-                    購買記錄
-                </h2>
-
-                {% if order_details %}
-                    <div class="space-y-4">
-                        {% for order in order_details %}
-                        <div class="card bg-base-200 shadow">
-                            <div class="card-body">
-                                <div class="flex justify-between items-start flex-wrap gap-2">
-                                    <div class="font-semibold text-lg">訂單編號：{{ order.order_no }}</div>
-                                    <div class="badge badge-success">已付款</div>
-                                </div>
-                                
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-                                    <div class="bg-base-100 p-3 rounded-lg">
-                                        <div class="text-sm text-base-content/70">商品描述</div>
-                                        <div class="font-medium">{{ order.item_description }}</div>
-                                    </div>
-                                    
-                                    <div class="bg-base-100 p-3 rounded-lg">
-                                        <div class="text-sm text-base-content/70">付款金額</div>
-                                        <div class="font-medium text-primary">NT$ {{ order.amount|floatformat:0 }}</div>
-                                    </div>
-                                    
-                                    <div class="bg-base-100 p-3 rounded-lg">
-                                        <div class="text-sm text-base-content/70">付款方式</div>
-                                        <div class="font-medium">
-                                            {% if order.payment_type %}
-                                                {{ order.payment_type }}
-                                            {% else %}
-                                                線上付款
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="bg-base-100 p-3 rounded-lg">
-                                        <div class="text-sm text-base-content/70">付款時間</div>
-                                        <div class="font-medium">
-                                            {% if order.payment_time %}
-                                                {{ order.payment_time|date:"Y-m-d H:i" }}
-                                            {% else %}
-                                                {{ order.payment.created_at|date:"Y-m-d H:i" }}
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="card-actions justify-end mt-4">
-                                    <a href="{% url 'customers_account:use_ticket' order.order_no %}" class="btn btn-primary btn-sm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-4 h-4 stroke-current">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
-                                        </svg>
-                                        使用票券
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <div class="text-center py-12">
-                        <div class="text-6xl mb-4">🛍️</div>
-                        <h3 class="text-xl font-semibold mb-2">尚無購買記錄</h3>
-                        <p class="text-base-content/70 mb-4">您還沒有購買任何商品，快去商城逛逛吧！</p>
-                        <a href="/" class="btn btn-primary">前往商城</a>
-                    </div>
-                {% endif %}
-            </div>
+        
+        <div class="bg-white p-6 rounded-xl border border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900 mb-2">待付款訂單</h3>
+            <p class="text-3xl font-bold text-yellow-600">{{ pending_orders }}</p>
         </div>
     </div>
-</body>
-</html>
+    
+    <!-- 最近購買記錄 -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-semibold text-gray-900">最近購買記錄</h2>
+            <a href="{% url 'customers_account:purchase_history' %}" class="text-blue-600 hover:text-blue-700 font-medium">
+                查看全部 →
+            </a>
+        </div>
+        
+        {% if recent_orders %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">訂單編號</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">商品名稱</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">商家</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">金額</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">狀態</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">購買時間</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for item in recent_orders %}
+                        <tr>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                {{ item.provider_order_id }}
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ item.product.name }}
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ item.product.merchant.ShopName }}
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                NT$ {{ item.amount|floatformat:0 }}
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm">
+                                <span class="px-2 py-1 text-xs rounded-full 
+                                    {% if item.status == 'paid' %}bg-green-100 text-green-800
+                                    {% elif item.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                    {% elif item.status == 'failed' %}bg-red-100 text-red-800
+                                    {% endif %}">
+                                    {{ item.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ item.created_at|date:"m/d H:i" }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-8">
+                <p class="text-gray-500">還沒有購買記錄</p>
+                <a href="{% url 'pages:home' %}" class="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                    開始購物
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
