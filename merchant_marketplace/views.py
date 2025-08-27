@@ -2,27 +2,55 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import Product
 from merchant_account.models import Merchant
+from django.http import Http404
 
 
 def index(request):
-    # 優先使用 subdomain/URL參數指定的商家
-    if hasattr(request, "tenant") and request.tenant:
-        products = Product.objects.filter(
-            merchant=request.tenant, is_active=True
-        ).order_by("-created_at")
+    shop_param = request.GET.get("shop")
+    shop_id_param = request.GET.get("shop_id")
+    if shop_param:
+        try:
+            merchant = Merchant.objects.get(subdomain=shop_param)
+            merchant_id = request.session.get("merchant_id")
+            if merchant_id == merchant.id:
+                products = Product.objects.filter(
+                    merchant=merchant, is_active=True
+                ).order_by("-created_at")
+                return render(
+                    request, "merchant_marketplace/index.html", {"products": products}
+                )
+            else:
+                return redirect("merchant_account:login")
+        except Merchant.DoesNotExist:
+            raise Http404(f"找不到子域名為 '{shop_param}' 的商家")
+    elif shop_id_param:
+        try:
+            merchant = Merchant.objects.get(id=shop_id_param)
+            merchant_id = request.session.get("merchant_id")
+            if merchant_id == merchant.id:
+                products = Product.objects.filter(
+                    merchant=merchant, is_active=True
+                ).order_by("-created_at")
+                return render(
+                    request, "merchant_marketplace/index.html", {"products": products}
+                )
+            else:
+                return redirect("merchant_account:login")
+        except Merchant.DoesNotExist:
+            raise Http404(f"找不到 ID 為 '{shop_id_param}' 的商家")
+    # 沒有指定商家參數時，檢查 session 中的登入商家
+    merchant_id = request.session.get("merchant_id")
+    if merchant_id:
+        merchant = get_object_or_404(Merchant, id=merchant_id)
+        products = Product.objects.filter(merchant=merchant, is_active=True).order_by(
+            "-created_at"
+        )
+        return render(
+            request, "merchant_marketplace/index.html", {"products": products}
+        )
     else:
-        # 沒有tenant時，檢查session中的登入商家
-        merchant_id = request.session.get("merchant_id")
-        if merchant_id:
-            merchant = get_object_or_404(Merchant, id=merchant_id)
-            products = Product.objects.filter(
-                merchant=merchant, is_active=True
-            ).order_by("-created_at")
-        else:
-            # 都沒有就顯示所有商品
-            products = Product.objects.filter(is_active=True).order_by("-created_at")
-
-    return render(request, "merchant_marketplace/index.html", {"products": products})
+        # 沒有登入且沒有指定商家，返回 404
+        raise Http404("找不到此頁面")
 
 
 def detail(request, id):
@@ -108,4 +136,6 @@ def edit(request, id):
 def payment_page(request, id):
     """公開的商品收款頁面，任何人都可以查看"""
     product = get_object_or_404(Product, id=id, is_active=True)
-    return render(request, "merchant_marketplace/payment_page.html", {"product": product})
+    return render(
+        request, "merchant_marketplace/payment_page.html", {"product": product}
+    )

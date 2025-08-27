@@ -34,7 +34,8 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
     ".truepay.local",
-    "5d9f7bcf5902.ngrok-free.app",
+    "*",
+    "5e71c318323f.ngrok-free.app",
 ]
 
 
@@ -52,11 +53,10 @@ INSTALLED_APPS = [
     "customers_account",
     "merchant_marketplace",
     "storages",
-    "payments",  # 統一付款應用
+    "newebpay",
 ]
 
 MIDDLEWARE = [
-    "truepay.middleware.subdomain_middleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -64,6 +64,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "truepay.middleware.subdomain_middleware",
 ]
 
 ROOT_URLCONF = "truepay.urls"
@@ -170,8 +171,6 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
-
-
 DEFAULT_FILE_STORAGE = "merchant_marketplace.storage_backends.MediaStorage"
 MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 
@@ -182,6 +181,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "resend"
 EMAIL_HOST_PASSWORD = os.getenv("RESEND_API_KEY")
 DEFAULT_FROM_EMAIL = "TruePay <onboarding@resend.dev>"
+
 
 # 藍新金流設定
 NEWEBPAY_MERCHANT_ID = os.getenv("NEWEBPAY_MERCHANT_ID")
@@ -194,30 +194,16 @@ NEWEBPAY_GATEWAY_URL = "https://ccore.newebpay.com/MPG/mpg_gateway"  # 統一網
 # 統一使用同一個網關，環境由商店ID決定
 CURRENT_GATEWAY_URL = NEWEBPAY_GATEWAY_URL
 
-# LINE Pay 設定
-LINEPAY_CHANNEL_ID = os.getenv("LINEPAY_CHANNEL_ID")
-LINEPAY_CHANNEL_SECRET = os.getenv("LINEPAY_CHANNEL_SECRET")
-LINEPAY_API_URL = os.getenv("LINEPAY_API_URL", "https://sandbox-api-pay.line.me")
-
 # 付款回調 URLs（需要是完整的 URL）
-# 使用 ngrok URL - 請在金流後台設定相同的 URL
-
-# 統一付款系統的回調 URLs
-PAYMENT_RETURN_URL = "https://5d9f7bcf5902.ngrok-free.app/payments/newebpay/return/"
-PAYMENT_NOTIFY_URL = "https://5d9f7bcf5902.ngrok-free.app/payments/newebpay/notify/"
-PAYMENT_CANCEL_URL = "https://5d9f7bcf5902.ngrok-free.app/payments/newebpay/cancel/"
-
-# LINE Pay 回調 URLs
-LINEPAY_CONFIRM_URL = "https://5d9f7bcf5902.ngrok-free.app/payments/linepay/confirm/"
-LINEPAY_CANCEL_URL = "https://5d9f7bcf5902.ngrok-free.app/payments/linepay/cancel/"
-
+# 使用 ngrok URL - 請在藍新後台設定相同的 URL
+PAYMENT_RETURN_URL = "https://5e71c318323f.ngrok-free.app/newebpay/payment/return/"
+PAYMENT_NOTIFY_URL = "https://5e71c318323f.ngrok-free.app/newebpay/payment/notify/"
+PAYMENT_CANCEL_URL = "https://5e71c318323f.ngrok-free.app/newebpay/payment/cancel/"
 
 # CSRF 豁免設定（金流回調需要）
 CSRF_TRUSTED_ORIGINS = [
     "https://ccore.newebpay.com",
     "http://127.0.0.1:8000",
-    "https://5d9f7bcf5902.ngrok-free.app",
+    "http://localhost:8000",
+    "https://5e71c318323f.ngrok-free.app",
 ]
-
-# 登入相關設定
-LOGIN_URL = "/customers/login/"

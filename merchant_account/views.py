@@ -1,5 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+<<<<<<< HEAD
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django.http import JsonResponse
+
+from .forms import RegisterForm, LoginForm, domain_settings_form
+from .models import Merchant
+from django.views.decorators.csrf import csrf_exempt
+from merchant_marketplace.models import Product
+from payments.models import Order
+from django.core.paginator import Paginator
+=======
 from django.core.paginator import Paginator
 from .forms import RegisterForm, LoginForm, domain_settings_form
 from .models import Merchant
@@ -10,6 +22,7 @@ from merchant_marketplace.models import Product
 
 
 
+>>>>>>> origin/develop
 
 
 # Create your views here.
@@ -51,7 +64,10 @@ def login(req):
                     req.session["merchant_id"] = merchant.id
                     req.session["merchant_name"] = merchant.Name
                     messages.success(req, "歡迎進入！！！")
-                    return redirect("merchant_marketplace:index")
+                    if merchant.subdomain:
+                        return redirect(f"/marketplace/?shop={merchant.subdomain}")
+                    else:
+                        return redirect(f"/marketplace/?shop_id={merchant.id}")
                 else:
                     messages.error(req, "密碼錯誤")
             except Merchant.DoesNotExist:
@@ -95,6 +111,21 @@ def domain_settings(request):
     return render(request, "merchant_account/domain_settings.html", {"form": form})
 
 
+<<<<<<< HEAD
+def shop_overview(request, subdomain):
+    try:
+        merchant = Merchant.objects.get(subdomain=subdomain)
+        products = Product.objects.filter(merchant=merchant, is_active=True).order_by(
+            "-created_at"
+        )
+        context = {"merchant": merchant, "products": products}
+        return render(request, "merchant_account/shop_overview.html", context)
+    except Merchant.DoesNotExist:
+        return redirect("pages:home")
+
+
+=======
+>>>>>>> origin/develop
 def transaction_history(request):
     """廠商交易記錄頁面"""
     # 檢查商家是否已登入
@@ -102,6 +133,34 @@ def transaction_history(request):
     if not merchant_id:
         messages.error(request, "請先登入")
         return redirect("merchant_account:login")
+<<<<<<< HEAD
+
+    merchant = get_object_or_404(Merchant, id=merchant_id)
+
+    # 查詢該商家的所有交易記錄（使用統一的 Order 模型）
+    orders = (
+        Order.objects.select_related("customer", "product")
+        .filter(product__merchant=merchant)
+        .order_by("-created_at")
+    )
+
+    # 為了向後兼容，我們仍然使用 order_items 這個變數名
+    order_items = orders
+
+    # 分頁處理
+    paginator = Paginator(order_items, 10)  # 每頁顯示10筆記錄
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        "merchant": merchant,
+        "page_obj": page_obj,
+        "order_items": page_obj,
+        "role": "merchant",  # 指定角色給模板使用
+    }
+
+    return render(request, "merchant_account/transaction_history.html", context)
+=======
     
     merchant = get_object_or_404(Merchant, id=merchant_id)
     
@@ -128,3 +187,4 @@ def transaction_history(request):
     }
     
     return render(request, 'merchant_account/transaction_history.html', context)
+>>>>>>> origin/develop
