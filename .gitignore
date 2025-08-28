@@ -45,3 +45,4 @@ build/
 .python-version
 .claude/
 
+ngrok.exe
