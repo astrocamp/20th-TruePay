@@ -2,13 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
-
 from .forms import RegisterForm, LoginForm, domain_settings_form
 from .models import Merchant
 from django.views.decorators.csrf import csrf_exempt
 from merchant_marketplace.models import Product
 from payments.models import Order
 from django.core.paginator import Paginator
+from django.db.models import Sum
 
 
 # Create your views here.
@@ -98,7 +98,7 @@ def dashboard(request):
     recent_orders = orders.select_related('product', 'customer').order_by('-created_at')[:5]
     
     # 計算總收入
-    total_revenue = sum(order.total_amount for order in orders)
+    total_revenue = orders.aggregate(total=Sum('amount'))['total'] or 0
     
     context = {
         'merchant': merchant,
