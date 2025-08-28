@@ -78,7 +78,7 @@
             </li>
             <li>
               {% if current_merchant.subdomain %}
-                <a href="{% url 'merchant_account:shop_overview' current_merchant.subdomain %}" 
+                <a href="{% url 'public_store:shop_overview' current_merchant.subdomain %}" 
                 target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl 
               hover:bg-[#F5F5F7]">
               {% else %}
