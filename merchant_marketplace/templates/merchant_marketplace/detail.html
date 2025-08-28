@@ -65,6 +65,13 @@
                                 刪除商品
                             </button>
                         </div>
+                        <div class="flex space-x-2">
+                            <a href="{% url 'public_marketplace:payment_page' product.id %}" 
+                            class="flex-1 bg-red-100 text-red-700 text-center py-2 px-3 rounded text-sm hover:bg-red-200 transition duration-200 border border-red-300"
+                            target="_blank">
+                                開啟收款頁面
+                            </a>
+                        </div>
                         
                         <!-- 隱藏的刪除表單 -->
                         <form id="deleteForm" action="{% url 'merchant_marketplace:detail' product.id %}" method="post" style="display: none;">
