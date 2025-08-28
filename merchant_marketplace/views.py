@@ -1,10 +1,34 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.views.decorators.cache import never_cache
+from functools import wraps
 from .models import Product
 from merchant_account.models import Merchant
 from django.http import Http404
 
 
+# 自定義 decorator：檢查商家登入狀態並防止快取
+def merchant_login_required(view_func):
+    @wraps(view_func)
+    @never_cache
+    def _wrapped_view(request, *args, **kwargs):
+        merchant_id = request.session.get("merchant_id")
+        if not merchant_id:
+            messages.error(request, "請先登入")
+            return redirect("merchant_account:login")
+        
+        # 設定防快取 headers
+        response = view_func(request, *args, **kwargs)
+        if hasattr(response, '__setitem__'):
+            response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = '0'
+        
+        return response
+    return _wrapped_view
+
+
+@merchant_login_required
 def index(request):
     shop_param = request.GET.get("shop")
     shop_id_param = request.GET.get("shop_id")
@@ -53,6 +77,7 @@ def index(request):
         raise Http404("找不到此頁面")
 
 
+@merchant_login_required
 def detail(request, id):
     product = get_object_or_404(Product, id=id, is_active=True)
     if request.method == "POST" and request.POST.get("action") == "delete":
@@ -69,6 +94,7 @@ def detail(request, id):
     return render(request, "merchant_marketplace/detail.html", {"product": product})
 
 
+@merchant_login_required
 def new(request):
     if request.method == "GET":
         return render(request, "merchant_marketplace/new.html")
@@ -98,6 +124,7 @@ def new(request):
             return render(request, "merchant_marketplace/new.html")
 
 
+@merchant_login_required
 def edit(request, id):
     product = get_object_or_404(Product, id=id)
     merchant_id = request.session.get("merchant_id")
