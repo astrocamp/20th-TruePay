@@ -9,9 +9,13 @@ def shop_required(view_func):
     def wrapper(request, *args, **kwargs):
         shop_param = request.GET.get("shop")
         shop_id_param = request.GET.get("shop_id")
-        if shop_param:
+        if shop_param or shop_id_param:
             try:
-                merchant = Merchant.objects.get(subdomain=shop_param)
+                if shop_param:
+                    merchant = Merchant.objects.get(subdomain=shop_param)
+                else:  # shop_id_param
+                    merchant = Merchant.objects.get(id=shop_id_param)
+
                 merchant_id = request.session.get("merchant_id")
                 if merchant_id == merchant.id:
                     request.merchant = merchant
@@ -19,18 +23,10 @@ def shop_required(view_func):
                 else:
                     return redirect("merchant_account:login")
             except Merchant.DoesNotExist:
-                raise Http404(f"找不到子域名為 '{shop_param}' 的商家")
-        elif shop_id_param:
-            try:
-                merchant = Merchant.objects.get(subdomain=shop_param)
-                merchant_id = request.session.get("merchant_id")
-                if merchant_id == merchant.id:
-                    request.merchant = merchant
-                    return view_func(request, *args, **kwargs)
+                if shop_param:
+                    raise Http404(f"找不到子域名為 '{shop_param}' 的商家")
                 else:
-                    return redirect("merchant_account:login")
-            except Merchant.DoesNotExist:
-                raise Http404(f"找不到ID為 '{shop_id_param}' 的商家")
+                    raise Http404(f"找不到ID為 '{shop_id_param}' 的商家")
         else:
             if request.method == "GET":
                 merchant_id = request.session.get("merchant_id")
