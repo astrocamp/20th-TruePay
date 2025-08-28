@@ -30,8 +30,10 @@ SECRET_KEY = "django-insecure-iip1xgbl_eh&cl1p81i9*nuvl)qlb$#gj1e+f1it-a!xu1qjio
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# 從環境變數讀取 ngrok URL
-NGROK_URL = os.getenv("NGROK_URL", "738361925443.ngrok-free.app")
+# 從環境變數讀取 ngrok URL (必須在 .env 中設定)
+NGROK_URL = os.getenv("NGROK_URL")
+if not NGROK_URL:
+    raise ValueError("請在 .env 檔案中設定 NGROK_URL=your-ngrok-id.ngrok-free.app")
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
