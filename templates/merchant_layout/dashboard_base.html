@@ -31,10 +31,10 @@
           <label for="sidebarToggle" class="ml-auto md:hidden cursor-pointer p-2 rounded-lg hover:bg-[#F5F5F7]" aria-label="關閉選單">✕</label>
         </div>
         <!-- 導覽選單 -->
-        <nav class="flex-1 overflow-y-auto py-4">
+        <nav class="flex-1 overflow-y-auto py-4" x-data="{ currentPath: window.location.pathname }">
           <ul class="px-2 space-y-1 text-sm">
             <li>
-              <a href="{% url 'merchant_account:dashboard' %}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-[#0056B3] font-medium">
+              <a href="{% url 'merchant_account:dashboard' %}" :class="currentPath === '/merchant/dashboard/' ? 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-[#0056B3] font-medium bg-blue-50' : 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-gray-700'">
                 <!-- home icon -->
                 <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
                   <path d="M3 10.5l9-7 9 7"/>
@@ -44,7 +44,7 @@
               </a>
             </li>
             <li>
-              <a href="{% url 'merchant_marketplace:index' %}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+              <a href="{% url 'merchant_marketplace:index' %}" :class="currentPath === '/marketplace/' ? 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-[#0056B3] font-medium bg-blue-50' : 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-gray-700'">
                 <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
                   <path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>
                 </svg>
@@ -52,7 +52,7 @@
               </a>
             </li>
             <li>
-              <a href="{% url 'merchant_marketplace:new' %}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+              <a href="{% url 'merchant_marketplace:new' %}" :class="currentPath === '/marketplace/new/' ? 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-[#0056B3] font-medium bg-blue-50' : 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-gray-700'">
                 <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
                   <path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>
                 </svg>
@@ -60,7 +60,7 @@
               </a>
             </li>
             <li>
-              <a href="{% url 'merchant_account:transaction_history' %}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+              <a href="{% url 'merchant_account:transaction_history' %}" :class="currentPath === '/merchant/transaction_history/' ? 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-[#0056B3] font-medium bg-blue-50' : 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-gray-700'">
                 <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
                   <path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>
                 </svg>
@@ -69,7 +69,7 @@
             </li>
             
             <li>
-              <a href="{% url 'merchant_account:domain_settings' %}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+              <a href="{% url 'merchant_account:domain_settings' %}" :class="currentPath === '/merchant/domain_settings/' ? 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-[#0056B3] font-medium bg-blue-50' : 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-gray-700'">
                 <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>
