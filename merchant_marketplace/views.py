@@ -71,7 +71,13 @@ def detail(request, id):
 
 def new(request):
     if request.method == "GET":
-        return render(request, "merchant_marketplace/new.html")
+        merchant_id = request.session.get("merchant_id")
+        if merchant_id:
+            merchant = get_object_or_404(Merchant, id=merchant_id)
+            context = {"merchant_phone": merchant.Cellphone}
+            return render(request, "merchant_marketplace/new.html", context)
+        else:
+            return render(request, "merchant_marketplace/new.html")
 
     elif request.method == "POST":
         try:
@@ -106,7 +112,11 @@ def edit(request, id):
         return redirect("merchant_marketplace:index")
 
     if request.method == "GET":
-        return render(request, "merchant_marketplace/edit.html", {"product": product})
+        context = {
+            "product": product,
+            "merchant_phone": product.merchant.Cellphone
+        }
+        return render(request, "merchant_marketplace/edit.html", context)
 
     elif request.method == "POST":
         try:
@@ -128,9 +138,11 @@ def edit(request, id):
 
         except Exception as e:
             messages.error(request, f"更新失敗：{str(e)}")
-            return render(
-                request, "merchant_marketplace/edit.html", {"product": product}
-            )
+            context = {
+                "product": product,
+                "merchant_phone": product.merchant.Cellphone
+            }
+            return render(request, "merchant_marketplace/edit.html", context)
 
 
 def payment_page(request, id):
