@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     "customers_account",
     "merchant_marketplace",
     "storages",
-    "payments",  # 統一付款應用
+    "payments",
 ]
 
 MIDDLEWARE = [

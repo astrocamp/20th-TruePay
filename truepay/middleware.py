@@ -16,6 +16,7 @@ class subdomain_middleware:
             not host.endswith("127.0.0.1")
             and not host.endswith("truepay.local")
             and not host.endswith("localhost")
+            and not host.endswith("ngrok-free.app")
         ):
             try:
                 merchant = Merchant.objects.get(

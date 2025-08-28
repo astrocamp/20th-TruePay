@@ -1,74 +1,37 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import Http404
 from django.contrib import messages
+
+from truepay.decorators import shop_required
 from .models import Product
 from merchant_account.models import Merchant
-from django.http import Http404
 
 
+@shop_required
 def index(request):
-    shop_param = request.GET.get("shop")
-    shop_id_param = request.GET.get("shop_id")
-    if shop_param:
-        try:
-            merchant = Merchant.objects.get(subdomain=shop_param)
-            merchant_id = request.session.get("merchant_id")
-            if merchant_id == merchant.id:
-                products = Product.objects.filter(
-                    merchant=merchant, is_active=True
-                ).order_by("-created_at")
-                return render(
-                    request, "merchant_marketplace/index.html", {"products": products}
-                )
-            else:
-                return redirect("merchant_account:login")
-        except Merchant.DoesNotExist:
-            raise Http404(f"找不到子域名為 '{shop_param}' 的商家")
-    elif shop_id_param:
-        try:
-            merchant = Merchant.objects.get(id=shop_id_param)
-            merchant_id = request.session.get("merchant_id")
-            if merchant_id == merchant.id:
-                products = Product.objects.filter(
-                    merchant=merchant, is_active=True
-                ).order_by("-created_at")
-                return render(
-                    request, "merchant_marketplace/index.html", {"products": products}
-                )
-            else:
-                return redirect("merchant_account:login")
-        except Merchant.DoesNotExist:
-            raise Http404(f"找不到 ID 為 '{shop_id_param}' 的商家")
-    # 沒有指定商家參數時，檢查 session 中的登入商家
-    merchant_id = request.session.get("merchant_id")
-    if merchant_id:
-        merchant = get_object_or_404(Merchant, id=merchant_id)
-        products = Product.objects.filter(merchant=merchant, is_active=True).order_by(
-            "-created_at"
-        )
-        return render(
-            request, "merchant_marketplace/index.html", {"products": products}
-        )
-    else:
-        # 沒有登入且沒有指定商家，返回 404
-        raise Http404("找不到此頁面")
+    products = Product.objects.filter(
+        merchant=request.merchant, is_active=True
+    ).order_by("-created_at")
+    return render(request, "merchant_marketplace/index.html", {"products": products})
 
 
+@shop_required
 def detail(request, id):
     product = get_object_or_404(Product, id=id, is_active=True)
     if request.method == "POST" and request.POST.get("action") == "delete":
-        merchant_id = request.session.get("merchant_id")
-        if not merchant_id or product.merchant.id != merchant_id:
+        if product.merchant_id != request.merchant.id:
             messages.error(request, "無權限刪除此商品")
             return redirect("merchant_marketplace:index")
 
         product.is_active = False
         product.save()
         messages.success(request, "商品已刪除")
-        return redirect("merchant_marketplace:index")
+        return redirect("/marketplace/")
 
     return render(request, "merchant_marketplace/detail.html", {"product": product})
 
 
+@shop_required
 def new(request):
     if request.method == "GET":
         merchant_id = request.session.get("merchant_id")
@@ -81,33 +44,27 @@ def new(request):
 
     elif request.method == "POST":
         try:
-            merchant_id = request.session.get("merchant_id")
-            if not merchant_id:
-                messages.error(request, "請先登入")
-                return redirect("merchant_account:login")
-
-            merchant = get_object_or_404(Merchant, id=merchant_id)
             product = Product.objects.create(
                 name=request.POST.get("name"),
                 description=request.POST.get("description"),
                 price=request.POST.get("price"),
                 image=request.FILES.get("image"),
                 phone_number=request.POST.get("phone_number"),
-                merchant=merchant,
+                merchant=request.merchant,
             )
 
             messages.success(request, "商品新增成功！")
-            return redirect("merchant_marketplace:detail", id=product.id)
+            return redirect("/marketplace/")
 
         except Exception as e:
             messages.error(request, f"新增失敗：{str(e)}")
             return render(request, "merchant_marketplace/new.html")
 
 
+@shop_required
 def edit(request, id):
     product = get_object_or_404(Product, id=id)
-    merchant_id = request.session.get("merchant_id")
-    if not merchant_id or product.merchant.id != merchant_id:
+    if product.merchant_id != request.merchant.id:
         messages.error(request, "無權限編輯此商品")
         return redirect("merchant_marketplace:index")
 
@@ -134,7 +91,7 @@ def edit(request, id):
             product.save()
 
             messages.success(request, "商品更新成功！")
-            return redirect("merchant_marketplace:detail", id=product.id)
+            return redirect("/marketplace/")
 
         except Exception as e:
             messages.error(request, f"更新失敗：{str(e)}")
