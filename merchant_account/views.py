@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.cache import never_cache
 from django.http import JsonResponse
+from functools import wraps
 
 from .forms import RegisterForm, LoginForm, domain_settings_form
 from .models import Merchant
@@ -9,6 +11,27 @@ from django.views.decorators.csrf import csrf_exempt
 from merchant_marketplace.models import Product
 from payments.models import Order
 from django.core.paginator import Paginator
+
+
+# 自定義 decorator：檢查商家登入狀態並防止快取
+def merchant_login_required(view_func):
+    @wraps(view_func)
+    @never_cache
+    def _wrapped_view(request, *args, **kwargs):
+        merchant_id = request.session.get("merchant_id")
+        if not merchant_id:
+            messages.error(request, "請先登入")
+            return redirect("merchant_account:login")
+        
+        # 設定防快取 headers
+        response = view_func(request, *args, **kwargs)
+        if hasattr(response, '__setitem__'):
+            response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = '0'
+        
+        return response
+    return _wrapped_view
 
 
 # Create your views here.
@@ -65,24 +88,28 @@ def login(req):
 
 
 def logout(req):
-    if "merchant_id" in req.session:
-        del req.session["merchant_id"]
-    if "merchant_name" in req.session:
-        del req.session["merchant_name"]
-
+    # 清除所有 session 資料
+    req.session.flush()  # 完全清除 session 並重新生成 session key
+    
+    # 清除 messages（避免累積）
     storage = messages.get_messages(req)
     for message in storage:
         pass
 
     messages.success(req, "已成功登出")
-    return redirect("merchant_account:login")
+    
+    # 建立重導向回應並設定防快取 headers
+    response = redirect("merchant_account:login")
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    
+    return response
 
 
+@merchant_login_required
 def domain_settings(request):
     merchant_id = request.session.get("merchant_id")
-    if not merchant_id:
-        messages.error(request, "請先登入")
-        return redirect("merchant_account:login")
     merchant = get_object_or_404(Merchant, id=merchant_id)
     if request.method == "POST":
         form = domain_settings_form(request.POST, instance=merchant)
@@ -98,13 +125,11 @@ def domain_settings(request):
 
 
 
+@merchant_login_required
 def transaction_history(request):
     """廠商交易記錄頁面"""
     # 檢查商家是否已登入
     merchant_id = request.session.get("merchant_id")
-    if not merchant_id:
-        messages.error(request, "請先登入")
-        return redirect("merchant_account:login")
     merchant = get_object_or_404(Merchant, id=merchant_id)
 
     # 查詢該商家的所有交易記錄（使用統一的 Order 模型）
