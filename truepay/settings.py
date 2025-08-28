@@ -30,11 +30,16 @@ SECRET_KEY = "django-insecure-iip1xgbl_eh&cl1p81i9*nuvl)qlb$#gj1e+f1it-a!xu1qjio
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# 從環境變數讀取 ngrok URL (必須在 .env 中設定)
+NGROK_URL = os.getenv("NGROK_URL")
+if not NGROK_URL:
+    raise ValueError("請在 .env 檔案中設定 NGROK_URL=your-ngrok-id.ngrok-free.app")
+
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
     ".truepay.local",
-    "ad5987ccb7aa.ngrok-free.app",
+    NGROK_URL,
 ]
 
 
@@ -206,20 +211,21 @@ LINEPAY_API_URL = os.getenv("LINEPAY_API_URL", "https://sandbox-api-pay.line.me"
 # 使用 ngrok URL - 請在金流後台設定相同的 URL
 
 # 統一付款系統的回調 URLs
-PAYMENT_RETURN_URL = "https://ad5987ccb7aa.ngrok-free.app/payments/newebpay/return/"
-PAYMENT_NOTIFY_URL = "https://ad5987ccb7aa.ngrok-free.app/payments/newebpay/notify/"
-PAYMENT_CANCEL_URL = "https://ad5987ccb7aa.ngrok-free.app/payments/newebpay/cancel/"
+
+PAYMENT_RETURN_URL = f"https://{NGROK_URL}/payments/newebpay/return/"
+PAYMENT_NOTIFY_URL = f"https://{NGROK_URL}/payments/newebpay/notify/"
+PAYMENT_CANCEL_URL = f"https://{NGROK_URL}/payments/newebpay/cancel/"
 
 # LINE Pay 回調 URLs
-LINEPAY_CONFIRM_URL = "https://ad5987ccb7aa.ngrok-free.app/payments/linepay/confirm/"
-LINEPAY_CANCEL_URL = "https://ad5987ccb7aa.ngrok-free.app/payments/linepay/cancel/"
-
+LINEPAY_CONFIRM_URL = f"https://{NGROK_URL}/payments/linepay/confirm/"
+LINEPAY_CANCEL_URL = f"https://{NGROK_URL}/payments/linepay/cancel/"
 
 # CSRF 豁免設定（金流回調需要）
 CSRF_TRUSTED_ORIGINS = [
     "https://ccore.newebpay.com",
     "http://127.0.0.1:8000",
-    "https://ad5987ccb7aa.ngrok-free.app",
+    f"https://{NGROK_URL}",
+
 ]
 
 # 登入相關設定
