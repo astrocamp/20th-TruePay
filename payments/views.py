@@ -3,14 +3,33 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
 from django.urls import reverse
 from django.contrib import messages
+from functools import wraps
 
 from .models import Order
 from customers_account.models import Customer
 from merchant_marketplace.models import Product
 from .newebpay import process_newebpay
 from .linepay import process_linepay
+
+
+# 增強版的 login_required decorator：加入防快取功能
+def customer_login_required(view_func):
+    @wraps(view_func)
+    @login_required(login_url='/customers/login/')
+    @never_cache
+    def _wrapped_view(request, *args, **kwargs):
+        # 設定防快取 headers
+        response = view_func(request, *args, **kwargs)
+        if hasattr(response, '__setitem__'):
+            response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = '0'
+        
+        return response
+    return _wrapped_view
 
 
 logger = logging.getLogger(__name__)
@@ -125,7 +144,7 @@ def create_payment(request):
         return redirect("pages:home")
 
 
-@login_required(login_url="/customers/login/")
+@customer_login_required
 def payment_status(request, order_id):
     """查詢訂單狀態"""
     order = get_object_or_404(Order, id=order_id)
