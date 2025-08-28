@@ -5,7 +5,7 @@
         <div class="bg-white rounded-lg shadow-lg overflow-hidden">
             <div class="md:flex">
                 <!-- 商品圖片 -->
-                <div class="md:w-1/3">
+                <div class="md:w-1/2">
                     {% if product.image %}
                         <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-96 object-cover">
                     {% else %}
@@ -16,7 +16,7 @@
                 </div>
                 
                 <!-- 商品資訊 -->
-                <div class="md:w-1/3 p-8">
+                <div class="md:w-1/2 p-8">
                     <div class="mb-6">
                         <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ product.name }}</h1>
                         <p class="text-4xl font-bold text-[#0056B3] mb-6">NT$ {{ product.price }}</p>
@@ -36,13 +36,13 @@
                     <!-- 藍新金流 -->
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-4">
                         <h3 class="text-lg font-bold text-blue-800 mb-4">藍新金流</h3>
-                        <form method="post" action="{% url 'payments:create_payment' %}">
+                        <form method="post" action="{% url 'payments:create_payment' %}" onsubmit="return handlePaymentSubmit(event)">
                             {% csrf_token %}
                             <input type="hidden" name="provider" value="newebpay">
                             <input type="hidden" name="amt" value="{{ product.price }}">
                             <input type="hidden" name="item_desc" value="{{ product.name }}|ProductID:{{ product.id }}">
                            
-                            <button type="submit" class="w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium text-lg">
+                            <button type="submit" class="w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium text-lg cursor-pointer">
                                 💳 藍新金流 NT$ {{ product.price }}
                             </button>
                         </form>
@@ -54,11 +54,11 @@
                     <!-- LINE PAY -->
                     <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-4">
                         <h3 class="text-lg font-bold text-green-800 mb-4">LINE PAY</h3>
-                        <form method="post" action="{% url 'payments:create_payment' %}">
+                        <form method="post" action="{% url 'payments:create_payment' %}" onsubmit="return handlePaymentSubmit(event)">
                             {% csrf_token %}
                             <input type="hidden" name="provider" value="linepay">
                             <input type="hidden" name="product_id" value="{{ product.id }}">
-                            <button type="submit" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition duration-200 font-medium text-lg">
+                            <button type="submit" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition duration-200 font-medium text-lg cursor-pointer">
                                 💳 LINE PAY NT$ {{ product.price }}
                             </button>
                         </form>
@@ -91,20 +91,10 @@
                     <div class="bg-[#0056B3] text-white w-12 h-12 rounded-full flex items-center justify-center font-bold">
                         {{ product.merchant.ShopName|first }}
                     </div>
-                    
-                    <!-- 商家資訊 -->
-                    <div class="p-6 border border-gray-200 rounded-lg bg-gray-50">
-                        <h3 class="text-xl font-bold text-gray-800 mb-4">商家資訊</h3>
-                        <div class="flex items-center space-x-4">
-                            <div class="bg-[#0056B3] text-white w-12 h-12 rounded-full flex items-center justify-center font-bold">
-                                {{ product.merchant.ShopName|first }}
-                            </div>
-                            <div>
-                                <p class="font-medium text-gray-800">{{ product.merchant.ShopName }}</p>
-                                <p class="text-gray-600">聯絡電話：{{ product.phone_number }}</p>
-                                <p class="text-sm text-gray-500">商品發布時間：{{ product.created_at|date:"Y年m月d日" }}</p>
-                            </div>
-                        </div>
+                    <div>
+                        <p class="font-medium text-gray-800">{{ product.merchant.ShopName }}</p>
+                        <p class="text-gray-600">聯絡電話：{{ product.phone_number }}</p>
+                        <p class="text-sm text-gray-500">商品發布時間：{{ product.created_at|date:"Y年m月d日" }}</p>
                     </div>
                 </div>
                     
@@ -137,4 +127,62 @@
         </div>
     </div>
 </div>
+
+<!-- 登入提示模態 -->
+<div id="loginModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg p-8 max-w-md mx-4 shadow-xl">
+        <div class="text-center">
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
+                <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">需要登入</h3>
+            <p class="text-sm text-gray-500 mb-6">請先登入會員帳號，才能進行購買</p>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <a href="{% url 'customers_account:login' %}?next={{ request.get_full_path }}" 
+                   class="flex-1 bg-[#0056B3] text-white px-4 py-2 rounded-lg hover:bg-[#00408A] transition duration-200 text-center font-medium cursor-pointer">
+                    立即登入
+                </a>
+                <button onclick="hideLoginModal()" 
+                        class="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition duration-200 font-medium cursor-pointer">
+                    取消
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 獲取用戶登入狀態
+const userIsAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
+
+// 處理付款表單提交
+function handlePaymentSubmit(event) {
+    if (!userIsAuthenticated) {
+        event.preventDefault();
+        showLoginModal();
+        return false;
+    }
+    return true;
+}
+
+// 顯示登入模態
+function showLoginModal() {
+    document.getElementById('loginModal').classList.remove('hidden');
+}
+
+// 隱藏登入模態
+function hideLoginModal() {
+    document.getElementById('loginModal').classList.add('hidden');
+}
+
+// 點擊模態背景關閉
+document.getElementById('loginModal').addEventListener('click', function(event) {
+    if (event.target === this) {
+        hideLoginModal();
+    }
+});
+</script>
+
 {% endblock %}

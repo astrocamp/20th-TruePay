@@ -3,8 +3,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
 from django.urls import reverse
 from django.contrib import messages
+from functools import wraps
 
 from .models import Order
 from customers_account.models import Customer
@@ -13,23 +15,33 @@ from .newebpay import process_newebpay
 from .linepay import process_linepay
 
 
+# 增強版的 login_required decorator：加入防快取功能
+def customer_login_required(view_func):
+    @wraps(view_func)
+    @login_required(login_url='/customers/login/')
+    @never_cache
+    def _wrapped_view(request, *args, **kwargs):
+        # 設定防快取 headers
+        response = view_func(request, *args, **kwargs)
+        if hasattr(response, '__setitem__'):
+            response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = '0'
+        
+        return response
+    return _wrapped_view
+
+
 logger = logging.getLogger(__name__)
 
 
 def _extract_payment_parameters(request, payment_data=None):
     """統一提取付款參數邏輯"""
-    if payment_data:
-        # 從 session 中的暫存資料提取
-        provider = payment_data.get("provider")
-        product_id = payment_data.get("product_id")
-        amt = payment_data.get("amt")
-        item_desc = payment_data.get("item_desc")
-    else:
-        # 從 POST 資料提取
-        provider = request.POST.get("provider")
-        product_id = request.POST.get("product_id")
-        amt = request.POST.get("amt")
-        item_desc = request.POST.get("item_desc")
+    # 從 POST 資料提取
+    provider = request.POST.get("provider")
+    product_id = request.POST.get("product_id")
+    amt = request.POST.get("amt")
+    item_desc = request.POST.get("item_desc")
 
     return provider, product_id, amt, item_desc
 
@@ -71,33 +83,14 @@ def _create_order_for_payment(customer, provider, product_id, amount, item_desc)
 
 
 @csrf_exempt
+@login_required(login_url="/customers/login/")
 def create_payment(request):
     """統一付款入口 - 支援藍新金流和 LINE Pay"""
-    # 檢查登入狀態
-    if not request.user.is_authenticated:
-        if request.method == "POST":
-            # 暫存付款資料到 session
-            request.session["payment_data"] = {
-                "provider": request.POST.get("provider"),
-                "product_id": request.POST.get("product_id"),
-                "amt": request.POST.get("amt"),
-                "item_desc": request.POST.get("item_desc"),
-            }
-        login_url = reverse("customers_account:login")
-        next_url = request.get_full_path()
-        return redirect(f"{login_url}?next={next_url}")
-
-    # 取得付款參數
-    payment_data = None
-    if request.method == "GET":
-        payment_data = request.session.get("payment_data")
-        if not payment_data:
-            return redirect("pages:home")
 
     try:
         # 提取付款參數
         provider, product_id, amt, item_desc = _extract_payment_parameters(
-            request, payment_data
+            request, None
         )
 
         # 驗證參數
@@ -123,9 +116,6 @@ def create_payment(request):
             customer, provider, product_id, amt, item_desc
         )
 
-        # 清除暫存的付款資料
-        if "payment_data" in request.session:
-            del request.session["payment_data"]
 
         # 處理不同的金流
         if provider == "newebpay":
@@ -154,7 +144,7 @@ def create_payment(request):
         return redirect("pages:home")
 
 
-@login_required(login_url="/customers/login/")
+@customer_login_required
 def payment_status(request, order_id):
     """查詢訂單狀態"""
     order = get_object_or_404(Order, id=order_id)

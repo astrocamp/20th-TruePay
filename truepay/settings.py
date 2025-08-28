@@ -57,12 +57,16 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "truepay.security_middleware.SecurityHeadersMiddleware",
+    "django.middleware.cache.UpdateCacheMiddleware", 
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "truepay.security_middleware.SessionSecurityMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.cache.FetchFromCacheMiddleware",
     "truepay.middleware.subdomain_middleware",
 ]
 
@@ -219,3 +223,19 @@ CSRF_TRUSTED_ORIGINS = [
 
 # 登入相關設定
 LOGIN_URL = "/customers/login/"
+
+# Session 安全設定
+SESSION_COOKIE_SECURE = not DEBUG  # 生產環境使用 HTTPS
+SESSION_COOKIE_HTTPONLY = True     # 防止 XSS 攻擊
+SESSION_COOKIE_SAMESITE = 'Lax'    # CSRF 保護
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 瀏覽器關閉時清除 Session
+SESSION_COOKIE_AGE = 3600  # Session 1小時後過期
+
+# 快取設定（防止敏感頁面被快取）
+CACHE_MIDDLEWARE_SECONDS = 0  # 不快取頁面
+CACHE_MIDDLEWARE_KEY_PREFIX = 'truepay'
+
+# 安全 Headers
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
