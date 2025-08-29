@@ -15,6 +15,7 @@ from .models import Merchant
 class RegisterForm(ModelForm):
     subdomain = SlugField(
         max_length=50,
+        required=False,
         help_text="商家專屬網址，例如：ownshop會變成－ownshop.truepay.com",
         widget=TextInput(attrs={"class": "input"}),
     )

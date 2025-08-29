@@ -1,31 +1,12 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login as django_login, logout as django_logout
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.cache import never_cache
+from truepay.decorators import customer_login_required
 from django.core.paginator import Paginator
-from functools import wraps
 from .forms import CustomerRegistrationForm, CustomerLoginForm
 from .models import Customer
 from payments.models import Order
-
-
-# 增強版的 login_required decorator：加入防快取功能
-def customer_login_required(view_func):
-    @wraps(view_func)
-    @login_required(login_url='/customers/login/')
-    @never_cache
-    def _wrapped_view(request, *args, **kwargs):
-        # 設定防快取 headers
-        response = view_func(request, *args, **kwargs)
-        if hasattr(response, '__setitem__'):
-            response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-            response['Pragma'] = 'no-cache'
-            response['Expires'] = '0'
-        
-        return response
-    return _wrapped_view
 
 
 def register(request):
@@ -59,17 +40,17 @@ def login(request):
             user, created = User.objects.get_or_create(
                 username=customer.email,
                 defaults={
-                    'email': customer.email,
-                    'first_name': customer.name,
-                    'is_active': customer.account_status == 'active'
-                }
+                    "email": customer.email,
+                    "first_name": customer.name,
+                    "is_active": customer.account_status == "active",
+                },
             )
-            
+
             # 使用 Django 認證系統登入
             django_login(request, user)
 
             # 檢查是否有 next 參數（登入後要重導向的頁面）
-            next_url = request.GET.get('next') or request.POST.get('next')
+            next_url = request.GET.get("next") or request.POST.get("next")
             if next_url:
                 messages.success(request, "登入成功")
                 return redirect(next_url)
@@ -88,18 +69,18 @@ def login(request):
 def logout(request):
     # 使用 Django 登出（這會清除 session 中的認證資訊）
     django_logout(request)
-    
+
     # 完全清除 session 並重新生成 session key
     request.session.flush()
 
     messages.success(request, "已成功登出")
-    
+
     # 建立重導向回應並設定防快取 headers
     response = redirect("pages:home")
-    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    response['Pragma'] = 'no-cache'
-    response['Expires'] = '0'
-    
+    response["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response["Pragma"] = "no-cache"
+    response["Expires"] = "0"
+
     return response
 
 
@@ -112,30 +93,30 @@ def purchase_history(request):
     except Customer.DoesNotExist:
         messages.error(request, "客戶資料不存在")
         return redirect("pages:home")
-    
+
     # 根據 customer 查詢購買記錄（使用統一的 Order 模型）
-    orders = Order.objects.select_related(
-        'product__merchant'
-    ).filter(
-        customer=customer
-    ).order_by('-created_at')
-    
+    orders = (
+        Order.objects.select_related("product__merchant")
+        .filter(customer=customer)
+        .order_by("-created_at")
+    )
+
     # 為了向後兼容，我們仍然使用 order_items 這個變數名
     order_items = orders
-    
+
     # 分頁處理
     paginator = Paginator(order_items, 10)  # 每頁顯示10筆記錄
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
-        'customer': customer,
-        'page_obj': page_obj,
-        'order_items': page_obj,
-        'role': 'customer'  # 指定角色給模板使用
+        "customer": customer,
+        "page_obj": page_obj,
+        "order_items": page_obj,
+        "role": "customer",  # 指定角色給模板使用
     }
-    
-    return render(request, 'customers/purchase_history.html', context)
+
+    return render(request, "customers/purchase_history.html", context)
 
 
 @customer_login_required
@@ -147,26 +128,24 @@ def dashboard(request):
     except Customer.DoesNotExist:
         messages.error(request, "客戶資料不存在")
         return redirect("pages:home")
-    
+
     # 取得該客戶的訂單記錄統計
-    orders = Order.objects.select_related(
-        'product__merchant'
-    ).filter(customer=customer)
-    
+    orders = Order.objects.select_related("product__merchant").filter(customer=customer)
+
     # 統計資料
     total_orders = orders.count()
     total_amount = sum(order.amount for order in orders)
-    pending_orders = orders.filter(status='pending').count()
-    
+    pending_orders = orders.filter(status="pending").count()
+
     # 最近5筆購買記錄
-    recent_orders = orders.order_by('-created_at')[:5]
-    
+    recent_orders = orders.order_by("-created_at")[:5]
+
     context = {
-        'customer': customer,
-        'total_orders': total_orders,
-        'total_amount': total_amount,
-        'pending_orders': pending_orders,
-        'recent_orders': recent_orders,
+        "customer": customer,
+        "total_orders": total_orders,
+        "total_amount": total_amount,
+        "pending_orders": pending_orders,
+        "recent_orders": recent_orders,
     }
-    
-    return render(request, 'customers/dashboard.html', context)
+
+    return render(request, "customers/dashboard.html", context)

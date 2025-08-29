@@ -1,22 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from merchant_account import views as merchant_views
-from django.shortcuts import redirect
-
-
-def accounts_login_redirect(request):
-    """重導向舊的 accounts/login/ 到新的 customers/login/"""
-    return redirect("/customers/login/", permanent=True)
-
-
-from django.shortcuts import redirect
 from django.views.generic import RedirectView
-
-
-def accounts_login_redirect(request):
-    """重導向舊的 accounts/login/ 到新的 customers/login/"""
-    return redirect("/customers/login/", permanent=True)
-
 
 urlpatterns = [
     path("admin/", admin.site.urls),

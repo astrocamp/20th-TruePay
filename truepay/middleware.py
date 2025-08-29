@@ -9,6 +9,8 @@ class subdomain_middleware:
 
     def __call__(self, request):
         # 檢查自訂域名（通向商品總覽頁面）
+        if request.path.startswith("/payments/"):
+            return self.get_response(request)
         host = request.META.get("HTTP_HOST", "").replace("www.", "")
         if ":" in host:
             host = host.split(":")[0]
@@ -16,6 +18,7 @@ class subdomain_middleware:
             not host.endswith("127.0.0.1")
             and not host.endswith("truepay.local")
             and not host.endswith("localhost")
+            and not host.endswith("ngrok-free.app")
         ):
             try:
                 merchant = Merchant.objects.get(
