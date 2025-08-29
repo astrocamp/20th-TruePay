@@ -3,9 +3,7 @@
 <div class="max-w-2xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
     <div class="mb-6">
         <a href="{% url 'merchant_marketplace:detail' product.id %}" class="text-blue-600 hover:text-blue-800 flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-            </svg>
+            {% include 'components/icons.html' with icon='arrow-left' class='w-5 h-5 mr-2' %}
             返回商品詳情
         </a>
     </div>
