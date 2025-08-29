@@ -16,24 +16,6 @@ def shop_overview(request, subdomain):
         return redirect("pages:home")
 
 
-def product_detail(request, subdomain, product_id):
-    """單一商品詳細頁面 - 客戶查看特定商品"""
-    try:
-        merchant = Merchant.objects.get(subdomain=subdomain)
-        product = get_object_or_404(
-            Product, 
-            id=product_id, 
-            merchant=merchant, 
-            is_active=True
-        )
-        context = {
-            "merchant": merchant, 
-            "product": product
-        }
-        return render(request, "public_store/product_detail.html", context)
-    except Merchant.DoesNotExist:
-        return redirect("pages:home")
-
 
 def payment_page(request, id):
     """商品收款頁面 - 客戶進行付款"""
