@@ -40,44 +40,32 @@
           <ul class="px-2 space-y-1 text-sm">
             <li>
               <a href="{% url 'merchant_account:dashboard' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
-                <!-- home icon -->
-                <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
-                  <path d="M3 10.5l9-7 9 7"/>
-                  <path d="M5 10v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9"/>
-                </svg>
+                {% include 'components/icons.html' with icon='home' %}
                 廠商總覽 Overview
               </a>
             </li>
             <li>
               <a href="{% url 'merchant_marketplace:index' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
-                <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
-                  <path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>
-                </svg>
+                {% include 'components/icons.html' with icon='menu' %}
                 商品列表 Product List
               </a>
             </li>
             <li>
               <a href="{% url 'merchant_marketplace:new' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
-                <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
-                  <path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>
-                </svg>
+                {% include 'components/icons.html' with icon='plus' %}
                 新增商品 Create Product
               </a>
             </li>
             <li>
               <a href="{% url 'merchant_account:transaction_history' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
-                <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
-                  <path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>
-                </svg>
+                {% include 'components/icons.html' with icon='document' %}
                 交易紀錄 Transactions
               </a>
             </li>
             
             <li>
               <a href="{% url 'merchant_account:domain_settings' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
-                <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
+                {% include 'components/icons.html' with icon='check-circle' %}
                 網域設定 Domain Settings
               </a>
             </li>
@@ -90,35 +78,20 @@
                 <a href="#" onclick="alert('請先在網域設定中設定自訂網域')" class="flex 
                 items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] opacity-50">
               {% endif %}
-                <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" 
-                stroke="currentColor">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 
-                8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
-                <line x1="12" y1="22.08" x2="12" y2="12"/>
-                </svg>
+                {% include 'components/icons.html' with icon='cube' %}
                    商品總覽頁面 Shop Overview
                 </a>
             </li>
             <li>
               <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
-                  <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
-                    <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
-                    <path d="m21 7V5a2 2 0 0 0-2-2h-2"/>
-                    <path d="M3 17v2a2 2 0 0 0 2 2h2"/>
-                    <path d="m21 17v2a2 2 0 0 1-2 2h-2"/>
-                    <circle cx="12" cy="12" r="1"/>
-                  </svg>
+                  {% include 'components/icons.html' with icon='qr' %}
                 掃描QR
               </a>
             </li>
             
             <li>
               <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
-                <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
-                  <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
-                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V22a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H2a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06A2 2 0 1 1 6.04 3.4l.06.06c.48.48 1.17.62 1.82.33H8a1.65 1.65 0 0 0 1-1.51V2a2 2 0 1 1 4 0v.09c0 .66.39 1.26 1 1.51h.08c.64.29 1.34.15 1.82-.33l.06-.06A2 2 0 1 1 20.6 6.04l-.06.06a1.65 1.65 0 0 0-.33 1.82v.08c.25.61.85 1 1.51 1H22a2 2 0 1 1 0 4h-.09c-.66 0-1.26.39-1.51 1z"/>
-                </svg>
+                {% include 'components/icons.html' with icon='settings' %}
                 設定 Settings
               </a>
             </li>
@@ -127,9 +100,7 @@
         <!-- 登出 -->
         <div class="p-4 border-t border-[#D2D2D7]">
           <a href="{%url 'merchant_account:logout'%}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-red-600">
-            <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
-              <path d="M10 17l5-5-5-5"/><path d="M15 12H3"/>
-            </svg>
+            {% include 'components/icons.html' with icon='logout' %}
             登出 Log out
           </a>
         </div>
