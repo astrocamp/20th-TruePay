@@ -11,7 +11,6 @@
       type="text/css"
     />
     <script src="{% static 'scripts/app.js' %}" defer></script>
-    <script src="{% static 'scripts/menu.js' %}" defer></script>
 
     <title>{% block title %}TruePay 首頁{% endblock %}</title>
   </head>
@@ -22,22 +21,15 @@
       <div class="max-w-screen-xl mx-auto flex items-center justify-between">
         <!-- 左側：手機時顯示漢堡 + 品牌 -->
         <div class="flex items-center gap-3">
-          <!-- 漢堡按鈕 (手機版) -->
-          <button
-            id="menu-toggle"
-            class="md:hidden p-2 text-brand-grayDark focus:outline-none"
-          >
+         <!-- 漢堡按鈕 (手機版) -->
+          <button id="menu-toggle" class="md:hidden p-2 text-brand-grayDark focus:outline-none" 
+                data-action="toggle-menu" data-menu-id="mobile-menu" data-brand-id="nav-brand"
+                aria-expanded="false">
             ☰
           </button>
           <!-- 品牌名稱 (桌機版才顯示 / 手機展開時隱藏) -->
-          <a
-            id="nav-brand"
-            href="{% url 'pages:home' %}"
-            class="text-lg font-bold text-brand-black md:text-xl"
-            >TruePay</a
-          >
-        </div>
-
+          <a id="nav-brand" href="{% url 'pages:home' %}" class="text-lg font-bold text-brand-black md:text-xl">TruePay</a>
+      </div>
         <!-- 桌機版選單 -->
         <ul class="hidden md:flex items-center gap-6 text-sm font-medium">
           <li>
@@ -118,8 +110,6 @@
             </li>
           {% endif %}
         </ul>
-      </div>
-
       <!-- 手機版選單 (預設隱藏) -->
       <div
         id="mobile-menu"

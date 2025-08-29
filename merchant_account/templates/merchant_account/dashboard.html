@@ -1,6 +1,6 @@
 {% extends "merchant_layout/dashboard_base.html" %}
 
-{% block title %}廠商總覽 - TrustPay{% endblock %}
+{% block title %}廠商總覽 - TruePay{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
@@ -25,9 +25,7 @@
                     <p class="text-green-600 text-sm mt-1">活躍商品</p>
                 </div>
                 <div class="p-3 bg-blue-50 rounded-full">
-                    <svg class="w-8 h-8 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                    </svg>
+                    {% include 'components/icons.html' with icon='box' class='w-8 h-8 text-[#0056B3]' %}
                 </div>
             </div>
         </div>
@@ -41,9 +39,7 @@
                     <p class="text-gray-500 text-sm mt-1">總訂單數</p>
                 </div>
                 <div class="p-3 bg-green-50 rounded-full">
-                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
+                    {% include 'components/icons.html' with icon='document' class='w-8 h-8 text-green-600' %}
                 </div>
             </div>
         </div>
@@ -57,9 +53,7 @@
                     <p class="text-gray-500 text-sm mt-1">累計金額</p>
                 </div>
                 <div class="p-3 bg-yellow-50 rounded-full">
-                    <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
-                    </svg>
+                    {% include 'components/icons.html' with icon='money' class='w-8 h-8 text-yellow-600' %}
                 </div>
             </div>
         </div>
@@ -144,31 +138,22 @@
         <h2 class="text-xl font-bold text-gray-900 mb-6">快速操作</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <a href="{% url 'merchant_marketplace:new' %}" class="flex flex-col items-center p-6 bg-[#0056B3] text-white rounded-xl hover:bg-[#00408A] transition-colors">
-                <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                </svg>
+                {% include 'components/icons.html' with icon='plus' class='w-8 h-8 mb-2' %}
                 <span class="text-sm font-medium">新增商品</span>
             </a>
             
             <a href="{% url 'merchant_marketplace:index' %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
-                <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-                </svg>
+                {% include 'components/icons.html' with icon='menu' class='w-8 h-8 mb-2' %}
                 <span class="text-sm font-medium">商品列表</span>
             </a>
             
             <a href="{% url 'merchant_account:transaction_history' %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
-                <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
+                {% include 'components/icons.html' with icon='document' class='w-8 h-8 mb-2' %}
                 <span class="text-sm font-medium">交易記錄</span>
             </a>
             
             <a href="{% url 'merchant_account:domain_settings' %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
-                <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
+                {% include 'components/icons.html' with icon='settings' class='w-8 h-8 mb-2' %}
                 <span class="text-sm font-medium">設定</span>
             </a>
         </div>
