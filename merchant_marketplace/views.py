@@ -1,8 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import Http404
 from django.contrib import messages
-from django.views.decorators.cache import never_cache
-from functools import wraps
 
 from truepay.decorators import shop_required
 from .models import Product
