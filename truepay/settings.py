@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "merchant_account",
     "customers_account",
     "merchant_marketplace",
+    "public_store",  # 公開商店頁面
     "storages",
     "payments",  # 統一付款應用
 ]

@@ -9,6 +9,5 @@ urlpatterns = [
     path("logout/", views.logout, name="logout"),
     path("dashboard/", views.dashboard, name="dashboard"),
     path("domain_settings/", views.domain_settings, name="domain_settings"),
-    path("shop/<slug:subdomain>/", views.shop_overview, name="shop_overview"),
     path("transaction_history/", views.transaction_history, name="transaction_history"),
 ]

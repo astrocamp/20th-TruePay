@@ -159,17 +159,6 @@ def domain_settings(request):
     return render(request, "merchant_account/domain_settings.html", {"form": form})
 
 
-def shop_overview(request, subdomain):
-    try:
-        merchant = Merchant.objects.get(subdomain=subdomain)
-        products = Product.objects.filter(merchant=merchant, is_active=True).order_by(
-            "-created_at"
-        )
-        context = {"merchant": merchant, "products": products}
-        return render(request, "merchant_account/shop_overview.html", context)
-    except Merchant.DoesNotExist:
-        return redirect("pages:home")
-
 
 @merchant_login_required
 def transaction_history(request):

@@ -172,9 +172,3 @@ def edit(request, id):
             return render(request, "merchant_marketplace/edit.html", context)
 
 
-def payment_page(request, id):
-    """公開的商品收款頁面，任何人都可以查看"""
-    product = get_object_or_404(Product, id=id, is_active=True)
-    return render(
-        request, "merchant_marketplace/payment_page.html", {"product": product}
-    )
