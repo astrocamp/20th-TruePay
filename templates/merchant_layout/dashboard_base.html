@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}TrustPay 廠商儀表板{% endblock %}</title>
+  <title>{% block title %}TruePay 廠商儀表板{% endblock %}</title>
   <!-- 使用專案編譯的 Tailwind CSS -->
   {% load static %}
   <link href="{% static 'styles/app.css' %}" rel="stylesheet" type="text/css" />
@@ -27,14 +27,19 @@
       <div class="h-full flex flex-col">
         <!-- Logo -->
         <div class="px-6 h-16 flex items-center border-b border-[#D2D2D7]">
-          <a href="/" class="text-xl font-bold text-[#0056B3]">TrustPay</a>
+          <a href="{% url 'merchant_account:dashboard' %}" class="text-xl font-bold text-[#0056B3]">TrustPay</a>
           <label for="sidebarToggle" class="ml-auto md:hidden cursor-pointer p-2 rounded-lg hover:bg-[#F5F5F7]" aria-label="關閉選單">✕</label>
         </div>
         <!-- 導覽選單 -->
-        <nav class="flex-1 overflow-y-auto py-4">
+        <nav class="flex-1 overflow-y-auto py-4" x-data="{ 
+          currentPath: window.location.pathname,
+          isActive(element) {
+            return this.currentPath === element.getAttribute('href').replace(/\?.*$/, '')
+          }
+        }">
           <ul class="px-2 space-y-1 text-sm">
             <li>
-              <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-[#0056B3] font-medium">
+              <a href="{% url 'merchant_account:dashboard' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
                 <!-- home icon -->
                 <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
                   <path d="M3 10.5l9-7 9 7"/>
@@ -44,7 +49,7 @@
               </a>
             </li>
             <li>
-              <a href="{% url 'merchant_marketplace:index' %}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+              <a href="{% url 'merchant_marketplace:index' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
                 <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
                   <path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>
                 </svg>
@@ -52,7 +57,7 @@
               </a>
             </li>
             <li>
-              <a href="{% url 'merchant_marketplace:new' %}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+              <a href="{% url 'merchant_marketplace:new' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
                 <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
                   <path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>
                 </svg>
@@ -60,7 +65,7 @@
               </a>
             </li>
             <li>
-              <a href="{% url 'merchant_account:transaction_history' %}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+              <a href="{% url 'merchant_account:transaction_history' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
                 <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
                   <path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>
                 </svg>
@@ -69,7 +74,7 @@
             </li>
             
             <li>
-              <a href="{% url 'merchant_account:domain_settings' %}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+              <a href="{% url 'merchant_account:domain_settings' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
                 <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>
@@ -145,7 +150,7 @@
     <!-- Footer -->
       <footer class="mt-auto border-t border-[#D2D2D7] bg-white">
         <div class="max-w-6xl mx-auto px-4 md:px-6 py-6 text-xs text-gray-500 flex items-center justify-between">
-          <p>© 2025 TrustPay</p>
+          <p>© 2025 TruePay</p>
           <nav class="flex items-center gap-4">
             <a href="#" class="hover:text-[#0056B3]">使用條款</a>
             <a href="#" class="hover:text-[#0056B3]">隱私權政策</a>
