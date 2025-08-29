@@ -3,10 +3,29 @@ from django.contrib import messages
 from django.contrib.auth import login as django_login, logout as django_logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
 from django.core.paginator import Paginator
+from functools import wraps
 from .forms import CustomerRegistrationForm, CustomerLoginForm
 from .models import Customer
 from payments.models import Order
+
+
+# 增強版的 login_required decorator：加入防快取功能
+def customer_login_required(view_func):
+    @wraps(view_func)
+    @login_required(login_url='/customers/login/')
+    @never_cache
+    def _wrapped_view(request, *args, **kwargs):
+        # 設定防快取 headers
+        response = view_func(request, *args, **kwargs)
+        if hasattr(response, '__setitem__'):
+            response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = '0'
+        
+        return response
+    return _wrapped_view
 
 
 def register(request):
@@ -67,14 +86,24 @@ def login(request):
 
 
 def logout(request):
-    # 使用 Django 登出
+    # 使用 Django 登出（這會清除 session 中的認證資訊）
     django_logout(request)
+    
+    # 完全清除 session 並重新生成 session key
+    request.session.flush()
 
     messages.success(request, "已成功登出")
-    return redirect("pages:home")
+    
+    # 建立重導向回應並設定防快取 headers
+    response = redirect("pages:home")
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    
+    return response
 
 
-@login_required(login_url='/customers/login/')
+@customer_login_required
 def purchase_history(request):
     """消費者購買記錄頁面"""
     # 透過 email 找到對應的 Customer
@@ -109,7 +138,7 @@ def purchase_history(request):
     return render(request, 'customers/purchase_history.html', context)
 
 
-@login_required(login_url='/customers/login/')
+@customer_login_required
 def dashboard(request):
     """消費者儀表板頁面"""
     # 透過 email 找到對應的 Customer

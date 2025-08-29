@@ -30,11 +30,17 @@ SECRET_KEY = "django-insecure-iip1xgbl_eh&cl1p81i9*nuvl)qlb$#gj1e+f1it-a!xu1qjio
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# 從環境變數讀取 ngrok URL (必須在 .env 中設定)
+NGROK_URL = os.getenv("NGROK_URL")
+if not NGROK_URL:
+    raise ValueError("請在 .env 檔案中設定 NGROK_URL=your-ngrok-id.ngrok-free.app")
+
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
     ".truepay.local",
-    "738361925443.ngrok-free.app",
+    NGROK_URL,
+
 ]
 
 
@@ -57,12 +63,16 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "truepay.security_middleware.SecurityHeadersMiddleware",
+    "django.middleware.cache.UpdateCacheMiddleware", 
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "truepay.security_middleware.SessionSecurityMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.cache.FetchFromCacheMiddleware",
     "truepay.middleware.subdomain_middleware",
 ]
 
@@ -201,21 +211,39 @@ LINEPAY_API_URL = os.getenv("LINEPAY_API_URL", "https://sandbox-api-pay.line.me"
 # 使用 ngrok URL - 請在金流後台設定相同的 URL
 
 # 統一付款系統的回調 URLs
-PAYMENT_RETURN_URL = "https://738361925443.ngrok-free.app/payments/newebpay/return/"
-PAYMENT_NOTIFY_URL = "https://738361925443.ngrok-free.app/payments/newebpay/notify/"
-PAYMENT_CANCEL_URL = "https://738361925443.ngrok-free.app/payments/newebpay/cancel/"
+
+PAYMENT_RETURN_URL = f"https://{NGROK_URL}/payments/newebpay/return/"
+PAYMENT_NOTIFY_URL = f"https://{NGROK_URL}/payments/newebpay/notify/"
+PAYMENT_CANCEL_URL = f"https://{NGROK_URL}/payments/newebpay/cancel/"
 
 # LINE Pay 回調 URLs
-LINEPAY_CONFIRM_URL = "https://738361925443.ngrok-free.app/payments/linepay/confirm/"
-LINEPAY_CANCEL_URL = "https://738361925443.ngrok-free.app/payments/linepay/cancel/"
+LINEPAY_CONFIRM_URL = f"https://{NGROK_URL}/payments/linepay/confirm/"
+LINEPAY_CANCEL_URL = f"https://{NGROK_URL}/payments/linepay/cancel/"
 
 
 # CSRF 豁免設定（金流回調需要）
 CSRF_TRUSTED_ORIGINS = [
     "https://ccore.newebpay.com",
     "http://127.0.0.1:8000",
-    "https://738361925443.ngrok-free.app",
+    f"https://{NGROK_URL}",
+
 ]
 
 # 登入相關設定
 LOGIN_URL = "/customers/login/"
+
+# Session 安全設定
+SESSION_COOKIE_SECURE = not DEBUG  # 生產環境使用 HTTPS
+SESSION_COOKIE_HTTPONLY = True     # 防止 XSS 攻擊
+SESSION_COOKIE_SAMESITE = 'Lax'    # CSRF 保護
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 瀏覽器關閉時清除 Session
+SESSION_COOKIE_AGE = 3600  # Session 1小時後過期
+
+# 快取設定（防止敏感頁面被快取）
+CACHE_MIDDLEWARE_SECONDS = 0  # 不快取頁面
+CACHE_MIDDLEWARE_KEY_PREFIX = 'truepay'
+
+# 安全 Headers
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
