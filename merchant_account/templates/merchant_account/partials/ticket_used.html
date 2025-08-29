@@ -1,9 +1,7 @@
 <!-- 票券使用成功的HTML片段 -->
 <div class="ticket-used text-center">
     <div class="bg-green-100 text-green-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
-        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
-        </svg>
+        {% include 'components/icons.html' with icon='check' class='w-8 h-8' %}
     </div>
     <h3 class="text-xl font-bold text-green-800 mb-3">{{ message }}</h3>
     <div class="bg-gray-50 rounded-lg p-4 mb-4">
