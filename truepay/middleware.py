@@ -1,6 +1,6 @@
 from merchant_account.models import Merchant
 from django.conf import settings
-from merchant_account.views import shop_overview
+from public_store.views import custom_domain_shop
 
 
 class subdomain_middleware:
@@ -24,7 +24,7 @@ class subdomain_middleware:
                 merchant = Merchant.objects.get(
                     merchant_domain=host, use_merchant_domain=True
                 )
-                return shop_overview(request, merchant.subdomain)
+                return custom_domain_shop(request, merchant)
             except Merchant.DoesNotExist:
                 if settings.DEBUG:
                     print(f"[DEBUG] 找不到使用自訂域名 '{host}' 的商家")
