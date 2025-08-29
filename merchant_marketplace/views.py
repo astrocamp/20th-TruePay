@@ -37,13 +37,8 @@ def detail(request, id):
 @shop_required
 def new(request):
     if request.method == "GET":
-        merchant_id = request.session.get("merchant_id")
-        if merchant_id:
-            merchant = get_object_or_404(Merchant, id=merchant_id)
-            context = {"merchant_phone": merchant.Cellphone}
-            return render(request, "merchant_marketplace/new.html", context)
-        else:
-            return render(request, "merchant_marketplace/new.html")
+        context = {"merchant_phone": request.merchant.Cellphone}
+        return render(request, "merchant_marketplace/new.html", context)
 
     elif request.method == "POST":
         try:
@@ -61,7 +56,9 @@ def new(request):
 
         except Exception as e:
             messages.error(request, f"新增失敗：{str(e)}")
-            return render(request, "merchant_marketplace/new.html")
+            context = {"merchant_phone": request.merchant.Cellphone}
+            return render(request, "merchant_marketplace/new.html", context)
+    return render(request, "merchant_marketplace/new.html")
 
 
 @no_cache_required
@@ -98,5 +95,3 @@ def edit(request, id):
             messages.error(request, f"更新失敗：{str(e)}")
             context = {"product": product, "merchant_phone": product.merchant.Cellphone}
             return render(request, "merchant_marketplace/edit.html", context)
-
-

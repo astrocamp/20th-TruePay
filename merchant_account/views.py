@@ -1,14 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.core.paginator import Paginator
-from truepay.decorators import no_cache_required, shop_required
+from django.contrib.auth.models import User
+from django.contrib.auth import login as django_login
+from django.contrib.auth import logout as django_logout
+from django.core.paginator import Paginator
+from django.db.models import Sum
 
+
+from truepay.decorators import no_cache_required, shop_required
 from .forms import RegisterForm, LoginForm, domain_settings_form
 from .models import Merchant
 from merchant_marketplace.models import Product
 from payments.models import Order
-from django.core.paginator import Paginator
-from django.db.models import Sum
 
 
 def register(req):
@@ -46,10 +50,13 @@ def login(req):
                 merchant = Merchant.objects.get(Email=email)
 
                 if merchant.check_password(password):
-                    req.session["merchant_id"] = merchant.id
-                    req.session["merchant_name"] = merchant.Name
-                    messages.success(req, "歡迎進入！！！")
+                    user, created = User.objects.get_or_create(
+                        username=f"merchant_{merchant.Email}",
+                        defaults={"email": merchant.Email, "first_name": merchant.Name},
+                    )
+                    django_login(req, user)
 
+                    messages.success(req, "歡迎進入！！！")
                     return redirect("merchant_marketplace:index")
                 else:
                     messages.error(req, "密碼錯誤")
@@ -62,6 +69,7 @@ def login(req):
 
 
 def logout(req):
+    django_logout(req)
     # 清除所有 session 資料
     req.session.flush()  # 完全清除 session 並重新生成 session key
 
@@ -85,12 +93,7 @@ def logout(req):
 @shop_required
 def dashboard(request):
     """廠商Dashboard概覽頁面"""
-    merchant_id = request.session.get("merchant_id")
-    if not merchant_id:
-        messages.error(request, "請先登入")
-        return redirect("merchant_account:login")
-
-    merchant = get_object_or_404(Merchant, id=merchant_id)
+    merchant = request.merchant
 
     # 獲取商家的基本統計數據
     products = Product.objects.filter(merchant=merchant, is_active=True)
