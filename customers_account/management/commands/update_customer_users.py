@@ -31,6 +31,7 @@ class Command(BaseCommand):
                         email=customer.email,
                         first_name=customer.name,
                         is_active=customer.account_status == "active",
+                        password=customer.password,
                     )
                     updated_count += 1
                     self.stdout.write(

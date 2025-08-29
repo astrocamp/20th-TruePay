@@ -55,12 +55,12 @@ class RegisterForm(ModelForm):
             "Password": PasswordInput(attrs={"class": "input"}),
         }
 
-        def save(self, commit=True):
-            merchant = super().save(commit=False)
-            merchant.set_password(self.cleaned_data["Password"])
-            if commit:
-                merchant.save()
-            return merchant
+    def save(self, commit=True):
+        merchant = super().save(commit=False)
+        merchant.set_password(self.cleaned_data["Password"])
+        if commit:
+            merchant.save()
+        return merchant
 
 
 class LoginForm(Form):
