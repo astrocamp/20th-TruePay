@@ -2,9 +2,7 @@
 <div class="ticket-success">
     <div class="text-center mb-4">
         <div class="bg-green-100 text-green-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
-            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
-            </svg>
+            {% include 'components/icons.html' with icon='check' class='w-8 h-8' %}
         </div>
         <h3 class="text-xl font-bold text-green-800">票券驗證成功</h3>
     </div>
@@ -32,9 +30,7 @@
         <form hx-post="{% url 'merchant_account:use_ticket' %}" hx-target="#scan-result" hx-swap="innerHTML">
             <input type="hidden" name="ticket_code" value="{{ ticket_code }}">
             <button type="submit" class="w-full bg-[#0056B3] hover:bg-[#00408A] text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center">
-                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
-                </svg>
+                {% include 'components/icons.html' with icon='check' class='w-5 h-5 mr-2' %}
                 確認使用票券
             </button>
         </form>
