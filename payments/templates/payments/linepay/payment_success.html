@@ -44,7 +44,7 @@
                 {% endif %}
                 
                 <div class="space-y-3">
-                    <a href="{% url 'pages:home' %}" class="block w-full bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition duration-200 font-medium">
+                    <a href="{% url 'customers_account:dashboard' %}" class="block w-full bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition duration-200 font-medium">
                         返回首頁
                     </a>
                     {% if order %}
@@ -68,7 +68,7 @@
                     <p class="text-sm text-yellow-800">如果您已完成付款，請稍候片刻或聯繫客服確認。</p>
                 </div>
                 
-                <a href="{% url 'pages:home' %}" class="block w-full bg-gray-500 text-white py-3 px-6 rounded-lg hover:bg-gray-600 transition duration-200 font-medium">
+                <a href="{% url 'customers_account:dashboard' %}" class="block w-full bg-gray-500 text-white py-3 px-6 rounded-lg hover:bg-gray-600 transition duration-200 font-medium">
                     返回首頁
                 </a>
             {% endif %}
