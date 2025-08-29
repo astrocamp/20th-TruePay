@@ -1,40 +1,14 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.views.decorators.http import require_http_methods
-from django.views.decorators.cache import never_cache
-from django.http import JsonResponse
-from functools import wraps
+from django.core.paginator import Paginator
+from truepay.decorators import no_cache_required, shop_required
 
 from .forms import RegisterForm, LoginForm, domain_settings_form
 from .models import Merchant
-from django.views.decorators.csrf import csrf_exempt
 from merchant_marketplace.models import Product
 from payments.models import Order
-from django.core.paginator import Paginator
 
 
-# 自定義 decorator：檢查商家登入狀態並防止快取
-def merchant_login_required(view_func):
-    @wraps(view_func)
-    @never_cache
-    def _wrapped_view(request, *args, **kwargs):
-        merchant_id = request.session.get("merchant_id")
-        if not merchant_id:
-            messages.error(request, "請先登入")
-            return redirect("merchant_account:login")
-        
-        # 設定防快取 headers
-        response = view_func(request, *args, **kwargs)
-        if hasattr(response, '__setitem__'):
-            response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-            response['Pragma'] = 'no-cache'
-            response['Expires'] = '0'
-        
-        return response
-    return _wrapped_view
-
-
-# Create your views here.
 def register(req):
     if req.method == "POST":
         form = RegisterForm(req.POST)
@@ -73,10 +47,8 @@ def login(req):
                     req.session["merchant_id"] = merchant.id
                     req.session["merchant_name"] = merchant.Name
                     messages.success(req, "歡迎進入！！！")
-                    if merchant.subdomain:
-                        return redirect(f"/marketplace/?shop={merchant.subdomain}")
-                    else:
-                        return redirect(f"/marketplace/?shop_id={merchant.id}")
+
+                    return redirect("merchant_marketplace:index")
                 else:
                     messages.error(req, "密碼錯誤")
             except Merchant.DoesNotExist:
@@ -90,29 +62,28 @@ def login(req):
 def logout(req):
     # 清除所有 session 資料
     req.session.flush()  # 完全清除 session 並重新生成 session key
-    
+
     # 清除 messages（避免累積）
     storage = messages.get_messages(req)
     for message in storage:
         pass
 
     messages.success(req, "已成功登出")
-    
+
     # 建立重導向回應並設定防快取 headers
     response = redirect("merchant_account:login")
-    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    response['Pragma'] = 'no-cache'
-    response['Expires'] = '0'
-    
+    response["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response["Pragma"] = "no-cache"
+    response["Expires"] = "0"
+
     return response
 
 
-@merchant_login_required
+@no_cache_required
+@shop_required
 def domain_settings(request):
-    merchant_id = request.session.get("merchant_id")
-    merchant = get_object_or_404(Merchant, id=merchant_id)
     if request.method == "POST":
-        form = domain_settings_form(request.POST, instance=merchant)
+        form = domain_settings_form(request.POST, instance=request.merchant)
         if form.is_valid():
             form.save()
             messages.success(request, "網域名稱已更新")
@@ -120,7 +91,7 @@ def domain_settings(request):
         else:
             messages.error(request, "設定失敗，請檢查內容")
     else:
-        form = domain_settings_form(instance=merchant)
+        form = domain_settings_form(instance=request.merchant)
     return render(request, "merchant_account/domain_settings.html", {"form": form})
 
 
@@ -136,17 +107,14 @@ def shop_overview(request, subdomain):
         return redirect("pages:home")
 
 
-@merchant_login_required
+@no_cache_required
+@shop_required
 def transaction_history(request):
     """廠商交易記錄頁面"""
-    # 檢查商家是否已登入
-    merchant_id = request.session.get("merchant_id")
-    merchant = get_object_or_404(Merchant, id=merchant_id)
-
     # 查詢該商家的所有交易記錄（使用統一的 Order 模型）
     orders = (
         Order.objects.select_related("customer", "product")
-        .filter(product__merchant=merchant)
+        .filter(product__merchant=request.merchant)
         .order_by("-created_at")
     )
 
@@ -159,7 +127,7 @@ def transaction_history(request):
     page_obj = paginator.get_page(page_number)
 
     context = {
-        "merchant": merchant,
+        "merchant": request.merchant,
         "page_obj": page_obj,
         "order_items": page_obj,
         "role": "merchant",  # 指定角色給模板使用
