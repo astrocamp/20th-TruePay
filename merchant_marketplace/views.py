@@ -28,7 +28,7 @@ def detail(request, id):
         product.is_active = False
         product.save()
         messages.success(request, "商品已刪除")
-        return redirect("/marketplace/")
+        return redirect("merchant_marketplace:index")
 
     return render(request, "merchant_marketplace/detail.html", {"product": product})
 
@@ -57,7 +57,7 @@ def new(request):
             )
 
             messages.success(request, "商品新增成功！")
-            return redirect("/marketplace/")
+            return redirect("merchant_marketplace:index")
 
         except Exception as e:
             messages.error(request, f"新增失敗：{str(e)}")
@@ -92,7 +92,7 @@ def edit(request, id):
             product.save()
 
             messages.success(request, "商品更新成功！")
-            return redirect("/marketplace/")
+            return redirect("merchant_marketplace:index")
 
         except Exception as e:
             messages.error(request, f"更新失敗：{str(e)}")
