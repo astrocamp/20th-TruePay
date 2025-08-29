@@ -73,42 +73,33 @@
             <div class="flex gap-2">
                 <input type="tel" id="phone_number" name="phone_number" value="{{ product.phone_number }}" required
                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-                <button type="button" onclick="useMerchantPhone()" 
+                <button type="button" data-action="use-merchant-phone" 
+                        data-target="phone_number" 
+                        data-phone="{{ merchant_phone|default:'' }}"
                         class="px-3 py-2 text-sm bg-gray-100 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-200 transition duration-200 whitespace-nowrap">
                     使用商家電話
                 </button>
             </div>
         </div>
         
-        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h3 class="text-sm font-medium text-yellow-800 mb-2">編輯提醒：</h3>
-            <ul class="text-sm text-yellow-700 space-y-1">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 class="text-sm font-medium text-blue-800 mb-2">編輯提醒：</h3>
+            <ul class="text-sm text-blue-700 space-y-1">
                 <li>• 修改後的資訊將立即生效</li>
                 <li>• 請確保所有資訊都是最新且正確的</li>
-                <li>• 如需下架商品，請返回詳情頁面刪除</li>
                 <li>• 圖片會自動上傳至 AWS S3</li>
+                <li>• 如需下架商品，請到商品詳情頁面操作</li>
             </ul>
         </div>
         
-        <div class="flex flex-col space-y-4">
-            <button type="submit" class="bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200">
+        <div class="flex gap-4">
+            <button type="submit" class="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200">
                 更新商品
             </button>
-            <div class="flex space-x-4">
-                <a href="{% url 'merchant_marketplace:detail' product.id %}" class="flex-1 text-center bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition duration-200">
-                    取消
-                </a>
-                <button type="button" onclick="confirmDelete()" class="flex-1 bg-red-100 text-red-700 hover:bg-red-200 transition duration-200 py-3 px-4 rounded-lg border border-red-300">
-                    刪除商品
-                </button>
-            </div>
+            <a href="{% url 'merchant_marketplace:detail' product.id %}" class="flex-1 text-center bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition duration-200">
+                取消
+            </a>
         </div>
-    </form>
-    
-    <!-- 隱藏的刪除表單 -->
-    <form id="deleteForm" action="{% url 'merchant_marketplace:detail' product.id %}" method="post" style="display: none;">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="delete">
     </form>
     
     <!-- 商品資訊預覽 -->
@@ -123,43 +114,4 @@
     </div>
 </div>
 
-<script>
-// 使用商家電話功能
-function useMerchantPhone() {
-    const merchantPhone = "{{ merchant_phone|default:'' }}";
-    if (merchantPhone) {
-        document.getElementById('phone_number').value = merchantPhone;
-    }
-}
-
-// 圖片檔案預覽功能
-document.getElementById('image').addEventListener('change', function() {
-    const file = this.files[0];
-    const preview = document.getElementById('new_image_preview');
-    
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            if (!preview) {
-                const previewDiv = document.createElement('div');
-                previewDiv.id = 'new_image_preview';
-                previewDiv.className = 'mt-2';
-                previewDiv.innerHTML = '<p class="text-sm text-gray-600 mb-2">新圖片預覽：</p><img class="w-32 h-32 object-cover rounded-lg border" alt="新圖片預覽">';
-                document.getElementById('image').parentNode.appendChild(previewDiv);
-            }
-            document.querySelector('#new_image_preview img').src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    } else if (preview) {
-        preview.remove();
-    }
-});
-
-// 刪除確認功能
-function confirmDelete() {
-    if (confirm('確定要刪除這個商品嗎？此操作無法復原。')) {
-        document.getElementById('deleteForm').submit();
-    }
-}
-</script>
 {% endblock %}

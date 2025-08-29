@@ -50,7 +50,7 @@
                 {% endif %}
                 
                 <div class="space-y-3">
-                    <a href="{% url 'pages:home' %}" class="block w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium">
+                    <a href="{% url 'customers_account:dashboard' %}" class="block w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium">
                         返回首頁
                     </a>
                     {% if order %}
@@ -74,7 +74,7 @@
                     <p class="text-sm text-yellow-800">{{ support_info }}</p>
                 </div>
                 
-                <a href="{% url 'pages:home' %}" class="block w-full bg-gray-500 text-white py-3 px-6 rounded-lg hover:bg-gray-600 transition duration-200 font-medium">
+                <a href="{% url 'customers_account:dashboard' %}" class="block w-full bg-gray-500 text-white py-3 px-6 rounded-lg hover:bg-gray-600 transition duration-200 font-medium">
                     返回首頁
                 </a>
             {% endif %}
