@@ -47,24 +47,20 @@
                     
                     <!-- 操作按鈕 -->
                     {% if request.session.merchant_id == product.merchant.id %}
-                        <div class="space-y-4">
-                            <div class="grid grid-cols-2 gap-4">
-                                <a href="{% url 'merchant_marketplace:edit' product.id %}" class="bg-[#0056B3] text-white px-6 py-3 rounded-lg hover:bg-[#00408A] transition duration-200 text-center">
-                                    編輯商品
-                                </a>
-                                <button data-action="confirm-delete" data-form-id="deleteForm" data-message="確定要刪除這個商品嗎？此操作無法復原。" class="bg-red-100 text-red-700 hover:bg-red-200 transition duration-200 px-6 py-3 rounded-lg border border-red-300 cursor-pointer">
-                                    刪除商品
-                                </button>
-                            </div>
-                            
-                            <div class="border-t border-gray-200 pt-4">
-                                <a href="{% url 'public_store:payment_page' product.id %}" 
-                                   class="w-full inline-block bg-green-600 text-white text-center py-3 px-6 rounded-lg hover:bg-green-700 transition duration-200 font-medium"
-                                   target="_blank">
-                                    🔗 開啟收款頁面
-                                </a>
-                                <p class="text-sm text-gray-500 mt-2 text-center">將在新視窗開啟顧客付款頁面</p>
-                            </div>
+                        <div class="flex space-x-4">
+                            <a href="{% url 'merchant_marketplace:edit' product.id %}" class="bg-[#0056B3] text-white px-6 py-3 rounded-lg hover:bg-[#00408A] transition duration-200">
+                                編輯商品
+                            </a>
+                            <button onclick="confirmDelete()" class="bg-red-100 text-red-700 hover:bg-red-200 transition duration-200 px-6 py-3 rounded-lg border border-red-300">
+                                刪除商品
+                            </button>
+                        </div>
+                        <div class="flex space-x-2">
+                            <a href="{% url 'public_store:payment_page' product.id %}" 
+                            class="flex-1 bg-red-100 text-red-700 text-center py-2 px-3 rounded text-sm hover:bg-red-200 transition duration-200 border border-red-300"
+                            target="_blank">
+                                預覽收款頁
+                            </a>
                         </div>
                         
                         <!-- 隱藏的刪除表單 -->
