@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from merchant_marketplace.models import Product
 from payments.models import Order
 from django.core.paginator import Paginator
+from django.db.models import Sum
 
 
 # 自定義 decorator：檢查商家登入狀態並防止快取
@@ -105,6 +106,40 @@ def logout(req):
     response['Expires'] = '0'
     
     return response
+
+
+def dashboard(request):
+    """廠商Dashboard概覽頁面"""
+    merchant_id = request.session.get("merchant_id")
+    if not merchant_id:
+        messages.error(request, "請先登入")
+        return redirect("merchant_account:login")
+    
+    merchant = get_object_or_404(Merchant, id=merchant_id)
+    
+    # 獲取商家的基本統計數據
+    products = Product.objects.filter(merchant=merchant, is_active=True)
+    total_products = products.count()
+    recent_products = products.order_by('-created_at')[:5]
+    
+    # 獲取交易記錄統計
+    orders = Order.objects.filter(product__merchant=merchant)
+    total_orders = orders.count()
+    recent_orders = orders.select_related('product', 'customer').order_by('-created_at')[:5]
+    
+    # 計算總收入
+    total_revenue = orders.aggregate(total=Sum('amount'))['total'] or 0
+    
+    context = {
+        'merchant': merchant,
+        'total_products': total_products,
+        'total_orders': total_orders,
+        'total_revenue': total_revenue,
+        'recent_products': recent_products,
+        'recent_orders': recent_orders,
+    }
+    
+    return render(request, 'merchant_account/dashboard.html', context)
 
 
 @merchant_login_required

@@ -1,0 +1,177 @@
+{% extends "merchant_layout/dashboard_base.html" %}
+
+{% block title %}廠商總覽 - TrustPay{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- 歡迎區塊 -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">歡迎回來，{{ merchant.Name }}！</h1>
+                <p class="text-gray-600">這裡是您的商家經營概況</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 統計卡片 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- 商品總數 -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-medium">商品總數</p>
+                    <p class="text-3xl font-bold text-[#0056B3] mt-2">{{ total_products }}</p>
+                    <p class="text-green-600 text-sm mt-1">活躍商品</p>
+                </div>
+                <div class="p-3 bg-blue-50 rounded-full">
+                    <svg class="w-8 h-8 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- 交易訂單 -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-medium">交易訂單</p>
+                    <p class="text-3xl font-bold text-green-600 mt-2">{{ total_orders }}</p>
+                    <p class="text-gray-500 text-sm mt-1">總訂單數</p>
+                </div>
+                <div class="p-3 bg-green-50 rounded-full">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- 總收入 -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-medium">總收入</p>
+                    <p class="text-3xl font-bold text-yellow-600 mt-2">${{ total_revenue|floatformat:0 }}</p>
+                    <p class="text-gray-500 text-sm mt-1">累計金額</p>
+                </div>
+                <div class="p-3 bg-yellow-50 rounded-full">
+                    <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 最新商品和訂單 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- 最新商品 -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-gray-900">最新商品</h2>
+                <a href="{% url 'merchant_marketplace:index' %}" class="text-[#0056B3] hover:text-[#00408A] text-sm font-medium">
+                    查看全部 →
+                </a>
+            </div>
+            
+            {% if recent_products %}
+                <div class="space-y-4">
+                    {% for product in recent_products %}
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                        <div class="flex items-center space-x-4">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-12 h-12 object-cover rounded-lg">
+                            {% else %}
+                                <div class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
+                                    <span class="text-gray-400 text-xs">無圖</span>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <p class="font-medium text-gray-900">{{ product.name|truncatechars:20 }}</p>
+                                <p class="text-sm text-gray-500">${{ product.price }}</p>
+                            </div>
+                        </div>
+                        <span class="text-xs text-gray-400">{{ product.created_at|date:"m/d" }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <p>尚無商品</p>
+                    <a href="{% url 'merchant_marketplace:new' %}" class="text-[#0056B3] hover:text-[#00408A] text-sm mt-2 inline-block">
+                        立即新增 →
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- 最新訂單 -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-gray-900">最新訂單</h2>
+                <a href="{% url 'merchant_account:transaction_history' %}" class="text-[#0056B3] hover:text-[#00408A] text-sm font-medium">
+                    查看全部 →
+                </a>
+            </div>
+            
+            {% if recent_orders %}
+                <div class="space-y-4">
+                    {% for order in recent_orders %}
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                        <div>
+                            <p class="font-medium text-gray-900">{{ order.product.name|truncatechars:25 }}</p>
+                            <p class="text-sm text-gray-500">{{ order.customer.name|default:"顧客" }}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-medium text-green-600">${{ order.total_amount }}</p>
+                            <p class="text-xs text-gray-400">{{ order.created_at|date:"m/d H:i" }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <p>尚無訂單</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 快速操作 -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h2 class="text-xl font-bold text-gray-900 mb-6">快速操作</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <a href="{% url 'merchant_marketplace:new' %}" class="flex flex-col items-center p-6 bg-[#0056B3] text-white rounded-xl hover:bg-[#00408A] transition-colors">
+                <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                <span class="text-sm font-medium">新增商品</span>
+            </a>
+            
+            <a href="{% url 'merchant_marketplace:index' %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                </svg>
+                <span class="text-sm font-medium">商品列表</span>
+            </a>
+            
+            <a href="{% url 'merchant_account:transaction_history' %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <span class="text-sm font-medium">交易記錄</span>
+            </a>
+            
+            <a href="{% url 'merchant_account:domain_settings' %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="text-sm font-medium">設定</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

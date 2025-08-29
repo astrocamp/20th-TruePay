@@ -211,7 +211,6 @@ LINEPAY_API_URL = os.getenv("LINEPAY_API_URL", "https://sandbox-api-pay.line.me"
 # 使用 ngrok URL - 請在金流後台設定相同的 URL
 
 # 統一付款系統的回調 URLs
-
 PAYMENT_RETURN_URL = f"https://{NGROK_URL}/payments/newebpay/return/"
 PAYMENT_NOTIFY_URL = f"https://{NGROK_URL}/payments/newebpay/notify/"
 PAYMENT_CANCEL_URL = f"https://{NGROK_URL}/payments/newebpay/cancel/"
