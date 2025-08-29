@@ -38,7 +38,7 @@ def login(request):
 
             # 建立或取得對應的 Django User
             user, created = User.objects.get_or_create(
-                username=customer.email,
+                username=f"customer_{customer.email}",
                 defaults={
                     "email": customer.email,
                     "first_name": customer.name,

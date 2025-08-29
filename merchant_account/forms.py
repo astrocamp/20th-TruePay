@@ -20,6 +20,14 @@ class RegisterForm(ModelForm):
         widget=TextInput(attrs={"class": "input"}),
     )
 
+    def save(self, commit=True):
+        merchant = super().save(commit=False)
+        # 使用 set_password 方法來雜湊密碼
+        merchant.set_password(self.cleaned_data['Password'])
+        if commit:
+            merchant.save()
+        return merchant
+
     class Meta:
         model = Merchant
         fields = [
@@ -54,6 +62,13 @@ class RegisterForm(ModelForm):
             "Cellphone": TextInput(attrs={"class": "input"}),
             "Password": PasswordInput(attrs={"class": "input"}),
         }
+
+    def save(self, commit=True):
+        merchant = super().save(commit=False)
+        merchant.set_password(self.cleaned_data["Password"])
+        if commit:
+            merchant.save()
+        return merchant
 
 
 class LoginForm(Form):
