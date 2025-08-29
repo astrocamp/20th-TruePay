@@ -45,7 +45,7 @@ def login(req):
             try:
                 merchant = Merchant.objects.get(Email=email)
 
-                if merchant.Password == password:
+                if merchant.check_password(password):
                     req.session["merchant_id"] = merchant.id
                     req.session["merchant_name"] = merchant.Name
                     messages.success(req, "歡迎進入！！！")
