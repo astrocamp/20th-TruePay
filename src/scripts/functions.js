@@ -140,68 +140,7 @@ function initImagePreview() {
 // 自動執行初始化
 initImagePreview();
 
-// 刪除確認對話框功能
-class ConfirmDialog {
-  constructor(config) {
-    this.buttonSelector = config.buttonSelector || '[onclick*="confirmDelete"]';
-    this.formId = config.formId || 'deleteForm';
-    this.message = config.message || '確定要刪除這個商品嗎？此操作無法復原。';
-    this.customConfirmHandler = config.customConfirmHandler;
-    
-    this.init();
-  }
 
-  init() {
-    // 移除所有按鈕的 onclick 屬性，改用事件監聽
-    document.addEventListener('DOMContentLoaded', () => {
-      this.setupDeleteButtons();
-    });
-  }
-
-  setupDeleteButtons() {
-    // 找到所有刪除按鈕
-    const deleteButtons = document.querySelectorAll(this.buttonSelector);
-    
-    deleteButtons.forEach(button => {
-      // 移除 onclick 屬性，避免衝突
-      button.removeAttribute('onclick');
-      
-      // 新增事件監聽器
-      button.addEventListener('click', (event) => {
-        event.preventDefault();
-        this.showConfirmDialog();
-      });
-    });
-  }
-
-  showConfirmDialog() {
-    if (confirm(this.message)) {
-      if (this.customConfirmHandler) {
-        this.customConfirmHandler();
-      } else {
-        this.submitDeleteForm();
-      }
-    }
-  }
-
-  submitDeleteForm() {
-    const form = document.getElementById(this.formId);
-    if (form) {
-      form.submit();
-    } else {
-      console.error(`ConfirmDialog: 找不到 ID 為 ${this.formId} 的表單`);
-    }
-  }
-
-  destroy() {
-    const deleteButtons = document.querySelectorAll(this.buttonSelector);
-    deleteButtons.forEach(button => {
-      button.removeEventListener('click', this.showConfirmDialog);
-    });
-  }
-}
-
-// 舊的 ConfirmDialog 初始化已移除，改用統一的事件委託系統
 
 
 // 付款倒數計時功能
@@ -377,6 +316,19 @@ function handleToggleMenu(element) {
   }
 }
 
+// 自動關閉選單的輔助函數
+function closeMenu(menuId = 'mobile-menu', brandId = 'nav-brand', toggleBtnId = 'menu-toggle') {
+  const menu = document.getElementById(menuId);
+  const brand = document.getElementById(brandId);
+  const toggleBtn = document.getElementById(toggleBtnId);
+  
+  if (menu && brand && toggleBtn && !menu.classList.contains('hidden')) {
+    menu.classList.add('hidden');
+    brand.classList.remove('hidden');
+    toggleBtn.setAttribute('aria-expanded', 'false');
+  }
+}
+
 // 統一的事件委託系統
 function initEventDelegation() {
   document.addEventListener('click', function(event) {
@@ -416,117 +368,32 @@ function initEventDelegation() {
 // 初始化事件委託系統
 document.addEventListener('DOMContentLoaded', function() {
   initEventDelegation();
+  
+  // 設置額外的選單相關事件監聽器
+  setupMenuEventListeners();
 });
 
-// 響應式選單功能
-class ResponsiveMenu {
-  constructor(config) {
-    this.toggleBtnId = config.toggleBtnId || 'menu-toggle';
-    this.mobileMenuId = config.mobileMenuId || 'mobile-menu';
-    this.navBrandId = config.navBrandId || 'nav-brand';
-    this.breakpoint = config.breakpoint || 768;
-    
-    this.toggleBtn = null;
-    this.mobileMenu = null;
-    this.navBrand = null;
-    this.isInitialized = false;
-    
-    this.init();
-  }
-
-  init() {
-    // 等待 DOM 載入完成
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => this.setup());
-    } else {
-      this.setup();
+// 設置選單相關的事件監聽器
+function setupMenuEventListeners() {
+  // 視窗大小變化時自動關閉手機選單
+  window.addEventListener('resize', function() {
+    if (window.innerWidth >= 768) { // md breakpoint
+      closeMenu();
     }
-  }
-
-  setup() {
-    // 取得 DOM 元素
-    this.toggleBtn = document.getElementById(this.toggleBtnId);
-    this.mobileMenu = document.getElementById(this.mobileMenuId);
-    this.navBrand = document.getElementById(this.navBrandId);
-
-    // 如果找不到必要元素，不初始化
-    if (!this.toggleBtn || !this.mobileMenu || !this.navBrand) {
-      return;
-    }
-
-    this.bindEvents();
-    this.isInitialized = true;
-  }
-
-  bindEvents() {
-    // 漢堡按鈕點擊事件
-    this.toggleBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      this.toggleMenu();
-    });
-
-    // 選單內連結點擊自動關閉
-    this.mobileMenu.addEventListener('click', (e) => {
-      const link = e.target.closest('a');
+  });
+  
+  // 手機選單內連結點擊時自動關閉選單
+  const mobileMenu = document.getElementById('mobile-menu');
+  if (mobileMenu) {
+    mobileMenu.addEventListener('click', function(event) {
+      const link = event.target.closest('a');
       if (link) {
-        this.closeMenu();
+        closeMenu();
       }
-    });
-
-    // 視窗大小變化處理
-    window.addEventListener('resize', () => {
-      if (window.innerWidth >= this.breakpoint) {
-        this.closeMenu();
-      }
-    });
-  }
-
-  toggleMenu() {
-    const isHidden = this.mobileMenu.classList.toggle('hidden');
-    this.navBrand.classList.toggle('hidden', !isHidden);
-    this.toggleBtn.setAttribute('aria-expanded', String(!isHidden));
-  }
-
-  closeMenu() {
-    if (!this.mobileMenu.classList.contains('hidden')) {
-      this.mobileMenu.classList.add('hidden');
-      this.navBrand.classList.remove('hidden');
-      this.toggleBtn.setAttribute('aria-expanded', 'false');
-    }
-  }
-
-  destroy() {
-    if (!this.isInitialized) return;
-
-    if (this.toggleBtn) {
-      this.toggleBtn.removeEventListener('click', this.toggleMenu);
-    }
-    
-    if (this.mobileMenu) {
-      this.mobileMenu.removeEventListener('click', this.closeMenu);
-    }
-    
-    window.removeEventListener('resize', this.closeMenu);
-    this.isInitialized = false;
-  }
-}
-
-// 自動初始化響應式選單功能
-function initResponsiveMenu() {
-  // 只在有相關元素的頁面初始化
-  if (document.getElementById('menu-toggle') && 
-      document.getElementById('mobile-menu') && 
-      document.getElementById('nav-brand')) {
-    new ResponsiveMenu({
-      toggleBtnId: 'menu-toggle',
-      mobileMenuId: 'mobile-menu',
-      navBrandId: 'nav-brand',
-      breakpoint: 768
     });
   }
 }
 
-// 自動執行初始化
-initResponsiveMenu();
 
-export { ImagePreview, ConfirmDialog, PaymentTimer, ResponsiveMenu };
+
+export { ImagePreview, PaymentTimer };
