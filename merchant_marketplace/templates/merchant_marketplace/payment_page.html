@@ -33,10 +33,11 @@
                         </div>
                     </div>
                     
+                    {% if user.is_authenticated %}
                     <!-- 藍新金流 -->
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-4">
                         <h3 class="text-lg font-bold text-blue-800 mb-4">藍新金流</h3>
-                        <form method="post" action="{% url 'payments:create_payment' %}" onsubmit="return handlePaymentSubmit(event)">
+                        <form method="post" action="{% url 'payments:create_payment' %}">
                             {% csrf_token %}
                             <input type="hidden" name="provider" value="newebpay">
                             <input type="hidden" name="amt" value="{{ product.price }}">
@@ -54,7 +55,7 @@
                     <!-- LINE PAY -->
                     <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-4">
                         <h3 class="text-lg font-bold text-green-800 mb-4">LINE PAY</h3>
-                        <form method="post" action="{% url 'payments:create_payment' %}" onsubmit="return handlePaymentSubmit(event)">
+                        <form method="post" action="{% url 'payments:create_payment' %}">
                             {% csrf_token %}
                             <input type="hidden" name="provider" value="linepay">
                             <input type="hidden" name="product_id" value="{{ product.id }}">
@@ -66,6 +67,17 @@
                             安全付款 | 24小時客服支援
                         </p>
                     </div>
+                    {% else %}
+                    <!-- 未登入提示 -->
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-4">
+                        <h3 class="text-lg font-bold text-yellow-800 mb-4">需要登入</h3>
+                        <p class="text-yellow-700 mb-4">請先登入會員帳號，才能進行購買</p>
+                        <a href="{% url 'customers_account:login' %}?next={{ request.get_full_path }}" 
+                           class="w-full inline-block text-center bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium text-lg cursor-pointer">
+                            立即登入
+                        </a>
+                    </div>
+                    {% endif %}
                     
                     <!-- 聯絡資訊 -->
                     <div class="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
@@ -128,61 +140,6 @@
     </div>
 </div>
 
-<!-- 登入提示模態 -->
-<div id="loginModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-lg p-8 max-w-md mx-4 shadow-xl">
-        <div class="text-center">
-            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
-                <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                </svg>
-            </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">需要登入</h3>
-            <p class="text-sm text-gray-500 mb-6">請先登入會員帳號，才能進行購買</p>
-            <div class="flex flex-col sm:flex-row gap-3">
-                <a href="{% url 'customers_account:login' %}?next={{ request.get_full_path }}" 
-                   class="flex-1 bg-[#0056B3] text-white px-4 py-2 rounded-lg hover:bg-[#00408A] transition duration-200 text-center font-medium cursor-pointer">
-                    立即登入
-                </a>
-                <button onclick="hideLoginModal()" 
-                        class="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition duration-200 font-medium cursor-pointer">
-                    取消
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
-<script>
-// 獲取用戶登入狀態
-const userIsAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
-
-// 處理付款表單提交
-function handlePaymentSubmit(event) {
-    if (!userIsAuthenticated) {
-        event.preventDefault();
-        showLoginModal();
-        return false;
-    }
-    return true;
-}
-
-// 顯示登入模態
-function showLoginModal() {
-    document.getElementById('loginModal').classList.remove('hidden');
-}
-
-// 隱藏登入模態
-function hideLoginModal() {
-    document.getElementById('loginModal').classList.add('hidden');
-}
-
-// 點擊模態背景關閉
-document.getElementById('loginModal').addEventListener('click', function(event) {
-    if (event.target === this) {
-        hideLoginModal();
-    }
-});
-</script>
 
 {% endblock %}
