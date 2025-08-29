@@ -27,7 +27,11 @@ def register(req):
                 )
                 messages.error(req, "註冊失敗，請重新再試")
             else:
-                form.save()
+                merchant = form.save()
+                user, created = User.objects.get_or_create(
+                    username=f"merchant_{merchant.Email}",
+                    defaults={"email": merchant.Email, "first_name": merchant.Name},
+                )
                 messages.success(req, "註冊成功！")
                 return redirect("merchant_account:login")
         else:
