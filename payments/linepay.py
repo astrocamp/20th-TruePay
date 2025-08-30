@@ -21,9 +21,21 @@ logger = logging.getLogger(__name__)
 def process_linepay(order, request):
     """處理 LINE Pay 付款"""
     try:
-        # LINE Pay 設定
-        channel_id = settings.LINEPAY_CHANNEL_ID
-        channel_secret = settings.LINEPAY_CHANNEL_SECRET
+        # 取得商家金流設定
+        merchant = order.product.merchant
+        
+        # 優先使用商家個人設定，沒有則使用系統預設
+        if merchant.has_linepay_setup():
+            payment_keys = merchant.get_payment_keys()
+            channel_id = payment_keys['linepay_channel_id']
+            channel_secret = payment_keys['linepay_channel_secret']
+            logger.info(f"使用商家 {merchant.ShopName} 的個人 LINE Pay 設定")
+        else:
+            # 使用系統預設設定
+            channel_id = settings.LINEPAY_CHANNEL_ID
+            channel_secret = settings.LINEPAY_CHANNEL_SECRET
+            logger.info(f"商家 {merchant.ShopName} 未設定個人 LINE Pay，使用系統預設")
+        
         api_url = getattr(
             settings, "LINEPAY_API_URL", "https://sandbox-api-pay.line.me"
         )
@@ -103,10 +115,19 @@ def linepay_confirm(request):
             )
 
         order = get_object_or_404(Order, id=order_id)
+        merchant = order.product.merchant
 
-        # 確認付款
-        channel_id = settings.LINEPAY_CHANNEL_ID
-        channel_secret = settings.LINEPAY_CHANNEL_SECRET
+        # 根據商家設定選擇金鑰
+        if merchant.has_linepay_setup():
+            payment_keys = merchant.get_payment_keys()
+            channel_id = payment_keys['linepay_channel_id']
+            channel_secret = payment_keys['linepay_channel_secret']
+            logger.info(f"確認付款使用商家 {merchant.ShopName} 的個人 LINE Pay 設定")
+        else:
+            channel_id = settings.LINEPAY_CHANNEL_ID
+            channel_secret = settings.LINEPAY_CHANNEL_SECRET
+            logger.info(f"確認付款使用系統預設 LINE Pay 設定")
+        
         api_url = getattr(
             settings, "LINEPAY_API_URL", "https://sandbox-api-pay.line.me"
         )

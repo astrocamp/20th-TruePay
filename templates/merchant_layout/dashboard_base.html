@@ -82,6 +82,12 @@
             </li>
             
             <li>
+              <a href="{% url 'merchant_account:payment_settings' %}" x-bind="navLinkBinding($el)">
+                {% include 'components/icons.html' with icon='money' %}
+                金流管理 Payment Settings
+              </a>
+            </li>
+            <li>
               <a href="#" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='settings' %}
                 設定 Settings
@@ -91,7 +97,7 @@
         </nav>
         <!-- 登出 -->
         <div class="p-4 border-t border-[#D2D2D7]">
-          <a href="{%url 'merchant_account:logout'%}" x-bind="logoutLinkBinding()">
+          <a href="{%url 'merchant_account:logout'%}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-red-600">
             {% include 'components/icons.html' with icon='logout' %}
             登出 Log out
           </a>

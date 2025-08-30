@@ -153,7 +153,6 @@ def transaction_history(request):
         .order_by("-created_at")
     )
 
-    # 為了向後兼容，我們仍然使用 order_items 這個變數名
     order_items = orders
 
     # 分頁處理
@@ -169,3 +168,72 @@ def transaction_history(request):
     }
 
     return render(request, "merchant_account/transaction_history.html", context)
+
+
+@no_cache_required
+@shop_required
+def payment_settings(request):
+    """商家金流設定頁面"""
+    merchant = request.merchant
+    
+    if request.method == "POST":
+        # 處理表單提交
+        try:
+            # 收集表單資料
+            payment_keys = {}
+            
+            # 藍新金流設定
+            newebpay_merchant_id = request.POST.get('newebpay_merchant_id', '').strip()
+            newebpay_hash_key = request.POST.get('newebpay_hash_key', '').strip()
+            newebpay_hash_iv = request.POST.get('newebpay_hash_iv', '').strip()
+            
+            # LINE Pay 設定
+            linepay_channel_id = request.POST.get('linepay_channel_id', '').strip()
+            linepay_channel_secret = request.POST.get('linepay_channel_secret', '').strip()
+            
+            # 驗證資料完整性
+            if newebpay_merchant_id or newebpay_hash_key or newebpay_hash_iv:
+                if not all([newebpay_merchant_id, newebpay_hash_key, newebpay_hash_iv]):
+                    messages.error(request, "請完整填寫藍新金流的所有欄位")
+                    return redirect('merchant_account:payment_settings')
+                payment_keys.update({
+                    'newebpay_merchant_id': newebpay_merchant_id,
+                    'newebpay_hash_key': newebpay_hash_key,
+                    'newebpay_hash_iv': newebpay_hash_iv,
+                })
+            
+            if linepay_channel_id or linepay_channel_secret:
+                if not all([linepay_channel_id, linepay_channel_secret]):
+                    messages.error(request, "請完整填寫 LINE Pay 的所有欄位")
+                    return redirect('merchant_account:payment_settings')
+                payment_keys.update({
+                    'linepay_channel_id': linepay_channel_id,
+                    'linepay_channel_secret': linepay_channel_secret,
+                })
+            
+            # 至少要有一組完整設定
+            has_newebpay = all([newebpay_merchant_id, newebpay_hash_key, newebpay_hash_iv])
+            has_linepay = all([linepay_channel_id, linepay_channel_secret])
+            
+            if not has_newebpay and not has_linepay:
+                messages.error(request, "請至少完成一組金流設定")
+                return redirect('merchant_account:payment_settings')
+            
+            # 設定金鑰並儲存
+            merchant.set_payment_keys(**payment_keys)
+            merchant.save()
+            
+            messages.success(request, "金流設定已成功更新！")
+            return redirect('merchant_account:payment_settings')
+            
+        except Exception as e:
+            messages.error(request, f"設定更新失敗：{str(e)}")
+            return redirect('merchant_account:payment_settings')
+    
+    # GET 請求：顯示設定頁面
+    context = {
+        'merchant': merchant,
+        'masked_keys': merchant.get_masked_keys(),
+    }
+    
+    return render(request, "merchant_account/payment_settings.html", context)

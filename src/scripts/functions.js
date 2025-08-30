@@ -454,4 +454,70 @@ class NavigationManager {
 // 將 NavigationManager 掛載到全域，供 Alpine.js 使用
 window.NavigationManager = NavigationManager;
 
-export { ImagePreview, PaymentTimer, NavigationManager };
+// 金流設定表單驗證
+class PaymentSettingsValidator {
+  constructor() {
+    this.init();
+  }
+
+  init() {
+    // 在 DOM 載入後初始化
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => this.attachFormHandler());
+    } else {
+      this.attachFormHandler();
+    }
+  }
+
+  attachFormHandler() {
+    const form = document.querySelector('form[data-form="payment-settings"]');
+    if (form) {
+      form.addEventListener('submit', (e) => this.validateForm(e));
+    }
+  }
+
+  validateForm(event) {
+    const merchantId = document.getElementById('newebpay_merchant_id')?.value.trim() || '';
+    const hashKey = document.getElementById('newebpay_hash_key')?.value.trim() || '';
+    const hashIv = document.getElementById('newebpay_hash_iv')?.value.trim() || '';
+    
+    const channelId = document.getElementById('linepay_channel_id')?.value.trim() || '';
+    const channelSecret = document.getElementById('linepay_channel_secret')?.value.trim() || '';
+    
+    // 檢查是否至少完成一組設定
+    const hasNewebpay = merchantId && hashKey && hashIv;
+    const hasLinepay = channelId && channelSecret;
+    
+    if (!hasNewebpay && !hasLinepay) {
+      event.preventDefault();
+      this.showAlert('請至少完成一組金流設定（藍新金流或 LINE Pay）');
+      return false;
+    }
+    
+    // 如果部分填寫藍新金流，要求完整填寫
+    if ((merchantId || hashKey || hashIv) && !hasNewebpay) {
+      event.preventDefault();
+      this.showAlert('請完整填寫藍新金流的所有欄位，或清空所有欄位');
+      return false;
+    }
+    
+    // 如果部分填寫 LINE Pay，要求完整填寫
+    if ((channelId || channelSecret) && !hasLinepay) {
+      event.preventDefault();
+      this.showAlert('請完整填寫 LINE Pay 的所有欄位，或清空所有欄位');
+      return false;
+    }
+
+    return true;
+  }
+
+  showAlert(message) {
+    // 可以替換為更好看的通知系統
+    alert(message);
+  }
+}
+
+// 自動初始化金流設定驗證器
+new PaymentSettingsValidator();
+
+export { ImagePreview, PaymentTimer, NavigationManager, PaymentSettingsValidator };
