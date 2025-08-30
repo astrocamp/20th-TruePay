@@ -10,6 +10,7 @@ from django.forms import (
     CheckboxInput,
 )
 from .models import Merchant
+from django.contrib.auth.models import User
 
 
 class RegisterForm(ModelForm):
@@ -20,13 +21,12 @@ class RegisterForm(ModelForm):
         widget=TextInput(attrs={"class": "input"}),
     )
 
-    def save(self, commit=True):
-        merchant = super().save(commit=False)
-        # 使用 set_password 方法來雜湊密碼
-        merchant.set_password(self.cleaned_data['Password'])
-        if commit:
-            merchant.save()
-        return merchant
+    def clean_subdomain(self):
+        subdomain = self.cleaned_data.get("subdomain")
+
+        if not subdomain or subdomain.strip() == "":
+            return None
+        return subdomain
 
     class Meta:
         model = Merchant
@@ -53,13 +53,13 @@ class RegisterForm(ModelForm):
             "Password": "密碼",
         }
         widgets = {
-            "ShopName": TextInput(attrs={"class": "input"}),
-            "UnifiedNumber": TextInput(attrs={"class": "input"}),
+            "ShopName": TextInput(attrs={"class": "input", "maxlength": "50"}),
+            "UnifiedNumber": TextInput(attrs={"class": "input", "maxlength": "30"}),
             "NationalNumber": TextInput(attrs={"class": "input"}),
-            "Email": EmailInput(attrs={"class": "input"}),
+            "Email": EmailInput(attrs={"class": "input", "maxlength": "254"}),
             "Name": TextInput(attrs={"class": "input"}),
-            "Address": TextInput(attrs={"class": "input"}),
-            "Cellphone": TextInput(attrs={"class": "input"}),
+            "Address": TextInput(attrs={"class": "input", "maxlength": "50"}),
+            "Cellphone": TextInput(attrs={"class": "input", "maxlength": "15"}),
             "Password": PasswordInput(attrs={"class": "input"}),
         }
 
@@ -68,6 +68,11 @@ class RegisterForm(ModelForm):
         merchant.set_password(self.cleaned_data["Password"])
         if commit:
             merchant.save()
+
+        User.objects.get_or_create(
+            username=f"merchant_{merchant.Email}",
+            defaults={"email": merchant.Email, "first_name": merchant.Name},
+        )
         return merchant
 
 
