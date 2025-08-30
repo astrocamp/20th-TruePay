@@ -18,7 +18,7 @@
   <body class="bg-brand-white text-brand-grayDark font-sans">
     <!-- 導覽列 -->
 
-    <nav class="bg-brand-white border-b border-brand-grayBorder px-4 py-3">
+    <nav class="bg-brand-white border-b border-brand-grayBorder px-4 py-3" x-data="NavigationManager.createAlpineData()">
       <div class="max-w-screen-xl mx-auto flex items-center justify-between">
         <!-- 左側：手機時顯示漢堡 + 品牌 -->
         <div class="flex items-center gap-3">
@@ -36,21 +36,21 @@
           <li>
             <a
               href="{% url 'pages:home' %}"
-              class="text-[#0056B3] hover:underline"
+              x-bind="navLinkBinding($el)"
               >首頁</a
             >
           </li>
           <li>
             <a
               href="{% url 'pages:about' %}"
-              class="text-brand-grayDark hover:text-[#0056B3]"
+              x-bind="navLinkBinding($el)"
               >關於</a
             >
           </li>
           <li>
             <a
               href="{% url 'pages:contact' %}"
-              class="text-brand-grayDark hover:text-[#0056B3]"
+              x-bind="navLinkBinding($el)"
               >聯絡</a
             >
           </li>
@@ -59,14 +59,14 @@
               <li>
                 <a
                   href="{% get_current_merchant %}"
-                  class="text-brand-grayDark hover:text-[#0056B3]"
+                  x-bind="navLinkBinding($el)"
                   >商家後台</a
                 >
               </li>
               <li>
                 <a
                   href="{% url 'merchant_account:logout' %}"
-                  class="text-brand-grayDark hover:text-[#0056B3]"
+                  x-bind="logoutLinkBinding()"
                   >登出</a
                 >
               </li>
@@ -74,14 +74,14 @@
               <li>
                 <a
                   href="{% url 'customers_account:dashboard' %}"
-                  class="text-brand-grayDark hover:text-[#0056B3]"
+                  x-bind="navLinkBinding($el)"
                   >我的帳戶</a
                 >
               </li>
               <li>
                 <a
                   href="{% url 'customers_account:logout' %}"
-                  class="text-brand-grayDark hover:text-[#0056B3]"
+                  x-bind="logoutLinkBinding()"
                   >登出</a
                 >
               </li>
@@ -89,14 +89,14 @@
               <li>
                 <a
                   href="{% url 'customers_account:dashboard' %}"
-                  class="text-brand-grayDark hover:text-[#0056B3]"
+                  x-bind="navLinkBinding($el)"
                   >我的帳戶</a
                 >
               </li>
               <li>
                 <a
                   href="{% url 'customers_account:logout' %}"
-                  class="text-brand-grayDark hover:text-[#0056B3]"
+                  x-bind="logoutLinkBinding()"
                   >登出</a
                 >
               </li>
@@ -105,7 +105,7 @@
             <li>
               <a
                 href="{% url 'pages:selectrole' %}"
-                class="text-brand-grayDark hover:text-[#0056B3]"
+                x-bind="navLinkBinding($el)"
                 >登入/註冊</a
               >
             </li>
@@ -122,21 +122,21 @@
           <li>
             <a
               href="{% url 'pages:home' %}"
-              class="block text-[#0056B3] hover:underline"
+              x-bind="navLinkBinding($el)"
               >首頁</a
             >
           </li>
           <li>
             <a
               href="{% url 'pages:about' %}"
-              class="block text-brand-grayDark hover:text-[#0056B3]"
+              x-bind="navLinkBinding($el)"
               >關於</a
             >
           </li>
           <li>
             <a
               href="{% url 'pages:contact' %}"
-              class="block text-brand-grayDark hover:text-[#0056B3]"
+              x-bind="navLinkBinding($el)"
               >聯絡</a
             >
           </li>
@@ -145,14 +145,14 @@
               <li>
                 <a
                   href="{% get_current_merchant %}"
-                  class="block text-brand-grayDark hover:text-[#0056B3]"
+                  x-bind="navLinkBinding($el)"
                   >商家後台</a
                 >
               </li>
               <li>
                 <a
                   href="{% url 'merchant_account:logout' %}"
-                  class="block text-brand-grayDark hover:text-[#0056B3]"
+                  x-bind="logoutLinkBinding()"
                   >登出</a
                 >
               </li>
@@ -160,14 +160,14 @@
               <li>
                 <a
                   href="{% url 'customers_account:dashboard' %}"
-                  class="block text-brand-grayDark hover:text-[#0056B3]"
+                  x-bind="navLinkBinding($el)"
                   >我的帳戶</a
                 >
               </li>
               <li>
                 <a
                   href="{% url 'customers_account:logout' %}"
-                  class="block text-brand-grayDark hover:text-[#0056B3]"
+                  x-bind="logoutLinkBinding()"
                   >登出</a
                 >
               </li>
@@ -175,14 +175,14 @@
               <li>
                 <a
                   href="{% url 'customers_account:dashboard' %}"
-                  class="block text-brand-grayDark hover:text-[#0056B3]"
+                  x-bind="navLinkBinding($el)"
                   >我的帳戶</a
                 >
               </li>
               <li>
                 <a
                   href="{% url 'customers_account:logout' %}"
-                  class="block text-brand-grayDark hover:text-[#0056B3]"
+                  x-bind="logoutLinkBinding()"
                   >登出</a
                 >
               </li>
@@ -191,7 +191,7 @@
             <li>
               <a
                 href="{% url 'pages:selectrole' %}"
-                class="block text-brand-grayDark hover:text-[#0056B3]"
+                x-bind="navLinkBinding($el)"
                 >登入/註冊</a
               >
             </li>

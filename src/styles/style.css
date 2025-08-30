@@ -7,7 +7,7 @@
     }
     
     &::-webkit-scrollbar-thumb {
-      background-color: theme('colors.brand.grayBorder');
+      background-color: #D2D2D7;
       border-radius: 999px;
     }
     
