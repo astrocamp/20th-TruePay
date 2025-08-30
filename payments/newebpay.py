@@ -88,56 +88,12 @@ def newebpay_return(request):
         trade_info = request.POST.get("TradeInfo")
         trade_sha = request.POST.get("TradeSha")
 
-        # 嘗試解密交易資料 - 先用系統預設金鑰，失敗後嘗試商家個人金鑰
-        hash_key = settings.NEWEBPAY_HASH_KEY
-        hash_iv = settings.NEWEBPAY_HASH_IV
-        decrypted_data = None
-        result_data = None
-        used_merchant_key = False
+        # 使用高效解密方法
+        result_data, hash_key, hash_iv = decrypt_newebpay_callback(trade_info, trade_sha)
 
-        # 方法1：嘗試系統預設金鑰
-        try:
-            check_value = generate_sha256(f"HashKey={hash_key}&{trade_info}&HashIV={hash_iv}")
-            if check_value.upper() == trade_sha.upper():
-                decrypted_data = aes_decrypt(trade_info, hash_key, hash_iv)
-                result_data = json.loads(decrypted_data)
-                logger.info("使用系統預設金鑰成功解密回調")
-            else:
-                logger.warning("系統預設金鑰簽名驗證失敗，嘗試商家個人金鑰")
-        except Exception as e:
-            logger.warning(f"系統預設金鑰解密失敗: {e}")
-
-        # 方法2：如果系統金鑰失敗，嘗試所有商家的個人金鑰
+        # 如果解密失敗
         if not result_data:
-            from merchant_account.models import Merchant
-            merchants_with_keys = Merchant.objects.filter(payment_setup_completed=True)
-            
-            for merchant in merchants_with_keys:
-                if not merchant.has_newebpay_setup():
-                    continue
-                    
-                try:
-                    payment_keys = merchant.get_payment_keys()
-                    merchant_hash_key = payment_keys['newebpay_hash_key']
-                    merchant_hash_iv = payment_keys['newebpay_hash_iv']
-                    
-                    # 驗證簽名
-                    check_value = generate_sha256(f"HashKey={merchant_hash_key}&{trade_info}&HashIV={merchant_hash_iv}")
-                    if check_value.upper() == trade_sha.upper():
-                        decrypted_data = aes_decrypt(trade_info, merchant_hash_key, merchant_hash_iv)
-                        result_data = json.loads(decrypted_data)
-                        hash_key = merchant_hash_key
-                        hash_iv = merchant_hash_iv
-                        used_merchant_key = True
-                        logger.info(f"使用商家 {merchant.ShopName} 的個人金鑰成功解密回調")
-                        break
-                except Exception as e:
-                    logger.debug(f"商家 {merchant.ShopName} 金鑰解密失敗: {e}")
-                    continue
-
-        # 如果所有金鑰都無法解密
-        if not result_data:
-            logger.error("所有金鑰都無法解密回調資料")
+            logger.error("無法解密回調資料")
             from django.shortcuts import render
             return render(
                 request,
@@ -225,64 +181,12 @@ def newebpay_notify(request):
             logger.error("藍新金流通知缺少 TradeInfo")
             return HttpResponse("0|Missing TradeInfo")
 
-        # 嘗試解密通知資料 - 先用系統預設金鑰，失敗後嘗試商家個人金鑰
-        hash_key = settings.NEWEBPAY_HASH_KEY
-        hash_iv = settings.NEWEBPAY_HASH_IV
-        decrypted_data = None
-        result_data = None
+        # 使用高效解密方法
+        result_data, hash_key, hash_iv = decrypt_newebpay_callback(trade_info, trade_sha)
 
-        if not hash_key or not hash_iv:
-            logger.error("藍新金流系統設定不完整 - 缺少 hash_key 或 hash_iv")
-            return HttpResponse("0|Config Error")
-
-        # 方法1：嘗試系統預設金鑰
-        try:
-            if trade_sha:
-                check_value = generate_sha256(f"HashKey={hash_key}&{trade_info}&HashIV={hash_iv}")
-                if check_value.upper() == trade_sha.upper():
-                    decrypted_data = aes_decrypt(trade_info, hash_key, hash_iv)
-                    result_data = json.loads(decrypted_data)
-                    logger.info("使用系統預設金鑰成功解密通知")
-                else:
-                    logger.warning("系統預設金鑰簽名驗證失敗，嘗試商家個人金鑰")
-            else:
-                # 沒有簽名的情況直接嘗試解密
-                decrypted_data = aes_decrypt(trade_info, hash_key, hash_iv)
-                result_data = json.loads(decrypted_data)
-                logger.info("使用系統預設金鑰成功解密通知（無簽名）")
-        except Exception as e:
-            logger.warning(f"系統預設金鑰解密失敗: {e}")
-
-        # 方法2：如果系統金鑰失敗，嘗試所有商家的個人金鑰
+        # 如果解密失敗
         if not result_data:
-            from merchant_account.models import Merchant
-            merchants_with_keys = Merchant.objects.filter(payment_setup_completed=True)
-            
-            for merchant in merchants_with_keys:
-                if not merchant.has_newebpay_setup():
-                    continue
-                    
-                try:
-                    payment_keys = merchant.get_payment_keys()
-                    merchant_hash_key = payment_keys['newebpay_hash_key']
-                    merchant_hash_iv = payment_keys['newebpay_hash_iv']
-                    
-                    if trade_sha:
-                        check_value = generate_sha256(f"HashKey={merchant_hash_key}&{trade_info}&HashIV={merchant_hash_iv}")
-                        if check_value.upper() != trade_sha.upper():
-                            continue
-                    
-                    decrypted_data = aes_decrypt(trade_info, merchant_hash_key, merchant_hash_iv)
-                    result_data = json.loads(decrypted_data)
-                    logger.info(f"使用商家 {merchant.ShopName} 的個人金鑰成功解密通知")
-                    break
-                except Exception as e:
-                    logger.debug(f"商家 {merchant.ShopName} 金鑰解密失敗: {e}")
-                    continue
-
-        # 如果所有金鑰都無法解密
-        if not result_data:
-            logger.error("所有金鑰都無法解密通知資料")
+            logger.error("無法解密通知資料")
             return HttpResponse("0|Decrypt Error")
 
         # 處理付款結果
@@ -332,6 +236,89 @@ def newebpay_notify(request):
     except Exception as e:
         logger.error(f"藍新金流通知處理失敗: {e}")
         return HttpResponse("0|System Error")
+
+
+def decrypt_newebpay_callback(trade_info, trade_sha=None):
+    """
+    高效解密藍新金流回調資料
+    先用系統預設金鑰解密取得 MerchantID，再用對應商家金鑰驗證
+    """
+    from merchant_account.models import Merchant
+    
+    # 步驟1: 先用系統預設金鑰解密，取得 MerchantID
+    system_hash_key = settings.NEWEBPAY_HASH_KEY
+    system_hash_iv = settings.NEWEBPAY_HASH_IV
+    
+    if not system_hash_key or not system_hash_iv:
+        logger.error("系統預設金鑰配置不完整")
+        return None, None, None
+    
+    try:
+        # 嘗試用系統預設金鑰解密，取得基本資訊
+        decrypted_data = aes_decrypt(trade_info, system_hash_key, system_hash_iv)
+        basic_data = json.loads(decrypted_data)
+        
+        # 取得 MerchantID
+        merchant_id = basic_data.get("MerchantID") or basic_data.get("Result", {}).get("MerchantID")
+        if not merchant_id:
+            logger.error("無法從解密資料中取得 MerchantID")
+            return None, None, None
+            
+        logger.info(f"從回調資料中識別出 MerchantID: {merchant_id}")
+        
+        # 步驟2: 根據 MerchantID 查詢對應商家
+        try:
+            merchant = Merchant.objects.get(newebpay_merchant_id=merchant_id)
+            if not merchant.has_newebpay_setup():
+                logger.warning(f"商家 {merchant.ShopName} 的藍新金流未完整設定")
+                # 如果商家金鑰未設定，使用系統預設金鑰
+                return _verify_and_return(trade_info, trade_sha, system_hash_key, system_hash_iv, "系統預設", basic_data)
+            
+            # 步驟3: 使用商家專屬金鑰重新解密並驗證
+            payment_keys = merchant.get_payment_keys()
+            merchant_hash_key = payment_keys['newebpay_hash_key']
+            merchant_hash_iv = payment_keys['newebpay_hash_iv']
+            
+            return _verify_and_return(trade_info, trade_sha, merchant_hash_key, merchant_hash_iv, f"商家 {merchant.ShopName}", None)
+            
+        except Merchant.DoesNotExist:
+            logger.warning(f"找不到 MerchantID 為 {merchant_id} 的商家，使用系統預設金鑰")
+            # 找不到商家時，使用系統預設金鑰
+            return _verify_and_return(trade_info, trade_sha, system_hash_key, system_hash_iv, "系統預設", basic_data)
+            
+    except Exception as e:
+        logger.error(f"解密回調資料失敗: {e}")
+        return None, None, None
+
+
+def _verify_and_return(trade_info, trade_sha, hash_key, hash_iv, key_source, cached_data=None):
+    """驗證簽名並返回解密結果"""
+    try:
+        # 如果有快取的解密資料且不需要簽名驗證，直接使用
+        if cached_data and not trade_sha:
+            logger.info(f"使用{key_source}金鑰成功解密回調（無簽名）")
+            return cached_data, hash_key, hash_iv
+        
+        # 驗證簽名（如果有）
+        if trade_sha:
+            check_value = generate_sha256(f"HashKey={hash_key}&{trade_info}&HashIV={hash_iv}")
+            if check_value.upper() != trade_sha.upper():
+                logger.warning(f"{key_source}金鑰簽名驗證失敗")
+                return None, None, None
+        
+        # 重新解密（或使用快取）
+        if cached_data:
+            result_data = cached_data
+        else:
+            decrypted_data = aes_decrypt(trade_info, hash_key, hash_iv)
+            result_data = json.loads(decrypted_data)
+        
+        logger.info(f"使用{key_source}金鑰成功解密回調")
+        return result_data, hash_key, hash_iv
+        
+    except Exception as e:
+        logger.error(f"{key_source}金鑰解密失敗: {e}")
+        return None, None, None
 
 
 # 工具函數

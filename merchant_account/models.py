@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
 from cryptography.fernet import Fernet
 import os
-import base64
 import logging
 
 logger = logging.getLogger(__name__)
@@ -48,23 +47,37 @@ class Merchant(models.Model):
     @staticmethod
     def _get_encryption_key():
         """取得加密金鑰"""
-        key = os.getenv('PAYMENT_ENCRYPTION_KEY', 'dev-key-32chars-for-testing-only!')
-        if isinstance(key, str):
-            key = key.encode()
-        # 確保金鑰長度正確
-        return base64.urlsafe_b64encode(key[:32].ljust(32, b'0'))
+        from django.core.exceptions import ImproperlyConfigured
+        
+        key = os.getenv('PAYMENT_ENCRYPTION_KEY')
+        if not key:
+            raise ImproperlyConfigured(
+                "PAYMENT_ENCRYPTION_KEY 環境變數未設定。\n"
+                "請使用 'python manage.py generate_payment_key' 命令產生一個安全的金鑰，"
+                "然後將其設定為環境變數。"
+            )
+        
+        # 驗證金鑰格式（應該是 Fernet.generate_key() 產生的 base64 編碼字串）
+        try:
+            # Fernet 會驗證金鑰格式的正確性
+            if isinstance(key, str):
+                key = key.encode()
+            Fernet(key)  # 這會驗證金鑰格式
+            return key
+        except Exception as e:
+            raise ImproperlyConfigured(
+                f"PAYMENT_ENCRYPTION_KEY 格式錯誤: {e}\n"
+                "請使用 'python manage.py generate_payment_key' 命令重新產生金鑰。"
+            )
     
     def _encrypt_data(self, data):
         """加密敏感資料"""
         if not data:
             return ''
-        try:
-            key = self._get_encryption_key()
-            fernet = Fernet(key)
-            return base64.urlsafe_b64encode(fernet.encrypt(data.encode())).decode()
-        except Exception as e:
-            logger.error(f"資料加密失敗: {e}")
-            return data
+        # 讓例外向上傳播，由呼叫者處理
+        key = self._get_encryption_key()
+        fernet = Fernet(key)
+        return fernet.encrypt(data.encode()).decode()
     
     def _decrypt_data(self, encrypted_data):
         """解密敏感資料"""
@@ -73,11 +86,20 @@ class Merchant(models.Model):
         try:
             key = self._get_encryption_key()
             fernet = Fernet(key)
-            decoded_data = base64.urlsafe_b64decode(encrypted_data.encode())
-            return fernet.decrypt(decoded_data).decode()
+            return fernet.decrypt(encrypted_data.encode()).decode()
         except Exception as e:
-            logger.error(f"資料解密失敗: {e}")
-            return encrypted_data
+            # 配置錯誤應該立即拋出，不應該被掩蓋
+            from django.core.exceptions import ImproperlyConfigured
+            from cryptography.fernet import InvalidToken
+            
+            if isinstance(e, ImproperlyConfigured):
+                raise
+            elif isinstance(e, InvalidToken):
+                logger.error("資料解密失敗：無效的加密 token，可能是資料損壞或使用了錯誤的金鑰")
+                return ''
+            else:
+                logger.error(f"資料解密失敗：未預期的錯誤 - {type(e).__name__}: {e}")
+                return ''
     
     def set_payment_keys(self, **kwargs):
         """設定金流金鑰（自動加密敏感資料）"""
