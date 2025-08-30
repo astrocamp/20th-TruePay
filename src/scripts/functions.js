@@ -396,4 +396,62 @@ function setupMenuEventListeners() {
 
 
 
-export { ImagePreview, PaymentTimer };
+// 導航管理器 - 統一處理導航連結的樣式和無障礙性
+class NavigationManager {
+  constructor() {
+    this.currentPath = window.location.pathname;
+    this.baseClasses = 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]';
+    this.activeClasses = 'text-[#0056B3] font-medium bg-blue-50';
+    this.inactiveClasses = 'text-gray-700';
+    this.logoutClasses = 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-red-600';
+  }
+
+  isActive(element) {
+    if (!element || !element.getAttribute) return false;
+    const href = element.getAttribute('href');
+    if (!href) return false;
+    return this.currentPath === href.replace(/\?.*$/, '');
+  }
+
+  navLinkBinding(element) {
+    const isActiveState = this.isActive(element);
+    const finalClasses = `${this.baseClasses} ${isActiveState ? this.activeClasses : this.inactiveClasses}`;
+    
+    return {
+      class: finalClasses,
+      'aria-current': isActiveState ? 'page' : null
+    };
+  }
+
+  navLinkBindingWithOpacity(element) {
+    const binding = this.navLinkBinding(element);
+    return {
+      ...binding,
+      class: binding.class + ' opacity-50'
+    };
+  }
+
+  logoutLinkBinding() {
+    return {
+      class: this.logoutClasses
+    };
+  }
+
+  // 為 Alpine.js 提供全域可用的函數
+  static createAlpineData() {
+    const manager = new NavigationManager();
+    
+    return {
+      currentPath: manager.currentPath,
+      isActive: (element) => manager.isActive(element),
+      navLinkBinding: (element) => manager.navLinkBinding(element),
+      navLinkBindingWithOpacity: (element) => manager.navLinkBindingWithOpacity(element),
+      logoutLinkBinding: () => manager.logoutLinkBinding()
+    };
+  }
+}
+
+// 將 NavigationManager 掛載到全域，供 Alpine.js 使用
+window.NavigationManager = NavigationManager;
+
+export { ImagePreview, PaymentTimer, NavigationManager };

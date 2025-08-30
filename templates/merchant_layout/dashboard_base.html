@@ -27,40 +27,35 @@
           <label for="sidebarToggle" class="ml-auto md:hidden cursor-pointer p-2 rounded-lg hover:bg-[#F5F5F7]" aria-label="關閉選單">✕</label>
         </div>
         <!-- 導覽選單 -->
-        <nav class="flex-1 overflow-y-auto py-4" x-data="{ 
-          currentPath: window.location.pathname,
-          isActive(element) {
-            return this.currentPath === element.getAttribute('href').replace(/\?.*$/, '')
-          }
-        }">
+        <nav class="flex-1 overflow-y-auto py-4" x-data="NavigationManager.createAlpineData()">
           <ul class="px-2 space-y-1 text-sm">
             <li>
-              <a href="{% url 'merchant_account:dashboard' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
+              <a href="{% url 'merchant_account:dashboard' %}" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='home' %}
                 廠商總覽 Overview
               </a>
             </li>
             <li>
-              <a href="{% url 'merchant_marketplace:index' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
+              <a href="{% url 'merchant_marketplace:index' %}" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='menu' %}
                 商品列表 Product List
               </a>
             </li>
             <li>
-              <a href="{% url 'merchant_marketplace:new' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
+              <a href="{% url 'merchant_marketplace:new' %}" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='plus' %}
                 新增商品 Create Product
               </a>
             </li>
             <li>
-              <a href="{% url 'merchant_account:transaction_history' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
+              <a href="{% url 'merchant_account:transaction_history' %}" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='document' %}
                 交易紀錄 Transactions
               </a>
             </li>
             
             <li>
-              <a href="{% url 'merchant_account:domain_settings' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
+              <a href="{% url 'merchant_account:domain_settings' %}" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='check-circle' %}
                 網域設定 Domain Settings
               </a>
@@ -68,25 +63,26 @@
             <li>
               {% if current_merchant.subdomain %}
                 <a href="{% url 'public_store:shop_overview' current_merchant.subdomain %}" 
-                target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl 
-              hover:bg-[#F5F5F7]">
+                   target="_blank" 
+                   x-bind="navLinkBinding($el)">
               {% else %}
-                <a href="#" onclick="alert('請先在網域設定中設定自訂網域')" class="flex 
-                items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] opacity-50">
+                <a href="#" 
+                   onclick="alert('請先在網域設定中設定自訂網域')" 
+                   x-bind="navLinkBindingWithOpacity($el)">
               {% endif %}
                 {% include 'components/icons.html' with icon='cube' %}
-                   商品總覽頁面 Shop Overview
+                商品總覽頁面 Shop Overview
                 </a>
             </li>
             <li>
-              <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+              <a href="#" x-bind="navLinkBinding($el)">
                   {% include 'components/icons.html' with icon='qr' %}
                 掃描QR
               </a>
             </li>
             
             <li>
-              <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+              <a href="#" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='settings' %}
                 設定 Settings
               </a>
@@ -95,7 +91,7 @@
         </nav>
         <!-- 登出 -->
         <div class="p-4 border-t border-[#D2D2D7]">
-          <a href="{%url 'merchant_account:logout'%}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-red-600">
+          <a href="{%url 'merchant_account:logout'%}" x-bind="logoutLinkBinding()">
             {% include 'components/icons.html' with icon='logout' %}
             登出 Log out
           </a>
