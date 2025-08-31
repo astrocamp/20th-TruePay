@@ -240,7 +240,7 @@ def newebpay_notify(request):
 
 def decrypt_newebpay_callback(trade_info, trade_sha=None):
     """
-    高效解密藍新金流回調資料
+    解密藍新金流回調資料
     先用系統預設金鑰解密取得 MerchantID，再用對應商家金鑰驗證
     """
     from merchant_account.models import Merchant
