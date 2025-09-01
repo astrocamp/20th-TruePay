@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 import random
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 def default_provider_raw_data():
@@ -140,3 +142,47 @@ class Order(models.Model):
     def customer_phone(self):
         """客戶電話 (透過關聯取得)"""
         return getattr(self.customer, 'phone', '')
+
+
+class OrderItem(models.Model):
+    """票券模型 - 訂單付款成功後產生的獨立票券"""
+    
+    STATUS_CHOICES = [
+        ('unused', '未使用'),
+        ('used', '已使用'),
+    ]
+    
+    # === 基本資訊 ===
+    ticket_code = models.CharField('票券代碼', max_length=50, unique=True)
+    status = models.CharField('票券狀態', max_length=20, choices=STATUS_CHOICES, default='unused')
+    created_at = models.DateTimeField('建立時間', auto_now_add=True)
+    used_at = models.DateTimeField('使用時間', null=True, blank=True)
+    #ForeignKey
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items', verbose_name='關聯訂單')
+    product = models.ForeignKey('merchant_marketplace.Product', on_delete=models.PROTECT, verbose_name='商品')
+    customer = models.ForeignKey('customers_account.Customer', on_delete=models.SET_NULL, null=True, verbose_name='客戶')
+    
+    def save(self, *args, **kwargs):
+        """自動生成票券代碼"""
+        if not self.ticket_code:
+            # 生成格式：TKT + 訂單ID後4位 + 時間戳 + 隨機數
+            order_suffix = str(self.order.id).zfill(4)[-4:]
+            timestamp = timezone.now().strftime("%m%d%H%M")
+            random_suffix = str(random.randint(100, 999))
+            self.ticket_code = f"TKT{order_suffix}{timestamp}{random_suffix}"
+        
+        super().save(*args, **kwargs)
+
+
+#用singnal方式產出票券(付款成功後)    
+@receiver(post_save, sender=Order)
+def create_item(sender, instance, created, **kwargs):
+    if instance.status == 'paid' and not instance.items.exists():
+        # 根據訂單數量產生對應數量的票券
+        for i in range(instance.quantity):
+            OrderItem.objects.create(
+                order=instance,
+                product=instance.product,
+                customer=instance.customer,
+                status='unused'
+            )
