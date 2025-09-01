@@ -15,28 +15,19 @@ from django.contrib.auth.models import User
 
 from .models import Order
 
+from django.db import transaction
+from django.db.models import F
+
 logger = logging.getLogger(__name__)
 
 
 def process_newebpay(order, request):
     """處理藍新金流付款"""
     try:
-        # 取得商家金流設定
-        merchant = order.product.merchant
-        
-        # 優先使用商家個人設定，沒有則使用系統預設
-        if merchant.has_newebpay_setup():
-            payment_keys = merchant.get_payment_keys()
-            merchant_id = payment_keys['newebpay_merchant_id']
-            hash_key = payment_keys['newebpay_hash_key']
-            hash_iv = payment_keys['newebpay_hash_iv']
-            logger.info(f"使用商家 {merchant.ShopName} 的個人金流設定")
-        else:
-            # 使用系統預設設定
-            merchant_id = settings.NEWEBPAY_MERCHANT_ID
-            hash_key = settings.NEWEBPAY_HASH_KEY
-            hash_iv = settings.NEWEBPAY_HASH_IV
-            logger.info(f"商家 {merchant.ShopName} 未設定個人金流，使用系統預設")
+        # 使用系統統一金流設定
+        merchant_id = settings.NEWEBPAY_MERCHANT_ID
+        hash_key = settings.NEWEBPAY_HASH_KEY
+        hash_iv = settings.NEWEBPAY_HASH_IV
 
         # 準備付款資料
         trade_info_data = {
@@ -88,8 +79,8 @@ def newebpay_return(request):
         trade_info = request.POST.get("TradeInfo")
         trade_sha = request.POST.get("TradeSha")
 
-        # 使用高效解密方法
-        result_data, hash_key, hash_iv = decrypt_newebpay_callback(trade_info, trade_sha)
+        # 使用系統統一金鑰解密
+        result_data = decrypt_newebpay_callback(trade_info, trade_sha)
 
         # 如果解密失敗
         if not result_data:
@@ -123,6 +114,9 @@ def newebpay_return(request):
             order.provider_raw_data = result_data
             order.paid_at = timezone.now()
             order.save()
+
+            # 付款成功後扣減庫存
+            _deduct_product_stock(order)
 
             # 付款成功後恢復用戶登入狀態（金流回調不攜帶 session）
             if order.customer:
@@ -181,8 +175,8 @@ def newebpay_notify(request):
             logger.error("藍新金流通知缺少 TradeInfo")
             return HttpResponse("0|Missing TradeInfo")
 
-        # 使用高效解密方法
-        result_data, hash_key, hash_iv = decrypt_newebpay_callback(trade_info, trade_sha)
+        # 使用系統統一金鑰解密
+        result_data = decrypt_newebpay_callback(trade_info, trade_sha)
 
         # 如果解密失敗
         if not result_data:
@@ -217,6 +211,9 @@ def newebpay_notify(request):
                     order.paid_at = timezone.now()
                     order.save()
 
+                    # 付款成功後扣減庫存
+                    _deduct_product_stock(order)
+
                     logger.info(
                         f"藍新金流通知處理成功 - 訂單 {merchant_order_no} 已更新為已付款"
                     )
@@ -239,86 +236,54 @@ def newebpay_notify(request):
 
 
 def decrypt_newebpay_callback(trade_info, trade_sha=None):
-    """
-    解密藍新金流回調資料
-    先用系統預設金鑰解密取得 MerchantID，再用對應商家金鑰驗證
-    """
-    from merchant_account.models import Merchant
-    
-    # 步驟1: 先用系統預設金鑰解密，取得 MerchantID
-    system_hash_key = settings.NEWEBPAY_HASH_KEY
-    system_hash_iv = settings.NEWEBPAY_HASH_IV
-    
-    if not system_hash_key or not system_hash_iv:
-        logger.error("系統預設金鑰配置不完整")
-        return None, None, None
-    
-    try:
-        # 嘗試用系統預設金鑰解密，取得基本資訊
-        decrypted_data = aes_decrypt(trade_info, system_hash_key, system_hash_iv)
-        basic_data = json.loads(decrypted_data)
-        
-        # 取得 MerchantID
-        merchant_id = basic_data.get("MerchantID") or basic_data.get("Result", {}).get("MerchantID")
-        if not merchant_id:
-            logger.error("無法從解密資料中取得 MerchantID")
-            return None, None, None
-            
-        logger.info(f"從回調資料中識別出 MerchantID: {merchant_id}")
-        
-        # 步驟2: 根據 MerchantID 查詢對應商家
-        try:
-            merchant = Merchant.objects.get(newebpay_merchant_id=merchant_id)
-            if not merchant.has_newebpay_setup():
-                logger.warning(f"商家 {merchant.ShopName} 的藍新金流未完整設定")
-                # 如果商家金鑰未設定，使用系統預設金鑰
-                return _verify_and_return(trade_info, trade_sha, system_hash_key, system_hash_iv, "系統預設", basic_data)
-            
-            # 步驟3: 使用商家專屬金鑰重新解密並驗證
-            payment_keys = merchant.get_payment_keys()
-            merchant_hash_key = payment_keys['newebpay_hash_key']
-            merchant_hash_iv = payment_keys['newebpay_hash_iv']
-            
-            return _verify_and_return(trade_info, trade_sha, merchant_hash_key, merchant_hash_iv, f"商家 {merchant.ShopName}", None)
-            
-        except Merchant.DoesNotExist:
-            logger.warning(f"找不到 MerchantID 為 {merchant_id} 的商家，使用系統預設金鑰")
-            # 找不到商家時，使用系統預設金鑰
-            return _verify_and_return(trade_info, trade_sha, system_hash_key, system_hash_iv, "系統預設", basic_data)
-            
-    except Exception as e:
-        logger.error(f"解密回調資料失敗: {e}")
-        return None, None, None
+    """解密藍新金流回調資料"""
+    hash_key = settings.NEWEBPAY_HASH_KEY
+    hash_iv = settings.NEWEBPAY_HASH_IV
 
+    if not hash_key or not hash_iv:
+        logger.error("系統金流配置不完整")
+        return None
 
-def _verify_and_return(trade_info, trade_sha, hash_key, hash_iv, key_source, cached_data=None):
-    """驗證簽名並返回解密結果"""
     try:
-        # 如果有快取的解密資料且不需要簽名驗證，直接使用
-        if cached_data and not trade_sha:
-            logger.info(f"使用{key_source}金鑰成功解密回調（無簽名）")
-            return cached_data, hash_key, hash_iv
-        
         # 驗證簽名（如果有）
         if trade_sha:
             check_value = generate_sha256(f"HashKey={hash_key}&{trade_info}&HashIV={hash_iv}")
             if check_value.upper() != trade_sha.upper():
-                logger.warning(f"{key_source}金鑰簽名驗證失敗")
-                return None, None, None
-        
-        # 重新解密（或使用快取）
-        if cached_data:
-            result_data = cached_data
-        else:
-            decrypted_data = aes_decrypt(trade_info, hash_key, hash_iv)
-            result_data = json.loads(decrypted_data)
-        
-        logger.info(f"使用{key_source}金鑰成功解密回調")
-        return result_data, hash_key, hash_iv
-        
+                logger.error("簽名驗證失敗")
+                return None
+
+        # 解密資料
+        decrypted_data = aes_decrypt(trade_info, hash_key, hash_iv)
+        result_data = json.loads(decrypted_data)
+
+        logger.info("成功解密藍新金流回調資料")
+        return result_data
+
     except Exception as e:
-        logger.error(f"{key_source}金鑰解密失敗: {e}")
-        return None, None, None
+        logger.error(f"解密回調資料失敗: {e}")
+        return None
+
+
+def _deduct_product_stock(order):
+    """扣減商品庫存"""
+    try:
+        with transaction.atomic():
+            product = order.product
+            rows_updated = product.__class__.objects.filter(
+                id=product.id, stock__gte=order.quantity  # 確保庫存足夠
+            ).update(stock=F("stock") - order.quantity)
+
+            if rows_updated == 0:
+                logger.error(
+                    f"訂單 {order.provider_order_id} 庫存扣減失敗 - 庫存不足或商品不存在"
+                )
+            else:
+                logger.info(
+                    f"訂單 {order.provider_order_id} 成功扣減 {order.quantity} 件庫存"
+                )
+
+    except Exception as e:
+        logger.error(f"扣減庫存時發生錯誤: {e}")
 
 
 # 工具函數

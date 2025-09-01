@@ -520,4 +520,211 @@ class PaymentSettingsValidator {
 // 自動初始化金流設定驗證器
 new PaymentSettingsValidator();
 
-export { ImagePreview, PaymentTimer, NavigationManager, PaymentSettingsValidator };
+// 購買數量管理器
+class PurchaseQuantityManager {
+  constructor() {
+    this.quantityInput = null;
+    this.decreaseBtn = null;
+    this.increaseBtn = null;
+    this.totalPriceElement = null;
+    this.paymentButtons = {};
+    this.unitPrice = 0;
+    this.maxStock = 0;
+    
+    this.init();
+  }
+
+  init() {
+    // 在 DOM 載入後初始化
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => this.setupElements());
+    } else {
+      this.setupElements();
+    }
+  }
+
+  setupElements() {
+    // 獲取 DOM 元素
+    this.quantityInput = document.getElementById('quantity');
+    this.decreaseBtn = document.getElementById('decrease-quantity');
+    this.increaseBtn = document.getElementById('increase-quantity');
+    this.totalPriceElement = document.getElementById('total-price');
+    
+    // 檢查是否在付款頁面
+    if (!this.quantityInput) {
+      return; // 不在付款頁面，不需要初始化
+    }
+    
+    // 獲取價格和庫存資訊
+    this.extractPriceAndStock();
+    
+    // 設置付款按鈕相關元素
+    this.setupPaymentElements();
+    
+    // 綁定事件監聽器
+    this.attachEventListeners();
+    
+    // 初始化驗證
+    this.validateQuantity();
+  }
+
+  extractPriceAndStock() {
+    // 從頁面中提取單價和最大庫存
+    const priceElement = document.querySelector('[data-unit-price]');
+    const stockElement = document.querySelector('[data-max-stock]');
+    
+    if (priceElement) {
+      this.unitPrice = parseInt(priceElement.dataset.unitPrice) || 0;
+    }
+    
+    if (stockElement) {
+      this.maxStock = parseInt(stockElement.dataset.maxStock) || 0;
+    }
+    
+    // 如果沒有 data 屬性，嘗試從輸入框的 max 屬性獲取
+    if (this.maxStock === 0 && this.quantityInput) {
+      this.maxStock = parseInt(this.quantityInput.getAttribute('max')) || 0;
+    }
+  }
+
+  setupPaymentElements() {
+    // 藍新金流相關元素
+    this.paymentButtons.newebpay = {
+      amt: document.getElementById('newebpay-amt'),
+      quantity: document.getElementById('newebpay-quantity'),
+      price: document.getElementById('newebpay-price')
+    };
+    
+    // LINE Pay 相關元素
+    this.paymentButtons.linepay = {
+      quantity: document.getElementById('linepay-quantity'),
+      price: document.getElementById('linepay-price')
+    };
+  }
+
+  attachEventListeners() {
+    // 數量輸入框事件
+    if (this.quantityInput) {
+      this.quantityInput.addEventListener('input', () => this.validateQuantity());
+      this.quantityInput.addEventListener('change', () => this.validateQuantity());
+    }
+    
+    // 減少按鈕
+    if (this.decreaseBtn) {
+      this.decreaseBtn.addEventListener('click', () => this.decreaseQuantity());
+    }
+    
+    // 增加按鈕
+    if (this.increaseBtn) {
+      this.increaseBtn.addEventListener('click', () => this.increaseQuantity());
+    }
+  }
+
+  decreaseQuantity() {
+    const currentQuantity = parseInt(this.quantityInput.value) || 1;
+    if (currentQuantity > 1) {
+      this.quantityInput.value = currentQuantity - 1;
+      this.validateQuantity();
+    }
+  }
+
+  increaseQuantity() {
+    const currentQuantity = parseInt(this.quantityInput.value) || 1;
+    if (currentQuantity < this.maxStock) {
+      this.quantityInput.value = currentQuantity + 1;
+      this.validateQuantity();
+    }
+  }
+
+  validateQuantity() {
+    let quantity = parseInt(this.quantityInput.value) || 1;
+    
+    // 確保數量在有效範圍內
+    if (quantity < 1) quantity = 1;
+    if (quantity > this.maxStock) quantity = this.maxStock;
+    
+    // 更新輸入框值
+    this.quantityInput.value = quantity;
+    
+    // 更新價格顯示
+    this.updatePrice(quantity);
+    
+    // 更新按鈕狀態
+    this.updateButtonStates(quantity);
+    
+    // 更新付款表單
+    this.updatePaymentForms(quantity);
+  }
+
+  updatePrice(quantity) {
+    const totalPrice = this.unitPrice * quantity;
+    
+    if (this.totalPriceElement) {
+      this.totalPriceElement.textContent = `NT$ ${totalPrice.toLocaleString()}`;
+    }
+  }
+
+  updateButtonStates(quantity) {
+    // 更新減少按鈕狀態
+    if (this.decreaseBtn) {
+      this.decreaseBtn.disabled = quantity <= 1;
+      this.decreaseBtn.classList.toggle('opacity-50', quantity <= 1);
+      this.decreaseBtn.classList.toggle('cursor-not-allowed', quantity <= 1);
+    }
+    
+    // 更新增加按鈕狀態
+    if (this.increaseBtn) {
+      this.increaseBtn.disabled = quantity >= this.maxStock;
+      this.increaseBtn.classList.toggle('opacity-50', quantity >= this.maxStock);
+      this.increaseBtn.classList.toggle('cursor-not-allowed', quantity >= this.maxStock);
+    }
+  }
+
+  updatePaymentForms(quantity) {
+    const totalPrice = this.unitPrice * quantity;
+    
+    // 更新藍新金流表單
+    const newebpay = this.paymentButtons.newebpay;
+    if (newebpay.amt) newebpay.amt.value = totalPrice;
+    if (newebpay.quantity) newebpay.quantity.value = quantity;
+    if (newebpay.price) newebpay.price.textContent = `NT$ ${totalPrice.toLocaleString()}`;
+    
+    // 更新 LINE Pay 表單
+    const linepay = this.paymentButtons.linepay;
+    if (linepay.quantity) linepay.quantity.value = quantity;
+    if (linepay.price) linepay.price.textContent = `NT$ ${totalPrice.toLocaleString()}`;
+  }
+
+  // 公開方法：設置單價（用於動態設置）
+  setUnitPrice(price) {
+    this.unitPrice = price;
+    this.validateQuantity();
+  }
+
+  // 公開方法：設置最大庫存（用於動態設置）
+  setMaxStock(stock) {
+    this.maxStock = stock;
+    if (this.quantityInput) {
+      this.quantityInput.setAttribute('max', stock);
+    }
+    this.validateQuantity();
+  }
+
+  // 公開方法：獲取當前數量
+  getCurrentQuantity() {
+    return parseInt(this.quantityInput?.value) || 1;
+  }
+
+  // 公開方法：獲取總價
+  getTotalPrice() {
+    return this.unitPrice * this.getCurrentQuantity();
+  }
+}
+
+// 自動初始化購買數量管理器
+const purchaseQuantityManager = new PurchaseQuantityManager();
+
+// 將管理器掛載到全域，供其他腳本使用
+window.PurchaseQuantityManager = purchaseQuantityManager;
+
+export { ImagePreview, PaymentTimer, NavigationManager, PaymentSettingsValidator, PurchaseQuantityManager };

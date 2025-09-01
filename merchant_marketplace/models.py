@@ -6,6 +6,7 @@ class Product(models.Model):
     name = models.CharField(max_length=200, verbose_name="商品名稱")
     description = models.TextField(verbose_name="商品介紹")
     price = models.PositiveIntegerField(verbose_name="商品價格")
+    stock = models.PositiveIntegerField(default=1, verbose_name="庫存數量")
     image = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name="商品圖片")
     phone_number = models.CharField(max_length=20, verbose_name="電話號碼")
     merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE, verbose_name="商家")

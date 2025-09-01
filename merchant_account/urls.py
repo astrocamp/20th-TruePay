@@ -10,5 +10,4 @@ urlpatterns = [
     path("dashboard/", views.dashboard, name="dashboard"),
     path("domain_settings/", views.domain_settings, name="domain_settings"),
     path("transaction_history/", views.transaction_history, name="transaction_history"),
-    path("payment_settings/", views.payment_settings, name="payment_settings"),
 ]

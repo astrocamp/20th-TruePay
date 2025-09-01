@@ -79,16 +79,10 @@
             <li>
               <a href="#" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                   {% include 'components/icons.html' with icon='qr' %}
-                掃描QR
+                掃描QR code
               </a>
             </li>
             
-            <li>
-              <a href="{% url 'merchant_account:payment_settings' %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
-                {% include 'components/icons.html' with icon='money' %}
-                金流管理 Payment Settings
-              </a>
-            </li>
             <li>
               <a href="#" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='settings' %}
