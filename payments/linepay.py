@@ -207,9 +207,9 @@ def _deduct_product_stock(order):
             ).update(stock=F("stock") - order.quantity)
 
             if rows_updated == 0:
-                logger.error(
-                    f"訂單 {order.provider_order_id} 庫存扣減失敗 - 庫存不足或商品不存在"
-                )
+                error_msg = f"訂單 {order.provider_order_id} 庫存扣減失敗 - 庫存不足或商品不存在"
+                logger.error(error_msg)
+                raise ValueError(error_msg)
             else:
                 logger.info(
                     f"訂單 {order.provider_order_id} 成功扣減 {order.quantity} 件庫存"
@@ -217,6 +217,7 @@ def _deduct_product_stock(order):
 
     except Exception as e:
         logger.error(f"扣減庫存時發生錯誤: {e}")
+        raise
 
 
 # 工具函數
