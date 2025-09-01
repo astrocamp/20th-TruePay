@@ -12,6 +12,7 @@ urlpatterns = [
     path("transaction_history/", views.transaction_history, name="transaction_history"),
     
     # 票券驗證相關路由
+    path("ticket/", views.ticket_validation_page, name="ticket_validation"),
     path("ticket/validate/", views.validate_ticket, name="validate_ticket"),
     path("ticket/use/", views.use_ticket, name="use_ticket"),
     path("ticket/scan_restart/", views.restart_scan, name="restart_scan"),

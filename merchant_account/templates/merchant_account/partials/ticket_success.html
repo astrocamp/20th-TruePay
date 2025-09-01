@@ -1,44 +1,50 @@
 <!-- 票券驗證成功的HTML片段 -->
 <div class="ticket-success">
-    <div class="text-center mb-4">
-        <div class="bg-green-100 text-green-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
-            {% include 'components/icons.html' with icon='check' class='w-8 h-8' %}
+    <div class="text-center mb-6">
+        <div class="avatar placeholder mb-4">
+            <div class="bg-success text-success-content rounded-full w-16">
+                {% include 'components/icons.html' with icon='check' class='w-8 h-8' %}
+            </div>
         </div>
-        <h3 class="text-xl font-bold text-green-800">票券驗證成功</h3>
+        <h3 class="text-xl font-bold text-success">票券驗證成功</h3>
     </div>
     
-    <div class="space-y-3 mb-6">
-        <div class="flex justify-between">
-            <span class="text-gray-600">商品名稱</span>
-            <span class="font-medium">{{ ticket_info.product_name }}</span>
-        </div>
-        <div class="flex justify-between">
-            <span class="text-gray-600">票券金額</span>
-            <span class="font-bold text-[#0056B3]">NT$ {{ ticket_info.ticket_value }}</span>
-        </div>
-        <div class="flex justify-between">
-            <span class="text-gray-600">客戶姓名</span>
-            <span class="font-medium">{{ ticket_info.customer_name }}</span>
-        </div>
-        <div class="flex justify-between">
-            <span class="text-gray-600">有效期限</span>
-            <span class="font-medium">{{ ticket_info.valid_until|date:"Y-m-d H:i" }}</span>
+    <div class="card bg-base-200 mb-6">
+        <div class="card-body p-4 space-y-3">
+            <div class="flex justify-between">
+                <span class="text-base-content/70">商品名稱</span>
+                <span class="font-medium">{{ ticket_info.product_name }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-base-content/70">票券金額</span>
+                <span class="font-bold text-primary">NT$ {{ ticket_info.ticket_value }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-base-content/70">客戶姓名</span>
+                <span class="font-medium">{{ ticket_info.customer_name }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-base-content/70">有效期限</span>
+                <span class="font-medium">{{ ticket_info.valid_until|date:"Y-m-d H:i" }}</span>
+            </div>
         </div>
     </div>
     
     <div class="space-y-3">
         <form hx-post="{% url 'merchant_account:use_ticket' %}" hx-target="#scan-result" hx-swap="innerHTML">
+            {% csrf_token %}
             <input type="hidden" name="ticket_code" value="{{ ticket_code }}">
-            <button type="submit" class="w-full bg-[#0056B3] hover:bg-[#00408A] text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center">
+            <button type="submit" class="btn btn-primary w-full">
                 {% include 'components/icons.html' with icon='check' class='w-5 h-5 mr-2' %}
                 確認使用票券
             </button>
         </form>
         
-        <button hx-post="{% url 'merchant_account:restart_scan' %}" hx-target="#scan-result" hx-swap="innerHTML"
-                onclick="restartScanning()" 
-                class="w-full bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-6 rounded-lg transition duration-200">
-            繼續掃描其他票券
-        </button>
+        <form hx-post="{% url 'merchant_account:restart_scan' %}" hx-target="#scan-result" hx-swap="innerHTML">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-neutral w-full" data-action="restart-scanning">
+                繼續驗證其他票券
+            </button>
+        </form>
     </div>
 </div>

@@ -36,6 +36,16 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     付款方式
                 </th>
+                {% if role == 'customer' %}
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    票券代碼
+                </th>
+                {% endif %}
+                {% if role == 'merchant' %}
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    票券代碼
+                </th>
+                {% endif %}
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     建立時間
                 </th>
@@ -82,13 +92,45 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {{ item.get_payment_method_display }}
                 </td>
+                {% if role == 'customer' %}
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    {% if item.status == 'paid' and item.ticket_code %}
+                        <span class="font-mono text-green-700 bg-green-50 px-2 py-1 rounded text-xs">
+                            {{ item.ticket_code }}
+                        </span>
+                        {% if item.is_ticket_used %}
+                            <div class="text-xs text-gray-500 mt-1">已使用</div>
+                        {% else %}
+                            <div class="text-xs text-green-600 mt-1">可使用</div>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-gray-400 text-xs">-</span>
+                    {% endif %}
+                </td>
+                {% endif %}
+                {% if role == 'merchant' %}
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    {% if item.status == 'paid' and item.ticket_code %}
+                        <span class="font-mono text-blue-700 bg-blue-50 px-2 py-1 rounded text-xs">
+                            {{ item.ticket_code }}
+                        </span>
+                        {% if item.is_ticket_used %}
+                            <div class="text-xs text-gray-500 mt-1">已使用</div>
+                        {% else %}
+                            <div class="text-xs text-blue-600 mt-1">待驗證</div>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-gray-400 text-xs">-</span>
+                    {% endif %}
+                </td>
+                {% endif %}
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {{ item.created_at|date:"Y/m/d H:i" }}
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="{% if role == 'merchant' %}10{% else %}8{% endif %}" class="px-6 py-8 text-center text-gray-500">
+                <td colspan="{% if role == 'merchant' %}11{% else %}9{% endif %}" class="px-6 py-8 text-center text-gray-500">
                     {% if role == 'merchant' %}
                         目前沒有交易記錄
                     {% else %}

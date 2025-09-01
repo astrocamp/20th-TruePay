@@ -173,6 +173,13 @@ def transaction_history(request):
 
 @no_cache_required
 @shop_required
+def ticket_validation_page(request):
+    """票券驗證主頁面"""
+    return render(request, 'merchant_account/ticket_validation.html')
+
+
+@no_cache_required
+@shop_required
 @require_POST
 def validate_ticket(request):
     """驗證票券（手動輸入驗證碼或QR掃描）"""

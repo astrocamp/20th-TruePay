@@ -1,0 +1,93 @@
+{% extends 'merchant_layout/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}票券驗證 - TruePay 廠商儀表板{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto" x-data="{
+    currentTab: 'manual',
+    ticketCode: '',
+    switchTab(tab) {
+        this.currentTab = tab;
+        if (tab === 'manual') {
+            this.$nextTick(() => this.$refs.ticketInput?.focus());
+        }
+    },
+    restartScanning() {
+        this.ticketCode = '';
+        this.currentTab = 'manual';
+        this.$nextTick(() => this.$refs.ticketInput?.focus());
+    }
+}">
+    <!-- 頁面標題 -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold mb-2">票券驗證</h1>
+        <p class="text-base-content/70">驗證客戶的票券並確認使用</p>
+    </div>
+
+    <!-- 驗證方式選擇 -->
+    <div class="card bg-base-100 shadow-sm border mb-6">
+        <div class="card-body">
+            <!-- Tab 切換 -->
+            <div class="tabs tabs-boxed mb-6">
+                <a @click="switchTab('manual')" 
+                   :class="{'tab-active': currentTab === 'manual'}" 
+                   class="tab">手動輸入驗證碼</a>
+                <a @click="switchTab('qr')" 
+                   :class="{'tab-active': currentTab === 'qr'}" 
+                   class="tab">QR Code 掃描</a>
+            </div>
+
+            <!-- 手動輸入區域 -->
+            <div x-show="currentTab === 'manual'" x-transition>
+                <form hx-post="{% url 'merchant_account:validate_ticket' %}" 
+                      hx-target="#scan-result" 
+                      hx-swap="innerHTML"
+                      class="space-y-4">
+                    {% csrf_token %}
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">票券驗證碼</span>
+                        </label>
+                        <input type="text" 
+                               x-ref="ticketInput"
+                               x-model="ticketCode"
+                               name="ticket_code" 
+                               class="input input-bordered w-full focus:input-primary"
+                               placeholder="請輸入票券驗證碼（例如：TC12345678）"
+                               @input="ticketCode = ticketCode.toUpperCase()">
+                        <input type="hidden" name="method" value="manual">
+                    </div>
+                    <button type="submit" 
+                            class="btn btn-primary w-full"
+                            :disabled="!ticketCode.trim()">
+                        {% include 'components/icons.html' with icon='check' class='w-5 h-5 mr-2' %}
+                        驗證票券
+                    </button>
+                </form>
+            </div>
+
+            <!-- QR Code 掃描區域 -->
+            <div x-show="currentTab === 'qr'" x-transition>
+                <div class="alert alert-info">
+                    <div class="flex flex-col items-center text-center">
+                        {% include 'components/icons.html' with icon='scan-frame' class='w-16 h-16 mb-4 opacity-60' %}
+                        <span class="text-lg font-medium">QR Code 掃描功能開發中...</span>
+                        <span class="text-sm opacity-70">目前請使用手動輸入驗證碼功能</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 驗證結果顯示區域 -->
+    <div class="card bg-base-100 shadow-sm border">
+        <div class="card-body">
+            <div id="scan-result">
+                {% include 'merchant_account/partials/scan_ready.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

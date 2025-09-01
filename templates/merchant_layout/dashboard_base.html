@@ -10,6 +10,8 @@
   {% load static %}
   <link href="{% static 'styles/app.css' %}" rel="stylesheet" type="text/css" />
   <script src="{% static 'scripts/app.js' %}" defer></script>
+  <!-- HTMX for AJAX functionality -->
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
   <style>
     /* 自訂滾動條（與 Apple 風格接近，低存在感）*/
     ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#D2D2D7;border-radius:999px}::-webkit-scrollbar-track{background:transparent}
@@ -35,6 +37,9 @@
           currentPath: window.location.pathname,
           isActive(element) {
             return this.currentPath === element.getAttribute('href').replace(/\?.*$/, '')
+          },
+          showDomainAlert() {
+            alert('請先在網域設定中設定自訂網域');
           }
         }">
           <ul class="px-2 space-y-1 text-sm">
@@ -75,7 +80,7 @@
                 target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl 
               hover:bg-[#F5F5F7]">
               {% else %}
-                <a href="#" onclick="alert('請先在網域設定中設定自訂網域')" class="flex 
+                <a href="#" @click.prevent="showDomainAlert()" class="flex 
                 items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] opacity-50">
               {% endif %}
                 {% include 'components/icons.html' with icon='cube' %}
@@ -83,9 +88,9 @@
                 </a>
             </li>
             <li>
-              <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+              <a href="{% url 'merchant_account:ticket_validation' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
                   {% include 'components/icons.html' with icon='qr' %}
-                掃描QR
+                票券驗證
               </a>
             </li>
             

@@ -62,7 +62,7 @@ class Order(models.Model):
     provider_raw_data = models.JSONField('金流原始回傳資料', default=default_provider_raw_data)
     
     # === 票券相關欄位 ===
-    ticket_code = models.CharField('票券驗證碼', max_length=20, blank=True, unique=True)
+    ticket_code = models.CharField('票券驗證碼', max_length=20, blank=True, null=True, unique=True)
     is_ticket_used = models.BooleanField('票券是否已使用', default=False)
     ticket_used_at = models.DateTimeField('票券使用時間', null=True, blank=True)
     ticket_valid_until = models.DateTimeField('票券有效期限', null=True, blank=True)
