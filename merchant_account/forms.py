@@ -6,12 +6,11 @@ from django.forms import (
     PasswordInput,
     Form,
     EmailField,
-    SlugField,
-    CheckboxInput,
 )
 from .models import Merchant
 from .utils import generate_unique_subdomain
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 
 class RegisterForm(ModelForm):
@@ -51,7 +50,10 @@ class RegisterForm(ModelForm):
     def save(self, commit=True):
         merchant = super().save(commit=False)
         merchant.set_password(self.cleaned_data["Password"])
-        merchant.subdomain = generate_unique_subdomain()
+        try:
+            merchant.subdomain = generate_unique_subdomain()
+        except ValueError as e:
+            raise ValidationError("無法生成唯一的商店網址") from e
 
         if commit:
             merchant.save()
