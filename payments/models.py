@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
 import random
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -291,8 +292,8 @@ def create_tickets(sender, instance, **kwargs):
                         customer=order.customer,
                         ticket_code=ticket_code,
                         status='unused',
-                        # 設定180天有效期限
-                        valid_until=timezone.now() + timezone.timedelta(days=180)
+                        # 設定票券有效期限
+                        valid_until=timezone.now() + timezone.timedelta(days=settings.TICKET_VALIDITY_DAYS)
                     )
                 )
             
