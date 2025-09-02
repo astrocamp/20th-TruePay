@@ -1,81 +1,111 @@
 {% extends "merchant_layout/dashboard_base.html" %}
 {% block content %}
 <div class="container mx-auto px-4 py-8">
-  <div class="max-w-4xl mx-auto">
-    <!-- 返回按鈕 -->
-    <div class="mb-6">
-      <a href="{% url 'merchant_marketplace:index' %}" class="text-[#0056B3] hover:text-[#00408A] flex items-center">
-        {% include 'components/icons.html' with icon='arrow-left' class='w-5 h-5 mr-2' %}
-        返回商品列表
-      </a>
-    </div>
-
-    {% if messages %}
-      {% for message in messages %}
-        <div class="mb-4 p-3 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% endif %}">
-          {{ message }}
+    <div class="max-w-4xl mx-auto">
+        <!-- 返回按鈕 -->
+        <div class="mb-6">
+            <a href="{% url 'merchant_marketplace:index' request.merchant.subdomain %}" class="text-[#0056B3] hover:text-[#00408A] flex items-center">
+                {% include 'components/icons.html' with icon='arrow-left' class='w-5 h-5 mr-2' %}
+                返回商品列表
+            </a>
         </div>
-      {% endfor %}
-    {% endif %}
+    {% if messages %} {% for message in messages %}
+    <div
+      class="mb-4 p-3 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% endif %}"
+    >
+      {{ message }}
+    </div>
+    {% endfor %} {% endif %}
 
     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
       <div class="md:flex">
         <!-- 商品圖片 -->
         <div class="md:w-1/2">
           {% if product.image %}
-            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-96 object-cover">
+          <img
+            src="{{ product.image.url }}"
+            alt="{{ product.name }}"
+            class="w-full h-96 object-cover"
+          />
           {% else %}
-            <div class="w-full h-96 bg-gray-200 flex items-center justify-center">
-              <span class="text-gray-500 text-lg">無圖片</span>
-            </div>
+          <div class="w-full h-96 bg-gray-200 flex items-center justify-center">
+            <span class="text-gray-500 text-lg">無圖片</span>
+          </div>
           {% endif %}
         </div>
 
         <!-- 商品資訊 -->
         <div class="md:w-1/2 p-8">
           <div class="mb-6">
-            <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ product.name }}</h1>
-            <p class="text-4xl font-bold text-[#0056B3] mb-6">${{ product.price }}</p>
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">
+              {{ product.name }}
+            </h1>
+            <p class="text-4xl font-bold text-[#0056B3] mb-6">
+              ${{ product.price }}
+            </p>
           </div>
 
           <div class="space-y-4 mb-8">
             <div class="flex items-start">
               <span class="text-gray-600 font-medium w-20">發布：</span>
-              <span class="text-gray-600">{{ product.created_at|date:"Y/m/d H:i" }}</span>
+              <span class="text-gray-600"
+                >{{ product.created_at|date:"Y/m/d H:i" }}</span
+              >
             </div>
           </div>
 
           <!-- 操作按鈕 -->
-          <div class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
-              <a href="{% url 'merchant_marketplace:edit' product.id %}" class="bg-[#0056B3] text-white px-6 py-3 rounded-lg hover:bg-[#00408A] transition duration-200 text-center">
-                編輯商品
-              </a>
-              <button data-action="confirm-delete" data-form-id="deleteForm" data-message="確定要刪除這個商品嗎？此操作無法復原。" class="bg-red-100 text-red-700 hover:bg-red-200 transition duration-200 px-6 py-3 rounded-lg border border-red-300 cursor-pointer">
-                刪除商品
-              </button>
-            </div>
-          
-            <div class="border-t border-gray-200 pt-4">
-              <a href="{% url 'public_store:payment_page' product.id %}" class="w-full inline-block bg-green-600 text-white text-center py-3 px-6 rounded-lg hover:bg-green-700 transition duration-200 font-medium" target="_blank">
-                🔗 開啟收款頁面
-              </a>
-              <p class="text-sm text-gray-500 mt-2 text-center">將在新視窗開啟顧客付款頁面</p>
-            </div>
+          {% if request.merchant.id == product.merchant.id %}
+          <div class="flex space-x-4">
+            <a
+              href="{% url 'merchant_marketplace:edit' request.merchant.subdomain product.id %}"
+              class="bg-[#0056B3] text-white px-6 py-3 rounded-lg hover:bg-[#00408A] transition duration-200"
+            >
+              編輯商品
+            </a>
+            <button
+              data-action="confirm-delete"
+              data-form-id="deleteForm"
+              data-message="確定要刪除這個商品嗎？此操作無法復原。"
+              class="bg-red-100 text-red-700 hover:bg-red-200 transition duration-200 px-6 py-3 rounded-lg border border-red-300"
+            >
+              刪除商品
+            </button>
           </div>
-          
+          <div class="flex space-x-2">
+            <a
+              href="{% url 'public_store:payment_page' product.id %}"
+              class="flex-1 bg-red-100 text-red-700 text-center py-2 px-3 rounded text-sm hover:bg-red-200 transition duration-200 border border-red-300"
+              target="_blank"
+            >
+              開啟收款頁面
+            </a>
+          </div>
+
           <!-- 隱藏的刪除表單 -->
-          <form id="deleteForm" action="{% url 'merchant_marketplace:detail' product.id %}" method="post" style="display: none;">
+          <form
+            id="deleteForm"
+            action="{% url 'merchant_marketplace:detail' request.merchant.subdomain product.id %}"
+            method="post"
+            style="display: none"
+          >
             {% csrf_token %}
-            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="action" value="delete" />
           </form>
+          {% else %}
+          <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+            <p class="text-green-800 font-medium">聯絡商家購買此商品</p>
+          </div>
+          {% endif %}
         </div>
       </div>
-      
+
       <!-- 商品描述 -->
       <div class="p-8 border-t border-gray-200">
         <h3 class="text-xl font-bold text-gray-800 mb-4">商品描述</h3>
-        <div class="text-gray-700 leading-relaxed whitespace-pre-line">{{ product.description }}</div>
+        <div class="text-gray-700 leading-relaxed whitespace-pre-line">
+          {{ product.description }}
+        </div>
       </div>
     </div>
   </div>

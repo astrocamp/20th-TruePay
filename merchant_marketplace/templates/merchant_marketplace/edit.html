@@ -2,7 +2,7 @@
 {% block content %}
 <div class="max-w-2xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
     <div class="mb-6">
-        <a href="{% url 'merchant_marketplace:detail' product.id %}" class="text-blue-600 hover:text-blue-800 flex items-center">
+        <a href="{% url 'merchant_marketplace:detail' request.merchant.subdomain product.id %}" class="text-blue-600 hover:text-blue-800 flex items-center">
             {% include 'components/icons.html' with icon='arrow-left' class='w-5 h-5 mr-2' %}
             返回商品詳情
         </a>
@@ -18,7 +18,7 @@
         {% endfor %}
     {% endif %}
     
-    <form action="{% url 'merchant_marketplace:edit' product.id %}" method="post" enctype="multipart/form-data" class="space-y-6">
+    <form action="{% url 'merchant_marketplace:edit' request.merchant.subdomain product.id %}" method="post" enctype="multipart/form-data" class="space-y-6">
         {% csrf_token %}
         
         <div>
@@ -118,7 +118,7 @@
             <button type="submit" class="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200">
                 更新商品
             </button>
-            <a href="{% url 'merchant_marketplace:detail' product.id %}" class="flex-1 text-center bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition duration-200">
+            <a href="{% url 'merchant_marketplace:detail' request.merchant.subdomain product.id %}" class="flex-1 text-center bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition duration-200">
                 取消
             </a>
         </div>

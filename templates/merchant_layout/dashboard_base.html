@@ -1,5 +1,3 @@
-{% load merchant_tags %}
-{% get_current_merchant as current_merchant %}
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -23,58 +21,49 @@
       <div class="h-full flex flex-col">
         <!-- Logo -->
         <div class="px-6 h-16 flex items-center border-b border-[#D2D2D7]">
-          <a href="{% url 'merchant_account:dashboard' %}" class="text-xl font-bold text-[#0056B3]">TruePay</a>
+          <a href="{% url 'merchant_account:dashboard' request.merchant.subdomain %}" class="text-xl font-bold text-[#0056B3]">TruePay</a>
           <label for="sidebarToggle" class="ml-auto md:hidden cursor-pointer p-2 rounded-lg hover:bg-[#F5F5F7]" aria-label="關閉選單">✕</label>
         </div>
         <!-- 導覽選單 -->
         <nav class="flex-1 overflow-y-auto py-4" x-data="NavigationManager.createAlpineData()">
           <ul class="px-2 space-y-1 text-sm">
             <li>
-              <a href="{% url 'merchant_account:dashboard' %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
+              <a href="{% url 'merchant_account:dashboard' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='home' %}
                 廠商總覽 Overview
               </a>
             </li>
             <li>
-              <a href="{% url 'merchant_marketplace:index' %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
+              <a href="{% url 'merchant_marketplace:index' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='menu' %}
                 商品列表 Product List
               </a>
             </li>
             <li>
-              <a href="{% url 'merchant_marketplace:new' %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
+              <a href="{% url 'merchant_marketplace:new' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='plus' %}
                 新增商品 Create Product
               </a>
             </li>
             <li>
-              <a href="{% url 'merchant_account:transaction_history' %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
+              <a href="{% url 'merchant_account:transaction_history' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='document' %}
                 交易紀錄 Transactions
               </a>
             </li>
             
             <li>
-              <a href="{% url 'merchant_account:domain_settings' %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
+              <a href="{% url 'merchant_account:domain_settings' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='check-circle' %}
                 網域設定 Domain Settings
               </a>
             </li>
             <li>
-              {% if current_merchant.subdomain %}
-                <a href="{% url 'public_store:shop_overview' current_merchant.subdomain %}" 
-                   target="_blank" 
-                   class="flex items-center gap-3" 
-                   x-bind="navLinkBinding($el)">
-              {% else %}
-                <a href="#" 
-                   onclick="alert('請先在網域設定中設定自訂網域')" 
-                   class="flex items-center gap-3" 
-                   x-bind="navLinkBindingWithOpacity($el)">
-              {% endif %}
+              <a href="{% url 'public_store:shop_overview' request.merchant.subdomain %}" 
+                target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
                 {% include 'components/icons.html' with icon='cube' %}
                 商品總覽頁面 Shop Overview
-                </a>
+              </a>
             </li>
             <li>
               <a href="#" class="flex items-center gap-3" x-bind="navLinkBinding($el)">

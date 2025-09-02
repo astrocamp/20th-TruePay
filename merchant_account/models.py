@@ -12,13 +12,7 @@ class Merchant(models.Model):
     Address = models.CharField(max_length=50, null=False)
     Cellphone = models.CharField(max_length=15, null=False)
     Password = models.CharField(max_length=128, null=False)
-    subdomain = models.SlugField(max_length=50, unique=True, null=True, blank=True)
-    merchant_domain = models.CharField(
-        max_length=50, blank=True, null=True, verbose_name="自訂域名"
-    )
-    use_merchant_domain = models.BooleanField(
-        default=False, verbose_name="使用自訂域名"
-    )
+    subdomain = models.SlugField(max_length=50, unique=True, null=False, blank=False)
 
     def __str__(self):
         return self.ShopName
