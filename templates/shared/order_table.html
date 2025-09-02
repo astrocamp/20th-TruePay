@@ -94,15 +94,21 @@
                 </td>
                 {% if role == 'customer' %}
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    {% if item.status == 'paid' and item.ticket_code %}
-                        <span class="font-mono text-green-700 bg-green-50 px-2 py-1 rounded text-xs">
-                            {{ item.ticket_code }}
-                        </span>
-                        {% if item.is_ticket_used %}
-                            <div class="text-xs text-gray-500 mt-1">已使用</div>
-                        {% else %}
-                            <div class="text-xs text-green-600 mt-1">可使用</div>
-                        {% endif %}
+                    {% if item.status == 'paid' and item.items.exists %}
+                        <div class="space-y-1">
+                            {% for ticket in item.items.all %}
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-mono text-green-700 bg-green-50 px-2 py-1 rounded text-xs">
+                                        {{ ticket.ticket_code }}
+                                    </span>
+                                    {% if ticket.status == 'used' %}
+                                        <span class="text-xs text-red-500">已使用</span>
+                                    {% else %}
+                                        <span class="text-xs text-green-600">可使用</span>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
                     {% else %}
                         <span class="text-gray-400 text-xs">-</span>
                     {% endif %}
@@ -110,15 +116,21 @@
                 {% endif %}
                 {% if role == 'merchant' %}
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    {% if item.status == 'paid' and item.ticket_code %}
-                        <span class="font-mono text-blue-700 bg-blue-50 px-2 py-1 rounded text-xs">
-                            {{ item.ticket_code }}
-                        </span>
-                        {% if item.is_ticket_used %}
-                            <div class="text-xs text-gray-500 mt-1">已使用</div>
-                        {% else %}
-                            <div class="text-xs text-blue-600 mt-1">待驗證</div>
-                        {% endif %}
+                    {% if item.status == 'paid' and item.items.exists %}
+                        <div class="space-y-1">
+                            {% for ticket in item.items.all %}
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-mono text-blue-700 bg-blue-50 px-2 py-1 rounded text-xs">
+                                        {{ ticket.ticket_code }}
+                                    </span>
+                                    {% if ticket.status == 'used' %}
+                                        <span class="text-xs text-gray-500">已使用</span>
+                                    {% else %}
+                                        <span class="text-xs text-blue-600">待驗證</span>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
                     {% else %}
                         <span class="text-gray-400 text-xs">-</span>
                     {% endif %}

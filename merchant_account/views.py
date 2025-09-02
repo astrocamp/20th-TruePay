@@ -147,6 +147,7 @@ def transaction_history(request):
     # 查詢該商家的所有交易記錄（使用統一的 Order 模型）
     orders = (
         Order.objects.select_related("customer", "product")
+        .prefetch_related("items")  # 預載入票券資料
         .filter(product__merchant=request.merchant)
         .order_by("-created_at")
     )
