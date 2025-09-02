@@ -12,7 +12,7 @@ from truepay.decorators import no_cache_required, shop_required
 from .forms import RegisterForm, LoginForm, domain_settings_form
 from .models import Merchant
 from merchant_marketplace.models import Product
-from payments.models import Order, TicketValidation
+from payments.models import Order, OrderItem, TicketValidation
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 
@@ -188,9 +188,9 @@ def validate_ticket(request):
     validation_method = request.POST.get('method', 'manual')
     
     # 記錄驗證嘗試
-    def create_validation_record(order, status, reason=''):
+    def create_validation_record(ticket, status, reason=''):
         return TicketValidation.objects.create(
-            order=order,
+            ticket=ticket,
             merchant=merchant,
             status=status,
             failure_reason=reason,
@@ -205,37 +205,37 @@ def validate_ticket(request):
         return render(request, 'merchant_account/partials/ticket_error.html', context)
     
     try:
-        # 查找票券
-        order = Order.objects.select_related('product__merchant', 'customer').get(
+        # 查找票券（OrderItem）
+        ticket = OrderItem.objects.select_related('order', 'product__merchant', 'customer').get(
             ticket_code=ticket_code
         )
         
         # 檢查票券有效性和商家權限
-        is_valid, message = order.is_ticket_valid()
+        is_valid, message = ticket.is_valid()
         if not is_valid:
-            create_validation_record(order, 'failed', message)
+            create_validation_record(ticket, 'failed', message)
             context = {
                 'error_message': message
             }
             return render(request, 'merchant_account/partials/ticket_error.html', context)
         
         # 檢查商家權限
-        if order.product.merchant != merchant:
-            create_validation_record(order, 'unauthorized', '您無權限驗證此票券')
+        if ticket.product.merchant != merchant:
+            create_validation_record(ticket, 'unauthorized', '您無權限驗證此票券')
             context = {
                 'error_message': '您無權限驗證此票券'
             }
             return render(request, 'merchant_account/partials/ticket_error.html', context)
         
         # 票券驗證成功，顯示確認頁面
-        create_validation_record(order, 'success')
+        create_validation_record(ticket, 'success')
         context = {
             'ticket_code': ticket_code,
-            'ticket_info': order.ticket_info,
+            'ticket_info': ticket.ticket_info,
         }
         return render(request, 'merchant_account/partials/ticket_success.html', context)
         
-    except Order.DoesNotExist:
+    except OrderItem.DoesNotExist:
         # 找不到票券
         context = {
             'error_message': '找不到此票券代碼'
@@ -258,17 +258,17 @@ def use_ticket(request):
         return render(request, 'merchant_account/partials/ticket_error.html', context)
     
     try:
-        order = Order.objects.select_related('product__merchant', 'customer').get(
+        ticket = OrderItem.objects.select_related('order', 'product__merchant', 'customer').get(
             ticket_code=ticket_code
         )
         
         # 使用票券
-        success, message = order.use_ticket(merchant)
+        success, message = ticket.use_ticket(merchant)
         
         if success:
             # 記錄成功使用
             TicketValidation.objects.create(
-                order=order,
+                ticket=ticket,
                 merchant=merchant,
                 status='success',
                 failure_reason='票券已成功使用',
@@ -278,8 +278,8 @@ def use_ticket(request):
             
             context = {
                 'message': message,
-                'ticket_value': order.amount,
-                'used_at': order.ticket_used_at,
+                'ticket_value': ticket.order.unit_price,
+                'used_at': ticket.used_at,
             }
             return render(request, 'merchant_account/partials/ticket_used.html', context)
         else:
@@ -288,7 +288,7 @@ def use_ticket(request):
             }
             return render(request, 'merchant_account/partials/ticket_error.html', context)
             
-    except Order.DoesNotExist:
+    except OrderItem.DoesNotExist:
         context = {
             'error_message': '找不到此票券代碼'
         }
