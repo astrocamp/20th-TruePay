@@ -228,8 +228,7 @@ def validate_ticket(request):
             }
             return render(request, 'merchant_account/partials/ticket_error.html', context)
         
-        # 票券驗證成功，顯示確認頁面
-        create_validation_record(ticket, 'success')
+        # 票券驗證成功，顯示確認頁面（驗證不需記錄，只有實際使用才記錄）
         context = {
             'ticket_code': ticket_code,
             'ticket_info': ticket.ticket_info,
@@ -267,15 +266,7 @@ def use_ticket(request):
         success, message = ticket.use_ticket(merchant)
         
         if success:
-            # 記錄成功使用
-            TicketValidation.objects.create(
-                ticket=ticket,
-                merchant=merchant,
-                status='success',
-                failure_reason='票券已成功使用',
-                validation_method='manual',
-                ip_address=request.META.get('REMOTE_ADDR')
-            )
+            # ticket.use_ticket() 已經更新票券狀態到資料庫，不需要額外記錄
             
             context = {
                 'message': message,
