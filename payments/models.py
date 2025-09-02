@@ -3,6 +3,7 @@ from django.utils import timezone
 import random
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.db import transaction
 
 
 def default_provider_raw_data():
@@ -162,27 +163,49 @@ class OrderItem(models.Model):
     product = models.ForeignKey('merchant_marketplace.Product', on_delete=models.PROTECT, verbose_name='商品')
     customer = models.ForeignKey('customers_account.Customer', on_delete=models.SET_NULL, null=True, verbose_name='客戶')
     
-    def save(self, *args, **kwargs):
-        """自動生成票券代碼"""
-        if not self.ticket_code:
-            # 生成格式：TKT + 訂單ID後4位 + 時間戳 + 隨機數
-            order_suffix = str(self.order.id).zfill(4)[-4:]
-            timestamp = timezone.now().strftime("%m%d%H%M")
-            random_suffix = str(random.randint(100, 999))
-            self.ticket_code = f"TKT{order_suffix}{timestamp}{random_suffix}"
-        
-        super().save(*args, **kwargs)
+    class Meta:
+        db_table = 'order_items'
+        ordering = ['-created_at']
+        verbose_name = '票券'
+        verbose_name_plural = '票券'
+    
+    def __str__(self):
+        return f"{self.ticket_code} - {self.get_status_display()}"
 
 
-#用singnal方式產出票券(付款成功後)    
+# 當訂單付款成功時，透過信號自動生成票券
 @receiver(post_save, sender=Order)
-def create_item(sender, instance, created, **kwargs):
-    if instance.status == 'paid' and not instance.items.exists():
-        # 根據訂單數量產生對應數量的票券
-        for i in range(instance.quantity):
-            OrderItem.objects.create(
-                order=instance,
-                product=instance.product,
-                customer=instance.customer,
-                status='unused'
-            )
+def create_item(sender, instance, **kwargs):
+    # 只處理狀態為「已付款」的訂單
+    if instance.status == 'paid':
+        with transaction.atomic():
+            # 使用 select_for_update 鎖定訂單，防止競爭條件
+            order = Order.objects.select_for_update().get(pk=instance.pk)
+            
+            # 再次檢查是否已生成票券，確保冪等性
+            if order.items.exists():
+                return
+
+            items_to_create = []
+            # 使用更長、更精確的時間戳（包含年份和秒數）
+            timestamp = timezone.now().strftime("%Y%m%d%H%M%S")
+            order_suffix = str(order.id).zfill(4)[-4:]
+
+            for i in range(order.quantity):
+                # 增加隨機數範圍並加上迴圈索引，確保批次內 ticket_code 唯一
+                random_suffix = str(random.randint(1000, 9999))
+                ticket_code = f"TKT{order_suffix}{timestamp}{i:03d}{random_suffix}"
+                
+                items_to_create.append(
+                    OrderItem(
+                        order=order,
+                        product=order.product,
+                        customer=order.customer,
+                        ticket_code=ticket_code,
+                        status='unused'
+                    )
+                )
+            
+            # 使用 bulk_create 進行批量創建以提升性能
+            if items_to_create:
+                OrderItem.objects.bulk_create(items_to_create)
