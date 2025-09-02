@@ -20,8 +20,9 @@ def shop_overview(request, subdomain):
 def payment_page(request, id):
     """商品收款頁面 - 客戶進行付款"""
     product = get_object_or_404(Product, id=id, is_active=True)
+    is_customer = request.user.is_authenticated and request.user.username.startswith('customer_')
     return render(
-        request, "public_store/payment_page.html", {"product": product}
+        request, "public_store/payment_page.html", {"product": product, "is_customer": is_customer}
     )
 
 

@@ -27,7 +27,11 @@ def register(req):
                 )
                 messages.error(req, "註冊失敗，請重新再試")
             else:
-                form.save()
+                merchant = form.save()
+                user, created = User.objects.get_or_create(
+                    username=f"merchant_{merchant.Email}",
+                    defaults={"email": merchant.Email, "first_name": merchant.Name},
+                )
                 messages.success(req, "註冊成功！")
                 return redirect("merchant_account:login")
         else:
@@ -149,7 +153,6 @@ def transaction_history(request):
         .order_by("-created_at")
     )
 
-    # 為了向後兼容，我們仍然使用 order_items 這個變數名
     order_items = orders
 
     # 分頁處理
@@ -165,3 +168,5 @@ def transaction_history(request):
     }
 
     return render(request, "merchant_account/transaction_history.html", context)
+
+

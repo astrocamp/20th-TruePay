@@ -1,2 +1,5 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+/* 引入自訂樣式 */
+@import "./style.css";

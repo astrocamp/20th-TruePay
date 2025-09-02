@@ -10,12 +10,8 @@
   {% load static %}
   <link href="{% static 'styles/app.css' %}" rel="stylesheet" type="text/css" />
   <script src="{% static 'scripts/app.js' %}" defer></script>
-  <style>
-    /* 自訂滾動條（與 Apple 風格接近，低存在感）*/
-    ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#D2D2D7;border-radius:999px}::-webkit-scrollbar-track{background:transparent}
-  </style>
 </head>
-<body class="bg-[#F5F5F7] text-black font-sans">
+<body class="bg-[#F5F5F7] text-black font-sans scrollbar-apple">
   <!-- 無 JS 的側欄開關（checkbox hack）；若用 JS，請以 data-action="toggle-sidebar" 綁定 -->
   <input id="sidebarToggle" type="checkbox" class="peer hidden" />
 
@@ -31,40 +27,35 @@
           <label for="sidebarToggle" class="ml-auto md:hidden cursor-pointer p-2 rounded-lg hover:bg-[#F5F5F7]" aria-label="關閉選單">✕</label>
         </div>
         <!-- 導覽選單 -->
-        <nav class="flex-1 overflow-y-auto py-4" x-data="{ 
-          currentPath: window.location.pathname,
-          isActive(element) {
-            return this.currentPath === element.getAttribute('href').replace(/\?.*$/, '')
-          }
-        }">
+        <nav class="flex-1 overflow-y-auto py-4" x-data="NavigationManager.createAlpineData()">
           <ul class="px-2 space-y-1 text-sm">
             <li>
-              <a href="{% url 'merchant_account:dashboard' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
+              <a href="{% url 'merchant_account:dashboard' %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='home' %}
                 廠商總覽 Overview
               </a>
             </li>
             <li>
-              <a href="{% url 'merchant_marketplace:index' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
+              <a href="{% url 'merchant_marketplace:index' %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='menu' %}
                 商品列表 Product List
               </a>
             </li>
             <li>
-              <a href="{% url 'merchant_marketplace:new' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
+              <a href="{% url 'merchant_marketplace:new' %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='plus' %}
                 新增商品 Create Product
               </a>
             </li>
             <li>
-              <a href="{% url 'merchant_account:transaction_history' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
+              <a href="{% url 'merchant_account:transaction_history' %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='document' %}
                 交易紀錄 Transactions
               </a>
             </li>
             
             <li>
-              <a href="{% url 'merchant_account:domain_settings' %}" :class="'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
+              <a href="{% url 'merchant_account:domain_settings' %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='check-circle' %}
                 網域設定 Domain Settings
               </a>
@@ -72,25 +63,28 @@
             <li>
               {% if current_merchant.subdomain %}
                 <a href="{% url 'public_store:shop_overview' current_merchant.subdomain %}" 
-                target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl 
-              hover:bg-[#F5F5F7]">
+                   target="_blank" 
+                   class="flex items-center gap-3" 
+                   x-bind="navLinkBinding($el)">
               {% else %}
-                <a href="#" onclick="alert('請先在網域設定中設定自訂網域')" class="flex 
-                items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] opacity-50">
+                <a href="#" 
+                   onclick="alert('請先在網域設定中設定自訂網域')" 
+                   class="flex items-center gap-3" 
+                   x-bind="navLinkBindingWithOpacity($el)">
               {% endif %}
                 {% include 'components/icons.html' with icon='cube' %}
-                   商品總覽頁面 Shop Overview
+                商品總覽頁面 Shop Overview
                 </a>
             </li>
             <li>
-              <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+              <a href="#" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                   {% include 'components/icons.html' with icon='qr' %}
-                掃描QR
+                掃描QR code
               </a>
             </li>
             
             <li>
-              <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+              <a href="#" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='settings' %}
                 設定 Settings
               </a>

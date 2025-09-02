@@ -15,13 +15,16 @@ from django.contrib.auth.models import User
 
 from .models import Order
 
+from django.db import transaction
+from django.db.models import F
+
 logger = logging.getLogger(__name__)
 
 
 def process_newebpay(order, request):
     """處理藍新金流付款"""
     try:
-        # 藍新金流設定
+        # 使用系統統一金流設定
         merchant_id = settings.NEWEBPAY_MERCHANT_ID
         hash_key = settings.NEWEBPAY_HASH_KEY
         hash_iv = settings.NEWEBPAY_HASH_IV
@@ -76,29 +79,18 @@ def newebpay_return(request):
         trade_info = request.POST.get("TradeInfo")
         trade_sha = request.POST.get("TradeSha")
 
-        # 解密交易資料
-        hash_key = settings.NEWEBPAY_HASH_KEY
-        hash_iv = settings.NEWEBPAY_HASH_IV
+        # 使用系統統一金鑰解密
+        result_data = decrypt_newebpay_callback(trade_info, trade_sha)
 
-        # 驗證簽名
-        check_value = generate_sha256(
-            f"HashKey={hash_key}&{trade_info}&HashIV={hash_iv}"
-        )
-        if check_value.upper() != trade_sha.upper():
-            logger.error(
-                f"簽名驗證失敗 - Expected: {check_value.upper()}, Got: {trade_sha.upper()}"
-            )
+        # 如果解密失敗
+        if not result_data:
+            logger.error("無法解密回調資料")
             from django.shortcuts import render
-
             return render(
                 request,
                 "payments/newebpay/payment_result.html",
                 {"success": False, "message": "簽名驗證失敗"},
             )
-
-        # 解密資料
-        decrypted_data = aes_decrypt(trade_info, hash_key, hash_iv)
-        result_data = json.loads(decrypted_data)
 
         if result_data["Status"] == "SUCCESS":
             # 更新付款狀態
@@ -122,6 +114,9 @@ def newebpay_return(request):
             order.provider_raw_data = result_data
             order.paid_at = timezone.now()
             order.save()
+
+            # 付款成功後扣減庫存
+            _deduct_product_stock(order)
 
             # 付款成功後恢復用戶登入狀態（金流回調不攜帶 session）
             if order.customer:
@@ -180,37 +175,13 @@ def newebpay_notify(request):
             logger.error("藍新金流通知缺少 TradeInfo")
             return HttpResponse("0|Missing TradeInfo")
 
-        hash_key = settings.NEWEBPAY_HASH_KEY
-        hash_iv = settings.NEWEBPAY_HASH_IV
+        # 使用系統統一金鑰解密
+        result_data = decrypt_newebpay_callback(trade_info, trade_sha)
 
-        if not hash_key or not hash_iv:
-            logger.error("藍新金流設定不完整 - 缺少 hash_key 或 hash_iv")
-            return HttpResponse("0|Config Error")
-
-        # 如果有 TradeSha，先驗證簽名
-        if trade_sha:
-            check_value = generate_sha256(
-                f"HashKey={hash_key}&{trade_info}&HashIV={hash_iv}"
-            )
-            if check_value.upper() != trade_sha.upper():
-                logger.error(
-                    f"藍新金流通知簽名驗證失敗 - Expected: {check_value.upper()}, Got: {trade_sha.upper()}"
-                )
-                return HttpResponse("0|Invalid Signature")
-
-        # 嘗試解密
-        try:
-            decrypted_data = aes_decrypt(trade_info, hash_key, hash_iv)
-        except Exception as decrypt_error:
-            logger.error(f"AES 解密失敗: {decrypt_error}")
+        # 如果解密失敗
+        if not result_data:
+            logger.error("無法解密通知資料")
             return HttpResponse("0|Decrypt Error")
-
-        # 解析 JSON 資料
-        try:
-            result_data = json.loads(decrypted_data)
-        except json.JSONDecodeError as json_error:
-            logger.error(f"JSON 解析失敗: {json_error}")
-            return HttpResponse("0|JSON Parse Error")
 
         # 處理付款結果
         if result_data.get("Status") == "SUCCESS":
@@ -240,6 +211,9 @@ def newebpay_notify(request):
                     order.paid_at = timezone.now()
                     order.save()
 
+                    # 付款成功後扣減庫存
+                    _deduct_product_stock(order)
+
                     logger.info(
                         f"藍新金流通知處理成功 - 訂單 {merchant_order_no} 已更新為已付款"
                     )
@@ -259,6 +233,58 @@ def newebpay_notify(request):
     except Exception as e:
         logger.error(f"藍新金流通知處理失敗: {e}")
         return HttpResponse("0|System Error")
+
+
+def decrypt_newebpay_callback(trade_info, trade_sha=None):
+    """解密藍新金流回調資料"""
+    hash_key = settings.NEWEBPAY_HASH_KEY
+    hash_iv = settings.NEWEBPAY_HASH_IV
+
+    if not hash_key or not hash_iv:
+        logger.error("系統金流配置不完整")
+        return None
+
+    try:
+        # 驗證簽名（如果有）
+        if trade_sha:
+            check_value = generate_sha256(f"HashKey={hash_key}&{trade_info}&HashIV={hash_iv}")
+            if check_value.upper() != trade_sha.upper():
+                logger.error("簽名驗證失敗")
+                return None
+
+        # 解密資料
+        decrypted_data = aes_decrypt(trade_info, hash_key, hash_iv)
+        result_data = json.loads(decrypted_data)
+
+        logger.info("成功解密藍新金流回調資料")
+        return result_data
+
+    except Exception as e:
+        logger.error(f"解密回調資料失敗: {e}")
+        return None
+
+
+def _deduct_product_stock(order):
+    """扣減商品庫存"""
+    try:
+        with transaction.atomic():
+            product = order.product
+            rows_updated = product.__class__.objects.filter(
+                id=product.id, stock__gte=order.quantity  # 確保庫存足夠
+            ).update(stock=F("stock") - order.quantity)
+
+            if rows_updated == 0:
+                error_msg = f"訂單 {order.provider_order_id} 庫存扣減失敗 - 庫存不足或商品不存在"
+                logger.error(error_msg)
+                raise ValueError(error_msg)
+            else:
+                logger.info(
+                    f"訂單 {order.provider_order_id} 成功扣減 {order.quantity} 件庫存"
+                )
+
+    except Exception as e:
+        logger.error(f"扣減庫存時發生錯誤: {e}")
+        raise
 
 
 # 工具函數

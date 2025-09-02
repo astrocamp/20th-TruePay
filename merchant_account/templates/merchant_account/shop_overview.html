@@ -20,9 +20,7 @@
         
         <div class="mt-6 grid md:grid-cols-3 gap-4">
           <div class="flex items-center">
-            <svg class="w-5 h-5 mr-3 text-[#0056B3]" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
-            </svg>
+            {% include 'components/icons.html' with icon='user' class='w-5 h-5 mr-3 text-[#0056B3]' %}
             <div>
               <span class="text-gray-600 text-sm">聯絡人</span>
               <p class="text-gray-800 font-medium">{{ merchant.Name }}</p>
@@ -30,9 +28,7 @@
           </div>
           
           <div class="flex items-center">
-            <svg class="w-5 h-5 mr-3 text-[#0056B3]" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
-            </svg>
+            {% include 'components/icons.html' with icon='phone' class='w-5 h-5 mr-3 text-[#0056B3]' %}
             <div>
               <span class="text-gray-600 text-sm">聯絡電話</span>
               <p class="text-gray-800 font-medium">{{ merchant.Cellphone }}</p>
@@ -40,10 +36,7 @@
           </div>
           
           <div class="flex items-center">
-            <svg class="w-5 h-5 mr-3 text-[#0056B3]" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
-              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
-            </svg>
+            {% include 'components/icons.html' with icon='email' class='w-5 h-5 mr-3 text-[#0056B3]' %}
             <div>
               <span class="text-gray-600 text-sm">Email</span>
               <p class="text-gray-800 font-medium">{{ merchant.Email }}</p>
@@ -68,9 +61,7 @@
               {% else %}
                 <div class="w-full h-full flex items-center justify-center text-gray-400">
                   <div class="text-center">
-                    <svg class="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
-                    </svg>
+                    {% include 'components/icons.html' with icon='image-placeholder' class='w-16 h-16 mx-auto mb-2' %}
                     <span class="text-sm">無圖片</span>
                   </div>
                 </div>
@@ -93,9 +84,7 @@
               <!-- 聯絡資訊 -->
               {% if product.phone_number %}
               <div class="flex items-center mb-4 text-sm text-gray-600">
-                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
-                </svg>
+                {% include 'components/icons.html' with icon='phone' class='w-4 h-4 mr-2' %}
                 {{ product.phone_number }}
               </div>
               {% endif %}
@@ -105,9 +94,7 @@
                 <a href="{% url 'public_store:payment_page' product.id %}" 
                    class="w-full bg-[#0056B3] hover:bg-[#00408A] text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center group">
                   <span>立即購買</span>
-                  <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                  </svg>
+                  {% include 'components/icons.html' with icon='arrow-right' class='w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform' %}
                 </a>
               </div>
             </div>
@@ -132,21 +119,15 @@
     <div class="mt-12 bg-white border border-gray-200 rounded-lg p-6">
       <div class="flex items-center justify-center space-x-8 text-sm text-gray-600">
         <div class="flex items-center">
-          <svg class="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-          </svg>
+          {% include 'components/icons.html' with icon='security' class='w-5 h-5 mr-2 text-green-500' %}
           安全加密
         </div>
         <div class="flex items-center">
-          <svg class="w-5 h-5 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-          </svg>
+          {% include 'components/icons.html' with icon='verified' class='w-5 h-5 mr-2 text-blue-500' %}
           TruePay 認證
         </div>
         <div class="flex items-center">
-          <svg class="w-5 h-5 mr-2 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
-          </svg>
+          {% include 'components/icons.html' with icon='phone' class='w-5 h-5 mr-2 text-purple-500' %}
           24小時客服
         </div>
       </div>
