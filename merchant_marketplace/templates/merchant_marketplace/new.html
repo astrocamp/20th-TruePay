@@ -3,7 +3,7 @@
 {% block content %}
 <div class="max-w-2xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
     <div class="mb-6">
-        <a href="{% url 'merchant_marketplace:index' %}" class="text-[#0056B3] hover:text-[#00408A] flex items-center">
+        <a href="{% url 'merchant_marketplace:index' request.merchant.subdomain %}" class="text-[#0056B3] hover:text-[#00408A] flex items-center">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
             </svg>
@@ -21,7 +21,7 @@
         {% endfor %}
     {% endif %}
     
-    <form action="{% url 'merchant_marketplace:new' %}" method="post" enctype="multipart/form-data" class="space-y-6">
+    <form action="{% url 'merchant_marketplace:new' request.merchant.subdomain %}" method="post" enctype="multipart/form-data" class="space-y-6">
         {% csrf_token %}
         
         <div>
@@ -86,7 +86,7 @@
             <button type="submit" class="flex-1 bg-[#0056B3] text-white py-3 px-4 rounded-lg hover:bg-[#00408A] focus:outline-none focus:ring-2 focus:ring-[#0056B3] focus:ring-offset-2 transition duration-200">
                 新增商品
             </button>
-            <a href="{% url 'merchant_marketplace:index' %}" class="flex-1 text-center bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition duration-200">
+            <a href="{% url 'merchant_marketplace:index' request.merchant.subdomain %}" class="flex-1 text-center bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition duration-200">
                 取消
             </a>
         </div>

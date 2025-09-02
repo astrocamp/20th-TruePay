@@ -12,9 +12,7 @@ def get_current_merchant(context):
         try:
             merchant = Merchant.objects.get(Email=email)
             if merchant.subdomain:
-                return f"/merchant/dashboard/?shop={merchant.subdomain}"
-            else:
-                return f"/merchant/dashboard/?shop_id={merchant.id}"
+                return f"/merchant/dashboard/{merchant.subdomain}/"
         except Merchant.DoesNotExist:
             pass
     return "/merchant/login/"

@@ -18,17 +18,18 @@ from .linepay import process_linepay
 # 增強版的 login_required decorator：加入防快取功能
 def customer_login_required(view_func):
     @wraps(view_func)
-    @login_required(login_url='/customers/login/')
+    @login_required(login_url="/customers/login/")
     @never_cache
     def _wrapped_view(request, *args, **kwargs):
         # 設定防快取 headers
         response = view_func(request, *args, **kwargs)
-        if hasattr(response, '__setitem__'):
-            response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-            response['Pragma'] = 'no-cache'
-            response['Expires'] = '0'
-        
+        if hasattr(response, "__setitem__"):
+            response["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            response["Pragma"] = "no-cache"
+            response["Expires"] = "0"
+
         return response
+
     return _wrapped_view
 
 
@@ -88,6 +89,9 @@ def create_payment(request):
     """統一付款入口 - 支援藍新金流和 LINE Pay"""
 
     try:
+        if request.user.username.startswith("merchant_"):
+            messages.info(request, "請使用客戶帳號登入以完成付款")
+            return redirect("/customers/login/")
         # 提取付款參數
         provider, product_id, amt, item_desc = _extract_payment_parameters(
             request, None
@@ -115,7 +119,6 @@ def create_payment(request):
         order = _create_order_for_payment(
             customer, provider, product_id, amt, item_desc
         )
-
 
         # 處理不同的金流
         if provider == "newebpay":

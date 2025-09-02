@@ -65,7 +65,7 @@
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-bold text-gray-900">最新商品</h2>
-                <a href="{% url 'merchant_marketplace:index' %}" class="text-[#0056B3] hover:text-[#00408A] text-sm font-medium">
+                <a href="{% url 'merchant_marketplace:index' request.merchant.subdomain %}" class="text-[#0056B3] hover:text-[#00408A] text-sm font-medium">
                     查看全部 →
                 </a>
             </div>
@@ -94,7 +94,7 @@
             {% else %}
                 <div class="text-center py-8 text-gray-500">
                     <p>尚無商品</p>
-                    <a href="{% url 'merchant_marketplace:new' %}" class="text-[#0056B3] hover:text-[#00408A] text-sm mt-2 inline-block">
+                    <a href="{% url 'merchant_marketplace:new' request.merchant.subdomain %}" class="text-[#0056B3] hover:text-[#00408A] text-sm mt-2 inline-block">
                         立即新增 →
                     </a>
                 </div>
@@ -105,7 +105,7 @@
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-bold text-gray-900">最新訂單</h2>
-                <a href="{% url 'merchant_account:transaction_history' %}" class="text-[#0056B3] hover:text-[#00408A] text-sm font-medium">
+                <a href="{% url 'merchant_account:transaction_history' request.merchant.subdomain %}" class="text-[#0056B3] hover:text-[#00408A] text-sm font-medium">
                     查看全部 →
                 </a>
             </div>
@@ -137,22 +137,22 @@
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 class="text-xl font-bold text-gray-900 mb-6">快速操作</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <a href="{% url 'merchant_marketplace:new' %}" class="flex flex-col items-center p-6 bg-[#0056B3] text-white rounded-xl hover:bg-[#00408A] transition-colors">
+            <a href="{% url 'merchant_marketplace:new' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-[#0056B3] text-white rounded-xl hover:bg-[#00408A] transition-colors">
                 {% include 'components/icons.html' with icon='plus' class='w-8 h-8 mb-2' %}
                 <span class="text-sm font-medium">新增商品</span>
             </a>
             
-            <a href="{% url 'merchant_marketplace:index' %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+            <a href="{% url 'merchant_marketplace:index' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                 {% include 'components/icons.html' with icon='menu' class='w-8 h-8 mb-2' %}
                 <span class="text-sm font-medium">商品列表</span>
             </a>
             
-            <a href="{% url 'merchant_account:transaction_history' %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+            <a href="{% url 'merchant_account:transaction_history' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                 {% include 'components/icons.html' with icon='document' class='w-8 h-8 mb-2' %}
                 <span class="text-sm font-medium">交易記錄</span>
             </a>
             
-            <a href="{% url 'merchant_account:domain_settings' %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+            <a href="{% url 'merchant_account:domain_settings' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                 {% include 'components/icons.html' with icon='settings' class='w-8 h-8 mb-2' %}
                 <span class="text-sm font-medium">設定</span>
             </a>

@@ -10,29 +10,15 @@ from django.forms import (
     CheckboxInput,
 )
 from .models import Merchant
+from .utils import generate_unique_subdomain
 from django.contrib.auth.models import User
 
 
 class RegisterForm(ModelForm):
-    subdomain = SlugField(
-        max_length=50,
-        required=False,
-        help_text="商家專屬網址，例如：ownshop會變成－ownshop.truepay.com",
-        widget=TextInput(attrs={"class": "input"}),
-    )
-
-    def clean_subdomain(self):
-        subdomain = self.cleaned_data.get("subdomain")
-
-        if not subdomain or subdomain.strip() == "":
-            return None
-        return subdomain
-
     class Meta:
         model = Merchant
         fields = [
             "ShopName",
-            "subdomain",
             "UnifiedNumber",
             "NationalNumber",
             "Email",
@@ -43,7 +29,6 @@ class RegisterForm(ModelForm):
         ]
         labels = {
             "ShopName": "商店名稱",
-            "subdomain": "專屬網址",
             "UnifiedNumber": "統一編號",
             "NationalNumber": "身分證號",
             "Email": "電子郵件",
@@ -66,6 +51,8 @@ class RegisterForm(ModelForm):
     def save(self, commit=True):
         merchant = super().save(commit=False)
         merchant.set_password(self.cleaned_data["Password"])
+        merchant.subdomain = generate_unique_subdomain()
+
         if commit:
             merchant.save()
 
@@ -100,11 +87,9 @@ class LoginForm(Form):
 class domain_settings_form(ModelForm):
     class Meta:
         model = Merchant
-        fields = ["subdomain", "merchant_domain", "use_merchant_domain"]
+        fields = ["subdomain"]
         labels = {
             "subdomain": "子網域名稱",
-            "merchant_domain": "自訂網域名稱",
-            "use_merchant_domain": "啟用自訂網域",
         }
         widgets = {
             "subdomain": TextInput(
@@ -113,13 +98,7 @@ class domain_settings_form(ModelForm):
                     "palceholder": "在網址上的shop後面會加上您填寫的名稱",
                 }
             ),
-            "merchant_domain": TextInput(
-                attrs={"class": "input", "placeholder": "例如：bakery.com(不要加 www)"}
-            ),
-            "use_merchant_domain": CheckboxInput(attrs={"class": "checkbox"}),
         }
         help_texts = {
-            "subdomain": "設定後可使用 /marketplace/?shop=子網域名稱訪問後台",
-            "merchant_domain": "請輸入您的網域名稱，不需要加上 www",
-            "use_merchant_domain": "勾選後就使用您自訂的網域名稱",
+            "subdomain": "系統會自動生成",
         }
