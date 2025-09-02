@@ -141,7 +141,6 @@ def transaction_history(request, subdomain):
         .order_by("-created_at")
     )
 
-    # 為了向後兼容，我們仍然使用 order_items 這個變數名
     order_items = orders
 
     # 分頁處理
@@ -157,3 +156,5 @@ def transaction_history(request, subdomain):
     }
 
     return render(request, "merchant_account/transaction_history.html", context)
+
+

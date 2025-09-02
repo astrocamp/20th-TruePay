@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-md mx-auto">
-        <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="bg-white rounded-lg shadow-lg p-6" x-data="createPaymentTimer({ duration: 5, formId: 'newebpay-form' })">
             <div class="text-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-800 mb-2">藍新金流付款</h1>
                 <p class="text-gray-600">安全付款 | 即將跳轉到付款頁面</p>
@@ -38,7 +38,7 @@
             
             <div class="mt-6 text-center">
                 <p class="text-sm text-gray-500">
-                    頁面將在 <span id="countdown">5</span> 秒後自動跳轉
+                    頁面將在 <span x-text="countdown">5</span> 秒後自動跳轉
                 </p>
             </div>
             

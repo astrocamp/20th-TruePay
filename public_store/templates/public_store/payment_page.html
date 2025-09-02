@@ -7,20 +7,17 @@
         <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-6" aria-label="Breadcrumb">
             <a href="{% url 'public_store:shop_overview' product.merchant.subdomain %}" 
                class="hover:text-[#0056B3] transition duration-200 flex items-center">
-                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
-                </svg>
+                {% include 'components/icons.html' with icon='home' class='w-4 h-4 mr-1' %}
                 {{ product.merchant.ShopName }}
             </a>
-            <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-            </svg>
+            {% include 'components/icons.html' with icon='arrow-right' class='w-4 h-4 text-gray-400' %}
             <span class="text-gray-800 font-medium">{{ product.name }}</span>
         </nav>
+        
         <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div class="md:flex">
+            <div class="flex">
                 <!-- 商品圖片 -->
-                <div class="md:w-1/2">
+                <div class="md:w-1/2 p-8">
                     {% if product.image %}
                         <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-96 object-cover">
                     {% else %}
@@ -31,7 +28,8 @@
                 </div>
                 
                 <!-- 商品資訊 -->
-                <div class="md:w-1/2 p-8">
+                <div class="md:w-1/2 p-8" x-data="createQuantityManager()" 
+                     data-unit-price="{{ product.price }}" data-max-stock="{{ product.stock }}">
                     <div class="mb-6">
                         <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ product.name }}</h1>
                         <p class="text-4xl font-bold text-[#0056B3] mb-6">NT$ {{ product.price }}</p>
@@ -46,52 +44,113 @@
                             <span class="text-gray-600 font-medium w-20">聯絡：</span>
                             <span class="text-gray-800">{{ product.phone_number }}</span>
                         </div>
+                        <div class="flex items-center">
+                            <span class="text-gray-600 font-medium w-20">庫存：</span>
+                            <span class="text-gray-800">
+                                {{ product.stock }} 件
+                                {% if product.stock == 0 %}
+                                    <span class="text-red-600 font-medium">（已售完）</span>
+                                {% elif product.stock <= 5 %}
+                                    <span class="text-orange-600 font-medium">（庫存不足）</span>
+                                {% endif %}
+                            </span>
+                        </div>
                     </div>
                     
-                    {% if user.is_authenticated %}
-                    <!-- 藍新金流 -->
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-4">
-                        <h3 class="text-lg font-bold text-blue-800 mb-4">藍新金流</h3>
-                        <form method="post" action="{% url 'payments:create_payment' %}">
-                            {% csrf_token %}
-                            <input type="hidden" name="provider" value="newebpay">
-                            <input type="hidden" name="amt" value="{{ product.price }}">
-                            <input type="hidden" name="item_desc" value="{{ product.name }}|ProductID:{{ product.id }}">
-                           
-                            <button type="submit" class="w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium text-lg">
-                                💳 藍新金流 NT$ {{ product.price }}
-                            </button>
-                        </form>
-                        <p class="text-sm text-blue-600 text-center mt-3">
-                            安全付款 | 24小時客服支援
-                        </p>
-                    </div>
+                    {% if product.stock > 0 %}
+                        <!-- 購買數量選擇 -->
+                        <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                            <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">
+                                購買數量
+                            </label>
+                            <div class="flex items-center space-x-3">
+                                <button type="button" @click="decrease()" 
+                                        :disabled="!canDecrease"
+                                        :class="canDecrease ? 'bg-gray-200 text-gray-600 hover:bg-gray-300' : 'bg-gray-100 text-gray-400 cursor-not-allowed'"
+                                        class="w-8 h-8 flex items-center justify-center rounded-md transition duration-200">
+                                    -
+                                </button>
+                                <input type="number" x-ref="quantityInput" x-model="quantity" 
+                                       min="1" max="{{ product.stock }}" 
+                                       class="w-20 text-center border border-gray-300 rounded-md py-1 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                                <button type="button" @click="increase()"
+                                        :disabled="!canIncrease"
+                                        :class="canIncrease ? 'bg-gray-200 text-gray-600 hover:bg-gray-300' : 'bg-gray-100 text-gray-400 cursor-not-allowed'"
+                                        class="w-8 h-8 flex items-center justify-center rounded-md transition duration-200">
+                                    +
+                                </button>
+                                <span class="text-sm text-gray-600">/ {{ product.stock }} 件</span>
+                            </div>
+                            <div class="mt-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">單價：</span>
+                                    <span class="font-medium">NT$ {{ product.price }}</span>
+                                </div>
+                                <div class="flex justify-between items-center mt-1">
+                                    <span class="text-gray-700">總價：</span>
+                                    <span class="text-xl font-bold text-[#0056B3]" x-text="formattedTotalPrice">NT$ {{ product.price }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                     
-                    <!-- LINE PAY -->
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-4">
-                        <h3 class="text-lg font-bold text-green-800 mb-4">LINE PAY</h3>
-                        <form method="post" action="{% url 'payments:create_payment' %}">
-                            {% csrf_token %}
-                            <input type="hidden" name="provider" value="linepay">
-                            <input type="hidden" name="product_id" value="{{ product.id }}">
-                            <button type="submit" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition duration-200 font-medium text-lg">
-                                💳 LINE PAY NT$ {{ product.price }}
-                            </button>
-                        </form>
-                        <p class="text-sm text-green-600 text-center mt-3">
-                            安全付款 | 24小時客服支援
-                        </p>
-                    </div>
+                    {% if is_customer %}
+                        {% if product.stock > 0 %}
+                            <!-- 藍新金流 -->
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-4">
+                                <h3 class="text-lg font-bold text-blue-800 mb-4">藍新金流</h3>
+                                <form method="post" action="{% url 'payments:create_payment' %}" id="newebpay-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="provider" value="newebpay">
+                                    <input type="hidden" name="amt" :value="totalPrice">
+                                    <input type="hidden" name="quantity" :value="quantity">
+                                    <input type="hidden" name="item_desc" value="{{ product.name }}|ProductID:{{ product.id }}">
+                                   
+                                    <button type="submit" class="w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium text-lg">
+                                        💳 藍新金流 <span x-text="formattedTotalPrice">NT$ {{ product.price }}</span>
+                                    </button>
+                                </form>
+                                <p class="text-sm text-blue-600 text-center mt-3">
+                                    安全付款 | 24小時客服支援
+                                </p>
+                            </div>
+                            
+                            <!-- LINE PAY -->
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-4">
+                                <h3 class="text-lg font-bold text-green-800 mb-4">LINE PAY</h3>
+                                <form method="post" action="{% url 'payments:create_payment' %}" id="linepay-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="provider" value="linepay">
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <input type="hidden" name="quantity" :value="quantity">
+                                    <button type="submit" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition duration-200 font-medium text-lg">
+                                        💳 LINE PAY <span x-text="formattedTotalPrice">NT$ {{ product.price }}</span>
+                                    </button>
+                                </form>
+                                <p class="text-sm text-green-600 text-center mt-3">
+                                    安全付款 | 24小時客服支援
+                                </p>
+                            </div>
+                        {% else %}
+                            <!-- 已售完提示 -->
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-4">
+                                <h3 class="text-lg font-bold text-red-800 mb-4">商品已售完</h3>
+                                <p class="text-red-700 mb-4">很抱歉，此商品目前已售完，無法購買</p>
+                                <div class="w-full bg-gray-400 text-white py-3 px-6 rounded-lg text-center font-medium text-lg cursor-not-allowed">
+                                    暫停購買
+                                </div>
+                            </div>
+                        {% endif %}
                     {% else %}
-                    <!-- 未登入提示 -->
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-4">
-                        <h3 class="text-lg font-bold text-yellow-800 mb-4">需要登入</h3>
-                        <p class="text-yellow-700 mb-4">請先登入會員帳號，才能進行購買</p>
-                        <a href="{% url 'customers_account:login' %}?next={{ request.get_full_path }}" 
-                           class="w-full inline-block text-center bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium text-lg">
-                            立即登入
-                        </a>
-                    </div>
+                        <!-- 未登入提示 -->
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-4">
+                            <h3 class="text-lg font-bold text-yellow-800 mb-4">需要登入</h3>
+                            <p class="text-yellow-700 mb-4">請先登入會員帳號，才能進行購買</p>
+                            <a href="{% url 'customers_account:login' %}?next={{ request.get_full_path }}" 
+                               class="w-full inline-block text-center bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium text-lg">
+                                立即登入
+                            </a>
+                        </div>
                     {% endif %}
                     
                     <!-- 聯絡資訊 -->
@@ -129,15 +188,11 @@
                     <h4 class="text-lg font-bold text-gray-800 mb-4">安全保障</h4>
                     <div class="grid grid-cols-1 gap-3">
                         <div class="flex items-center">
-                            <svg class="w-5 h-5 mr-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                            </svg>
+                            {% include 'components/icons.html' with icon='security' class='w-5 h-5 mr-3 text-green-600' %}
                             <span class="text-gray-700 font-medium">SSL 安全加密</span>
                         </div>
                         <div class="flex items-center">
-                            <svg class="w-5 h-5 mr-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
+                            {% include 'components/icons.html' with icon='verified' class='w-5 h-5 mr-3 text-blue-600' %}
                             <span class="text-gray-700 font-medium">TruePay 認證</span>
                         </div>
                         <div class="flex items-center">
@@ -148,7 +203,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
             </div>
         </div>
     </div>

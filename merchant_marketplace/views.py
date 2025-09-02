@@ -33,10 +33,15 @@ def new(request, subdomain):
 
     elif request.method == "POST":
         try:
+            stock = int(request.POST.get("stock", 1))
+            if stock < 1:
+                raise ValueError("庫存數量必須至少為 1 件")
+                
             product = Product.objects.create(
                 name=request.POST.get("name"),
                 description=request.POST.get("description"),
                 price=request.POST.get("price"),
+                stock=stock,
                 image=request.FILES.get("image"),
                 phone_number=request.POST.get("phone_number"),
                 merchant=request.merchant,
@@ -68,6 +73,12 @@ def edit(request, subdomain, id):
             product.name = request.POST.get("name", product.name)
             product.description = request.POST.get("description", product.description)
             product.price = request.POST.get("price", product.price)
+            
+            # 更新庫存，允許設為 0（賣完狀態）
+            stock = int(request.POST.get("stock", product.stock))
+            if stock < 0:
+                raise ValueError("庫存數量不能為負數")
+            product.stock = stock
 
             # 只有在有新圖片時才更新
             if request.FILES.get("image"):
