@@ -36,12 +36,7 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     付款方式
                 </th>
-                {% if role == 'customer' %}
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    票券代碼
-                </th>
-                {% endif %}
-                {% if role == 'merchant' %}
+                {% if role == 'customer' or role == 'merchant' %}
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     票券代碼
                 </th>
