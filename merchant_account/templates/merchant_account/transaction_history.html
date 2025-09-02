@@ -17,7 +17,7 @@
     {% else %}
         <div class="text-center py-8">
             <p class="text-gray-500 text-lg">目前沒有交易記錄</p>
-            <a href="{% url 'merchant_marketplace:index' %}" class="mt-4 inline-block bg-[#0056B3] text-white px-6 py-2 rounded-lg hover:bg-[#00408A] transition duration-200">
+            <a href="{% url 'merchant_marketplace:index' request.merchant.subdomain %}" class="mt-4 inline-block bg-[#0056B3] text-white px-6 py-2 rounded-lg hover:bg-[#00408A] transition duration-200">
                 管理商品
             </a>
         </div>

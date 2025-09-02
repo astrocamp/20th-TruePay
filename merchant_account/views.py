@@ -8,7 +8,7 @@ from django.core.paginator import Paginator
 from django.db.models import Sum
 
 
-from truepay.decorators import no_cache_required, shop_required
+from truepay.decorators import no_cache_required
 from .forms import RegisterForm, LoginForm, domain_settings_form
 from .models import Merchant
 from merchant_marketplace.models import Product
@@ -20,16 +20,9 @@ def register(req):
         form = RegisterForm(req.POST)
 
         if form.is_valid():
-            subdomain = form.cleaned_data["subdomain"]
-            if Merchant.objects.filter(subdomain=subdomain).exists():
-                form.add_error(
-                    "subdomain", "此網址已被其他商家註冊了，請重新設定其他網址"
-                )
-                messages.error(req, "註冊失敗，請重新再試")
-            else:
-                form.save()
-                messages.success(req, "註冊成功！")
-                return redirect("merchant_account:login")
+            form.save()
+            messages.success(req, "註冊成功！")
+            return redirect("merchant_account:login")
         else:
             messages.error(req, "註冊失敗，請重新再試")
     else:
@@ -57,7 +50,7 @@ def login(req):
                     django_login(req, user)
 
                     messages.success(req, "歡迎進入！！！")
-                    return redirect("merchant_marketplace:index")
+                    return redirect("merchant_account:dashboard", merchant.subdomain)
                 else:
                     messages.error(req, "密碼錯誤")
             except Merchant.DoesNotExist:
@@ -90,8 +83,7 @@ def logout(req):
 
 
 @no_cache_required
-@shop_required
-def dashboard(request):
+def dashboard(request, subdomain):
     """廠商Dashboard概覽頁面"""
     merchant = request.merchant
 
@@ -123,14 +115,15 @@ def dashboard(request):
 
 
 @no_cache_required
-@shop_required
-def domain_settings(request):
+def domain_settings(request, subdomain):
     if request.method == "POST":
         form = domain_settings_form(request.POST, instance=request.merchant)
         if form.is_valid():
-            form.save()
+            update_merchant = form.save()
             messages.success(request, "網域名稱已更新")
-            return redirect("merchant_account:domain_settings")
+            return redirect(
+                "merchant_account:domain_settings", update_merchant.subdomain
+            )
         else:
             messages.error(request, "設定失敗，請檢查內容")
     else:
@@ -139,8 +132,7 @@ def domain_settings(request):
 
 
 @no_cache_required
-@shop_required
-def transaction_history(request):
+def transaction_history(request, subdomain):
     """廠商交易記錄頁面"""
     # 查詢該商家的所有交易記錄（使用統一的 Order 模型）
     orders = (
