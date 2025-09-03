@@ -13,6 +13,9 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 
 
+Member = get_user_model()
+
+
 class RegisterForm(ModelForm):
     class Meta:
         model = Merchant
@@ -48,7 +51,7 @@ class RegisterForm(ModelForm):
         }
 
     def save(self, commit=True):
-        Member = get_user_model()
+
         member = Member.objects.create_user(
             username=self.cleaned_data["Email"],
             email=self.cleaned_data["Email"],
@@ -57,7 +60,6 @@ class RegisterForm(ModelForm):
         )
         merchant = super().save(commit=False)
         merchant.member = member
-        merchant.set_password(self.cleaned_data["Password"])
         try:
             merchant.subdomain = generate_unique_subdomain()
         except ValueError as e:

@@ -37,7 +37,6 @@ def login(request):
 
             # 使用 Django 認證系統登入
             django_login(request, member)
-            customer.update_last_login()
             # 檢查是否有 next 參數（登入後要重導向的頁面）
             next_url = request.GET.get("next") or request.POST.get("next")
             if next_url:

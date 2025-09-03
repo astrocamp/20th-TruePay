@@ -138,21 +138,21 @@ class CustomerLoginForm(forms.Form):
             try:
                 member = Member.objects.get(email=email, member_type="customer")
                 if not member.check_password(password):
-                    try:
-                        customer = Customer.objects.get(member=member)
-                        customer.increment_login_failed_count()
-                    except Customer.DoesNotExist:
-                        pass
+                    if hasattr(member, "customer"):
+                        member.customer.increment_login_failed_count()
                     raise ValidationError("電子郵件或密碼錯誤")
                 elif not member.is_active:
                     raise ValidationError("帳號已停用，請聯絡客服")
                 else:
-                    customer = Customer.objects.get(member=member)
-                    customer.reset_login_failed_count()
-                    customer.update_last_login()
+                    if hasattr(member, "customer"):
+                        customer = Customer.objects.get(member=member)
+                        customer.reset_login_failed_count()
+                        customer.update_last_login()
 
-                    cleaned_data["member"] = member
-                    cleaned_data["customer"] = customer
+                        cleaned_data["member"] = member
+                        cleaned_data["customer"] = customer
+                    else:
+                        raise ValidationError("客戶資料不存在，請聯絡客服")
             except Member.DoesNotExist:
                 raise ValidationError("電子郵件或密碼錯誤")
 
