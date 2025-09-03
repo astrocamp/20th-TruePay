@@ -2,38 +2,84 @@
 {% block title %}TruePay - 非實體商品金流解決方案{% endblock %}
 
 {% block content %}
-<!-- Hero 區塊 -->
-<section class="py-20 bg-brand-blue">
-  <div class="max-w-6xl mx-auto text-center">
-    <div class="bg-brand-white rounded-3xl p-16 shadow-2xl">
-      <p class="text-2xl text-brand-grayDark mb-12 max-w-4xl mx-auto leading-relaxed">
+<!-- Hero Section -->
+<section class="relative py-24 bg-gradient-to-br from-cis-primary to-cis-primaryHover overflow-hidden">
+  <div class="absolute inset-0 bg-black opacity-5"></div>
+  <div class="relative max-w-6xl mx-auto px-4 text-center">
+    <div class="bg-brand-white rounded-3xl p-12 lg:p-16 shadow-2xl transform hover:scale-105 transition-transform duration-300">
+      <h1 class="text-4xl lg:text-5xl font-bold text-cis-primary mb-6">
         專為非實體商品設計的金流平台
+      </h1>
+      <p class="text-xl text-brand-grayDark mb-8 max-w-4xl mx-auto leading-relaxed">
+        讓你的線上課程、會員制服務、活動票券，都能快速完成收款。支援所有非實體商品上架，從銷售到交付一站式完成。付款後自動轉換為可兌換票券，方便管理與使用。
       </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <button class="bg-cis-primary hover:bg-cis-primaryHover text-white px-8 py-3 rounded-xl font-semibold transition-colors duration-200 shadow-lg">
+        商家立即開始使用
+        </button>
+      </div>
     </div>
   </div>
 </section>
-<section class="py-20 bg-brand-blue">
-  <div class="max-w-6xl mx-auto text-center">
-    <div class="bg-brand-white rounded-3xl p-16 shadow-2xl">
-      <p class="text-2xl text-brand-grayDark mb-12 max-w-4xl mx-auto leading-relaxed">
-        驗證交易真實性
-      </p>
-      <p class="text-2xl text-brand-grayDark mb-12 max-w-4xl mx-auto leading-relaxed">
-        打造安全透明的支付流程
-      </p>
+
+<!-- Features Section -->
+<section class="py-20 bg-brand-grayLight">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <!-- Feature 1: Security -->
+      <div class="order-2 md:order-1">
+        <div class="bg-brand-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <div class="flex items-center mb-6">
+            <h3 class="text-2xl font-bold text-brand-black ml-4">驗證交易真實性</h3>
+          </div>
+          <p class="text-lg text-brand-grayDark leading-relaxed mb-4">
+            打造安全透明的支付流程
+          </p>
+          <p class="text-brand-grayDark leading-relaxed">
+            每筆票券都能依需求自訂驗證方式，從線上核銷到現場兌換，保障買賣雙方權益。透過清楚的驗證紀錄，有效降低消費糾紛，讓交易更安心。
+          </p>
+        </div>
+      </div>
+      
+      <!-- Feature 2: Management -->
+      <div class="order-1 md:order-2">
+        <div class="bg-brand-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <div class="flex items-center mb-6">
+            <h3 class="text-2xl font-bold text-brand-black ml-4">多元收款方式</h3>
+          </div>
+          <p class="text-lg text-brand-grayDark leading-relaxed mb-4">
+            一站式金流集中管理
+          </p>
+          <p class="text-brand-grayDark leading-relaxed">
+            支援藍新、LINE Pay 等多種金流串接，所有交易狀況都能在後台即時掌握。不必再登入各家金流後台，一個平台就能完整查看收付款紀錄。
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
-<section class="py-20 bg-brand-blue">
-  <div class="max-w-6xl mx-auto text-center">
-    <div class="bg-brand-white rounded-3xl p-16 shadow-2xl">
-      <p class="text-2xl text-brand-grayDark mb-12 max-w-4xl mx-auto leading-relaxed">
-        多元收款方式
-      </p>
-      <p class="text-2xl text-brand-grayDark mb-12 max-w-4xl mx-auto leading-relaxed">
-        一站式金流集中管理
-      </p>
+
+<!-- Stats/Benefits Section -->
+<section class="py-20 bg-brand-white">
+  <div class="max-w-6xl mx-auto px-4 text-center">
+    <h2 class="text-3xl font-bold text-brand-black mb-12">為什麼選擇 TruePay？</h2>
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="p-6">
+        <h3 class="text-xl font-semibold text-brand-black mb-2">快速整合</h3>
+        <p class="text-brand-grayDark">5 分鐘內完成設定，立即開始收款</p>
+      </div>
+      
+      <div class="p-6">
+        <h3 class="text-xl font-semibold text-brand-black mb-2">安全可靠</h3>
+        <p class="text-brand-grayDark">符合 --- --- 標準，保障交易安全</p>
+      </div>
+      
+      <div class="p-6">
+        <h3 class="text-xl font-semibold text-brand-black mb-2">全方位支援</h3>
+        <p class="text-brand-grayDark">--- ---  客服支援，隨時協助解決問題</p>
+      </div>
     </div>
   </div>
 </section>
+
 {% endblock  %}
