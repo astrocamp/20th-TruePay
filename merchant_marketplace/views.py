@@ -44,6 +44,7 @@ def new(request, subdomain):
                 stock=stock,
                 image=request.FILES.get("image"),
                 phone_number=request.POST.get("phone_number"),
+                verification_timing=request.POST.get("verification_timing", "before_redeem"),
                 merchant=request.merchant,
             )
 
@@ -86,6 +87,9 @@ def edit(request, subdomain, id):
 
             product.phone_number = request.POST.get(
                 "phone_number", product.phone_number
+            )
+            product.verification_timing = request.POST.get(
+                "verification_timing", product.verification_timing
             )
             product.save()
 
