@@ -1,9 +1,17 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
+from django.conf import settings
 
 
 # Create your models here.
 class Merchant(models.Model):
+    member = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="會員帳號",
+    )
     ShopName = models.CharField(max_length=50, null=False)
     UnifiedNumber = models.CharField(max_length=8, null=False)
     NationalNumber = models.CharField(max_length=10, null=False)

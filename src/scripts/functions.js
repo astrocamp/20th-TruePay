@@ -389,6 +389,66 @@ function createQuantityManager(config = {}) {
   };
 }
 
+// Alpine.js 組件註冊
+document.addEventListener('alpine:init', () => {
+  // 票券複製功能組件
+  Alpine.data('ticketCopy', () => ({
+    copyButtonText: '複製票券代碼',
+    
+    async copyTicketCode(ticketCode) {
+      try {
+        // 使用現代 Clipboard API
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(ticketCode);
+          this.showCopySuccess();
+        } else {
+          // 降級到舊版方法
+          this.fallbackCopyTextToClipboard(ticketCode);
+        }
+      } catch (error) {
+        console.error('複製失敗:', error);
+        this.fallbackCopyTextToClipboard(ticketCode);
+      }
+    },
+    
+    fallbackCopyTextToClipboard(text) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      
+      // 避免捲動到底部
+      textArea.style.top = '0';
+      textArea.style.left = '0';
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          this.showCopySuccess();
+        } else {
+          console.error('舊版複製方法失敗');
+        }
+      } catch (err) {
+        console.error('複製失敗:', err);
+      }
+      
+      document.body.removeChild(textArea);
+    },
+    
+    showCopySuccess() {
+      this.copyButtonText = '已複製！';
+      setTimeout(() => {
+        this.copyButtonText = '複製票券代碼';
+      }, 2000);
+    }
+  }));
+});
+
+export { ImagePreview, PaymentTimer };
 // 將函數掛載到全域供 Alpine.js 使用
 window.createQuantityManager = createQuantityManager;
 

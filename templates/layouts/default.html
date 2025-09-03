@@ -58,7 +58,7 @@
             >
           </li>
           {% if user.is_authenticated %}
-            {% if user.username|slice:":9" == "merchant_" %}
+            {% if user.member_type == "merchant" %}
               <li>
                 <a
                   href="{% get_current_merchant %}"
@@ -73,7 +73,7 @@
                   >登出</a
                 >
               </li>
-            {% elif user.username|slice:":9" == "customer_" %}
+            {% elif user.member_type == "customer" %}
               <li>
                 <a
                   href="{% url 'customers_account:dashboard' %}"
@@ -145,7 +145,7 @@
             >
           </li>
           {% if user.is_authenticated %}
-            {% if user.username|slice:":9" == "merchant_" %}
+            {% if user.member_type == "merchant" %}
               <li>
                 <a
                   href="{% get_current_merchant %}"
@@ -160,7 +160,7 @@
                   >登出</a
                 >
               </li>
-            {% elif user.username|slice:":9" == "customer_" %}
+            {% elif user.member_type == "customer" %}
               <li>
                 <a
                   href="{% url 'customers_account:dashboard' %}"

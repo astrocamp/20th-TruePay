@@ -56,26 +56,24 @@ def _create_order_for_payment(customer, provider, product_id, amount, item_desc,
             raise ValueError("購買數量必須大於 0")
     except (ValueError, TypeError):
         raise ValueError("購買數量格式錯誤")
-    
-    # 根據不同的金流處理參數
-    if provider == "newebpay":
-        # 藍新金流：從 item_desc 解析 product_id，金額已計算好
-        if "|ProductID:" in item_desc:
-            product_id = item_desc.split("|ProductID:")[1]
-        else:
-            raise ValueError("商品資訊錯誤")
-        amount = int(amount)
-
-    elif provider == "linepay":
-        # LINE Pay：直接使用 product_id，需要計算總金額
-        if not product_id:
-            raise ValueError("缺少商品ID")
-        product = get_object_or_404(Product, id=product_id, is_active=True)
-        amount = product.price * quantity
 
     # 取得商品資訊
+    if not product_id:
+        raise ValueError("缺少商品ID")
+
     product = get_object_or_404(Product, id=int(product_id), is_active=True)
-    
+
+    # 根據不同的金流處理金額
+    if provider == "newebpay":
+        # 藍新金流：驗證前端計算的金額是否正確
+        expected_amount = product.price * quantity
+        if int(amount) != expected_amount:
+            raise ValueError("金額不符")
+
+    elif provider == "linepay":
+        # LINE Pay：後端計算總金額
+        amount = product.price * quantity
+
     # 庫存檢查
     if product.stock < quantity:
         raise ValueError(f"庫存不足，目前庫存：{product.stock} 件，購買數量：{quantity} 件")
@@ -84,7 +82,7 @@ def _create_order_for_payment(customer, provider, product_id, amount, item_desc,
     order = Order.objects.create(
         provider=provider,
         amount=amount,
-        item_description=f"{product.name}|ProductID:{product.id}",
+        item_description=product.name[:50],
         product=product,
         customer=customer,
         quantity=quantity,
@@ -101,7 +99,7 @@ def create_payment(request):
     """統一付款入口 - 支援藍新金流和 LINE Pay"""
 
     try:
-        if request.user.username.startswith("merchant_"):
+        if request.user.member_type == "merchant":
             messages.info(request, "請使用客戶帳號登入以完成付款")
             return redirect("/customers/login/")
         # 提取付款參數
@@ -176,7 +174,11 @@ def payment_status(request, order_id):
         messages.error(request, "您沒有權限查看此訂單記錄")
         return redirect("pages:home")
 
+    # 取得訂單相關的票券
+    tickets = order.items.all() if order.status == 'paid' else []
+    
     context = {
-        "order": order,
+        "payment": order,  # 保持template中的變數名稱
+        "tickets": tickets,
     }
     return render(request, "payments/payment_status.html", context)

@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login as django_login, logout as django_logout
-from django.contrib.auth.models import User
 from truepay.decorators import customer_login_required
 from django.core.paginator import Paginator
 from .forms import CustomerRegistrationForm, CustomerLoginForm
@@ -33,22 +32,12 @@ def login(request):
     if request.method == "POST":
         form = CustomerLoginForm(request.POST)
         if form.is_valid():
+            member = form.cleaned_data["member"]
             customer = form.cleaned_data["customer"]
-            customer.update_last_login()
-
-            # 建立或取得對應的 Django User
-            user, created = User.objects.get_or_create(
-                username=f"customer_{customer.email}",
-                defaults={
-                    "email": customer.email,
-                    "first_name": customer.name,
-                    "is_active": customer.account_status == "active",
-                },
-            )
 
             # 使用 Django 認證系統登入
-            django_login(request, user)
-
+            django_login(request, member)
+            customer.update_last_login()
             # 檢查是否有 next 參數（登入後要重導向的頁面）
             next_url = request.GET.get("next") or request.POST.get("next")
             if next_url:
@@ -97,6 +86,7 @@ def purchase_history(request):
     # 根據 customer 查詢購買記錄（使用統一的 Order 模型）
     orders = (
         Order.objects.select_related("product__merchant")
+        .prefetch_related("items")  # 預載入票券資料
         .filter(customer=customer)
         .order_by("-created_at")
     )

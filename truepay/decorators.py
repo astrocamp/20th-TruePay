@@ -16,7 +16,8 @@ def no_cache_required(view_func):
                 merchant = Merchant.objects.get(subdomain=subdomain)
                 if (
                     request.user.is_authenticated
-                    and request.user.username == f"merchant_{merchant.Email}"
+                    and request.user.email == merchant.Email
+                    and request.user.member_type == "merchant"
                 ):
                     request.merchant = merchant
                 else:
@@ -24,13 +25,7 @@ def no_cache_required(view_func):
             except Merchant.DoesNotExist:
                 raise Http404(f"找不到子域名為 '{subdomain}' 的商家")
 
-        response = view_func(request, *args, **kwargs)
-        if hasattr(response, "__setitem__"):
-            response["Cache-Control"] = "no-cache, no-store, must-revalidate"
-            response["Pragma"] = "no-cache"
-            response["Expires"] = "0"
-
-        return response
+        return view_func(request, *args, **kwargs)
 
     return _wrapped_view
 
