@@ -75,7 +75,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.cache.FetchFromCacheMiddleware",
-    "truepay.middleware.subdomain_middleware",
 ]
 
 ROOT_URLCONF = "truepay.urls"

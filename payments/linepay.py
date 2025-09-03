@@ -14,6 +14,9 @@ from django.contrib.auth import login as django_login
 from django.contrib.auth.models import User
 
 from .models import Order
+from django.db import transaction
+from django.db.models import F
+
 
 logger = logging.getLogger(__name__)
 
@@ -21,9 +24,10 @@ logger = logging.getLogger(__name__)
 def process_linepay(order, request):
     """處理 LINE Pay 付款"""
     try:
-        # LINE Pay 設定
+        # 使用系統統一 LINE Pay 設定
         channel_id = settings.LINEPAY_CHANNEL_ID
         channel_secret = settings.LINEPAY_CHANNEL_SECRET
+        
         api_url = getattr(
             settings, "LINEPAY_API_URL", "https://sandbox-api-pay.line.me"
         )
@@ -104,9 +108,10 @@ def linepay_confirm(request):
 
         order = get_object_or_404(Order, id=order_id)
 
-        # 確認付款
+        # 使用系統統一 LINE Pay 設定
         channel_id = settings.LINEPAY_CHANNEL_ID
         channel_secret = settings.LINEPAY_CHANNEL_SECRET
+        
         api_url = getattr(
             settings, "LINEPAY_API_URL", "https://sandbox-api-pay.line.me"
         )
@@ -134,6 +139,9 @@ def linepay_confirm(request):
             order.provider_transaction_id = transaction_id
             order.paid_at = timezone.now()
             order.save()
+
+            # 付款成功後扣減庫存
+            _deduct_product_stock(order)
 
             # 付款成功後恢復用戶登入狀態（金流回調不攜帶 session）
             if order.customer:
@@ -187,6 +195,29 @@ def linepay_cancel(request):
     return render(
         request, "payments/linepay/payment_cancel.html", {"message": "您已取消付款"}
     )
+
+
+def _deduct_product_stock(order):
+    """扣減商品庫存"""
+    try:
+        with transaction.atomic():
+            product = order.product
+            rows_updated = product.__class__.objects.filter(
+                id=product.id, stock__gte=order.quantity  # 確保庫存足夠
+            ).update(stock=F("stock") - order.quantity)
+
+            if rows_updated == 0:
+                error_msg = f"訂單 {order.provider_order_id} 庫存扣減失敗 - 庫存不足或商品不存在"
+                logger.error(error_msg)
+                raise ValueError(error_msg)
+            else:
+                logger.info(
+                    f"訂單 {order.provider_order_id} 成功扣減 {order.quantity} 件庫存"
+                )
+
+    except Exception as e:
+        logger.error(f"扣減庫存時發生錯誤: {e}")
+        raise
 
 
 # 工具函數

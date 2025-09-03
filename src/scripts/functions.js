@@ -1,263 +1,139 @@
-class ImagePreview {
-  constructor(config) {
-    this.inputId = config.inputId;
-    this.previewId = config.previewId;
-    this.previewText = config.previewText || '圖片預覽：';
-    this.altText = config.altText || '圖片預覽';
-    this.imageClasses = config.imageClasses || 'w-32 h-32 object-cover rounded-lg border';
-    this.containerClasses = config.containerClasses || 'mt-2';
+// Alpine.js 圖片預覽組件
+function createImagePreview() {
+  return {
+    previewSrc: null,
+    previewText: '圖片預覽：',
+    imageClasses: 'w-32 h-32 object-cover rounded-lg border',
     
-    this.init();
-  }
-
-  init() {
-    const inputElement = document.getElementById(this.inputId);
-    if (!inputElement) {
-      console.warn(`ImagePreview: 找不到 ID 為 ${this.inputId} 的輸入欄位`);
-      return;
-    }
-
-    inputElement.addEventListener('change', (event) => {
-      this.handleFileChange(event);
-    });
-  }
-
-  handleFileChange(event) {
-    const file = event.target.files[0];
-    const existingPreview = document.getElementById(this.previewId);
+    init() {
+      // 根據頁面類型調整預覽文字
+      const isEditPage = window.location.pathname.includes('/edit/') || 
+                        (document.querySelector('form[method="post"]') && 
+                         document.querySelector('form[method="post"]').action.includes('edit'));
+      
+      if (isEditPage) {
+        this.previewText = '新圖片預覽：';
+      }
+    },
     
-    if (file && this.isValidImageFile(file)) {
-      this.createOrUpdatePreview(file, existingPreview);
-    } else if (existingPreview) {
-      this.removePreview(existingPreview);
-    }
-  }
-
-  isValidImageFile(file) {
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    if (!validTypes.includes(file.type)) {
-      alert('請選擇有效的圖片檔案 (JPG, PNG, GIF, WebP)');
-      return false;
-    }
-    
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxSize) {
-      alert('圖片檔案大小不能超過 5MB');
-      return false;
-    }
-    
-    return true;
-  }
-
-  createOrUpdatePreview(file, existingPreview) {
-    const reader = new FileReader();
-    
-    reader.onload = (e) => {
-      if (existingPreview) {
-        const img = existingPreview.querySelector('img');
-        if (img) {
-          img.src = e.target.result;
-          return;
-        }
+    handleFileChange(event) {
+      const file = event.target.files[0];
+      
+      if (!file) {
+        this.previewSrc = null;
+        return;
       }
       
-      this.createPreviewElement(e.target.result);
-    };
-
-    reader.onerror = () => {
-      console.error('ImagePreview: 讀取檔案時發生錯誤');
-      alert('讀取圖片時發生錯誤，請重新選擇');
-    };
-
-    reader.readAsDataURL(file);
-  }
-
-  createPreviewElement(imageSrc) {
-    const inputElement = document.getElementById(this.inputId);
-    const previewDiv = document.createElement('div');
+      if (!this.isValidImageFile(file)) {
+        this.previewSrc = null;
+        event.target.value = '';
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.previewSrc = e.target.result;
+      };
+      
+      reader.onerror = () => {
+        console.error('ImagePreview: 讀取檔案時發生錯誤');
+        alert('讀取圖片時發生錯誤，請重新選擇');
+        this.previewSrc = null;
+      };
+      
+      reader.readAsDataURL(file);
+    },
     
-    previewDiv.id = this.previewId;
-    previewDiv.className = this.containerClasses;
-    previewDiv.innerHTML = `
-      <p class="text-sm text-gray-600 mb-2">${this.previewText}</p>
-      <img class="${this.imageClasses}" src="${imageSrc}" alt="${this.altText}">
-    `;
-    
-    inputElement.parentNode.appendChild(previewDiv);
-  }
-
-  removePreview(previewElement) {
-    if (previewElement && previewElement.parentNode) {
-      previewElement.parentNode.removeChild(previewElement);
+    isValidImageFile(file) {
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        alert('請選擇有效的圖片檔案 (JPG, PNG, GIF, WebP)');
+        return false;
+      }
+      
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        alert('圖片檔案大小不能超過 5MB');
+        return false;
+      }
+      
+      return true;
     }
-  }
-
-  destroy() {
-    const inputElement = document.getElementById(this.inputId);
-    const previewElement = document.getElementById(this.previewId);
-    
-    if (inputElement) {
-      inputElement.removeEventListener('change', this.handleFileChange);
-    }
-    
-    if (previewElement) {
-      this.removePreview(previewElement);
-    }
-  }
+  };
 }
 
-// 自動初始化圖片預覽功能
-function initImagePreview() {
-  document.addEventListener('DOMContentLoaded', function() {
-    const imageInput = document.getElementById('image');
-    if (!imageInput) return;
-
-    // 檢查是否為編輯頁面（通過URL或表單action判斷）
-    const isEditPage = window.location.pathname.includes('/edit/') || 
-                      (document.querySelector('form[method="post"]') && 
-                       document.querySelector('form[method="post"]').action.includes('edit'));
-
-    if (isEditPage) {
-      // 編輯頁面的圖片預覽
-      new ImagePreview({
-        inputId: 'image',
-        previewId: 'new_image_preview',
-        previewText: '新圖片預覽：',
-        altText: '新圖片預覽'
-      });
-    } else {
-      // 新增頁面的圖片預覽
-      new ImagePreview({
-        inputId: 'image',
-        previewId: 'image_preview',
-        previewText: '圖片預覽：',
-        altText: '圖片預覽'
-      });
-    }
-  });
-}
-
-// 自動執行初始化
-initImagePreview();
+// 將函數掛載到全域供 Alpine.js 使用
+window.createImagePreview = createImagePreview;
 
 
 
 
 // 付款倒數計時功能
-class PaymentTimer {
-  constructor(config) {
-    this.duration = config.duration || 5;
-    this.countdownElementId = config.countdownElementId || 'countdown';
-    this.formId = config.formId || 'newebpay-form';
-    this.onComplete = config.onComplete || this.defaultOnComplete.bind(this);
-    this.onTick = config.onTick || this.defaultOnTick.bind(this);
+// Alpine.js 付款倒數計時組件
+function createPaymentTimer(config = {}) {
+  return {
+    countdown: config.duration || 5,
+    formId: config.formId || 'newebpay-form',
+    timer: null,
+    isRunning: false,
     
-    this.currentTime = this.duration;
-    this.timer = null;
-    this.isRunning = false;
+    init() {
+      // 自動開始計時
+      this.startTimer();
+    },
     
-    this.init();
-  }
-
-  init() {
-    const countdownElement = document.getElementById(this.countdownElementId);
-    if (!countdownElement) {
-      console.warn(`PaymentTimer: 找不到 ID 為 ${this.countdownElementId} 的倒數顯示元素`);
-      return;
-    }
-
-    const form = document.getElementById(this.formId);
-    if (!form) {
-      console.warn(`PaymentTimer: 找不到 ID 為 ${this.formId} 的表單`);
-      return;
-    }
-
-    this.start();
-  }
-
-  start() {
-    if (this.isRunning) return;
-    
-    this.isRunning = true;
-    this.updateDisplay();
-    
-    this.timer = setInterval(() => {
-      this.currentTime--;
-      this.updateDisplay();
-      this.onTick(this.currentTime);
+    startTimer() {
+      if (this.isRunning) return;
       
-      if (this.currentTime <= 0) {
-        this.complete();
+      this.isRunning = true;
+      this.timer = setInterval(() => {
+        this.countdown--;
+        
+        if (this.countdown <= 0) {
+          this.completeTimer();
+        }
+      }, 1000);
+    },
+    
+    pauseTimer() {
+      if (this.timer) {
+        clearInterval(this.timer);
+        this.timer = null;
+        this.isRunning = false;
       }
-    }, 1000);
-  }
-
-  pause() {
-    if (this.timer) {
-      clearInterval(this.timer);
-      this.timer = null;
-      this.isRunning = false;
+    },
+    
+    resumeTimer() {
+      if (!this.isRunning && this.countdown > 0) {
+        this.startTimer();
+      }
+    },
+    
+    resetTimer() {
+      this.pauseTimer();
+      this.countdown = config.duration || 5;
+    },
+    
+    completeTimer() {
+      this.pauseTimer();
+      
+      // 提交表單
+      const form = document.getElementById(this.formId);
+      if (form) {
+        form.submit();
+      } else {
+        console.error(`PaymentTimer: 無法提交表單，找不到 ID 為 ${this.formId} 的表單`);
+      }
+    },
+    
+    destroy() {
+      this.pauseTimer();
     }
-  }
-
-  resume() {
-    if (!this.isRunning && this.currentTime > 0) {
-      this.start();
-    }
-  }
-
-  reset() {
-    this.pause();
-    this.currentTime = this.duration;
-    this.updateDisplay();
-  }
-
-  complete() {
-    this.pause();
-    this.onComplete();
-  }
-
-  updateDisplay() {
-    const countdownElement = document.getElementById(this.countdownElementId);
-    if (countdownElement) {
-      countdownElement.textContent = this.currentTime;
-    }
-  }
-
-  defaultOnTick(remainingTime) {
-    // 可以在這裡加入每秒的額外處理邏輯
-  }
-
-  defaultOnComplete() {
-    const form = document.getElementById(this.formId);
-    if (form) {
-      form.submit();
-    } else {
-      console.error(`PaymentTimer: 無法提交表單，找不到 ID 為 ${this.formId} 的表單`);
-    }
-  }
-
-  destroy() {
-    this.pause();
-  }
+  };
 }
 
-// 自動初始化付款倒數計時功能
-function initPaymentTimer() {
-  document.addEventListener('DOMContentLoaded', function() {
-    // 檢查是否有倒數顯示元素和表單
-    if (document.getElementById('countdown') && document.getElementById('newebpay-form')) {
-      new PaymentTimer({
-        duration: 5,
-        countdownElementId: 'countdown',
-        formId: 'newebpay-form'
-      });
-    }
-  });
-}
-
-// 自動執行初始化
-initPaymentTimer();
+// 將函數掛載到全域供 Alpine.js 使用
+window.createPaymentTimer = createPaymentTimer;
 
 // 統一的事件處理器
 function handleConfirmDelete(element) {
@@ -290,43 +166,38 @@ function handleUseMerchantPhone(element) {
   }
 }
 
-function handlePaymentTimer(element) {
-  const duration = parseInt(element.dataset.duration) || 5;
-  const countdownElementId = element.dataset.countdownElement || 'countdown';
-  const formId = element.dataset.formId || 'newebpay-form';
-  
-  new PaymentTimer({
-    duration: duration,
-    countdownElementId: countdownElementId,
-    formId: formId
-  });
-}
-
-function handleToggleMenu(element) {
-  const menuId = element.dataset.menuId || 'mobile-menu';
-  const brandId = element.dataset.brandId || 'nav-brand';
-  
-  const menu = document.getElementById(menuId);
-  const brand = document.getElementById(brandId);
-  
-  if (menu && brand) {
-    const isHidden = menu.classList.toggle('hidden');
-    brand.classList.toggle('hidden', !isHidden);
-    element.setAttribute('aria-expanded', String(!isHidden));
-  }
-}
-
-// 自動關閉選單的輔助函數
-function closeMenu(menuId = 'mobile-menu', brandId = 'nav-brand', toggleBtnId = 'menu-toggle') {
-  const menu = document.getElementById(menuId);
-  const brand = document.getElementById(brandId);
-  const toggleBtn = document.getElementById(toggleBtnId);
-  
-  if (menu && brand && toggleBtn && !menu.classList.contains('hidden')) {
-    menu.classList.add('hidden');
-    brand.classList.remove('hidden');
-    toggleBtn.setAttribute('aria-expanded', 'false');
-  }
+// Alpine.js 選單管理組件
+function createMobileMenu() {
+  return {
+    isOpen: false,
+    
+    init() {
+      // 視窗大小變化時自動關閉選單
+      this.$nextTick(() => {
+        window.addEventListener('resize', () => {
+          if (window.innerWidth >= 768) { // md breakpoint
+            this.isOpen = false;
+          }
+        });
+      });
+    },
+    
+    toggle() {
+      this.isOpen = !this.isOpen;
+    },
+    
+    close() {
+      this.isOpen = false;
+    },
+    
+    // 當點擊選單內連結時自動關閉
+    handleLinkClick(event) {
+      const link = event.target.closest('a');
+      if (link) {
+        this.close();
+      }
+    }
+  };
 }
 
 // 統一的事件委託系統
@@ -348,16 +219,6 @@ function initEventDelegation() {
         handleUseMerchantPhone(element);
         break;
         
-      case 'start-payment-timer':
-        event.preventDefault();
-        handlePaymentTimer(element);
-        break;
-        
-      case 'toggle-menu':
-        event.preventDefault();
-        handleToggleMenu(element);
-        break;
-        
       default:
         // 未知的 action，不處理
         break;
@@ -368,33 +229,165 @@ function initEventDelegation() {
 // 初始化事件委託系統
 document.addEventListener('DOMContentLoaded', function() {
   initEventDelegation();
-  
-  // 設置額外的選單相關事件監聽器
-  setupMenuEventListeners();
 });
 
-// 設置選單相關的事件監聽器
-function setupMenuEventListeners() {
-  // 視窗大小變化時自動關閉手機選單
-  window.addEventListener('resize', function() {
-    if (window.innerWidth >= 768) { // md breakpoint
-      closeMenu();
-    }
-  });
-  
-  // 手機選單內連結點擊時自動關閉選單
-  const mobileMenu = document.getElementById('mobile-menu');
-  if (mobileMenu) {
-    mobileMenu.addEventListener('click', function(event) {
-      const link = event.target.closest('a');
-      if (link) {
-        closeMenu();
-      }
-    });
+// 將選單組件掛載到全域供 Alpine.js 使用
+window.createMobileMenu = createMobileMenu;
+
+
+
+// 導航管理器 - 統一處理導航連結的樣式和無障礙性
+class NavigationManager {
+  constructor() {
+    this.currentPath = window.location.pathname;
+    this.baseClasses = 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]';
+    this.activeClasses = 'text-[#0056B3] font-medium bg-blue-50';
+    this.inactiveClasses = 'text-gray-700';
+    this.logoutClasses = 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-red-600';
+  }
+
+  isActive(element) {
+    if (!element || !element.getAttribute) return false;
+    const href = element.getAttribute('href');
+    if (!href) return false;
+    return this.currentPath === href.replace(/\?.*$/, '');
+  }
+
+  navLinkBinding(element) {
+    const isActiveState = this.isActive(element);
+    const finalClasses = `${this.baseClasses} ${isActiveState ? this.activeClasses : this.inactiveClasses}`;
+    
+    return {
+      class: finalClasses,
+      'aria-current': isActiveState ? 'page' : null
+    };
+  }
+
+  navLinkBindingWithOpacity(element) {
+    const binding = this.navLinkBinding(element);
+    return {
+      ...binding,
+      class: binding.class + ' opacity-50'
+    };
+  }
+
+  logoutLinkBinding() {
+    return {
+      class: this.logoutClasses
+    };
+  }
+
+  // 為 Alpine.js 提供全域可用的函數
+  static createAlpineData() {
+    const manager = new NavigationManager();
+    
+    return {
+      currentPath: manager.currentPath,
+      isActive: (element) => manager.isActive(element),
+      navLinkBinding: (element) => manager.navLinkBinding(element),
+      navLinkBindingWithOpacity: (element) => manager.navLinkBindingWithOpacity(element),
+      logoutLinkBinding: () => manager.logoutLinkBinding()
+    };
   }
 }
 
+// 將 NavigationManager 掛載到全域，供 Alpine.js 使用
+window.NavigationManager = NavigationManager;
 
+// Alpine.js 數量管理組件
+function createQuantityManager(config = {}) {
+  return {
+    quantity: 1,
+    unitPrice: 0,
+    maxStock: 0,
+    
+    init() {
+      // 從頁面中提取價格和庫存資訊
+      this.extractPriceAndStock();
+      
+      // 設置初始數量
+      const quantityInput = this.$refs.quantityInput;
+      if (quantityInput && quantityInput.value) {
+        this.quantity = parseInt(quantityInput.value) || 1;
+      }
+      
+      // 驗證並更新初始狀態
+      this.validateQuantity();
+    },
+    
+    extractPriceAndStock() {
+      // 從頁面中提取單價
+      const priceElement = document.querySelector('[data-unit-price]');
+      if (priceElement) {
+        this.unitPrice = parseInt(priceElement.dataset.unitPrice) || 0;
+      }
+      
+      // 從頁面中提取最大庫存
+      const stockElement = document.querySelector('[data-max-stock]');
+      if (stockElement) {
+        this.maxStock = parseInt(stockElement.dataset.maxStock) || 0;
+      }
+      
+      // 如果沒有 data 屬性，嘗試從輸入框的 max 屬性獲取
+      if (this.maxStock === 0) {
+        const quantityInput = this.$refs.quantityInput;
+        if (quantityInput) {
+          this.maxStock = parseInt(quantityInput.getAttribute('max')) || 0;
+        }
+      }
+    },
+    
+    decrease() {
+      if (this.quantity > 1) {
+        this.quantity--;
+        this.validateQuantity();
+      }
+    },
+    
+    increase() {
+      if (this.quantity < this.maxStock) {
+        this.quantity++;
+        this.validateQuantity();
+      }
+    },
+    
+    validateQuantity() {
+      // 確保數量在有效範圍內
+      if (this.quantity < 1) this.quantity = 1;
+      if (this.quantity > this.maxStock) this.quantity = this.maxStock;
+    },
+    
+    // 計算總價
+    get totalPrice() {
+      return this.unitPrice * this.quantity;
+    },
+    
+    // 格式化價格顯示
+    get formattedTotalPrice() {
+      return `NT$ ${this.totalPrice.toLocaleString()}`;
+    },
+    
+    // 按鈕狀態
+    get canDecrease() {
+      return this.quantity > 1;
+    },
+    
+    get canIncrease() {
+      return this.quantity < this.maxStock;
+    },
+    
+    // 公開方法：設置單價
+    setUnitPrice(price) {
+      this.unitPrice = price;
+    },
+    
+    // 公開方法：設置最大庫存
+    setMaxStock(stock) {
+      this.maxStock = stock;
+      this.validateQuantity();
+    }
+  };
+}
 
 // Alpine.js 組件註冊
 document.addEventListener('alpine:init', () => {
@@ -456,3 +449,14 @@ document.addEventListener('alpine:init', () => {
 });
 
 export { ImagePreview, PaymentTimer };
+// 將函數掛載到全域供 Alpine.js 使用
+window.createQuantityManager = createQuantityManager;
+
+// 導出 Alpine.js 組件創建函數和 NavigationManager
+export { 
+  createImagePreview,
+  createPaymentTimer, 
+  createMobileMenu,
+  createQuantityManager,
+  NavigationManager
+};

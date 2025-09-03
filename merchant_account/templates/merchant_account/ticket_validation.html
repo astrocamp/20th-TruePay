@@ -39,7 +39,7 @@
 
             <!-- 手動輸入區域 -->
             <div x-show="currentTab === 'manual'" x-transition>
-                <form hx-post="{% url 'merchant_account:validate_ticket' %}" 
+                <form hx-post="{% url 'merchant_account:validate_ticket' request.merchant.subdomain %}" 
                       hx-target="#scan-result" 
                       hx-swap="innerHTML"
                       class="space-y-6">

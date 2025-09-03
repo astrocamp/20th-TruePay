@@ -8,7 +8,7 @@ from django.core.paginator import Paginator
 from django.db.models import Sum
 
 
-from truepay.decorators import no_cache_required, shop_required
+from truepay.decorators import no_cache_required
 from .forms import RegisterForm, LoginForm, domain_settings_form
 from .models import Merchant
 from merchant_marketplace.models import Product
@@ -22,16 +22,9 @@ def register(req):
         form = RegisterForm(req.POST)
 
         if form.is_valid():
-            subdomain = form.cleaned_data["subdomain"]
-            if Merchant.objects.filter(subdomain=subdomain).exists():
-                form.add_error(
-                    "subdomain", "此網址已被其他商家註冊了，請重新設定其他網址"
-                )
-                messages.error(req, "註冊失敗，請重新再試")
-            else:
-                form.save()
-                messages.success(req, "註冊成功！")
-                return redirect("merchant_account:login")
+            form.save()
+            messages.success(req, "註冊成功！")
+            return redirect("merchant_account:login")
         else:
             messages.error(req, "註冊失敗，請重新再試")
     else:
@@ -59,7 +52,7 @@ def login(req):
                     django_login(req, user)
 
                     messages.success(req, "歡迎進入！！！")
-                    return redirect("merchant_marketplace:index")
+                    return redirect("merchant_account:dashboard", merchant.subdomain)
                 else:
                     messages.error(req, "密碼錯誤")
             except Merchant.DoesNotExist:
@@ -92,8 +85,7 @@ def logout(req):
 
 
 @no_cache_required
-@shop_required
-def dashboard(request):
+def dashboard(request, subdomain):
     """廠商Dashboard概覽頁面"""
     merchant = request.merchant
 
@@ -125,14 +117,15 @@ def dashboard(request):
 
 
 @no_cache_required
-@shop_required
-def domain_settings(request):
+def domain_settings(request, subdomain):
     if request.method == "POST":
         form = domain_settings_form(request.POST, instance=request.merchant)
         if form.is_valid():
-            form.save()
+            update_merchant = form.save()
             messages.success(request, "網域名稱已更新")
-            return redirect("merchant_account:domain_settings")
+            return redirect(
+                "merchant_account:domain_settings", update_merchant.subdomain
+            )
         else:
             messages.error(request, "設定失敗，請檢查內容")
     else:
@@ -141,8 +134,7 @@ def domain_settings(request):
 
 
 @no_cache_required
-@shop_required
-def transaction_history(request):
+def transaction_history(request, subdomain):
     """廠商交易記錄頁面"""
     # 查詢該商家的所有交易記錄（使用統一的 Order 模型）
     orders = (
@@ -152,7 +144,6 @@ def transaction_history(request):
         .order_by("-created_at")
     )
 
-    # 為了向後兼容，我們仍然使用 order_items 這個變數名
     order_items = orders
 
     # 分頁處理
@@ -173,16 +164,14 @@ def transaction_history(request):
 # === 票券驗證相關視圖 ===
 
 @no_cache_required
-@shop_required
-def ticket_validation_page(request):
+def ticket_validation_page(request, subdomain):
     """票券驗證主頁面"""
     return render(request, 'merchant_account/ticket_validation.html')
 
 
 @no_cache_required
-@shop_required
 @require_POST
-def validate_ticket(request):
+def validate_ticket(request, subdomain):
     """驗證票券（手動輸入驗證碼或QR掃描）"""
     merchant = request.merchant
     ticket_code = request.POST.get('ticket_code', '').strip().upper()
@@ -201,7 +190,8 @@ def validate_ticket(request):
     
     if not ticket_code:
         context = {
-            'error_message': '請輸入票券驗證碼'
+            'error_message': '請輸入票券驗證碼',
+            'merchant': merchant,
         }
         return render(request, 'merchant_account/partials/ticket_error.html', context)
     
@@ -216,7 +206,8 @@ def validate_ticket(request):
         if not is_valid:
             create_validation_record(ticket, 'failed', message)
             context = {
-                'error_message': message
+                'error_message': message,
+                'merchant': merchant,
             }
             return render(request, 'merchant_account/partials/ticket_error.html', context)
         
@@ -224,7 +215,8 @@ def validate_ticket(request):
         if ticket.product.merchant != merchant:
             create_validation_record(ticket, 'unauthorized', '您無權限驗證此票券')
             context = {
-                'error_message': '您無權限驗證此票券'
+                'error_message': '您無權限驗證此票券',
+                'merchant': merchant,
             }
             return render(request, 'merchant_account/partials/ticket_error.html', context)
         
@@ -232,28 +224,30 @@ def validate_ticket(request):
         context = {
             'ticket_code': ticket_code,
             'ticket_info': ticket.ticket_info,
+            'merchant': merchant,
         }
         return render(request, 'merchant_account/partials/ticket_success.html', context)
         
     except OrderItem.DoesNotExist:
         # 找不到票券
         context = {
-            'error_message': '找不到此票券代碼'
+            'error_message': '找不到此票券代碼',
+            'merchant': merchant,
         }
         return render(request, 'merchant_account/partials/ticket_error.html', context)
 
 
 @no_cache_required
-@shop_required  
 @require_POST
-def use_ticket(request):
+def use_ticket(request, subdomain):
     """確認使用票券"""
     merchant = request.merchant
     ticket_code = request.POST.get('ticket_code', '').strip().upper()
     
     if not ticket_code:
         context = {
-            'error_message': '票券代碼遺失'
+            'error_message': '票券代碼遺失',
+            'merchant': merchant,
         }
         return render(request, 'merchant_account/partials/ticket_error.html', context)
     
@@ -272,25 +266,27 @@ def use_ticket(request):
                 'message': message,
                 'ticket_value': ticket.order.unit_price,
                 'used_at': ticket.used_at,
+                'merchant': merchant,
             }
             return render(request, 'merchant_account/partials/ticket_used.html', context)
         else:
             context = {
-                'error_message': message
+                'error_message': message,
+                'merchant': merchant,
             }
             return render(request, 'merchant_account/partials/ticket_error.html', context)
             
     except OrderItem.DoesNotExist:
         context = {
-            'error_message': '找不到此票券代碼'
+            'error_message': '找不到此票券代碼',
+            'merchant': merchant,
         }
         return render(request, 'merchant_account/partials/ticket_error.html', context)
 
 
 @no_cache_required
-@shop_required
 @require_POST
-def restart_scan(request):
+def restart_scan(request, subdomain):
     """重新開始掃描"""
     context = {}
     return render(request, 'merchant_account/partials/scan_ready.html', context)
