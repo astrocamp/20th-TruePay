@@ -12,7 +12,9 @@ from truepay.decorators import no_cache_required
 from .forms import RegisterForm, LoginForm, domain_settings_form
 from .models import Merchant
 from merchant_marketplace.models import Product
-from payments.models import Order
+from payments.models import Order, OrderItem, TicketValidation
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.http import require_POST
 
 
 def register(req):
@@ -137,6 +139,7 @@ def transaction_history(request, subdomain):
     # 查詢該商家的所有交易記錄（使用統一的 Order 模型）
     orders = (
         Order.objects.select_related("customer", "product")
+        .prefetch_related("items")  # 預載入票券資料
         .filter(product__merchant=request.merchant)
         .order_by("-created_at")
     )
@@ -158,3 +161,132 @@ def transaction_history(request, subdomain):
     return render(request, "merchant_account/transaction_history.html", context)
 
 
+# === 票券驗證相關視圖 ===
+
+@no_cache_required
+def ticket_validation_page(request, subdomain):
+    """票券驗證主頁面"""
+    return render(request, 'merchant_account/ticket_validation.html')
+
+
+@no_cache_required
+@require_POST
+def validate_ticket(request, subdomain):
+    """驗證票券（手動輸入驗證碼或QR掃描）"""
+    merchant = request.merchant
+    ticket_code = request.POST.get('ticket_code', '').strip().upper()
+    validation_method = request.POST.get('method', 'manual')
+    
+    # 記錄驗證嘗試
+    def create_validation_record(ticket, status, reason=''):
+        return TicketValidation.objects.create(
+            ticket=ticket,
+            merchant=merchant,
+            status=status,
+            failure_reason=reason,
+            validation_method=validation_method,
+            ip_address=request.META.get('REMOTE_ADDR')
+        )
+    
+    if not ticket_code:
+        context = {
+            'error_message': '請輸入票券驗證碼',
+            'merchant': merchant,
+        }
+        return render(request, 'merchant_account/partials/ticket_error.html', context)
+    
+    try:
+        # 查找票券（OrderItem）
+        ticket = OrderItem.objects.select_related('order', 'product__merchant', 'customer').get(
+            ticket_code=ticket_code
+        )
+        
+        # 檢查票券有效性和商家權限
+        is_valid, message = ticket.is_valid()
+        if not is_valid:
+            create_validation_record(ticket, 'failed', message)
+            context = {
+                'error_message': message,
+                'merchant': merchant,
+            }
+            return render(request, 'merchant_account/partials/ticket_error.html', context)
+        
+        # 檢查商家權限
+        if ticket.product.merchant != merchant:
+            create_validation_record(ticket, 'unauthorized', '您無權限驗證此票券')
+            context = {
+                'error_message': '您無權限驗證此票券',
+                'merchant': merchant,
+            }
+            return render(request, 'merchant_account/partials/ticket_error.html', context)
+        
+        # 票券驗證成功，顯示確認頁面（驗證不需記錄，只有實際使用才記錄）
+        context = {
+            'ticket_code': ticket_code,
+            'ticket_info': ticket.ticket_info,
+            'merchant': merchant,
+        }
+        return render(request, 'merchant_account/partials/ticket_success.html', context)
+        
+    except OrderItem.DoesNotExist:
+        # 找不到票券
+        context = {
+            'error_message': '找不到此票券代碼',
+            'merchant': merchant,
+        }
+        return render(request, 'merchant_account/partials/ticket_error.html', context)
+
+
+@no_cache_required
+@require_POST
+def use_ticket(request, subdomain):
+    """確認使用票券"""
+    merchant = request.merchant
+    ticket_code = request.POST.get('ticket_code', '').strip().upper()
+    
+    if not ticket_code:
+        context = {
+            'error_message': '票券代碼遺失',
+            'merchant': merchant,
+        }
+        return render(request, 'merchant_account/partials/ticket_error.html', context)
+    
+    try:
+        ticket = OrderItem.objects.select_related('order', 'product__merchant', 'customer').get(
+            ticket_code=ticket_code
+        )
+        
+        # 使用票券
+        success, message = ticket.use_ticket(merchant)
+        
+        if success:
+            # ticket.use_ticket() 已經更新票券狀態到資料庫，不需要額外記錄
+            
+            context = {
+                'message': message,
+                'ticket_value': ticket.order.unit_price,
+                'used_at': ticket.used_at,
+                'merchant': merchant,
+            }
+            return render(request, 'merchant_account/partials/ticket_used.html', context)
+        else:
+            context = {
+                'error_message': message,
+                'merchant': merchant,
+            }
+            return render(request, 'merchant_account/partials/ticket_error.html', context)
+            
+    except OrderItem.DoesNotExist:
+        context = {
+            'error_message': '找不到此票券代碼',
+            'merchant': merchant,
+        }
+        return render(request, 'merchant_account/partials/ticket_error.html', context)
+
+
+@no_cache_required
+@require_POST
+def restart_scan(request, subdomain):
+    """重新開始掃描"""
+    context = {}
+    return render(request, 'merchant_account/partials/scan_ready.html', context)

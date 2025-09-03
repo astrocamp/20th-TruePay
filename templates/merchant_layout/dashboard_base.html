@@ -8,6 +8,12 @@
   {% load static %}
   <link href="{% static 'styles/app.css' %}" rel="stylesheet" type="text/css" />
   <script src="{% static 'scripts/app.js' %}" defer></script>
+  <!-- HTMX for AJAX functionality -->
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <style>
+    /* 自訂滾動條（與 Apple 風格接近，低存在感）*/
+    ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#D2D2D7;border-radius:999px}::-webkit-scrollbar-track{background:transparent}
+  </style>
 </head>
 <body class="bg-[#F5F5F7] text-black font-sans scrollbar-apple">
   <!-- 無 JS 的側欄開關（checkbox hack）；若用 JS，請以 data-action="toggle-sidebar" 綁定 -->
@@ -66,7 +72,7 @@
               </a>
             </li>
             <li>
-              <a href="#" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
+              <a href="{% url 'merchant_account:ticket_validation' request.merchant.subdomain %}" :class="'flex items-center gap-3" x-bind="navLinkBinding($el) ' + (isActive($el) ? 'text-[#0056B3] font-medium bg-blue-50' : 'text-gray-700')">
                   {% include 'components/icons.html' with icon='qr' %}
                 掃描QR code
               </a>

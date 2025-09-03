@@ -97,6 +97,7 @@ def purchase_history(request):
     # 根據 customer 查詢購買記錄（使用統一的 Order 模型）
     orders = (
         Order.objects.select_related("product__merchant")
+        .prefetch_related("items")  # 預載入票券資料
         .filter(customer=customer)
         .order_by("-created_at")
     )

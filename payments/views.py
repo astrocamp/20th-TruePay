@@ -176,7 +176,11 @@ def payment_status(request, order_id):
         messages.error(request, "您沒有權限查看此訂單記錄")
         return redirect("pages:home")
 
+    # 取得訂單相關的票券
+    tickets = order.items.all() if order.status == 'paid' else []
+    
     context = {
-        "order": order,
+        "payment": order,  # 保持template中的變數名稱
+        "tickets": tickets,
     }
     return render(request, "payments/payment_status.html", context)
