@@ -101,7 +101,7 @@ def create_payment(request):
     """統一付款入口 - 支援藍新金流和 LINE Pay"""
 
     try:
-        if request.user.username.startswith("merchant_"):
+        if request.user.member_type == "merchant":
             messages.info(request, "請使用客戶帳號登入以完成付款")
             return redirect("/customers/login/")
         # 提取付款參數

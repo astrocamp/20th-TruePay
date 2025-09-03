@@ -33,22 +33,12 @@ def login(request):
     if request.method == "POST":
         form = CustomerLoginForm(request.POST)
         if form.is_valid():
+            member = form.cleaned_data["member"]
             customer = form.cleaned_data["customer"]
-            customer.update_last_login()
-
-            # 建立或取得對應的 Django User
-            user, created = User.objects.get_or_create(
-                username=f"customer_{customer.email}",
-                defaults={
-                    "email": customer.email,
-                    "first_name": customer.name,
-                    "is_active": customer.account_status == "active",
-                },
-            )
 
             # 使用 Django 認證系統登入
-            django_login(request, user)
-
+            django_login(request, member)
+            customer.update_last_login()
             # 檢查是否有 next 參數（登入後要重導向的頁面）
             next_url = request.GET.get("next") or request.POST.get("next")
             if next_url:

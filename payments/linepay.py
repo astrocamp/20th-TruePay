@@ -11,7 +11,7 @@ from django.shortcuts import render, redirect
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import login as django_login
-from django.contrib.auth.models import User
+from accounts.models import Member
 
 from .models import Order
 from django.db import transaction
@@ -146,17 +146,18 @@ def linepay_confirm(request):
             # 付款成功後恢復用戶登入狀態（金流回調不攜帶 session）
             if order.customer:
                 try:
-                    # 根據訂單客戶資訊建立對應的 Django User session
-                    user, created = User.objects.get_or_create(
+                    # 根據訂單客戶資訊建立對應的 Django Member session
+                    member, created = Member.objects.get_or_create(
                         username=order.customer.email,
                         defaults={
                             "email": order.customer.email,
                             "first_name": order.customer.name,
                             "is_active": order.customer.account_status == "active",
+                            "member_type": "customer"
                         },
                     )
                     # 建立用戶認證 session
-                    django_login(request, user)
+                    django_login(request, member)
                     logger.info(
                         f"LINE Pay 付款成功，已為用戶 {order.customer.email} 恢復登入狀態"
                     )

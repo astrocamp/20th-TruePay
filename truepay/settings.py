@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "public_store",  # 公開商店頁面
     "storages",
     "payments",
+    "accounts",
 ]
 
 MIDDLEWARE = [
@@ -245,3 +246,5 @@ CACHE_MIDDLEWARE_KEY_PREFIX = "truepay"
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
+
+AUTH_USER_MODEL = "accounts.Member"

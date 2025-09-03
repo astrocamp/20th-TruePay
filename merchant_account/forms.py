@@ -9,8 +9,8 @@ from django.forms import (
 )
 from .models import Merchant
 from .utils import generate_unique_subdomain
-from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
 
 
 class RegisterForm(ModelForm):
@@ -48,7 +48,15 @@ class RegisterForm(ModelForm):
         }
 
     def save(self, commit=True):
+        Member = get_user_model()
+        member = Member.objects.create_user(
+            username=self.cleaned_data["Email"],
+            email=self.cleaned_data["Email"],
+            password=self.cleaned_data["Password"],
+            member_type="merchant",
+        )
         merchant = super().save(commit=False)
+        merchant.member = member
         merchant.set_password(self.cleaned_data["Password"])
         try:
             merchant.subdomain = generate_unique_subdomain()
@@ -57,11 +65,6 @@ class RegisterForm(ModelForm):
 
         if commit:
             merchant.save()
-
-        User.objects.get_or_create(
-            username=f"merchant_{merchant.Email}",
-            defaults={"email": merchant.Email, "first_name": merchant.Name},
-        )
         return merchant
 
 
@@ -85,6 +88,32 @@ class LoginForm(Form):
         label="密碼",
     )
 
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get("email")
+        password = cleaned_data.get("password")
+
+        if email and password:
+            try:
+                Member = get_user_model()
+                member = Member.objects.get(email=email, member_type="merchant")
+
+                if not member.check_password(password):
+                    raise ValidationError("電子郵件或密碼錯誤")
+                elif not member.is_active:
+                    raise ValidationError("帳號已停用，請聯絡客服")
+                else:
+                    merchant = Merchant.objects.get(member=member)
+                    cleaned_data["member"] = member
+                    cleaned_data["merchant"] = merchant
+
+            except Member.DoesNotExist:
+                raise ValidationError("電子郵件或密碼錯誤")
+            except Merchant.DoesNotExist:
+                raise ValidationError("商家資料不存在")
+
+        return cleaned_data
+
 
 class domain_settings_form(ModelForm):
     class Meta:
@@ -97,7 +126,7 @@ class domain_settings_form(ModelForm):
             "subdomain": TextInput(
                 attrs={
                     "class": "input",
-                    "palceholder": "在網址上的shop後面會加上您填寫的名稱",
+                    "placeholder": "在網址上的shop後面會加上您填寫的名稱",
                 }
             ),
         }

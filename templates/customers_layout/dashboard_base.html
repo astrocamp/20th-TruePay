@@ -6,7 +6,11 @@
   <title>{% block title %}TruePay 消費者儀表板{% endblock %}</title>
   <!-- 使用專案編譯後的 Tailwind CSS -->
   {% load static %}
-  <link href="{% static 'styles/app.css' %}" rel="stylesheet" type="text/css" /></script>
+  <link href="{% static 'styles/app.css' %}" rel="stylesheet" type="text/css" />
+  <style>
+    /* 自訂滾動條（與 Apple 風格接近，低存在感）*/
+    ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#D2D2D7;border-radius:999px}::-webkit-scrollbar-track{background:transparent}
+  </style>
 </head>
 <body class="bg-[#F5F5F7] text-black font-sans scrollbar-apple">
   <input id="sidebarToggle" type="checkbox" class="peer hidden" />
