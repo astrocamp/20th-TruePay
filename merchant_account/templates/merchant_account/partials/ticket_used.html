@@ -1,0 +1,28 @@
+<!-- 票券使用成功的HTML片段 -->
+<div class="ticket-used text-center">
+    <div class="p-4 bg-green-50 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+        {% include 'components/icons.html' with icon='check' class='w-10 h-10 text-green-600' %}
+    </div>
+    <h3 class="text-2xl font-bold text-green-600 mb-2">{{ message }}</h3>
+    <p class="text-gray-600 mb-8">票券已成功使用，交易完成</p>
+    
+    <div class="bg-green-50 border border-green-200 rounded-xl p-6 mb-8">
+        <div class="space-y-4">
+            <div class="flex justify-between items-center">
+                <span class="text-green-700 font-medium">使用時間</span>
+                <span class="font-bold text-green-900">{{ used_at|date:"Y-m-d H:i:s" }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-green-700 font-medium">票券金額</span>
+                <span class="font-bold text-green-900 text-lg">NT$ {{ ticket_value }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <form hx-post="{% url 'merchant_account:restart_scan' merchant.subdomain %}" hx-target="#scan-result" hx-swap="innerHTML">
+        {% csrf_token %}
+        <button type="submit" class="w-full bg-[#0056B3] text-white py-4 px-6 rounded-xl hover:bg-[#00408A] focus:ring-4 focus:ring-blue-100 font-medium text-lg transition-all" data-action="restart-scanning">
+            繼續驗證其他票券
+        </button>
+    </form>
+</div>

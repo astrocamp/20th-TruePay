@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.contrib.auth.models import User
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
 from django.contrib.auth import get_user_model
@@ -86,12 +85,12 @@ def dashboard(request, subdomain):
     """廠商Dashboard概覽頁面"""
 
     # 獲取商家的基本統計數據
-    products = Product.objects.filter(merchant=merchant, is_active=True)
+    products = Product.objects.filter(merchant=request.merchant, is_active=True)
     total_products = products.count()
     recent_products = products.order_by("-created_at")[:5]
 
     # 獲取交易記錄統計
-    orders = Order.objects.filter(product__merchant=merchant)
+    orders = Order.objects.filter(product__merchant=request.merchant)
     total_orders = orders.count()
     recent_orders = orders.select_related("product", "customer").order_by(
         "-created_at"
@@ -101,7 +100,7 @@ def dashboard(request, subdomain):
     total_revenue = orders.aggregate(total=Sum("amount"))["total"] or 0
 
     context = {
-        "merchant": merchant,
+        "merchant": request.merchant,
         "total_products": total_products,
         "total_orders": total_orders,
         "total_revenue": total_revenue,

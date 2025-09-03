@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login as django_login, logout as django_logout
-from django.contrib.auth.models import User
 from truepay.decorators import customer_login_required
 from django.core.paginator import Paginator
 from .forms import CustomerRegistrationForm, CustomerLoginForm
