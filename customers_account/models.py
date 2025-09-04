@@ -20,9 +20,9 @@ class Customer(models.Model):
 
     # 用戶填入的欄位
     name = models.CharField(max_length=100, verbose_name="姓名")
-    id_number = models.CharField(max_length=10, unique=True, verbose_name="身分證字號")
-    birth_date = models.DateField(verbose_name="生日")
-    phone = models.CharField(max_length=15, verbose_name="電話")
+    id_number = models.CharField(max_length=10, unique=True, null=True, blank=True, verbose_name="身分證字號")
+    birth_date = models.DateField(null=True, blank=True, verbose_name="生日")
+    phone = models.CharField(max_length=15, null=True, blank=True, verbose_name="電話")
 
     # 系統自動處理的欄位（綠色標示）
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="註冊時間")
