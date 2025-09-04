@@ -45,7 +45,12 @@
             {% for item in order_items %}
             <tr>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {{ item.provider_order_id }}
+                    <a href="{% url 'customers_account:ticket_wallet' %}?order={{ item.provider_order_id }}" 
+                       style="color: #2563eb; text-decoration: underline; font-weight: 500;"
+                       onmouseover="this.style.color='#1d4ed8'" 
+                       onmouseout="this.style.color='#2563eb'">
+                        {{ item.provider_order_id }}
+                    </a>
                 </td>
                 {% if role == 'merchant' %}
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
