@@ -18,10 +18,24 @@ Member = get_user_model()
 
 class RegisterForm(ModelForm):
     email = EmailField(
-        widget=EmailInput(attrs={"class": "input", "maxlength": "254"}),
+        max_length=254,
+        widget=EmailInput(
+            attrs={
+                "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "placeholder": "請輸入電子郵件",
+            }
+        ),
         label="電子郵件",
     )
-    password = CharField(widget=PasswordInput(attrs={"class": "input"}), label="密碼")
+    password = CharField(
+        widget=PasswordInput(
+            attrs={
+                "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "placeholder": "請輸入密碼",
+            }
+        ),
+        label="密碼",
+    )
 
     class Meta:
         model = Merchant
@@ -42,12 +56,46 @@ class RegisterForm(ModelForm):
             "Cellphone": "手機號碼",
         }
         widgets = {
-            "ShopName": TextInput(attrs={"class": "input", "maxlength": "50"}),
-            "UnifiedNumber": TextInput(attrs={"class": "input", "maxlength": "30"}),
-            "NationalNumber": TextInput(attrs={"class": "input"}),
-            "Name": TextInput(attrs={"class": "input"}),
-            "Address": TextInput(attrs={"class": "input", "maxlength": "50"}),
-            "Cellphone": TextInput(attrs={"class": "input", "maxlength": "15"}),
+            "ShopName": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "maxlength": "50",
+                    "placeholder": "請輸入商店名稱",
+                }
+            ),
+            "UnifiedNumber": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "maxlength": "30",
+                    "placeholder": "請輸入統一編號",
+                }
+            ),
+            "NationalNumber": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "placeholder": "請輸入身分證字號",
+                }
+            ),
+            "Name": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "placeholder": "請輸入負責人姓名",
+                }
+            ),
+            "Address": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "maxlength": "50",
+                    "placeholder": "請輸入地址",
+                }
+            ),
+            "Cellphone": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "maxlength": "15",
+                    "placeholder": "請輸入手機號碼",
+                }
+            ),
         }
 
     def save(self, commit=True):
