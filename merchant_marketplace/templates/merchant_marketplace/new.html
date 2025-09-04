@@ -89,6 +89,41 @@
                    placeholder="請輸入聯絡電話">
         </div>
         
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-4">
+                交易驗證時間點 <span class="text-red-500">*</span>
+            </label>
+            <div class="space-y-3">
+                <div class="flex items-center">
+                    <input type="radio" id="verify_before_payment" name="verification_timing" value="before_payment" required
+                           class="w-4 h-4 text-[#0056B3] bg-gray-100 border-gray-300 focus:ring-[#0056B3] focus:ring-2">
+                    <label for="verify_before_payment" class="ml-3 text-sm text-gray-700">
+                        <span class="font-medium">付款前驗證</span>
+                        <span class="block text-xs text-gray-500 mt-1">消費者需先完成驗證才能付款</span>
+                    </label>
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="radio" id="verify_before_redeem" name="verification_timing" value="before_redeem" required
+                           class="w-4 h-4 text-[#0056B3] bg-gray-100 border-gray-300 focus:ring-[#0056B3] focus:ring-2">
+                    <label for="verify_before_redeem" class="ml-3 text-sm text-gray-700">
+                        <span class="font-medium">核銷前驗證</span>
+                        <span class="block text-xs text-gray-500 mt-1">消費者可先付款，但核銷時需驗證</span>
+                    </label>
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="radio" id="verify_after_redeem" name="verification_timing" value="after_redeem" required
+                           class="w-4 h-4 text-[#0056B3] bg-gray-100 border-gray-300 focus:ring-[#0056B3] focus:ring-2">
+                    <label for="verify_after_redeem" class="ml-3 text-sm text-gray-700">
+                        <span class="font-medium">核銷後驗證</span>
+                        <span class="block text-xs text-gray-500 mt-1">消費者完成核銷後進行事後驗證</span>
+                    </label>
+                </div>
+            </div>
+            <p class="text-sm text-gray-500 mt-2">選擇交易驗證的時機點，影響消費者的購買和使用流程</p>
+        </div>
+        
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h3 class="text-sm font-medium text-blue-800 mb-2">注意事項：</h3>
             <ul class="text-sm text-blue-700 space-y-1">

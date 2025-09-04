@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from .models import Customer
 import re
+from django.utils import timezone
 
 Member = get_user_model()
 
@@ -153,8 +154,8 @@ class CustomerLoginForm(forms.Form):
                     if hasattr(member, "customer"):
                         customer = Customer.objects.get(member=member)
                         member.login_failed_count = 0
-                        member.update_last_login()
-                        member.save(update_fields=["login_failed_count"])
+                        member.last_login = timezone.now()
+                        member.save(update_fields=["login_failed_count", "last_login"])
 
                         cleaned_data["member"] = member
                         cleaned_data["customer"] = customer
