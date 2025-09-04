@@ -77,7 +77,17 @@
     <div class="space-y-4">
       {% for ticket in tickets %}
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
-           x-data="{ showQR: false, qrGenerated: false }">
+           x-data="{ 
+             showQR: false, 
+             qrGenerated: false,
+             needsRedemptionVerification: '{{ ticket.product.verification_timing }}' === 'before_redeem',
+             isRedemptionVerified: false,
+             redemptionData: {
+               identity: '',
+               phone: '',
+               terms: false
+             }
+           }">
         <div class="p-6">
           <div class="flex items-start justify-between">
             <!-- 左側：票券資訊 -->
@@ -123,7 +133,7 @@
               {% if ticket.status == 'unused' %}
                 <!-- QR Code 顯示按鈕 -->
                 <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
-                        @click="showQR = !showQR; if(showQR && !qrGenerated) { generateQR('qr-{{ ticket.id }}', '{{ ticket.ticket_code }}'); qrGenerated = true; }"
+                        @click="showQR = !showQR; if(showQR && !qrGenerated && (!needsRedemptionVerification || isRedemptionVerified)) { generateQR('qr-{{ ticket.id }}', '{{ ticket.ticket_code }}'); qrGenerated = true; }"
                         :class="showQR ? 'bg-gray-600' : 'bg-blue-600 hover:bg-blue-700'">
                   {% include 'components/icons.html' with icon='qr-code' class='w-4 h-4 inline mr-2' %}
                   <span x-text="showQR ? '收起' : '顯示QR Code'">顯示QR Code</span>
@@ -147,13 +157,63 @@
                x-transition:leave-start="opacity-100 transform scale-100"
                x-transition:leave-end="opacity-0 transform scale-95"
                class="mt-6 pt-6 border-t border-gray-200">
-            <div class="bg-gray-50 rounded-lg p-6 text-center">
-              <h4 class="text-lg font-semibold text-gray-900 mb-4">票券 QR Code</h4>
-              <div id="qr-{{ ticket.id }}" class="flex justify-center mb-4"></div>
-              <div class="space-y-2">
-                <p class="text-sm text-gray-600">票券代碼</p>
-                <p class="font-mono text-lg font-semibold bg-white px-3 py-2 rounded border">{{ ticket.ticket_code }}</p>
-                <p class="text-sm text-gray-500">{{ ticket.product.name }}</p>
+            
+            <!-- 核銷前驗證區域 -->
+            <div x-show="needsRedemptionVerification && !isRedemptionVerified" class="mb-6">
+              <div class="bg-orange-50 border-2 border-orange-200 rounded-lg p-6">
+                <div class="flex items-center mb-4">
+                  <svg class="w-6 h-6 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.728-.833-2.498 0L4.316 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                  </svg>
+                  <h3 class="text-lg font-bold text-orange-800">🔐 核銷前驗證</h3>
+                </div>
+                <p class="text-orange-700 mb-6">此票券需要在查看 QR Code 前完成身分驗證，請填寫以下資訊：</p>
+                
+                <div class="space-y-4">
+                  <div>
+                    <label class="flex items-start">
+                      <input type="checkbox" x-model="redemptionData.terms" class="mt-1 mr-3">
+                      <span class="text-sm text-gray-700">
+                        我已閱讀並同意相關使用條款，了解票券兌換方式及相關規範
+                      </span>
+                    </label>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">身分驗證</label>
+                    <input type="text" x-model="redemptionData.identity" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                           placeholder="請輸入身分證字號或護照號碼">
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">聯絡電話</label>
+                    <input type="tel" x-model="redemptionData.phone" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                           placeholder="請輸入聯絡電話">
+                  </div>
+                </div>
+                
+                <button type="button" 
+                        @click="if(redemptionData.terms && redemptionData.identity && redemptionData.phone) { isRedemptionVerified = true; if(!qrGenerated) { generateQR('qr-{{ ticket.id }}', '{{ ticket.ticket_code }}'); qrGenerated = true; } }"
+                        :disabled="!redemptionData.terms || !redemptionData.identity || !redemptionData.phone"
+                        :class="redemptionData.terms && redemptionData.identity && redemptionData.phone ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-400 cursor-not-allowed'"
+                        class="w-full text-white py-3 px-6 rounded-lg transition duration-200 font-medium text-lg mt-6">
+                  ✓ 完成驗證，查看票券
+                </button>
+              </div>
+            </div>
+            
+            <!-- QR Code 顯示區域 -->
+            <div x-show="!needsRedemptionVerification || isRedemptionVerified">
+              <div class="bg-gray-50 rounded-lg p-6 text-center">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">票券 QR Code</h4>
+                <div id="qr-{{ ticket.id }}" class="flex justify-center mb-4"></div>
+                <div class="space-y-2">
+                  <p class="text-sm text-gray-600">票券代碼</p>
+                  <p class="font-mono text-lg font-semibold bg-white px-3 py-2 rounded border">{{ ticket.ticket_code }}</p>
+                  <p class="text-sm text-gray-500">{{ ticket.product.name }}</p>
+                </div>
               </div>
             </div>
           </div>
