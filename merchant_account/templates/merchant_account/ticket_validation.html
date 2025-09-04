@@ -18,7 +18,8 @@
             this.currentTab = 'manual';
             this.$nextTick(() => this.$refs.ticketInput?.focus());
         }
-    }">
+    }"
+    @restart-scanning.window="restartScanning()">
         <!-- 驗證方式選擇 -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             <!-- Tab 切換 -->
