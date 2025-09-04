@@ -41,6 +41,12 @@
                 購買記錄 Purchase History
               </a>
             </li>
+            <li>
+              <a href="{% url 'customers_account:ticket_wallet' %}" x-bind="navLinkBinding($el)">
+                {% include 'components/icons.html' with icon='ticket' %}
+                票券錢包 Ticket Wallet
+              </a>
+            </li>
             
             <li>
               <a href="#" x-bind="navLinkBinding($el)">

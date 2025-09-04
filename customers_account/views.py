@@ -3,9 +3,12 @@ from django.contrib import messages
 from django.contrib.auth import login as django_login, logout as django_logout
 from truepay.decorators import customer_login_required
 from django.core.paginator import Paginator
+from django.utils import timezone
+from django.db.models import Q, Count
 from .forms import CustomerRegistrationForm, CustomerLoginForm
 from .models import Customer
-from payments.models import Order
+from payments.models import Order, OrderItem
+from merchant_account.models import Merchant
 
 
 def register(request):
@@ -139,3 +142,71 @@ def dashboard(request):
     }
 
     return render(request, "customers/dashboard.html", context)
+
+
+@customer_login_required
+def ticket_wallet(request):
+    """消費者票券錢包頁面"""
+    # 透過 email 找到對應的 Customer
+    try:
+        customer = Customer.objects.get(email=request.user.email)
+    except Customer.DoesNotExist:
+        messages.error(request, "客戶資料不存在")
+        return redirect("pages:home")
+    
+    # 取得篩選參數
+    status_filter = request.GET.get('status', '')
+    merchant_filter = request.GET.get('merchant', '')
+    
+    # 基本查詢：取得該客戶的所有票券
+    tickets = OrderItem.objects.select_related(
+        'product__merchant', 'order'
+    ).filter(customer=customer).order_by('-created_at')
+    
+    # 狀態篩選
+    if status_filter:
+        tickets = tickets.filter(status=status_filter)
+    
+    # 商家篩選
+    if merchant_filter:
+        try:
+            merchant_id = int(merchant_filter)
+            tickets = tickets.filter(product__merchant_id=merchant_id)
+        except (ValueError, TypeError):
+            pass
+    
+    # 取得統計資料
+    now = timezone.now()
+    all_tickets = OrderItem.objects.filter(customer=customer)
+    
+    ticket_stats = {
+        'total': all_tickets.count(),
+        'unused': all_tickets.filter(status='unused').count(),
+        'used': all_tickets.filter(status='used').count(),
+        'expired': all_tickets.filter(
+            status='unused', 
+            valid_until__lt=now
+        ).count() if all_tickets.filter(valid_until__isnull=False).exists() else 0,
+    }
+    
+    # 取得所有相關商家（用於篩選下拉選單）
+    merchants = Merchant.objects.filter(
+        product__orderitem__customer=customer
+    ).distinct().order_by('ShopName')
+    
+    # 分頁處理
+    paginator = Paginator(tickets, 10)  # 每頁顯示10筆記錄
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'customer': customer,
+        'tickets': page_obj,
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
+        'ticket_stats': ticket_stats,
+        'merchants': merchants,
+        'now': now,
+    }
+    
+    return render(request, "customers/ticket_wallet.html", context)
