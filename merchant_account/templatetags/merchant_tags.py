@@ -8,9 +8,8 @@ register = template.Library()
 def get_current_merchant(context):
     request = context["request"]
     if request.user.is_authenticated and request.user.member_type == "merchant":
-        email = request.user.email
         try:
-            merchant = Merchant.objects.get(Email=email)
+            merchant = Merchant.objects.get(member=request.user)
             if merchant.subdomain:
                 return f"/merchant/dashboard/{merchant.subdomain}/"
         except Merchant.DoesNotExist:

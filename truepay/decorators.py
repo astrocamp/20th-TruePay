@@ -16,7 +16,7 @@ def no_cache_required(view_func):
                 merchant = Merchant.objects.get(subdomain=subdomain)
                 if (
                     request.user.is_authenticated
-                    and request.user.email == merchant.Email
+                    and request.user.email == merchant.member.email
                     and request.user.member_type == "merchant"
                 ):
                     request.merchant = merchant
