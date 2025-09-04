@@ -176,13 +176,15 @@ def ticket_wallet(request):
         except (ValueError, TypeError):
             pass
     
-    # 訂單編號篩選
+    # 訂單編號篩選（支援訂單ID或訂單編號）
     if order_filter:
+        # 先嘗試用訂單ID篩選
         try:
             order_id = int(order_filter)
             tickets = tickets.filter(order_id=order_id)
         except (ValueError, TypeError):
-            pass
+            # 如果不是數字，則用訂單編號篩選
+            tickets = tickets.filter(order__provider_order_id=order_filter)
     
     # 取得統計資料
     now = timezone.now()
