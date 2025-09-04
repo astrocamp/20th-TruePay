@@ -148,6 +148,11 @@
   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4V4h-4v16zM4 4h4v4H4V4zm0 16h4v-4H4v4zm8-16h4v4h-4V4z"/>
 </svg>
 
+{% elif icon == 'filter' %}
+<svg class="{{ class|default:'w-5 h-5' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+</svg>
+
 {% else %}
 <!-- 預設圖示或錯誤處理 -->
 <svg class="{{ class|default:'w-5 h-5' }} stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">

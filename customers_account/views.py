@@ -157,6 +157,7 @@ def ticket_wallet(request):
     # 取得篩選參數
     status_filter = request.GET.get('status', '')
     merchant_filter = request.GET.get('merchant', '')
+    order_filter = request.GET.get('order', '')
     
     # 基本查詢：取得該客戶的所有票券
     tickets = OrderItem.objects.select_related(
@@ -172,6 +173,14 @@ def ticket_wallet(request):
         try:
             merchant_id = int(merchant_filter)
             tickets = tickets.filter(product__merchant_id=merchant_id)
+        except (ValueError, TypeError):
+            pass
+    
+    # 訂單編號篩選
+    if order_filter:
+        try:
+            order_id = int(order_filter)
+            tickets = tickets.filter(order_id=order_id)
         except (ValueError, TypeError):
             pass
     
