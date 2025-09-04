@@ -1,5 +1,29 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+/* 自定義 CIS 和品牌顏色 */
+@theme {
+  --color-brand-blue: #0056B3;
+  --color-brand-blue-hover: #00408A;
+  --color-brand-black: #000000;
+  --color-brand-white: #FFFFFF;
+  --color-brand-gray-dark: #333333;
+  --color-brand-gray-light: #F5F5F7;
+  --color-brand-gray-border: #D2D2D7;
+  
+  --color-cis-primary: #003d82;
+  --color-cis-primary-hover: #002a5c;
+  --color-cis-secondary: #00a651;
+  --color-cis-secondary-hover: #007d3c;
+  --color-cis-accent: #ff6b35;
+  --color-cis-accent-hover: #e5572e;
+}
+
+/* 強制生成 CIS 工具類別 */
+@tailwind utilities;
+.bg-cis-primary { background-color: var(--color-cis-primary) !important; }
+.bg-cis-primary-hover { background-color: var(--color-cis-primary-hover) !important; }
+.hover\:bg-cis-primary-hover:hover { background-color: var(--color-cis-primary-hover) !important; }
+
 /* 引入自訂樣式 */
 @import "./style.css";
