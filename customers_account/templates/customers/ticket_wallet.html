@@ -69,7 +69,8 @@
   {% if tickets %}
     <div class="space-y-4">
       {% for ticket in tickets %}
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+           x-data="{ showQR: false, qrGenerated: false }">
         <div class="p-6">
           <div class="flex items-start justify-between">
             <!-- 左側：票券資訊 -->
@@ -86,10 +87,6 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
                 <div>
                   <span class="font-medium">商家：</span>{{ ticket.product.merchant.ShopName }}
-                </div>
-                <div>
-                  <span class="font-medium">票券代碼：</span>
-                  <code class="bg-gray-100 px-2 py-1 rounded font-mono text-xs">{{ ticket.ticket_code }}</code>
                 </div>
                 <div>
                   <span class="font-medium">購買時間：</span>{{ ticket.created_at|date:"Y年m月d日 H:i" }}
@@ -119,9 +116,10 @@
               {% if ticket.status == 'unused' %}
                 <!-- QR Code 顯示按鈕 -->
                 <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
-                        onclick="showTicketQR('{{ ticket.ticket_code }}', '{{ ticket.product.name }}')">
+                        @click="showQR = !showQR; if(showQR && !qrGenerated) { generateQR('qr-{{ ticket.id }}', '{{ ticket.ticket_code }}'); qrGenerated = true; }"
+                        :class="showQR ? 'bg-gray-600' : 'bg-blue-600 hover:bg-blue-700'">
                   {% include 'components/icons.html' with icon='qr-code' class='w-4 h-4 inline mr-2' %}
-                  顯示QR Code
+                  <span x-text="showQR ? '收起' : '顯示QR Code'">顯示QR Code</span>
                 </button>
               {% else %}
                 <div class="text-sm text-gray-500">
@@ -131,6 +129,28 @@
               {% endif %}
             </div>
           </div>
+
+          <!-- QR Code 展開區域 -->
+          {% if ticket.status == 'unused' %}
+          <div x-show="showQR" 
+               x-transition:enter="transition ease-out duration-300"
+               x-transition:enter-start="opacity-0 transform scale-95"
+               x-transition:enter-end="opacity-100 transform scale-100"
+               x-transition:leave="transition ease-in duration-200"
+               x-transition:leave-start="opacity-100 transform scale-100"
+               x-transition:leave-end="opacity-0 transform scale-95"
+               class="mt-6 pt-6 border-t border-gray-200">
+            <div class="bg-gray-50 rounded-lg p-6 text-center">
+              <h4 class="text-lg font-semibold text-gray-900 mb-4">票券 QR Code</h4>
+              <div id="qr-{{ ticket.id }}" class="flex justify-center mb-4"></div>
+              <div class="space-y-2">
+                <p class="text-sm text-gray-600">票券代碼</p>
+                <p class="font-mono text-lg font-semibold bg-white px-3 py-2 rounded border">{{ ticket.ticket_code }}</p>
+                <p class="text-sm text-gray-500">{{ ticket.product.name }}</p>
+              </div>
+            </div>
+          </div>
+          {% endif %}
 
           <!-- 商品描述 -->
           {% if ticket.product.description %}
@@ -179,66 +199,51 @@
   {% endif %}
 </div>
 
-<!-- QR Code Modal -->
-<div id="qrModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 items-center justify-center">
-  <div class="bg-white rounded-lg max-w-md w-full mx-4">
-    <div class="p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold">票券 QR Code</h3>
-        <button onclick="closeQRModal()" class="text-gray-400 hover:text-gray-600">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      
-      <div class="text-center">
-        <div id="qrcode" class="flex justify-center mb-4"></div>
-        <p class="text-sm text-gray-600 mb-2">票券代碼</p>
-        <p id="ticketCode" class="font-mono text-lg font-semibold bg-gray-100 px-3 py-2 rounded"></p>
-        <p id="productName" class="text-sm text-gray-600 mt-2"></p>
-      </div>
-    </div>
-  </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
-function showTicketQR(ticketCode, productName) {
-  // 清除舊的 QR Code
-  document.getElementById('qrcode').innerHTML = '';
-  
-  // 生成新的 QR Code
-  QRCode.toCanvas(document.getElementById('qrcode'), ticketCode, {
-    width: 200,
-    margin: 2,
-    color: {
-      dark: '#000000',
-      light: '#FFFFFF'
+// 生成 QR Code 函數
+function generateQR(elementId, ticketCode) {
+  // 等待 QRCode 庫載入
+  function waitForQRCode(callback) {
+    if (typeof QRCode !== 'undefined') {
+      callback();
+    } else {
+      setTimeout(() => waitForQRCode(callback), 100);
     }
-  });
-  
-  // 設置票券資訊
-  document.getElementById('ticketCode').textContent = ticketCode;
-  document.getElementById('productName').textContent = productName;
-  
-  // 顯示 Modal
-  document.getElementById('qrModal').classList.remove('hidden');
-  document.getElementById('qrModal').classList.add('flex');
-}
-
-function closeQRModal() {
-  document.getElementById('qrModal').classList.add('hidden');
-  document.getElementById('qrModal').classList.remove('flex');
-}
-
-// 點擊背景關閉 Modal
-document.getElementById('qrModal').addEventListener('click', function(e) {
-  if (e.target === this) {
-    closeQRModal();
   }
-});
+
+  waitForQRCode(() => {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    // 清除舊的內容
+    element.innerHTML = '';
+    
+    // 創建 canvas 元素
+    const canvas = document.createElement('canvas');
+    element.appendChild(canvas);
+    
+    // 生成 QR Code
+    QRCode.toCanvas(canvas, ticketCode, {
+      width: 200,
+      margin: 2,
+      color: {
+        dark: '#000000',
+        light: '#FFFFFF'
+      }
+    }, function (error) {
+      if (error) {
+        console.error('QR Code generation failed:', error);
+        element.innerHTML = '<p class="text-red-500 text-sm">QR Code 生成失敗</p>';
+      }
+    });
+  });
+}
+
+// 確保 Alpine.js 可以使用 generateQR 函數
+window.generateQR = generateQR;
 </script>
 {% endblock %}
