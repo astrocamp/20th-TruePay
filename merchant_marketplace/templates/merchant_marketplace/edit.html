@@ -107,7 +107,61 @@
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-4">
                 交易驗證時間點 <span class="text-red-500">*</span>
+                {% if has_tickets %}
+                <span class="ml-2 px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">已鎖定</span>
+                {% endif %}
             </label>
+            
+            {% if has_tickets %}
+            <!-- 有票券時顯示鎖定狀態 -->
+            <div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 mb-4">
+                <div class="flex items-center mb-2">
+                    <svg class="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m0 0h3m0 0h-3m3 0l-1-1m-2 1v-2m0-3V9m0 0h3m-3 0V5.5M9 3v16.5"/>
+                    </svg>
+                    <h3 class="text-sm font-medium text-yellow-800">驗證方式已鎖定</h3>
+                </div>
+                <p class="text-sm text-yellow-700">此商品已有售出票券，無法修改驗證方式以保護消費者權益。</p>
+            </div>
+            
+            <!-- 顯示當前設定（唯讀） -->
+            <div class="space-y-3 opacity-75">
+                <div class="flex items-center">
+                    <input type="radio" id="verify_before_payment_readonly" name="verification_timing" value="before_payment" required
+                           {% if product.verification_timing == 'before_payment' %}checked{% endif %} disabled
+                           class="w-4 h-4 text-gray-400 bg-gray-200 border-gray-300">
+                    <label for="verify_before_payment_readonly" class="ml-3 text-sm text-gray-500">
+                        <span class="font-medium">付款前驗證</span>
+                        <span class="block text-xs text-gray-400 mt-1">消費者需先完成驗證才能付款</span>
+                    </label>
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="radio" id="verify_before_redeem_readonly" name="verification_timing" value="before_redeem" required
+                           {% if product.verification_timing == 'before_redeem' %}checked{% endif %} disabled
+                           class="w-4 h-4 text-gray-400 bg-gray-200 border-gray-300">
+                    <label for="verify_before_redeem_readonly" class="ml-3 text-sm text-gray-500">
+                        <span class="font-medium">核銷前驗證</span>
+                        <span class="block text-xs text-gray-400 mt-1">消費者可先付款，但核銷時需驗證</span>
+                    </label>
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="radio" id="verify_after_redeem_readonly" name="verification_timing" value="after_redeem" required
+                           {% if product.verification_timing == 'after_redeem' %}checked{% endif %} disabled
+                           class="w-4 h-4 text-gray-400 bg-gray-200 border-gray-300">
+                    <label for="verify_after_redeem_readonly" class="ml-3 text-sm text-gray-500">
+                        <span class="font-medium">核銷後驗證</span>
+                        <span class="block text-xs text-gray-400 mt-1">消費者完成核銷後進行事後驗證</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- 隱藏欄位保持原值 -->
+            <input type="hidden" name="verification_timing" value="{{ product.verification_timing }}">
+            
+            {% else %}
+            <!-- 沒有票券時正常顯示 -->
             <div class="space-y-3">
                 <div class="flex items-center">
                     <input type="radio" id="verify_before_payment" name="verification_timing" value="before_payment" required
@@ -139,7 +193,15 @@
                     </label>
                 </div>
             </div>
-            <p class="text-sm text-gray-500 mt-2">選擇交易驗證的時機點，影響消費者的購買和使用流程</p>
+            {% endif %}
+            
+            <p class="text-sm text-gray-500 mt-2">
+                {% if has_tickets %}
+                此設定在商品首次售出後即無法修改，以確保票券使用條件的一致性
+                {% else %}
+                選擇交易驗證的時機點，影響消費者的購買和使用流程
+                {% endif %}
+            </p>
         </div>
         
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">

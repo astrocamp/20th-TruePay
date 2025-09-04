@@ -66,11 +66,23 @@ def edit(request, subdomain, id):
         return redirect("merchant_marketplace:index", request.merchant.subdomain)
 
     if request.method == "GET":
-        context = {"product": product, "merchant_phone": product.merchant.Cellphone}
+        # 檢查是否有票券，決定是否可以修改驗證方式
+        from payments.models import OrderItem
+        has_tickets = OrderItem.objects.filter(product=product).exists()
+        
+        context = {
+            "product": product, 
+            "merchant_phone": product.merchant.Cellphone,
+            "has_tickets": has_tickets
+        }
         return render(request, "merchant_marketplace/edit.html", context)
 
     elif request.method == "POST":
         try:
+            # 檢查是否有票券
+            from payments.models import OrderItem
+            has_tickets = OrderItem.objects.filter(product=product).exists()
+            
             product.name = request.POST.get("name", product.name)
             product.description = request.POST.get("description", product.description)
             product.price = request.POST.get("price", product.price)
@@ -88,9 +100,13 @@ def edit(request, subdomain, id):
             product.phone_number = request.POST.get(
                 "phone_number", product.phone_number
             )
-            product.verification_timing = request.POST.get(
-                "verification_timing", product.verification_timing
-            )
+            
+            # 驗證方式鎖定邏輯
+            new_verification_timing = request.POST.get("verification_timing")
+            if has_tickets and new_verification_timing != product.verification_timing:
+                raise ValueError("此商品已有售出票券，無法修改驗證方式")
+            
+            product.verification_timing = new_verification_timing or product.verification_timing
             product.save()
 
             messages.success(request, "商品更新成功！")
