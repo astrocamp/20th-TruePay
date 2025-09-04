@@ -10,7 +10,17 @@ class CustomerAdmin(admin.ModelAdmin):
     readonly_fields = ["created_at"]
 
     fieldsets = (
-        ("基本資料", {"fields": ("name", "id_number", "birth_date", "phone")}),
+        (
+            "基本資料",
+            {
+                "fields": (
+                    "name",
+                    "id_number",
+                    "birth_date",
+                    "phone",
+                )
+            },
+        ),
         (
             "帳號狀態",
             {"fields": ("account_status",)},
@@ -18,7 +28,7 @@ class CustomerAdmin(admin.ModelAdmin):
         (
             "系統資訊",
             {
-                "fields": ("created_at"),
+                "fields": ("created_at",),
                 "classes": ("collapse",),
             },
         ),
