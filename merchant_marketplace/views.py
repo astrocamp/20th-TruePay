@@ -83,6 +83,10 @@ def edit(request, subdomain, id):
             from payments.models import OrderItem
             has_tickets = OrderItem.objects.filter(product=product).exists()
             
+            # 如果已有票券，完全禁止修改
+            if has_tickets:
+                raise ValueError("此商品已有售出票券，為確保票券真實性和消費者權益，所有商品資訊已鎖定無法修改")
+            
             product.name = request.POST.get("name", product.name)
             product.description = request.POST.get("description", product.description)
             product.price = request.POST.get("price", product.price)
@@ -101,12 +105,8 @@ def edit(request, subdomain, id):
                 "phone_number", product.phone_number
             )
             
-            # 驗證方式鎖定邏輯
-            new_verification_timing = request.POST.get("verification_timing")
-            if has_tickets and new_verification_timing != product.verification_timing:
-                raise ValueError("此商品已有售出票券，無法修改驗證方式")
-            
-            product.verification_timing = new_verification_timing or product.verification_timing
+            # 更新驗證方式
+            product.verification_timing = request.POST.get("verification_timing") or product.verification_timing
             product.save()
 
             messages.success(request, "商品更新成功！")
@@ -114,5 +114,12 @@ def edit(request, subdomain, id):
 
         except Exception as e:
             messages.error(request, f"更新失敗：{str(e)}")
-            context = {"product": product, "merchant_phone": product.merchant.Cellphone}
+            # 重新檢查票券狀態以正確顯示表單
+            from payments.models import OrderItem
+            has_tickets = OrderItem.objects.filter(product=product).exists()
+            context = {
+                "product": product, 
+                "merchant_phone": product.merchant.Cellphone,
+                "has_tickets": has_tickets
+            }
             return render(request, "merchant_marketplace/edit.html", context)
