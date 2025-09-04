@@ -122,8 +122,8 @@ def create_payment(request):
             messages.error(request, error_msg)
             return redirect("pages:home")
 
-        # 透過 email 找到對應的 Customer
-        customer = Customer.objects.get(email=request.user.email)
+        # 透過 user 找到對應的 Customer
+        customer = Customer.objects.get(member=request.user)
 
         # 創建訂單
         order = _create_order_for_payment(
@@ -162,9 +162,9 @@ def payment_status(request, order_id):
     """查詢訂單狀態"""
     order = get_object_or_404(Order, id=order_id)
 
-    # 透過 email 找到對應的 Customer
+    # 透過 user 找到對應的 Customer
     try:
-        customer = Customer.objects.get(email=request.user.email)
+        customer = Customer.objects.get(member=request.user)
     except Customer.DoesNotExist:
         messages.error(request, "客戶資料不存在")
         return redirect("pages:home")

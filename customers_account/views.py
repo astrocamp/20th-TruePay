@@ -74,9 +74,9 @@ def logout(request):
 @customer_login_required
 def purchase_history(request):
     """消費者購買記錄頁面"""
-    # 透過 email 找到對應的 Customer
+    # 透過 user 找到對應的 Customer
     try:
-        customer = Customer.objects.get(email=request.user.email)
+        customer = Customer.objects.get(member=request.user)
     except Customer.DoesNotExist:
         messages.error(request, "客戶資料不存在")
         return redirect("pages:home")
@@ -110,9 +110,9 @@ def purchase_history(request):
 @customer_login_required
 def dashboard(request):
     """消費者儀表板頁面"""
-    # 透過 email 找到對應的 Customer
+    # 透過 user 找到對應的 Customer
     try:
-        customer = Customer.objects.get(email=request.user.email)
+        customer = Customer.objects.get(member=request.user)
     except Customer.DoesNotExist:
         messages.error(request, "客戶資料不存在")
         return redirect("pages:home")
