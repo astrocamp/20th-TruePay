@@ -17,7 +17,7 @@ def send_welcome_mail(sender, instance, created, **kwargs):
   您的商家資訊：
   - 商家名稱：{instance.ShopName}
   - 負責人姓名：{instance.Name}
-  - 電子郵件：{instance.Email}
+  - 電子郵件：{instance.member.email}
   - 專屬網址：{instance.subdomain}.truepay.com
 
   您現在可以：
@@ -35,9 +35,9 @@ def send_welcome_mail(sender, instance, created, **kwargs):
                 subject,
                 message,
                 settings.DEFAULT_FROM_EMAIL,
-                [instance.Email],
+                [instance.member.email],
                 fail_silently=False,
             )
-            print(f"✅ 歡迎郵件已發送給 {instance.Email}")
+            print(f"✅ 歡迎郵件已發送給 {instance.member.email}")
         except Exception as e:
             print(f"❌ 郵件發送失敗：{e}")

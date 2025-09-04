@@ -17,45 +17,46 @@ Member = get_user_model()
 
 
 class RegisterForm(ModelForm):
+    email = EmailField(
+        widget=EmailInput(attrs={"class": "input", "maxlength": "254"}),
+        label="電子郵件",
+    )
+    password = CharField(widget=PasswordInput(attrs={"class": "input"}), label="密碼")
+
     class Meta:
         model = Merchant
         fields = [
             "ShopName",
             "UnifiedNumber",
             "NationalNumber",
-            "Email",
             "Name",
             "Address",
             "Cellphone",
-            "Password",
         ]
         labels = {
             "ShopName": "商店名稱",
             "UnifiedNumber": "統一編號",
             "NationalNumber": "身分證號",
-            "Email": "電子郵件",
             "Name": "負責人姓名",
             "Address": "地址",
             "Cellphone": "手機號碼",
-            "Password": "密碼",
         }
         widgets = {
             "ShopName": TextInput(attrs={"class": "input", "maxlength": "50"}),
             "UnifiedNumber": TextInput(attrs={"class": "input", "maxlength": "30"}),
             "NationalNumber": TextInput(attrs={"class": "input"}),
-            "Email": EmailInput(attrs={"class": "input", "maxlength": "254"}),
             "Name": TextInput(attrs={"class": "input"}),
             "Address": TextInput(attrs={"class": "input", "maxlength": "50"}),
             "Cellphone": TextInput(attrs={"class": "input", "maxlength": "15"}),
-            "Password": PasswordInput(attrs={"class": "input"}),
         }
 
     def save(self, commit=True):
+        email = self.cleaned_data["email"]
 
         member = Member.objects.create_user(
-            username=self.cleaned_data["Email"],
-            email=self.cleaned_data["Email"],
-            password=self.cleaned_data["Password"],
+            username=email,
+            email=email,
+            password=self.cleaned_data["password"],
             member_type="merchant",
         )
         merchant = super().save(commit=False)

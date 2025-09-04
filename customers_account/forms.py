@@ -8,6 +8,16 @@ Member = get_user_model()
 
 
 class CustomerRegistrationForm(forms.ModelForm):
+    password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "placeholder": "請輸入密碼",
+            }
+        ),
+        label="密碼",
+    )
+
     password_confirm = forms.CharField(
         max_length=128,
         widget=forms.PasswordInput(
@@ -18,23 +28,21 @@ class CustomerRegistrationForm(forms.ModelForm):
         ),
         label="確認密碼",
     )
+    email = forms.EmailField(
+        max_length=254,
+        widget=forms.EmailInput(
+            attrs={
+                "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "placeholder": "請輸入電子郵件",
+            }
+        ),
+        label="電子郵件",
+    )
 
     class Meta:
         model = Customer
-        fields = ["email", "password", "name", "id_number", "birth_date", "phone"]
+        fields = ["name", "id_number", "birth_date", "phone"]
         widgets = {
-            "email": forms.EmailInput(
-                attrs={
-                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入電子郵件",
-                }
-            ),
-            "password": forms.PasswordInput(
-                attrs={
-                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入密碼",
-                }
-            ),
             "name": forms.TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
@@ -61,8 +69,6 @@ class CustomerRegistrationForm(forms.ModelForm):
             ),
         }
         labels = {
-            "email": "電子郵件",
-            "password": "密碼",
             "name": "姓名",
             "id_number": "身分證字號",
             "birth_date": "生日",
@@ -96,6 +102,7 @@ class CustomerRegistrationForm(forms.ModelForm):
         return phone
 
     def save(self, commit=True):
+
         member = Member.objects.create_user(
             username=self.cleaned_data["email"],
             email=self.cleaned_data["email"],
@@ -138,16 +145,17 @@ class CustomerLoginForm(forms.Form):
             try:
                 member = Member.objects.get(email=email, member_type="customer")
                 if not member.check_password(password):
-                    if hasattr(member, "customer"):
-                        member.customer.increment_login_failed_count()
+                    member.login_failed_count += 1
+                    member.save(update_fields=["login_failed_count"])
                     raise ValidationError("電子郵件或密碼錯誤")
                 elif not member.is_active:
                     raise ValidationError("帳號已停用，請聯絡客服")
                 else:
                     if hasattr(member, "customer"):
                         customer = Customer.objects.get(member=member)
-                        customer.reset_login_failed_count()
-                        customer.update_last_login()
+                        member.login_failed_count = 0
+                        member.update_last_login()
+                        member.save(update_fields=["login_failed_count"])
 
                         cleaned_data["member"] = member
                         cleaned_data["customer"] = customer

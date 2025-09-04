@@ -33,7 +33,6 @@ def login(request):
         form = CustomerLoginForm(request.POST)
         if form.is_valid():
             member = form.cleaned_data["member"]
-            customer = form.cleaned_data["customer"]
 
             # 使用 Django 認證系統登入
             django_login(request, member)
