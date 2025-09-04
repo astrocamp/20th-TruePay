@@ -1,0 +1,47 @@
+<!-- 票券驗證成功的HTML片段 -->
+<div class="ticket-success">
+    <div class="text-center mb-8">
+        <div class="p-4 bg-green-50 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+            {% include 'components/icons.html' with icon='check' class='w-10 h-10 text-green-600' %}
+        </div>
+        <h3 class="text-xl font-bold text-green-600 mb-2">票券驗證成功</h3>
+        <p class="text-gray-600">票券資訊已確認，請檢查詳細資料</p>
+    </div>
+    <div class="bg-gray-50 rounded-xl p-6 mb-8">
+        <div class="grid grid-cols-1 gap-4">
+            <div class="flex justify-between items-center py-3 border-b border-gray-200">
+                <span class="text-gray-600 font-medium">商品名稱</span>
+                <span class="font-bold text-gray-900">{{ ticket_info.product_name }}</span>
+            </div>
+            <div class="flex justify-between items-center py-3 border-b border-gray-200">
+                <span class="text-gray-600 font-medium">票券金額</span>
+                <span class="font-bold text-[#0056B3] text-lg">NT$ {{ ticket_info.ticket_value }}</span>
+            </div>
+            <div class="flex justify-between items-center py-3 border-b border-gray-200">
+                <span class="text-gray-600 font-medium">客戶姓名</span>
+                <span class="font-medium text-gray-900">{{ ticket_info.customer_name }}</span>
+            </div>
+            <div class="flex justify-between items-center py-3">
+                <span class="text-gray-600 font-medium">有效期限</span>
+                <span class="font-medium text-gray-900">{{ ticket_info.valid_until|date:"Y-m-d H:i" }}</span>
+            </div>
+        </div>
+    </div>
+      <div class="space-y-4">
+        <form hx-post="{% url 'merchant_account:use_ticket' merchant.subdomain %}" hx-target="#scan-result" hx-swap="innerHTML">
+            {% csrf_token %}
+            <input type="hidden" name="ticket_code" value="{{ ticket_code }}">
+            <button type="submit" class="w-full bg-green-600 text-white py-4 px-6 rounded-xl hover:bg-green-700 focus:ring-4 focus:ring-green-100 font-medium text-lg transition-all flex items-center justify-center gap-3">
+                {% include 'components/icons.html' with icon='check' class='w-6 h-6' %}
+                確認使用票券
+            </button>
+        </form>
+        
+        <form hx-post="{% url 'merchant_account:restart_scan' merchant.subdomain %}" hx-target="#scan-result" hx-swap="innerHTML">
+            {% csrf_token %}
+            <button type="submit" class="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-xl hover:bg-gray-200 font-medium transition-all" data-action="restart-scanning">
+                繼續驗證其他票券
+            </button>
+        </form>
+    </div>
+</div>

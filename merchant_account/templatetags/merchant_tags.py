@@ -7,8 +7,8 @@ register = template.Library()
 @register.simple_tag(takes_context=True)
 def get_current_merchant(context):
     request = context["request"]
-    if request.user.is_authenticated and request.user.username.startswith("merchant_"):
-        email = request.user.username.replace("merchant_", "")
+    if request.user.is_authenticated and request.user.member_type == "merchant":
+        email = request.user.email
         try:
             merchant = Merchant.objects.get(Email=email)
             if merchant.subdomain:
