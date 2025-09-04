@@ -102,7 +102,6 @@ class CustomerRegistrationForm(forms.ModelForm):
         return phone
 
     def save(self, commit=True):
-
         member = Member.objects.create_user(
             username=self.cleaned_data["email"],
             email=self.cleaned_data["email"],
