@@ -102,6 +102,15 @@ class CustomerRegistrationForm(forms.ModelForm):
             raise ValidationError("手機號碼格式不正確（格式：09xxxxxxxx）")
         return phone
 
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        existing_members = Member.objects.filter(email=email, member_type="customer")
+        if existing_members.filter(socialaccount__provider="google").exists():
+            raise ValidationError("此電子郵件已透過Google帳號註冊，請使用Google登入。")
+        elif existing_members.exists():
+            raise ValidationError("此電子郵件已被註冊使用，請使用登入功能。")
+        return email
+
     def save(self, commit=True):
         member = Member.objects.create_user(
             username=self.cleaned_data["email"],
@@ -143,7 +152,17 @@ class CustomerLoginForm(forms.Form):
 
         if email and password:
             try:
-                member = Member.objects.get(email=email, member_type="customer")
+                member = Member.objects.filter(
+                    email=email, member_type="customer"
+                ).first()
+
+                if not member:
+                    raise ValidationError("電子郵件或密碼錯誤")
+
+                if not member.has_usable_password():
+                    if member.socialaccount_set.filter(provider="google").exists():
+                        raise ValidationError("您有用過google去登入，請點擊google按鈕")
+
                 if not member.check_password(password):
                     member.login_failed_count += 1
                     member.save(update_fields=["login_failed_count"])
