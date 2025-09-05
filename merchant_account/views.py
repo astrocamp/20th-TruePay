@@ -96,8 +96,9 @@ def dashboard(request, subdomain):
         "-created_at"
     )[:5]
 
-    # 計算總收入
-    total_revenue = orders.aggregate(total=Sum("amount"))["total"] or 0
+    # 計算總收入（只計算已付款的訂單）
+    paid_orders = orders.filter(status="paid")
+    total_revenue = paid_orders.aggregate(total=Sum("amount"))["total"] or 0
 
     context = {
         "merchant": request.merchant,
