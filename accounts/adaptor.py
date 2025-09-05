@@ -129,7 +129,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                     customer, created = Customer.objects.get_or_create(
                         member=user,
                         defaults={
-                            'email': user.email,
+                            # 'email': user.email,
                             'name': name,
                         }
                     )
