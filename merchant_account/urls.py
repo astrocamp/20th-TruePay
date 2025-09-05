@@ -16,6 +16,7 @@ urlpatterns = [
     path("ticket/validate/<slug:subdomain>/", views.validate_ticket, name="validate_ticket"),
     path("ticket/use/<slug:subdomain>/", views.use_ticket, name="use_ticket"),
     path("ticket/scan_restart/<slug:subdomain>/", views.restart_scan, name="restart_scan"),
+    path("verification_records/<slug:subdomain>/", views.verification_records, name="verification_records"),
     path("dashboard/<slug:subdomain>/", views.dashboard, name="dashboard"),
     path(
         "domain_settings/<slug:subdomain>/",

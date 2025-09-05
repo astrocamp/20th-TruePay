@@ -77,6 +77,12 @@
                 票券驗證 Tickets
               </a>
             </li>
+            <li>
+              <a href="{% url 'merchant_account:verification_records' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
+                {% include 'components/icons.html' with icon='ticket' %}
+                票券使用紀錄 Usage Records
+              </a>
+            </li>
             
             <li>
               <a href="#" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
