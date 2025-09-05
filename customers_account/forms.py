@@ -259,7 +259,7 @@ class CustomerProfileUpdateForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data.get("email")
-        if email and Member.objects.exclude(pk=self.user.pk).filter(email=email).exists():
+        if email and get_user_model().objects.exclude(pk=self.user.pk).filter(email=email).exists():
             raise ValidationError("此電子郵件已被使用")
         return email
 
@@ -318,12 +318,18 @@ class PasswordChangeForm(forms.Form):
         return old_password
 
     def clean_confirm_password(self):
-        new_password = self.cleaned_data.get("new_password")
         confirm_password = self.cleaned_data.get("confirm_password")
+        return confirm_password
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get("new_password")
+        confirm_password = cleaned_data.get("confirm_password")
         
         if new_password and confirm_password and new_password != confirm_password:
-            raise ValidationError("新密碼確認不相符")
-        return confirm_password
+            self.add_error('confirm_password', "新密碼確認不相符")
+        
+        return cleaned_data
 
     def save(self):
         self.user.set_password(self.cleaned_data['new_password'])
