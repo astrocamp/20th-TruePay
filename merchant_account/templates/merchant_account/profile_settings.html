@@ -1,0 +1,143 @@
+{% extends "merchant_layout/dashboard_base.html" %}
+{% block title %}商家資料設定 - TruePay{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto" x-data="{ activeTab: 'profile' }">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">商家資料設定</h1>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <!-- 分頁標籤 -->
+    <div class="mb-8">
+        <div class="border-b border-gray-200">
+            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                <button @click="activeTab = 'profile'" :class="activeTab === 'profile' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'" class="hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                    商家資料
+                </button>
+                <button @click="activeTab = 'password'" :class="activeTab === 'password' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'" class="hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                    修改密碼
+                </button>
+            </nav>
+        </div>
+    </div>
+    
+    <!-- 商家資料表單 -->
+    <div x-show="activeTab === 'profile'" class="mb-8">
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">商家資料</h2>
+            
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="profile">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ profile_form.ShopName.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ profile_form.ShopName.label }}
+                        </label>
+                        {{ profile_form.ShopName }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ profile_form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ profile_form.email.label }}
+                        </label>
+                        {{ profile_form.email }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ profile_form.Name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ profile_form.Name.label }}
+                        </label>
+                        {{ profile_form.Name }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ profile_form.Cellphone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ profile_form.Cellphone.label }}
+                        </label>
+                        {{ profile_form.Cellphone }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ profile_form.UnifiedNumber.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ profile_form.UnifiedNumber.label }}
+                        </label>
+                        {{ profile_form.UnifiedNumber }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ profile_form.NationalNumber.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ profile_form.NationalNumber.label }}
+                        </label>
+                        {{ profile_form.NationalNumber }}
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label for="{{ profile_form.Address.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ profile_form.Address.label }}
+                        </label>
+                        {{ profile_form.Address }}
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200">
+                        更新商家資料
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 密碼修改表單 -->
+    <div x-show="activeTab === 'password'">
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">修改密碼</h2>
+            
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="password">
+                
+                <div class="space-y-4">
+                    <div>
+                        <label for="{{ password_form.old_password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ password_form.old_password.label }}
+                        </label>
+                        {{ password_form.old_password }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ password_form.new_password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ password_form.new_password.label }}
+                        </label>
+                        {{ password_form.new_password }}
+                        {% if password_form.new_password.help_text %}
+                            <p class="mt-2 text-sm text-gray-500">{{ password_form.new_password.help_text }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ password_form.confirm_password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ password_form.confirm_password.label }}
+                        </label>
+                        {{ password_form.confirm_password }}
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition duration-200">
+                        修改密碼
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

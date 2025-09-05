@@ -184,3 +184,122 @@ class domain_settings_form(ModelForm):
         help_texts = {
             "subdomain": "系統會自動生成",
         }
+
+
+class MerchantProfileUpdateForm(ModelForm):
+    email = EmailField(
+        max_length=254,
+        widget=EmailInput(
+            attrs={
+                "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "placeholder": "請輸入電子郵件",
+            }
+        ),
+        label="電子郵件",
+    )
+
+    class Meta:
+        model = Merchant
+        fields = ["ShopName", "UnifiedNumber", "NationalNumber", "Name", "Address", "Cellphone"]
+        labels = {
+            "ShopName": "商店名稱",
+            "UnifiedNumber": "統一編號", 
+            "NationalNumber": "身分證號",
+            "Name": "負責人姓名",
+            "Address": "地址",
+            "Cellphone": "手機號碼",
+        }
+        widgets = {
+            "ShopName": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "placeholder": "請輸入商店名稱",
+                }
+            ),
+            "UnifiedNumber": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "placeholder": "請輸入統一編號",
+                }
+            ),
+            "NationalNumber": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "placeholder": "請輸入身分證字號",
+                }
+            ),
+            "Name": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "placeholder": "請輸入負責人姓名",
+                }
+            ),
+            "Address": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "placeholder": "請輸入地址",
+                }
+            ),
+            "Cellphone": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "placeholder": "請輸入手機號碼",
+                }
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if self.user:
+            self.fields['email'].initial = self.user.email
+
+    def clean_UnifiedNumber(self):
+        unified_number = self.cleaned_data.get("UnifiedNumber")
+        if unified_number and len(unified_number) != 8:
+            raise ValidationError("統一編號必須為8位數字")
+        
+        # 檢查是否與其他商家重複（排除自己）
+        if unified_number and Merchant.objects.exclude(pk=self.instance.pk).filter(UnifiedNumber=unified_number).exists():
+            raise ValidationError("此統一編號已被使用")
+        
+        return unified_number
+
+    def clean_NationalNumber(self):
+        national_number = self.cleaned_data.get("NationalNumber")
+        if national_number and len(national_number) != 10:
+            raise ValidationError("身分證字號必須為10位")
+        
+        # 檢查是否與其他商家重複（排除自己）
+        if national_number and Merchant.objects.exclude(pk=self.instance.pk).filter(NationalNumber=national_number).exists():
+            raise ValidationError("此身分證字號已被使用")
+        
+        return national_number
+
+    def clean_Cellphone(self):
+        cellphone = self.cleaned_data.get("Cellphone")
+        if cellphone and len(cellphone) > 15:
+            raise ValidationError("手機號碼長度不能超過15位")
+        return cellphone
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        Member = get_user_model()
+        
+        # 只有在電子郵件實際被修改時才檢查唯一性
+        if email and self.user and email != self.user.email:
+            if Member.objects.exclude(pk=self.user.pk).filter(email=email).exists():
+                raise ValidationError("此電子郵件已被使用")
+        return email
+
+    def save(self, commit=True):
+        merchant = super().save(commit=False)
+        if commit:
+            merchant.save()
+            # 更新 Member 的 email
+            if self.user:
+                self.user.email = self.cleaned_data['email']
+                # 更新 username (格式: ID_email)
+                self.user.username = f"{self.user.pk}_{self.cleaned_data['email']}"
+                self.user.save(update_fields=['email', 'username'])
+        return merchant

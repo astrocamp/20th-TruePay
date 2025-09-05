@@ -4,7 +4,8 @@ from django.contrib.auth import login as django_login, logout as django_logout
 from django.db.models import Sum
 from truepay.decorators import customer_login_required
 from django.core.paginator import Paginator
-from .forms import CustomerRegistrationForm, CustomerLoginForm
+from .forms import CustomerRegistrationForm, CustomerLoginForm, CustomerProfileUpdateForm, PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 from .models import Customer
 from payments.models import Order
 
@@ -139,3 +140,56 @@ def dashboard(request):
     }
 
     return render(request, "customers/dashboard.html", context)
+
+
+@customer_login_required
+def profile_settings(request):
+    """消費者會員資料修改頁面"""
+    # 透過 user 找到對應的 Customer
+    try:
+        customer = Customer.objects.get(member=request.user)
+    except Customer.DoesNotExist:
+        messages.error(request, "客戶資料不存在")
+        return redirect("pages:home")
+
+    if request.method == "POST":
+        form_type = request.POST.get("form_type")
+        
+        if form_type == "profile":
+            # 處理個人資料修改
+            form = CustomerProfileUpdateForm(request.POST, instance=customer, user=request.user)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "個人資料已成功更新")
+                return redirect("customers_account:profile_settings")
+            else:
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{form.fields.get(field, {}).label or field}: {error}")
+        
+        elif form_type == "password":
+            # 處理密碼修改
+            password_form = PasswordChangeForm(request.user, request.POST)
+            if password_form.is_valid():
+                password_form.save()
+                # 更新 session，避免用戶被登出
+                update_session_auth_hash(request, request.user)
+                messages.success(request, "密碼已成功修改")
+                return redirect("customers_account:profile_settings")
+            else:
+                for field, errors in password_form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{password_form.fields.get(field, {}).label or field}: {error}")
+    
+    # GET 請求或表單驗證失敗時顯示表單
+    profile_form = CustomerProfileUpdateForm(instance=customer, user=request.user)
+    password_form = PasswordChangeForm(request.user)
+    
+    
+    context = {
+        "customer": customer,
+        "profile_form": profile_form,
+        "password_form": password_form,
+    }
+    
+    return render(request, "customers/profile_settings.html", context)
