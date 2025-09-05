@@ -122,7 +122,9 @@ def dashboard(request):
 
     # 統計資料
     total_orders = orders.count()
-    total_amount = sum(order.amount for order in orders)
+    # 只計算已付款訂單的金額
+    paid_orders = orders.filter(status="paid")
+    total_amount = sum(order.amount for order in paid_orders)
     pending_orders = orders.filter(status="pending").count()
 
     # 最近5筆購買記錄
