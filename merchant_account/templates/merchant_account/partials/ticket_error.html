@@ -6,29 +6,12 @@
     <h3 class="text-xl font-bold text-red-600 mb-2">驗證失敗</h3>
     <p class="text-gray-600 mb-8">{{ error_message }}</p>
     
-    <button type="button" 
-            class="w-full bg-gray-100 text-gray-700 py-4 px-6 rounded-xl hover:bg-gray-200 focus:ring-4 focus:ring-gray-100 font-medium text-lg transition-all" 
-            @click="
-                fetch('{% url 'merchant_account:restart_scan' merchant.subdomain %}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    }
-                })
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById('scan-result').innerHTML = html;
-                    // 清除輸入欄位並重置狀態
-                    const ticketInput = document.querySelector('input[name=ticket_code]');
-                    if (ticketInput) {
-                        ticketInput.value = '';
-                        ticketInput.focus();
-                    }
-                    // 重置 Alpine 狀態
-                    window.dispatchEvent(new CustomEvent('restart-scanning'));
-                });
-            ">
-        重新驗證
-    </button>
+    <div x-data="createTicketScanManager()">
+        <button type="button" 
+                :class="restartButtonClass + ' bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-100'"
+                :disabled="isLoading"
+                @click="restartScan('{% url 'merchant_account:restart_scan' merchant.subdomain %}', '{{ csrf_token }}')">
+            <span x-text="restartButtonText || '重新驗證'"></span>
+        </button>
+    </div>
 </div>

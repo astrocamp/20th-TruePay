@@ -448,8 +448,77 @@ document.addEventListener('alpine:init', () => {
   }));
 });
 
-export { ImagePreview, PaymentTimer };
+// Alpine.js 票券掃描管理組件
+function createTicketScanManager() {
+  return {
+    isLoading: false,
+    
+    async restartScan(restartUrl, csrfToken) {
+      if (this.isLoading) return;
+      
+      this.isLoading = true;
+      
+      try {
+        const response = await fetch(restartUrl, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const html = await response.text();
+        
+        const scanResultElement = document.getElementById('scan-result');
+        if (scanResultElement) {
+          scanResultElement.innerHTML = html;
+        } else {
+          console.error('TicketScanManager: 找不到 scan-result 元素');
+          return;
+        }
+        
+        this.resetScanState();
+        
+        window.dispatchEvent(new CustomEvent('restart-scanning'));
+        
+      } catch (error) {
+        console.error('TicketScanManager: 重啟掃描失敗', error);
+        alert('重新掃描失敗，請重新整理頁面後再試');
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    
+    resetScanState() {
+      const ticketInput = document.querySelector('input[name=ticket_code]');
+      if (ticketInput) {
+        ticketInput.value = '';
+        ticketInput.focus();
+      }
+    },
+    
+    get restartButtonClass() {
+      const baseClasses = 'w-full py-4 px-6 rounded-xl font-medium text-lg transition-all focus:ring-4';
+      const loadingClasses = 'opacity-50 cursor-not-allowed';
+      const normalClasses = 'hover:bg-opacity-90';
+      
+      return this.isLoading ? 
+        `${baseClasses} ${loadingClasses}` : 
+        `${baseClasses} ${normalClasses}`;
+    },
+    
+    get restartButtonText() {
+      return this.isLoading ? '處理中...' : null;
+    }
+  };
+}
+
 // 將函數掛載到全域供 Alpine.js 使用
+window.createTicketScanManager = createTicketScanManager;
 window.createQuantityManager = createQuantityManager;
 
 // 導出 Alpine.js 組件創建函數和 NavigationManager
@@ -458,5 +527,6 @@ export {
   createPaymentTimer, 
   createMobileMenu,
   createQuantityManager,
+  createTicketScanManager,
   NavigationManager
 };

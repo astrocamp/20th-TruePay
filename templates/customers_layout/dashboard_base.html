@@ -43,7 +43,7 @@
             </li>
             
             <li>
-              <a href="#" x-bind="navLinkBinding($el)">
+              <a href="{% url 'customers_account:profile_settings' %}" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='settings' %}
                 設定 Settings
               </a>
