@@ -54,6 +54,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",  # 為 allauth 需要
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
     "pages",
     "merchant_account",
     "customers_account",
@@ -69,6 +74,7 @@ MIDDLEWARE = [
     "truepay.security_middleware.SecurityHeadersMiddleware",
     "django.middleware.cache.UpdateCacheMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
     "truepay.security_middleware.SessionSecurityMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -248,3 +254,46 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
 
 AUTH_USER_MODEL = "accounts.Member"
+
+# Django Sites Framework (required for allauth)
+SITE_ID = 1
+
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+# Django Allauth 配置
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "none"  # 暫時關閉郵件驗證
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_UNIQUE_EMAIL = True
+
+# 登入重導向設定
+LOGIN_REDIRECT_URL = "/customers/dashboard/"
+LOGOUT_REDIRECT_URL = "/"
+
+# Social Account 配置
+SOCIALACCOUNT_ADAPTER = "accounts.adaptor.CustomSocialAccountAdapter"
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+# Google OAuth 設定
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
+        "OAUTH_PKCE_ENABLED": True,
+        "APP": {
+            "client_id": os.getenv("GOOGLE_OAUTH2_CLIENT_ID"),
+            "secret": os.getenv("GOOGLE_OAUTH2_CLIENT_SECRET"),
+            "key": "",
+        },
+    }
+}

@@ -46,7 +46,7 @@ def login(req):
             member = form.cleaned_data["member"]
             merchant = form.cleaned_data["merchant"]
 
-            django_login(req, member)
+            django_login(req, member, backend='django.contrib.auth.backends.ModelBackend')
 
             messages.success(req, "歡迎進入！！！")
             return redirect("merchant_account:dashboard", merchant.subdomain)

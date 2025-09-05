@@ -1,4 +1,5 @@
 {% extends "layouts/default.html" %}
+{% load socialaccount %}
 {% block content %}
 <div class="max-w-md mx-auto mt-8 p-6 bg-brand-white rounded-lg shadow-md">
     <h1 class="text-2xl font-bold text-center text-brand-black mb-6">消費者登入</h1>
@@ -45,6 +46,32 @@
             登入
         </button>
     </form>
+    
+    <!-- 分隔線 -->
+    <div class="mt-6 mb-6">
+        <div class="relative">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-300"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+                <span class="px-2 bg-brand-white text-brand-grayDark">或</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Google 登入按鈕 -->
+    <div class="mb-6">
+        {% get_providers as socialaccount_providers %}
+        {% for provider in socialaccount_providers %}
+            {% if provider.id == "google" %}
+                <a href="{% provider_login_url 'google' process='login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" 
+                   class="w-full flex justify-center items-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#0056B3] focus:ring-offset-2 transition duration-200">
+                    {% include 'components/icons.html' with icon='google' class='w-5 h-5 mr-3' %}
+                    使用 Google 帳號登入
+                </a>
+            {% endif %}
+        {% endfor %}
+    </div>
     
     <div class="mt-6 text-center">
         <p class="text-brand-grayDark">
