@@ -27,7 +27,7 @@ def process_linepay(order, request):
         # 使用系統統一 LINE Pay 設定
         channel_id = settings.LINEPAY_CHANNEL_ID
         channel_secret = settings.LINEPAY_CHANNEL_SECRET
-        
+
         api_url = getattr(
             settings, "LINEPAY_API_URL", "https://sandbox-api-pay.line.me"
         )
@@ -111,7 +111,7 @@ def linepay_confirm(request):
         # 使用系統統一 LINE Pay 設定
         channel_id = settings.LINEPAY_CHANNEL_ID
         channel_secret = settings.LINEPAY_CHANNEL_SECRET
-        
+
         api_url = getattr(
             settings, "LINEPAY_API_URL", "https://sandbox-api-pay.line.me"
         )
@@ -146,20 +146,12 @@ def linepay_confirm(request):
             # 付款成功後恢復用戶登入狀態（金流回調不攜帶 session）
             if order.customer:
                 try:
-                    # 根據訂單客戶資訊建立對應的 Django Member session
-                    member, created = Member.objects.get_or_create(
-                        username=order.customer.email,
-                        defaults={
-                            "email": order.customer.email,
-                            "first_name": order.customer.name,
-                            "is_active": order.customer.account_status == "active",
-                            "member_type": "customer"
-                        },
-                    )
+                    # 直接使用已存在的 Member 記錄（不要創建新的）
+                    member = order.customer.member
                     # 建立用戶認證 session
-                    django_login(request, member)
+                    django_login(request, member, backend='django.contrib.auth.backends.ModelBackend')
                     logger.info(
-                        f"LINE Pay 付款成功，已為用戶 {order.customer.email} 恢復登入狀態"
+                        f"LINE Pay 付款成功，已為用戶 {order.customer.member.email} 恢復登入狀態"
                     )
                 except Exception as e:
                     logger.warning(f"LINE Pay 付款成功後恢復登入狀態失敗: {e}")

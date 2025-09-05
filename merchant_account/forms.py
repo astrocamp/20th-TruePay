@@ -13,51 +13,102 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 
 
+Member = get_user_model()
+
+
 class RegisterForm(ModelForm):
+    email = EmailField(
+        max_length=254,
+        widget=EmailInput(
+            attrs={
+                "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "placeholder": "請輸入電子郵件",
+            }
+        ),
+        label="電子郵件",
+    )
+    password = CharField(
+        widget=PasswordInput(
+            attrs={
+                "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "placeholder": "請輸入密碼",
+            }
+        ),
+        label="密碼",
+    )
+
     class Meta:
         model = Merchant
         fields = [
             "ShopName",
             "UnifiedNumber",
             "NationalNumber",
-            "Email",
             "Name",
             "Address",
             "Cellphone",
-            "Password",
         ]
         labels = {
             "ShopName": "商店名稱",
             "UnifiedNumber": "統一編號",
             "NationalNumber": "身分證號",
-            "Email": "電子郵件",
             "Name": "負責人姓名",
             "Address": "地址",
             "Cellphone": "手機號碼",
-            "Password": "密碼",
         }
         widgets = {
-            "ShopName": TextInput(attrs={"class": "input", "maxlength": "50"}),
-            "UnifiedNumber": TextInput(attrs={"class": "input", "maxlength": "30"}),
-            "NationalNumber": TextInput(attrs={"class": "input"}),
-            "Email": EmailInput(attrs={"class": "input", "maxlength": "254"}),
-            "Name": TextInput(attrs={"class": "input"}),
-            "Address": TextInput(attrs={"class": "input", "maxlength": "50"}),
-            "Cellphone": TextInput(attrs={"class": "input", "maxlength": "15"}),
-            "Password": PasswordInput(attrs={"class": "input"}),
+            "ShopName": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "maxlength": "50",
+                    "placeholder": "請輸入商店名稱",
+                }
+            ),
+            "UnifiedNumber": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "maxlength": "30",
+                    "placeholder": "請輸入統一編號",
+                }
+            ),
+            "NationalNumber": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "placeholder": "請輸入身分證字號",
+                }
+            ),
+            "Name": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "placeholder": "請輸入負責人姓名",
+                }
+            ),
+            "Address": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "maxlength": "50",
+                    "placeholder": "請輸入地址",
+                }
+            ),
+            "Cellphone": TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "maxlength": "15",
+                    "placeholder": "請輸入手機號碼",
+                }
+            ),
         }
 
     def save(self, commit=True):
-        Member = get_user_model()
+        email = self.cleaned_data["email"]
+
         member = Member.objects.create_user(
-            username=self.cleaned_data["Email"],
-            email=self.cleaned_data["Email"],
-            password=self.cleaned_data["Password"],
+            username=email,
+            email=email,
+            password=self.cleaned_data["password"],
             member_type="merchant",
         )
         merchant = super().save(commit=False)
         merchant.member = member
-        merchant.set_password(self.cleaned_data["Password"])
         try:
             merchant.subdomain = generate_unique_subdomain()
         except ValueError as e:

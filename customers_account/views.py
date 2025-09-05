@@ -39,7 +39,7 @@ def login(request):
             customer = form.cleaned_data["customer"]
 
             # 使用 Django 認證系統登入
-            django_login(request, member)
+            django_login(request, member, backend='django.contrib.auth.backends.ModelBackend')
             customer.update_last_login()
             # 檢查是否有 next 參數（登入後要重導向的頁面）
             next_url = request.GET.get("next") or request.POST.get("next")
@@ -79,9 +79,9 @@ def logout(request):
 @customer_login_required
 def purchase_history(request):
     """消費者購買記錄頁面"""
-    # 透過 email 找到對應的 Customer
+    # 透過 user 找到對應的 Customer
     try:
-        customer = Customer.objects.get(email=request.user.email)
+        customer = Customer.objects.get(member=request.user)
     except Customer.DoesNotExist:
         messages.error(request, "客戶資料不存在")
         return redirect("pages:home")
@@ -115,9 +115,9 @@ def purchase_history(request):
 @customer_login_required
 def dashboard(request):
     """消費者儀表板頁面"""
-    # 透過 email 找到對應的 Customer
+    # 透過 user 找到對應的 Customer
     try:
-        customer = Customer.objects.get(email=request.user.email)
+        customer = Customer.objects.get(member=request.user)
     except Customer.DoesNotExist:
         messages.error(request, "客戶資料不存在")
         return redirect("pages:home")

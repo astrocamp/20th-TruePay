@@ -40,7 +40,7 @@ def process_newebpay(order, request):
             "ItemDesc": order.item_description,
             "ReturnURL": settings.PAYMENT_RETURN_URL,
             "NotifyURL": settings.PAYMENT_NOTIFY_URL,
-            "Email": order.customer.email,
+            "Email": order.customer.member.email,
         }
 
         # 生成 TradeInfo 和 TradeSha
@@ -86,6 +86,7 @@ def newebpay_return(request):
         if not result_data:
             logger.error("無法解密回調資料")
             from django.shortcuts import render
+
             return render(
                 request,
                 "payments/newebpay/payment_result.html",
@@ -121,19 +122,13 @@ def newebpay_return(request):
             # 付款成功後恢復用戶登入狀態（金流回調不攜帶 session）
             if order.customer:
                 try:
-                    # 根據訂單客戶資訊建立對應的 Django Member session
-                    member, created = Member.objects.get_or_create(
-                        username=order.customer.email,
-                        defaults={
-                            'email': order.customer.email,
-                            'first_name': order.customer.name,
-                            'is_active': order.customer.account_status == 'active',
-                            'member_type': 'customer'
-                        }
-                    )
+                    # 直接使用已存在的 Member 記錄（不要創建新的）
+                    member = order.customer.member
                     # 建立用戶認證 session
-                    django_login(request, member)
-                    logger.info(f"藍新金流付款成功，已為用戶 {order.customer.email} 恢復登入狀態")
+                    django_login(request, member, backend='django.contrib.auth.backends.ModelBackend')
+                    logger.info(
+                        f"藍新金流付款成功，已為用戶 {order.customer.member.email} 恢復登入狀態"
+                    )
                 except Exception as e:
                     logger.warning(f"藍新金流付款成功後恢復登入狀態失敗: {e}")
 
@@ -248,7 +243,9 @@ def decrypt_newebpay_callback(trade_info, trade_sha=None):
     try:
         # 驗證簽名（如果有）
         if trade_sha:
-            check_value = generate_sha256(f"HashKey={hash_key}&{trade_info}&HashIV={hash_iv}")
+            check_value = generate_sha256(
+                f"HashKey={hash_key}&{trade_info}&HashIV={hash_iv}"
+            )
             if check_value.upper() != trade_sha.upper():
                 logger.error("簽名驗證失敗")
                 return None

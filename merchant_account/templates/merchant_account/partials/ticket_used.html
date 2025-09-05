@@ -19,10 +19,29 @@
         </div>
     </div>
     
-    <form hx-post="{% url 'merchant_account:restart_scan' merchant.subdomain %}" hx-target="#scan-result" hx-swap="innerHTML">
-        {% csrf_token %}
-        <button type="submit" class="w-full bg-[#0056B3] text-white py-4 px-6 rounded-xl hover:bg-[#00408A] focus:ring-4 focus:ring-blue-100 font-medium text-lg transition-all" data-action="restart-scanning">
-            繼續驗證其他票券
-        </button>
-    </form>
+    <button type="button" 
+            class="w-full bg-[#0056B3] text-white py-4 px-6 rounded-xl hover:bg-[#00408A] focus:ring-4 focus:ring-blue-100 font-medium text-lg transition-all" 
+            @click="
+                fetch('{% url 'merchant_account:restart_scan' merchant.subdomain %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('scan-result').innerHTML = html;
+                    // 清除輸入欄位並重置狀態
+                    const ticketInput = document.querySelector('input[name=ticket_code]');
+                    if (ticketInput) {
+                        ticketInput.value = '';
+                        ticketInput.focus();
+                    }
+                    // 重置 Alpine 狀態
+                    window.dispatchEvent(new CustomEvent('restart-scanning'));
+                });
+            ">
+        繼續驗證其他票券
+    </button>
 </div>

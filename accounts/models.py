@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
+import uuid
 
 
 class Member(AbstractUser):
@@ -23,6 +24,23 @@ class Member(AbstractUser):
         verbose_name = "會員"
         verbose_name_plural = "會員"
 
+    def save(self, *args, **kwargs):
+        """自動產生 ID+email 組合的 username"""
+        # 如果是新建立的記錄或是臨時 username
+        if not self.pk or (self.username and self.username.startswith("temp_")):
+            # 如果還沒有 username 或不是臨時的，給一個臨時 username
+            if not self.username or not self.username.startswith("temp_"):
+                self.username = f"temp_{uuid.uuid4().hex[:8]}"
+
+            # 第一次儲存以取得 ID
+            super().save(*args, **kwargs)
+
+            # 更新為正式的 username (ID + email)
+            self.username = f"{self.pk}_{self.email}"
+            super().save(update_fields=["username"])
+        else:
+            # 如果已經有正式 username，直接儲存
+            super().save(*args, **kwargs)
     def __str__(self):
         return f"{self.username}({self.get_member_type_display()})"
 
