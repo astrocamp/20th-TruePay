@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login as django_login, logout as django_logout
+from django.db.models import Sum
 from truepay.decorators import customer_login_required
 from django.core.paginator import Paginator
 from .forms import CustomerRegistrationForm, CustomerLoginForm
@@ -122,9 +123,8 @@ def dashboard(request):
 
     # 統計資料
     total_orders = orders.count()
-    # 只計算已付款訂單的金額
-    paid_orders = orders.filter(status="paid")
-    total_amount = sum(order.amount for order in paid_orders)
+    # 只計算已付款訂單的金額（使用 aggregate 更高效）
+    total_amount = orders.filter(status="paid").aggregate(total=Sum("amount"))["total"] or 0
     pending_orders = orders.filter(status="pending").count()
 
     # 最近5筆購買記錄
