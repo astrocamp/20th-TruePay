@@ -147,9 +147,9 @@ def dashboard(request):
 @customer_login_required
 def ticket_wallet(request):
     """消費者票券錢包頁面"""
-    # 透過 email 找到對應的 Customer
+    # 透過 member 找到對應的 Customer
     try:
-        customer = Customer.objects.get(email=request.user.email)
+        customer = Customer.objects.get(member=request.user)
     except Customer.DoesNotExist:
         messages.error(request, "客戶資料不存在")
         return redirect("pages:home")
