@@ -163,7 +163,7 @@ def profile_settings(request):
             else:
                 for field, errors in form.errors.items():
                     for error in errors:
-                        messages.error(request, f"{form.fields.get(field, {}).label or field}: {error}")
+                        messages.error(request, f"{form.fields[field].label if field in form.fields else field}: {error}")
         
         elif form_type == "password":
             # 處理密碼修改
@@ -177,7 +177,7 @@ def profile_settings(request):
             else:
                 for field, errors in password_form.errors.items():
                     for error in errors:
-                        messages.error(request, f"{password_form.fields.get(field, {}).label or field}: {error}")
+                        messages.error(request, f"{password_form.fields[field].label if field in password_form.fields else field}: {error}")
     
     # GET 請求或表單驗證失敗時顯示表單
     profile_form = CustomerProfileUpdateForm(instance=customer, user=request.user)
