@@ -1,5 +1,29 @@
 <!-- 票券驗證成功的HTML片段 -->
-<div class="ticket-success">
+<div class="ticket-success" x-data="{ 
+    showPostVerification: false,
+    verificationData: {
+        idNumber: '',
+        customerName: '',
+        phoneNumber: '',
+        verificationNotes: ''
+    },
+    submitVerification() {
+        // 這裡可以加上提交驗證資料的邏輯
+        console.log('提交驗證資料:', this.verificationData);
+        // 模擬提交成功
+        setTimeout(() => {
+            alert('驗證完成！');
+            this.showPostVerification = false;
+            // 重置表單
+            this.verificationData = {
+                idNumber: '',
+                customerName: '',
+                phoneNumber: '',
+                verificationNotes: ''
+            };
+        }, 500);
+    }
+}">
     <div class="text-center mb-8">
         <div class="p-4 bg-green-50 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
             {% include 'components/icons.html' with icon='check' class='w-10 h-10 text-green-600' %}
@@ -27,40 +51,110 @@
             </div>
         </div>
     </div>
-      <div class="space-y-4">
-        <form hx-post="{% url 'merchant_account:use_ticket' merchant.subdomain %}" hx-target="#scan-result" hx-swap="innerHTML">
-            {% csrf_token %}
-            <input type="hidden" name="ticket_code" value="{{ ticket_code }}">
-            <button type="submit" class="w-full bg-green-600 text-white py-4 px-6 rounded-xl hover:bg-green-700 focus:ring-4 focus:ring-green-100 font-medium text-lg transition-all flex items-center justify-center gap-3">
-                {% include 'components/icons.html' with icon='check' class='w-6 h-6' %}
-                確認使用票券
-            </button>
-        </form>
+      <div class="space-y-4" x-show="!showPostVerification">
+        {% if ticket_info.requires_post_verification %}
+            <!-- 核銷後驗證：先使用票券，成功後顯示驗證畫面 -->
+            <form hx-post="{% url 'merchant_account:use_ticket' merchant.subdomain %}" 
+                  hx-swap="none"
+                  @htmx:after-request="if(event.detail.successful && event.detail.xhr.responseText.includes('已使用')) { showPostVerification = true; }">
+                {% csrf_token %}
+                <input type="hidden" name="ticket_code" value="{{ ticket_code }}">
+                <button type="submit" class="w-full bg-green-600 text-white py-4 px-6 rounded-xl hover:bg-green-700 focus:ring-4 focus:ring-green-100 font-medium text-lg transition-all flex items-center justify-center gap-3">
+                    {% include 'components/icons.html' with icon='check' class='w-6 h-6' %}
+                    確認使用票券（需要驗證）
+                </button>
+            </form>
+        {% else %}
+            <!-- 一般流程：直接使用票券 -->
+            <form hx-post="{% url 'merchant_account:use_ticket' merchant.subdomain %}" hx-target="#scan-result" hx-swap="innerHTML">
+                {% csrf_token %}
+                <input type="hidden" name="ticket_code" value="{{ ticket_code }}">
+                <button type="submit" class="w-full bg-green-600 text-white py-4 px-6 rounded-xl hover:bg-green-700 focus:ring-4 focus:ring-green-100 font-medium text-lg transition-all flex items-center justify-center gap-3">
+                    {% include 'components/icons.html' with icon='check' class='w-6 h-6' %}
+                    確認使用票券
+                </button>
+            </form>
+        {% endif %}
         
         <button type="button" 
                 class="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-xl hover:bg-gray-200 font-medium transition-all" 
-                @click="
-                    fetch('{% url 'merchant_account:restart_scan' merchant.subdomain %}', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': '{{ csrf_token }}',
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        }
-                    })
-                    .then(response => response.text())
-                    .then(html => {
-                        document.getElementById('scan-result').innerHTML = html;
-                        // 清除輸入欄位並重置狀態
-                        const ticketInput = document.querySelector('input[name=ticket_code]');
-                        if (ticketInput) {
-                            ticketInput.value = '';
-                            ticketInput.focus();
-                        }
-                        // 重置 Alpine 狀態
-                        window.dispatchEvent(new CustomEvent('restart-scanning'));
-                    });
-                ">
+                hx-post="{% url 'merchant_account:restart_scan' merchant.subdomain %}"
+                hx-target="#scan-result"
+                hx-swap="innerHTML">
             繼續驗證其他票券
         </button>
+    </div>
+
+    <!-- 核銷後驗證畫面 -->
+    <div x-show="showPostVerification" x-transition class="mt-8">
+        <div class="text-center mb-6">
+            <div class="p-4 bg-blue-50 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                {% include 'components/icons.html' with icon='shield' class='w-10 h-10 text-blue-600' %}
+            </div>
+            <h3 class="text-xl font-bold text-blue-600 mb-2">需要身份驗證</h3>
+            <p class="text-gray-600">此商品需要核銷後驗證，請填寫客戶資料</p>
+        </div>
+
+        <div class="bg-blue-50 rounded-xl p-6 mb-6">
+            <div class="space-y-4">
+                <!-- 身份證字號 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">身份證字號 *</label>
+                    <input type="text" 
+                           x-model="verificationData.idNumber"
+                           placeholder="請輸入身份證字號"
+                           maxlength="10"
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+
+                <!-- 客戶姓名 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">客戶姓名 *</label>
+                    <input type="text" 
+                           x-model="verificationData.customerName"
+                           placeholder="請輸入客戶姓名"
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+
+                <!-- 聯絡電話 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">聯絡電話</label>
+                    <input type="tel" 
+                           x-model="verificationData.phoneNumber"
+                           placeholder="請輸入聯絡電話（選填）"
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+
+                <!-- 驗證備註 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">驗證備註</label>
+                    <textarea x-model="verificationData.verificationNotes"
+                             placeholder="其他驗證相關備註（選填）"
+                             rows="3"
+                             class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-3">
+            <!-- 完成驗證按鈕 -->
+            <button @click="submitVerification()"
+                    :disabled="!verificationData.idNumber || !verificationData.customerName"
+                    :class="verificationData.idNumber && verificationData.customerName ? 
+                        'bg-blue-600 hover:bg-blue-700 focus:ring-blue-100' : 
+                        'bg-gray-300 cursor-not-allowed'"
+                    class="w-full text-white py-4 px-6 rounded-xl focus:ring-4 font-medium text-lg transition-all flex items-center justify-center gap-3">
+                {% include 'components/icons.html' with icon='check-circle' class='w-6 h-6' %}
+                完成身份驗證
+            </button>
+
+            <!-- 跳過驗證按鈕 -->
+            <button hx-post="{% url 'merchant_account:restart_scan' merchant.subdomain %}"
+                    hx-target="#scan-result"
+                    hx-swap="innerHTML"
+                    class="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-xl hover:bg-gray-200 font-medium transition-all">
+                跳過驗證（繼續下一張票券）
+            </button>
+        </div>
     </div>
 </div>

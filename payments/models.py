@@ -244,6 +244,8 @@ class OrderItem(models.Model):
             "valid_until": self.valid_until,
             "is_used": self.status == "used",
             "used_at": self.used_at,
+            "verification_timing": self.product.verification_timing,
+            "requires_post_verification": self.product.verification_timing == 'after_redeem',
         }
 
 
