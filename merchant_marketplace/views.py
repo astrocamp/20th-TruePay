@@ -1,8 +1,10 @@
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import Product
 from merchant_account.models import Merchant
 from truepay.decorators import no_cache_required
+from payments.models import OrderItem
 
 
 @no_cache_required
@@ -65,11 +67,10 @@ def edit(request, subdomain, id):
         messages.error(request, "無權限編輯此商品")
         return redirect("merchant_marketplace:index", request.merchant.subdomain)
 
+    # 檢查是否有票券，決定是否可以修改驗證方式（GET/POST 共用）
+    has_tickets = OrderItem.objects.filter(product=product).exists()
+
     if request.method == "GET":
-        # 檢查是否有票券，決定是否可以修改驗證方式
-        from payments.models import OrderItem
-        has_tickets = OrderItem.objects.filter(product=product).exists()
-        
         context = {
             "product": product, 
             "merchant_phone": product.merchant.Cellphone,
@@ -79,44 +80,30 @@ def edit(request, subdomain, id):
 
     elif request.method == "POST":
         try:
-            # 檢查是否有票券
-            from payments.models import OrderItem
-            has_tickets = OrderItem.objects.filter(product=product).exists()
-            
             # 如果已有票券，完全禁止修改
             if has_tickets:
                 raise ValueError("此商品已有售出票券，為確保票券真實性和消費者權益，所有商品資訊已鎖定無法修改")
-            
             product.name = request.POST.get("name", product.name)
             product.description = request.POST.get("description", product.description)
             product.price = request.POST.get("price", product.price)
-            
             # 更新庫存，允許設為 0（賣完狀態）
             stock = int(request.POST.get("stock", product.stock))
             if stock < 0:
                 raise ValueError("庫存數量不能為負數")
             product.stock = stock
-
             # 只有在有新圖片時才更新
             if request.FILES.get("image"):
                 product.image = request.FILES.get("image")
-
             product.phone_number = request.POST.get(
                 "phone_number", product.phone_number
             )
-            
             # 更新驗證方式
             product.verification_timing = request.POST.get("verification_timing") or product.verification_timing
             product.save()
-
             messages.success(request, "商品更新成功！")
             return redirect("merchant_marketplace:index", request.merchant.subdomain)
-
         except Exception as e:
             messages.error(request, f"更新失敗：{str(e)}")
-            # 重新檢查票券狀態以正確顯示表單
-            from payments.models import OrderItem
-            has_tickets = OrderItem.objects.filter(product=product).exists()
             context = {
                 "product": product, 
                 "merchant_phone": product.merchant.Cellphone,

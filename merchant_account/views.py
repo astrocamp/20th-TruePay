@@ -17,6 +17,8 @@ from .models import Merchant
 from payments.models import Order, OrderItem, TicketValidation
 from merchant_marketplace.models import Product
 from payments.models import Order
+from datetime import datetime
+from django.db.models import Sum
 
 
 def register(req):
@@ -334,30 +336,25 @@ def verification_records(request, subdomain):
     
     # 日期篩選
     if date_filter:
-        from datetime import datetime
         try:
             filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
             used_tickets = used_tickets.filter(used_at__date=filter_date)
         except ValueError:
             pass
     
-    # 統計資料
-    from django.db.models import Sum
+    # 統計資料（合併為單一 aggregate 查詢）
+    
     all_used_tickets = OrderItem.objects.filter(
         product__merchant=merchant,
         status='used'
     )
-    
-    usage_stats = {
-        'total_tickets': all_used_tickets.count(),
-        'total_revenue': all_used_tickets.aggregate(
-            total=Sum('order__unit_price')
-        )['total'] or 0,
-        'today_tickets': all_used_tickets.filter(
-            used_at__date=timezone.now().date()
-        ).count(),
-        'products_count': all_used_tickets.values('product').distinct().count(),
-    }
+    usage_stats = all_used_tickets.aggregate(
+        total_tickets=Count('id'),
+        total_revenue=Sum('order__unit_price'),
+        today_tickets=Count('id', filter=Q(used_at__date=timezone.now().date())),
+        products_count=Count('product', distinct=True)
+    )
+    usage_stats['total_revenue'] = usage_stats.get('total_revenue') or 0
     
     # 取得商品列表（用於篩選下拉選單）
     products = Product.objects.filter(

@@ -40,7 +40,7 @@ def login(request):
 
             # 使用 Django 認證系統登入
             django_login(request, member, backend='django.contrib.auth.backends.ModelBackend')
-            customer.update_last_login()
+         
             # 檢查是否有 next 參數（登入後要重導向的頁面）
             next_url = request.GET.get("next") or request.POST.get("next")
             if next_url:
@@ -189,16 +189,12 @@ def ticket_wallet(request):
     # 取得統計資料
     now = timezone.now()
     all_tickets = OrderItem.objects.filter(customer=customer)
-    
-    ticket_stats = {
-        'total': all_tickets.count(),
-        'unused': all_tickets.filter(status='unused').count(),
-        'used': all_tickets.filter(status='used').count(),
-        'expired': all_tickets.filter(
-            status='unused', 
-            valid_until__lt=now
-        ).count() if all_tickets.filter(valid_until__isnull=False).exists() else 0,
-    }
+    ticket_stats = all_tickets.aggregate(
+        total=Count('id'),
+        unused=Count('id', filter=Q(status='unused')),
+        used=Count('id', filter=Q(status='used')),
+        expired=Count('id', filter=Q(status='unused', valid_until__lt=now))
+    )
     
     # 取得所有相關商家（用於篩選下拉選單）
     merchants = Merchant.objects.filter(
