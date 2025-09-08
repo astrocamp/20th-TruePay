@@ -36,11 +36,6 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     付款方式
                 </th>
-                {% if role == 'customer' or role == 'merchant' %}
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    票券代碼
-                </th>
-                {% endif %}
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     建立時間
                 </th>
@@ -50,7 +45,10 @@
             {% for item in order_items %}
             <tr>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {{ item.provider_order_id }}
+                    <a href="{% url 'customers_account:ticket_wallet' %}?order={{ item.provider_order_id }}" 
+                       class="font-medium text-blue-600 underline hover:text-blue-700 transition-colors">
+                        {{ item.provider_order_id }}
+                    </a>
                 </td>
                 {% if role == 'merchant' %}
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -87,57 +85,13 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {{ item.get_payment_method_display }}
                 </td>
-                {% if role == 'customer' %}
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    {% if item.status == 'paid' and item.items.exists %}
-                        <div class="space-y-1">
-                            {% for ticket in item.items.all %}
-                                <div class="flex items-center space-x-2">
-                                    <span class="font-mono text-green-700 bg-green-50 px-2 py-1 rounded text-xs">
-                                        {{ ticket.ticket_code }}
-                                    </span>
-                                    {% if ticket.status == 'used' %}
-                                        <span class="text-xs text-red-500">已使用</span>
-                                    {% else %}
-                                        <span class="text-xs text-green-600">可使用</span>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <span class="text-gray-400 text-xs">-</span>
-                    {% endif %}
-                </td>
-                {% endif %}
-                {% if role == 'merchant' %}
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    {% if item.status == 'paid' and item.items.exists %}
-                        <div class="space-y-1">
-                            {% for ticket in item.items.all %}
-                                <div class="flex items-center space-x-2">
-                                    <span class="font-mono text-blue-700 bg-blue-50 px-2 py-1 rounded text-xs">
-                                        {{ ticket.ticket_code }}
-                                    </span>
-                                    {% if ticket.status == 'used' %}
-                                        <span class="text-xs text-gray-500">已使用</span>
-                                    {% else %}
-                                        <span class="text-xs text-blue-600">待驗證</span>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <span class="text-gray-400 text-xs">-</span>
-                    {% endif %}
-                </td>
-                {% endif %}
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {{ item.created_at|date:"Y/m/d H:i" }}
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="{% if role == 'merchant' %}11{% else %}9{% endif %}" class="px-6 py-8 text-center text-gray-500">
+                <td colspan="{% if role == 'merchant' %}9{% else %}7{% endif %}" class="px-6 py-8 text-center text-gray-500">
                     {% if role == 'merchant' %}
                         目前沒有交易記錄
                     {% else %}

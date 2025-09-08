@@ -1,0 +1,270 @@
+{% extends "customers_layout/dashboard_base.html" %}
+{% block title %}票券錢包 - TruePay{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+  <!-- 頁面標題 -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">票券錢包</h1>
+    <p class="text-gray-600">管理您的所有票券，查看使用狀態和有效期限</p>
+  </div>
+
+  <!-- 篩選和統計 -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <!-- 統計卡片 -->
+      <div class="text-center">
+        <div class="text-2xl font-bold text-blue-600">{{ ticket_stats.total }}</div>
+        <div class="text-sm text-gray-600">總票券數</div>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-bold text-green-600">{{ ticket_stats.unused }}</div>
+        <div class="text-sm text-gray-600">未使用</div>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-bold text-gray-600">{{ ticket_stats.used }}</div>
+        <div class="text-sm text-gray-600">已使用</div>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-bold text-red-600">{{ ticket_stats.expired }}</div>
+        <div class="text-sm text-gray-600">已過期</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 篩選器 -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+    <form method="get" class="flex flex-wrap gap-4 items-end">
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-sm font-medium text-gray-700 mb-1">狀態篩選</label>
+        <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">全部狀態</option>
+          <option value="unused" {% if request.GET.status == 'unused' %}selected{% endif %}>未使用</option>
+          <option value="used" {% if request.GET.status == 'used' %}selected{% endif %}>已使用</option>
+        </select>
+      </div>
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-sm font-medium text-gray-700 mb-1">商家篩選</label>
+        <select name="merchant" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">全部商家</option>
+          {% for merchant in merchants %}
+          <option value="{{ merchant.id }}" {% if request.GET.merchant == merchant.id|slugify %}selected{% endif %}>
+            {{ merchant.ShopName }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-sm font-medium text-gray-700 mb-1">訂單編號篩選</label>
+        <input type="text" name="order" 
+               value="{{ request.GET.order }}" 
+               placeholder="輸入訂單編號"
+               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          篩選
+        </button>
+        <a href="{% url 'customers_account:ticket_wallet' %}" class="ml-2 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+          清除
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- 票券列表 -->
+  {% if tickets %}
+    <div class="space-y-4">
+      {% for ticket in tickets %}
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+           x-data="{ 
+             showQR: false, 
+             qrGenerated: false,
+             needsRedemptionVerification: '{{ ticket.product.verification_timing }}' === 'before_redeem',
+             isRedemptionVerified: false,
+             redemptionData: {
+               identity: '',
+               phone: '',
+               terms: false
+             }
+           }">
+        <div class="p-6">
+          <div class="flex items-start justify-between">
+            <!-- 左側：票券資訊 -->
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-3">
+                <h3 class="text-lg font-semibold text-gray-900">{{ ticket.product.name }}</h3>
+                {% if ticket.status == 'unused' %}
+                  <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">未使用</span>
+                {% else %}
+                  <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">已使用</span>
+                {% endif %}
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                <div>
+                  <span class="font-medium">商家：</span>{{ ticket.product.merchant.ShopName }}
+                </div>
+                <div>
+                  <span class="font-medium">購買時間：</span>{{ ticket.created_at|date:"Y年m月d日 H:i" }}
+                </div>
+                {% if ticket.used_at %}
+                <div>
+                  <span class="font-medium">使用時間：</span>{{ ticket.used_at|date:"Y年m月d日 H:i" }}
+                </div>
+                {% endif %}
+                {% if ticket.valid_until %}
+                <div>
+                  <span class="font-medium">有效期限：</span>
+                  <span class="{% if ticket.valid_until < now %}text-red-600{% endif %}">
+                    {{ ticket.valid_until|date:"Y年m月d日" }}
+                  </span>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- 右側：票券價值和操作 -->
+            <div class="text-right ml-6">
+              <div class="text-xl font-bold text-blue-600 mb-2">
+                NT$ {{ ticket.order.unit_price|floatformat:0 }}
+              </div>
+              
+              {% if ticket.status == 'unused' %}
+                <!-- QR Code 顯示按鈕 -->
+                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                        @click="showQR = !showQR; if(showQR && !qrGenerated && (!needsRedemptionVerification || isRedemptionVerified)) { generateQR('qr-{{ ticket.id }}', '{{ ticket.ticket_code }}'); qrGenerated = true; }"
+                        :class="showQR ? 'bg-gray-600' : 'bg-blue-600 hover:bg-blue-700'">
+                  {% include 'components/icons.html' with icon='qr-code' class='w-4 h-4 inline mr-2' %}
+                  <span x-text="showQR ? '收起' : '顯示QR Code'">顯示QR Code</span>
+                </button>
+              {% else %}
+                <div class="text-sm text-gray-500">
+                  {% include 'components/icons.html' with icon='check-circle' class='w-4 h-4 inline mr-1 text-green-600' %}
+                  已使用
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- QR Code 展開區域 -->
+          {% if ticket.status == 'unused' %}
+          <div x-show="showQR" 
+               x-transition:enter="transition ease-out duration-300"
+               x-transition:enter-start="opacity-0 transform scale-95"
+               x-transition:enter-end="opacity-100 transform scale-100"
+               x-transition:leave="transition ease-in duration-200"
+               x-transition:leave-start="opacity-100 transform scale-100"
+               x-transition:leave-end="opacity-0 transform scale-95"
+               class="mt-6 pt-6 border-t border-gray-200">
+            
+            <!-- 核銷前驗證區域 -->
+            <div x-show="needsRedemptionVerification && !isRedemptionVerified" class="mb-6">
+              <div class="bg-orange-50 border-2 border-orange-200 rounded-lg p-6">
+                <div class="flex items-center mb-4">
+                  <svg class="w-6 h-6 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.728-.833-2.498 0L4.316 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                  </svg>
+                  <h3 class="text-lg font-bold text-orange-800">🔐 核銷前驗證</h3>
+                </div>
+                <p class="text-orange-700 mb-6">此票券需要在查看 QR Code 前完成身分驗證，請填寫以下資訊：</p>
+                
+                <div class="space-y-4">
+                  <div>
+                    <label class="flex items-start">
+                      <input type="checkbox" x-model="redemptionData.terms" class="mt-1 mr-3">
+                      <span class="text-sm text-gray-700">
+                        我已閱讀並同意相關使用條款，了解票券兌換方式及相關規範
+                      </span>
+                    </label>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">身分驗證</label>
+                    <input type="text" x-model="redemptionData.identity" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                           placeholder="請輸入身分證字號或護照號碼">
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">聯絡電話</label>
+                    <input type="tel" x-model="redemptionData.phone" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                           placeholder="請輸入聯絡電話">
+                  </div>
+                </div>
+                
+                <button type="button" 
+                        @click="if(redemptionData.terms && redemptionData.identity && redemptionData.phone) { isRedemptionVerified = true; if(!qrGenerated) { generateQR('qr-{{ ticket.id }}', '{{ ticket.ticket_code }}'); qrGenerated = true; } }"
+                        :disabled="!redemptionData.terms || !redemptionData.identity || !redemptionData.phone"
+                        :class="redemptionData.terms && redemptionData.identity && redemptionData.phone ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-400 cursor-not-allowed'"
+                        class="w-full text-white py-3 px-6 rounded-lg transition duration-200 font-medium text-lg mt-6">
+                  ✓ 完成驗證，查看票券
+                </button>
+              </div>
+            </div>
+            
+            <!-- QR Code 顯示區域 -->
+            <div x-show="!needsRedemptionVerification || isRedemptionVerified">
+              <div class="bg-gray-50 rounded-lg p-6 text-center">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">票券 QR Code</h4>
+                <div id="qr-{{ ticket.id }}" class="flex justify-center mb-4"></div>
+                <div class="space-y-2">
+                  <p class="text-sm text-gray-600">票券代碼</p>
+                  <p class="font-mono text-lg font-semibold bg-white px-3 py-2 rounded border">{{ ticket.ticket_code }}</p>
+                  <p class="text-sm text-gray-500">{{ ticket.product.name }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- 商品描述 -->
+          {% if ticket.product.description %}
+          <div class="mt-4 pt-4 border-t border-gray-100">
+            <p class="text-sm text-gray-600 line-clamp-2">{{ ticket.product.description }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- 分頁 -->
+    {% if is_paginated %}
+    <div class="mt-8 flex justify-center">
+      <nav class="flex items-center space-x-2">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.merchant %}&merchant={{ request.GET.merchant }}{% endif %}{% if request.GET.order %}&order={{ request.GET.order }}{% endif %}" 
+             class="px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50">上一頁</a>
+        {% endif %}
+        
+        <span class="px-3 py-2 text-sm text-gray-600">
+          第 {{ page_obj.number }} 頁，共 {{ page_obj.paginator.num_pages }} 頁
+        </span>
+        
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.merchant %}&merchant={{ request.GET.merchant }}{% endif %}{% if request.GET.order %}&order={{ request.GET.order }}{% endif %}" 
+             class="px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50">下一頁</a>
+        {% endif %}
+      </nav>
+    </div>
+    {% endif %}
+  {% else %}
+    <!-- 空狀態 -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+      <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        {% include 'components/icons.html' with icon='ticket' class='w-8 h-8 text-gray-400' %}
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">還沒有票券</h3>
+      <p class="text-gray-600 mb-6">您目前沒有任何票券，快去購買商品吧！</p>
+      <a href="{% url 'pages:home' %}" 
+         class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+        前往購物
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}
+

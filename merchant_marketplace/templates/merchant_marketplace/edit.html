@@ -8,7 +8,12 @@
         </a>
     </div>
     
-    <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">編輯商品</h1>
+    <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">
+        編輯商品
+        {% if has_tickets %}
+        <span class="block text-sm font-normal text-yellow-600 mt-2">此商品已售出票券，資訊已鎖定</span>
+        {% endif %}
+    </h1>
     
     {% if messages %}
         {% for message in messages %}
@@ -16,6 +21,22 @@
                 {{ message }}
             </div>
         {% endfor %}
+    {% endif %}
+    
+    {% if has_tickets %}
+    <!-- 商品已鎖定提示 -->
+    <div class="mb-6 bg-red-50 border-2 border-red-200 rounded-lg p-6">
+        <div class="flex items-center mb-4">
+            <svg class="w-6 h-6 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-4-2v2m8-2v2M5 10l7-7 7 7M5 10v10a1 1 0 001 1h3m-4-11h4m0 0V7a1 1 0 011-1h2m-3 4h3m0 0v3.5M15 10h4m-4 0V7a1 1 0 011-1h2m-3 4v10a1 1 0 001 1h3m-4-11z"/>
+            </svg>
+            <h2 class="text-lg font-bold text-red-800">🔒 商品資訊已鎖定</h2>
+        </div>
+        <div class="text-red-700">
+            <p class="mb-2">此商品已有售出票券，為確保票券真實性和消費者權益，商品資訊已完全鎖定無法修改。</p>
+            <p class="text-sm">包含商品名稱、描述、價格、聯絡電話及驗證方式等所有資訊均無法變更。</p>
+        </div>
+    </div>
     {% endif %}
     
     <form action="{% url 'merchant_marketplace:edit' request.merchant.subdomain product.id %}" method="post" enctype="multipart/form-data" class="space-y-6">
@@ -26,7 +47,8 @@
                 商品名稱 <span class="text-red-500">*</span>
             </label>
             <input type="text" id="name" name="name" value="{{ product.name }}" required
-                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                   {% if has_tickets %}disabled{% endif %}
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent {% if has_tickets %}bg-gray-100 text-gray-500{% endif %}">
         </div>
         
         <div>
@@ -34,7 +56,8 @@
                 商品描述 <span class="text-red-500">*</span>
             </label>
             <textarea id="description" name="description" rows="5" required
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">{{ product.description }}</textarea>
+                      {% if has_tickets %}disabled{% endif %}
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent {% if has_tickets %}bg-gray-100 text-gray-500{% endif %}">{{ product.description }}</textarea>
         </div>
         
         <div>
@@ -44,7 +67,8 @@
             <div class="relative">
                 <span class="absolute left-3 top-2 text-gray-500">$</span>
                 <input type="number" id="price" name="price" step="1" min="1" value="{{ product.price }}" required
-                       class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                       {% if has_tickets %}disabled{% endif %}
+                       class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent {% if has_tickets %}bg-gray-100 text-gray-500{% endif %}">
             </div>
         </div>
         
@@ -53,7 +77,8 @@
                 庫存數量 <span class="text-red-500">*</span>
             </label>
             <input type="number" id="stock" name="stock" min="0" value="{{ product.stock }}" required
-                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                   {% if has_tickets %}disabled{% endif %}
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent {% if has_tickets %}bg-gray-100 text-gray-500{% endif %}"
                    placeholder="請輸入庫存數量">
             <p class="text-sm text-gray-500 mt-1">
                 目前庫存：{{ product.stock }} 件
@@ -70,8 +95,9 @@
                 商品圖片
             </label>
             <input type="file" id="image" name="image" accept="image/*"
+                   {% if has_tickets %}disabled{% endif %}
                    @change="handleFileChange($event)"
-                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent {% if has_tickets %}bg-gray-100 text-gray-500{% endif %}">
             <p class="text-sm text-gray-500 mt-1">選擇新圖片將覆蓋現有圖片，檔案將自動上傳至 AWS S3</p>
             
             {% if product.image %}
@@ -94,11 +120,13 @@
             </label>
             <div class="flex gap-2">
                 <input type="tel" id="phone_number" name="phone_number" value="{{ product.phone_number }}" required
-                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                       {% if has_tickets %}disabled{% endif %}
+                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent {% if has_tickets %}bg-gray-100 text-gray-500{% endif %}">
                 <button type="button" data-action="use-merchant-phone" 
                         data-target="phone_number" 
                         data-phone="{{ merchant_phone|default:'' }}"
-                        class="px-3 py-2 text-sm bg-gray-100 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-200 transition duration-200 whitespace-nowrap">
+                        {% if has_tickets %}disabled{% endif %}
+                        class="px-3 py-2 text-sm bg-gray-100 text-gray-700 border border-gray-300 rounded-lg {% if not has_tickets %}hover:bg-gray-200{% endif %} transition duration-200 whitespace-nowrap {% if has_tickets %}opacity-50 cursor-not-allowed{% endif %}">
                     使用商家電話
                 </button>
             </div>
@@ -107,7 +135,61 @@
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-4">
                 交易驗證時間點 <span class="text-red-500">*</span>
+                {% if has_tickets %}
+                <span class="ml-2 px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">已鎖定</span>
+                {% endif %}
             </label>
+            
+            {% if has_tickets %}
+            <!-- 有票券時顯示鎖定狀態 -->
+            <div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 mb-4">
+                <div class="flex items-center mb-2">
+                    <svg class="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m0 0h3m0 0h-3m3 0l-1-1m-2 1v-2m0-3V9m0 0h3m-3 0V5.5M9 3v16.5"/>
+                    </svg>
+                    <h3 class="text-sm font-medium text-yellow-800">驗證方式已鎖定</h3>
+                </div>
+                <p class="text-sm text-yellow-700">此商品已有售出票券，無法修改驗證方式以保護消費者權益。</p>
+            </div>
+            
+            <!-- 顯示當前設定（唯讀） -->
+            <div class="space-y-3 opacity-75">
+                <div class="flex items-center">
+                    <input type="radio" id="verify_before_payment_readonly" name="verification_timing" value="before_payment" required
+                           {% if product.verification_timing == 'before_payment' %}checked{% endif %} disabled
+                           class="w-4 h-4 text-gray-400 bg-gray-200 border-gray-300">
+                    <label for="verify_before_payment_readonly" class="ml-3 text-sm text-gray-500">
+                        <span class="font-medium">付款前驗證</span>
+                        <span class="block text-xs text-gray-400 mt-1">消費者需先完成驗證才能付款</span>
+                    </label>
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="radio" id="verify_before_redeem_readonly" name="verification_timing" value="before_redeem" required
+                           {% if product.verification_timing == 'before_redeem' %}checked{% endif %} disabled
+                           class="w-4 h-4 text-gray-400 bg-gray-200 border-gray-300">
+                    <label for="verify_before_redeem_readonly" class="ml-3 text-sm text-gray-500">
+                        <span class="font-medium">核銷前驗證</span>
+                        <span class="block text-xs text-gray-400 mt-1">消費者可先付款，但核銷時需驗證</span>
+                    </label>
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="radio" id="verify_after_redeem_readonly" name="verification_timing" value="after_redeem" required
+                           {% if product.verification_timing == 'after_redeem' %}checked{% endif %} disabled
+                           class="w-4 h-4 text-gray-400 bg-gray-200 border-gray-300">
+                    <label for="verify_after_redeem_readonly" class="ml-3 text-sm text-gray-500">
+                        <span class="font-medium">核銷後驗證</span>
+                        <span class="block text-xs text-gray-400 mt-1">消費者完成核銷後進行事後驗證</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- 隱藏欄位保持原值 -->
+            <input type="hidden" name="verification_timing" value="{{ product.verification_timing }}">
+            
+            {% else %}
+            <!-- 沒有票券時正常顯示 -->
             <div class="space-y-3">
                 <div class="flex items-center">
                     <input type="radio" id="verify_before_payment" name="verification_timing" value="before_payment" required
@@ -139,7 +221,15 @@
                     </label>
                 </div>
             </div>
-            <p class="text-sm text-gray-500 mt-2">選擇交易驗證的時機點，影響消費者的購買和使用流程</p>
+            {% endif %}
+            
+            <p class="text-sm text-gray-500 mt-2">
+                {% if has_tickets %}
+                此設定在商品首次售出後即無法修改，以確保票券使用條件的一致性
+                {% else %}
+                選擇交易驗證的時機點，影響消費者的購買和使用流程
+                {% endif %}
+            </p>
         </div>
         
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -153,8 +243,10 @@
         </div>
         
         <div class="flex gap-4">
-            <button type="submit" class="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200">
-                更新商品
+            <button type="submit" 
+                    {% if has_tickets %}disabled{% endif %}
+                    class="flex-1 {% if has_tickets %}bg-gray-400 cursor-not-allowed{% else %}bg-blue-600 hover:bg-blue-700{% endif %} text-white py-3 px-4 rounded-lg transition duration-200">
+                {% if has_tickets %}商品已鎖定{% else %}更新商品{% endif %}
             </button>
             <a href="{% url 'merchant_marketplace:detail' request.merchant.subdomain product.id %}" class="flex-1 text-center bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition duration-200">
                 取消

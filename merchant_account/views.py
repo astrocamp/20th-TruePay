@@ -5,8 +5,10 @@ from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
 from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
-from django.db.models import Sum
+from django.db.models import Sum, Count, Q
+from django.db import models
 from django.views.decorators.http import require_POST
+from django.utils import timezone
 
 
 from truepay.decorators import no_cache_required
@@ -17,6 +19,8 @@ from .models import Merchant
 from payments.models import Order, OrderItem, TicketValidation
 from merchant_marketplace.models import Product
 from payments.models import Order
+from datetime import datetime
+from django.db.models import Sum
 
 
 def register(req):
@@ -296,6 +300,87 @@ def restart_scan(request, subdomain):
     """重新開始掃描"""
     context = {}
     return render(request, "merchant_account/partials/scan_ready.html", context)
+
+
+@no_cache_required
+def verification_records(request, subdomain):
+    """票券使用紀錄頁面 - 顯示該商家的已使用票券記錄"""
+    merchant = request.merchant
+    
+    # 取得篩選參數
+    product_filter = request.GET.get('product', '')
+    date_filter = request.GET.get('date', '')
+    customer_filter = request.GET.get('customer', '')
+    
+    # 基本查詢：取得該商家的所有已使用票券
+    used_tickets = OrderItem.objects.select_related(
+        'order__customer__member',
+        'product',
+        'order'
+    ).filter(
+        product__merchant=merchant,
+        status='used'
+    ).order_by('-used_at')
+    
+    # 商品篩選
+    if product_filter:
+        try:
+            product_id = int(product_filter)
+            used_tickets = used_tickets.filter(product_id=product_id)
+        except (ValueError, TypeError):
+            pass
+    
+    # 客戶篩選
+    if customer_filter:
+        used_tickets = used_tickets.filter(
+            order__customer__member__email__icontains=customer_filter
+        )
+    
+    # 日期篩選
+    if date_filter:
+        try:
+            filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
+            used_tickets = used_tickets.filter(used_at__date=filter_date)
+        except ValueError:
+            pass
+    
+    # 統計資料（合併為單一 aggregate 查詢）
+    
+    all_used_tickets = OrderItem.objects.filter(
+        product__merchant=merchant,
+        status='used'
+    )
+    usage_stats = all_used_tickets.aggregate(
+        total_tickets=Count('id'),
+        total_revenue=Sum('order__unit_price'),
+        today_tickets=Count('id', filter=Q(used_at__date=timezone.now().date())),
+        products_count=Count('product', distinct=True)
+    )
+    usage_stats['total_revenue'] = usage_stats.get('total_revenue') or 0
+    
+    # 取得商品列表（用於篩選下拉選單）
+    products = Product.objects.filter(
+        merchant=merchant,
+        orderitem__status='used'
+    ).distinct().order_by('name')
+    
+    # 分頁處理
+    paginator = Paginator(used_tickets, 15)  # 每頁顯示15筆記錄
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'merchant': merchant,
+        'used_tickets': page_obj,
+        'page_obj': page_obj,
+        'usage_stats': usage_stats,
+        'products': products,
+        'product_filter': product_filter,
+        'customer_filter': customer_filter,
+        'date_filter': date_filter,
+    }
+    
+    return render(request, "merchant_account/verification_records.html", context)
 
 
 @no_cache_required

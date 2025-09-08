@@ -4,10 +4,13 @@ from django.contrib.auth import login as django_login, logout as django_logout
 from django.db.models import Sum
 from truepay.decorators import customer_login_required
 from django.core.paginator import Paginator
+from django.utils import timezone
+from django.db.models import Q, Count
 from .forms import CustomerRegistrationForm, CustomerLoginForm, CustomerProfileUpdateForm, PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from .models import Customer
-from payments.models import Order
+from payments.models import Order, OrderItem
+from merchant_account.models import Merchant
 
 
 def register(request):
@@ -35,9 +38,11 @@ def login(request):
         form = CustomerLoginForm(request.POST)
         if form.is_valid():
             member = form.cleaned_data["member"]
+            customer = form.cleaned_data["customer"]
 
             # 使用 Django 認證系統登入
             django_login(request, member, backend='django.contrib.auth.backends.ModelBackend')
+         
             # 檢查是否有 next 參數（登入後要重導向的頁面）
             next_url = request.GET.get("next") or request.POST.get("next")
             if next_url:
@@ -140,6 +145,81 @@ def dashboard(request):
     }
 
     return render(request, "customers/dashboard.html", context)
+
+
+@customer_login_required
+def ticket_wallet(request):
+    """消費者票券錢包頁面"""
+    # 透過 member 找到對應的 Customer
+    try:
+        customer = Customer.objects.get(member=request.user)
+    except Customer.DoesNotExist:
+        messages.error(request, "客戶資料不存在")
+        return redirect("pages:home")
+    
+    # 取得篩選參數
+    status_filter = request.GET.get('status', '')
+    merchant_filter = request.GET.get('merchant', '')
+    order_filter = request.GET.get('order', '')
+    
+    # 基本查詢：取得該客戶的所有票券
+    tickets = OrderItem.objects.select_related(
+        'product__merchant', 'order'
+    ).filter(customer=customer).order_by('-created_at')
+    
+    # 狀態篩選
+    if status_filter:
+        tickets = tickets.filter(status=status_filter)
+    
+    # 商家篩選
+    if merchant_filter:
+        try:
+            merchant_id = int(merchant_filter)
+            tickets = tickets.filter(product__merchant_id=merchant_id)
+        except (ValueError, TypeError):
+            pass
+    
+    # 訂單編號篩選（支援訂單ID或訂單編號）
+    if order_filter:
+        # 先嘗試用訂單ID篩選
+        try:
+            order_id = int(order_filter)
+            tickets = tickets.filter(order_id=order_id)
+        except (ValueError, TypeError):
+            # 如果不是數字，則用訂單編號篩選
+            tickets = tickets.filter(order__provider_order_id=order_filter)
+    
+    # 取得統計資料
+    now = timezone.now()
+    all_tickets = OrderItem.objects.filter(customer=customer)
+    ticket_stats = all_tickets.aggregate(
+        total=Count('id'),
+        unused=Count('id', filter=Q(status='unused')),
+        used=Count('id', filter=Q(status='used')),
+        expired=Count('id', filter=Q(status='unused', valid_until__lt=now))
+    )
+    
+    # 取得所有相關商家（用於篩選下拉選單）
+    merchants = Merchant.objects.filter(
+        product__orderitem__customer=customer
+    ).distinct().order_by('ShopName')
+    
+    # 分頁處理
+    paginator = Paginator(tickets, 10)  # 每頁顯示10筆記錄
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'customer': customer,
+        'tickets': page_obj,
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
+        'ticket_stats': ticket_stats,
+        'merchants': merchants,
+        'now': now,
+    }
+    
+    return render(request, "customers/ticket_wallet.html", context)
 
 
 @customer_login_required

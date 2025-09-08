@@ -7,6 +7,8 @@ from django.utils import timezone
 
 Member = get_user_model()
 
+Member = get_user_model()
+
 
 class CustomerRegistrationForm(forms.ModelForm):
     password = forms.CharField(

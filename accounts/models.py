@@ -41,7 +41,6 @@ class Member(AbstractUser):
         else:
             # 如果已經有正式 username，直接儲存
             super().save(*args, **kwargs)
-
     def __str__(self):
         return f"{self.username}({self.get_member_type_display()})"
 
