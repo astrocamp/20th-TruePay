@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.hashers import make_password, check_password
 from django.conf import settings
 from django.utils import timezone
@@ -77,24 +77,31 @@ class Merchant(models.Model):
         if Merchant.objects.filter(subdomain=new_subdomain).exists():
             raise ValueError("此子網域名稱已被使用")
 
-        old_subdomain = self.subdomain
-        history_record = {
-            "old_subdomain": old_subdomain,
-            "new_subdomain": new_subdomain,
-            "changed_at": timezone.now().isoformat(),
-            "reason": reason,
-        }
-        if not self.subdomain_history:
-            self.subdomain_history = []
-        self.subdomain_history.append(history_record)
-        self.subdomain = new_subdomain
-        self.subdomain_change_count += 1
-        self.last_subdomain_change = timezone.now()
-        self.save()
+        with transaction.atomic():
+            old_subdomain = self.subdomain
+            history_record = {
+                "old_subdomain": old_subdomain,
+                "new_subdomain": new_subdomain,
+                "changed_at": timezone.now().isoformat(),
+                "reason": reason,
+            }
+            self.subdomain_history.append(history_record)
+            self.subdomain = new_subdomain
+            self.subdomain_change_count += 1
+            self.last_subdomain_change = timezone.now()
 
-        SubdomainRedirect.create_redirect(
-            old_subdomain=old_subdomain, new_subdomain=new_subdomain, merchant=self
-        )
+            self.save(
+                update_fields=[
+                    "subdomain_history",
+                    "subdomain",
+                    "subdomain_change_count",
+                    "last_subdomain_change",
+                ]
+            )
+
+            SubdomainRedirect.create_redirect(
+                old_subdomain=old_subdomain, new_subdomain=new_subdomain, merchant=self
+            )
 
         return True
 

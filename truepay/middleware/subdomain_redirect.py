@@ -60,7 +60,7 @@ class SubdomainRedirectMiddleware:
 
         current_subdomain, _ = self.extract_subdomain_from_path(request)
         if current_subdomain:
-            new_path = original_path.replace(current_subdomain, new_subdomain)
+            new_path = original_path.replace(current_subdomain, new_subdomain, 1)
         else:
             new_path = original_path
 
