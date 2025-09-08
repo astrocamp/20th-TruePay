@@ -1,62 +1,194 @@
-{% extends "merchant_layout/dashboard_base.html" %} {% block content %}
-<div class="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
-  <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">
-    自訂域名設定
-  </h1>
+{% extends "merchant_layout/dashboard_base.html" %}
 
-  {% if messages %} {% for message in messages %}
-  <div
-    class="mb-4 p-3 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% endif %}"
-  >
-    {{ message }}
-  </div>
-  {% endfor %} {% endif %}
-  <form
-    action="{% url 'merchant_account:domain_settings' request.merchant.subdomain %}"
-    method="post"
-    class="space-y-4"
-  >
-    {% csrf_token %}
+{% block title %}網域設定 - TruePay{% endblock %}
 
-    <div>
-      <label
-        for="{{ form.subdomain.id_for_label }}"
-        class="block text-sm font-medium text-gray-700 mb-1"
-      >
-        {{ form.subdomain.label }}
-      </label>
-      {{ form.subdomain }} {% if form.subdomain.help_text %}
-      <p class="text-gray-500 text-sm mt-1">{{ form.subdomain.help_text }}</p>
-      {% endif %} {% if form.subdomain.errors %} {% for error in form.subdomain.errors %}
-      <p class="text-red-500 text-sm mt-1">{{ error }}</p>
-      {% endfor %} {% endif %}
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">網域設定</h1>
+                <p class="text-gray-600">管理您的商店子網域設定</p>
+            </div>
+        </div>
     </div>
 
+    {% if messages %}
+        <div class="space-y-4">
+        {% for message in messages %}
+            <div class="p-4 rounded-xl {% if message.tags == 'success' %}bg-green-100 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-100 text-red-800 border border-red-200{% else %}bg-blue-100 text-blue-800 border border-blue-200{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+        </div>
+    {% endif %}
 
-    <button
-      type="submit"
-      class="w-full bg-[#0056B3] text-white py-3 px-4 rounded-lg hover:bg-[#00408A] focus:outline-none focus:ring-2 focus:ring-[#0056B3] focus:ring-offset-2 transition duration-200"
-    >
-      儲存設定
-    </button>
-  </form>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">修改子網域</h2>
+            
+            <!-- 目前網址顯示 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                <label class="block text-sm font-medium text-gray-700 mb-2">目前商店網址</label>
+                <div class="text-sm text-gray-600 mb-2">
+                    <a href="{% url 'public_store:shop_overview' request.merchant.subdomain %}" target="_blank" 
+                       class="text-[#0056B3] hover:underline font-mono">
+                        http://127.0.0.1:8000/shop/{{ current_subdomain }}/
+                    </a>
+                </div>
+            </div>
 
-  <!-- DNS 設定說明 -->
-  <div class="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-    <h3 class="text-lg font-semibold text-blue-800 mb-2">DNS 設定說明</h3>
-    <p class="text-blue-700 text-sm mb-2">
-      如果您想使用自訂域名，請在您的域名商設定以下 DNS 記錄：
-    </p>
-    <div class="bg-white p-2 rounded border text-sm font-mono">
-      類型: CNAME<br />
-      名稱: www<br />
-      值: truepay.com
+            <div class="mb-6">
+                <div class="flex items-center justify-between p-4 rounded-xl border {% if can_change %}bg-green-50 border-green-200{% else %}bg-yellow-50 border-yellow-200{% endif %}">
+                    <div>
+                        <p class="text-sm font-medium {% if can_change %}text-green-800{% else %}text-yellow-800{% endif %}">
+                            {{ status_message }}
+                        </p>
+                        <p class="text-xs mt-1 {% if can_change %}text-green-600{% else %}text-yellow-600{% endif %}">
+                            本年度已修改 {{ merchant.subdomain_change_count }} / {{ merchant.max_subdomains_change_per_year }} 次
+                        </p>
+                    </div>
+                    {% if can_change %}
+                        <div class="p-2 bg-green-100 rounded-full">
+                            {% include 'components/icons.html' with icon='check-circle' class='w-5 h-5 text-green-600' %}
+                        </div>
+                    {% else %}
+                        <div class="p-2 bg-yellow-100 rounded-full">
+                            {% include 'components/icons.html' with icon='warning' class='w-5 h-5 text-yellow-600' %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <form method="post" action="{% url 'merchant_account:change_subdomain' request.merchant.subdomain %}" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- 新子網域欄位 -->
+                <div>
+                    <label for="{{ form.new_subdomain.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.new_subdomain.label }}
+                    </label>
+                    <div class="flex items-center">
+                        <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                            https://
+                        </span>
+                        <span class="inline-flex items-center px-3 rounded-r-lg border border-l-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                            www.truepay.tw/
+                        </span>
+                         {{ form.new_subdomain }}
+                    </div>
+                    {% if form.new_subdomain.help_text %}
+                        <p class="text-sm text-gray-500 mt-2">{{ form.new_subdomain.help_text }}</p>
+                    {% endif %}
+                    {% if form.new_subdomain.errors %}
+                        {% for error in form.new_subdomain.errors %}
+                            <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- 修改原因欄位 -->
+                <div>
+                    <label for="{{ form.reason.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.reason.label }}
+                    </label>
+                    {{ form.reason }}
+                    {% if form.reason.help_text %}
+                        <p class="text-sm text-gray-500 mt-2">{{ form.reason.help_text }}</p>
+                    {% endif %}
+                    {% if form.reason.errors %}
+                        {% for error in form.reason.errors %}
+                            <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="submit" 
+                            class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-[#0056B3] hover:bg-[#00408A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0056B3] transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed" 
+                            {% if not can_change %}disabled{% endif %}>
+                        {% include 'components/icons.html' with icon='save' class='w-4 h-4 mr-2' %}
+                        申請變更
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="space-y-6">
+            
+            <!-- 修改歷史 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900">修改歷史</h2>
+                    <div class="p-2 bg-blue-50 rounded-full">
+                        {% include 'components/icons.html' with icon='clock' class='w-5 h-5 text-[#0056B3]' %}
+                    </div>
+                </div>
+                
+                {% if history %}
+                    <div class="space-y-3">
+                        {% for record in history %}
+                            <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-sm">
+                                        <span class="font-mono bg-red-100 text-red-800 px-2 py-1 rounded text-xs">{{ record.old_subdomain }}</span>
+                                        <span class="text-gray-400 mx-2">→</span>
+                                        <span class="font-mono bg-green-100 text-green-800 px-2 py-1 rounded text-xs">{{ record.new_subdomain }}</span>
+                                    </div>
+                                </div>
+                                <div class="mt-2 text-xs text-gray-500">
+                                    <div>{{ record.changed_at|date:"Y-m-d H:i" }}</div>
+                                    <div>原因：{{ record.reason|default:"未提供" }}</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-6">
+                        <div class="text-gray-400 mb-2">
+                            {% include 'components/icons.html' with icon='document' class='w-12 h-12 mx-auto' %}
+                        </div>
+                        <p class="text-sm text-gray-500">沒有修改紀錄</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- 有效重導向 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900">有效重導向</h2>
+                    <div class="p-2 bg-green-50 rounded-full">
+                        {% include 'components/icons.html' with icon='arrow-right' class='w-5 h-5 text-green-600' %}
+                    </div>
+                </div>
+                
+                {% if redirects %}
+                    <div class="space-y-3">
+                        {% for redirect in redirects %}
+                            <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-sm">
+                                        <span class="font-mono bg-gray-200 text-gray-800 px-2 py-1 rounded text-xs">{{ redirect.old_subdomain }}</span>
+                                        <span class="text-gray-400 mx-2">→</span>
+                                        <span class="font-mono bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">{{ redirect.new_subdomain }}</span>
+                                    </div>
+                                </div>
+                                <div class="mt-2 text-xs text-gray-500">
+                                    到期日：{{ redirect.expires_at|date:"Y-m-d" }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-6">
+                        <div class="text-gray-400 mb-2">
+                            {% include 'components/icons.html' with icon='arrow-right' class='w-12 h-12 mx-auto' %}
+                        </div>
+                        <p class="text-sm text-gray-500">沒有有效重導向</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
-    <p class="text-blue-600 text-sm mt-2">
-      設定完成後，等待 DNS
-      生效（通常需要幾分鐘到幾小時），然後勾選「啟用自訂域名」即可使用。
-    </p>
-  </div>
-</div>
-
 {% endblock %}
