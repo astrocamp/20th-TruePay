@@ -300,22 +300,19 @@ def restart_scan(request, subdomain):
 def verification_records(request, subdomain):
     """票券使用紀錄頁面 - 顯示該商家的已使用票券記錄"""
     merchant = request.merchant
-    
+
     # 取得篩選參數
-    product_filter = request.GET.get('product', '')
-    date_filter = request.GET.get('date', '')
-    customer_filter = request.GET.get('customer', '')
-    
+    product_filter = request.GET.get("product", "")
+    date_filter = request.GET.get("date", "")
+    customer_filter = request.GET.get("customer", "")
+
     # 基本查詢：取得該商家的所有已使用票券
-    used_tickets = OrderItem.objects.select_related(
-        'order__customer__member',
-        'product',
-        'order'
-    ).filter(
-        product__merchant=merchant,
-        status='used'
-    ).order_by('-used_at')
-    
+    used_tickets = (
+        OrderItem.objects.select_related("order__customer__member", "product", "order")
+        .filter(product__merchant=merchant, status="used")
+        .order_by("-used_at")
+    )
+
     # 商品篩選
     if product_filter:
         try:
@@ -323,57 +320,57 @@ def verification_records(request, subdomain):
             used_tickets = used_tickets.filter(product_id=product_id)
         except (ValueError, TypeError):
             pass
-    
+
     # 客戶篩選
     if customer_filter:
         used_tickets = used_tickets.filter(
             order__customer__member__email__icontains=customer_filter
         )
-    
+
     # 日期篩選
     if date_filter:
         try:
-            filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
+            filter_date = datetime.strptime(date_filter, "%Y-%m-%d").date()
             used_tickets = used_tickets.filter(used_at__date=filter_date)
         except ValueError:
             pass
-    
+
     # 統計資料（合併為單一 aggregate 查詢）
-    
+
     all_used_tickets = OrderItem.objects.filter(
-        product__merchant=merchant,
-        status='used'
+        product__merchant=merchant, status="used"
     )
     usage_stats = all_used_tickets.aggregate(
-        total_tickets=Count('id'),
-        total_revenue=Sum('order__unit_price'),
-        today_tickets=Count('id', filter=Q(used_at__date=timezone.now().date())),
-        products_count=Count('product', distinct=True)
+        total_tickets=Count("id"),
+        total_revenue=Sum("order__unit_price"),
+        today_tickets=Count("id", filter=Q(used_at__date=timezone.now().date())),
+        products_count=Count("product", distinct=True),
     )
-    usage_stats['total_revenue'] = usage_stats.get('total_revenue') or 0
-    
+    usage_stats["total_revenue"] = usage_stats.get("total_revenue") or 0
+
     # 取得商品列表（用於篩選下拉選單）
-    products = Product.objects.filter(
-        merchant=merchant,
-        orderitem__status='used'
-    ).distinct().order_by('name')
-    
+    products = (
+        Product.objects.filter(merchant=merchant, orderitem__status="used")
+        .distinct()
+        .order_by("name")
+    )
+
     # 分頁處理
     paginator = Paginator(used_tickets, 15)  # 每頁顯示15筆記錄
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
-        'merchant': merchant,
-        'used_tickets': page_obj,
-        'page_obj': page_obj,
-        'usage_stats': usage_stats,
-        'products': products,
-        'product_filter': product_filter,
-        'customer_filter': customer_filter,
-        'date_filter': date_filter,
+        "merchant": merchant,
+        "used_tickets": page_obj,
+        "page_obj": page_obj,
+        "usage_stats": usage_stats,
+        "products": products,
+        "product_filter": product_filter,
+        "customer_filter": customer_filter,
+        "date_filter": date_filter,
     }
-    
+
     return render(request, "merchant_account/verification_records.html", context)
 
 
@@ -454,47 +451,3 @@ def subdomain_management(request, subdomain):
         "form": form,
     }
     return render(request, "merchant_account/domain_settings.html", context)
-
-
-@no_cache_required
-def change_subdomain(request, subdomain):
-    merchant = request.merchant
-    if request.method == "POST":
-        form = SubdomainChangeForm(merchant, request.POST)
-
-        if form.is_valid():
-            try:
-                new_subdomain = form.cleaned_data["new_subdomain"]
-                reason = form.cleaned_data.get("reason", "商家主動修改")
-
-                merchant.change_subdomain(new_subdomain, reason)
-                messages.success(
-                    request,
-                    "子網域已成功修改",
-                    "舊網址將自動重導向到新網址,期限為一個月",
-                )
-                return redirect(
-                    "merchant_account:subdomain_management", subdomain=new_subdomain
-                )
-            except ValueError as e:
-                messages.error(request, str(e))
-        else:
-            messages.error(request, "表單資料有誤，請檢查後重試")
-    else:
-        form = SubdomainChangeForm(merchant)
-    context = {
-        "form": form,
-        "merchant": merchant,
-    }
-    return render(request, "merchant_account/subdomain_management.html", context)
-
-
-@no_cache_required
-def subdomain_history(request, subdomain):
-    merchant = request.merchant
-    history = merchant.subdomain_history or []
-    context = {
-        "merchant": merchant,
-        "history": reversed(history),
-    }
-    return render(request, "merchant_account/subdomain_management.html", context)

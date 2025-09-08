@@ -34,7 +34,7 @@
                 <div class="text-sm text-gray-600 mb-2">
                     <a href="{% url 'public_store:shop_overview' request.merchant.subdomain %}" target="_blank" 
                        class="text-[#0056B3] hover:underline font-mono">
-                        http://127.0.0.1:8000/shop/{{ current_subdomain }}/
+                        {{ request.scheme }}://{{ request.get_host }}{% url 'public_store:shop_overview' current_subdomain %}
                     </a>
                 </div>
             </div>
@@ -61,7 +61,7 @@
                 </div>
             </div>
 
-            <form method="post" action="{% url 'merchant_account:change_subdomain' request.merchant.subdomain %}" class="space-y-6">
+            <form method="post" action="{% url 'merchant_account:subdomain_management' request.merchant.subdomain %}" class="space-y-6">
                 {% csrf_token %}
                 
                 <!-- 新子網域欄位 -->

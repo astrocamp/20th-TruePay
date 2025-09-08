@@ -34,16 +34,6 @@ urlpatterns = [
         name="subdomain_management",
     ),
     path(
-        "change_subdomain/<slug:subdomain>/",
-        views.change_subdomain,
-        name="change_subdomain",
-    ),
-    path(
-        "subdomain_history/<slug:subdomain>/",
-        views.subdomain_history,
-        name="subdomain_history",
-    ),
-    path(
         "transaction_history/<slug:subdomain>/",
         views.transaction_history,
         name="transaction_history",
