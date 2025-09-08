@@ -7,10 +7,6 @@ export default defineConfig({
     build:{
         outDir: 'static',
         emptyOutDir: false,
-        watch: {
-            exclude: ['static/**', 'node_modules/**'],
-            buildDelay: 100
-        },
         rollupOptions:{
             input: {
                 app: resolve(__dirname,'src/scripts/app.js')
