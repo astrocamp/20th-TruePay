@@ -59,7 +59,7 @@
             </li>
             
             <li>
-              <a href="{% url 'merchant_account:domain_settings' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
+              <a href="{% url 'merchant_account:subdomain_management' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='check-circle' %}
                 網域設定 Domain Settings
               </a>

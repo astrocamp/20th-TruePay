@@ -152,7 +152,7 @@
                 <span class="text-sm font-medium">交易記錄</span>
             </a>
             
-            <a href="{% url 'merchant_account:domain_settings' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+            <a href="{% url 'merchant_account:subdomain_management' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                 {% include 'components/icons.html' with icon='settings' class='w-8 h-8 mb-2' %}
                 <span class="text-sm font-medium">設定</span>
             </a>

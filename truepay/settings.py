@@ -77,6 +77,7 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
     "truepay.security_middleware.SessionSecurityMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
