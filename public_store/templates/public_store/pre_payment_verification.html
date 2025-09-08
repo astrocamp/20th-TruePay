@@ -1,4 +1,4 @@
-{% extends "layouts/default.html" %}
+ {% extends "layouts/default.html" %}
 {% block content %}
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-6xl mx-auto">
@@ -27,10 +27,11 @@
                 </div>
                 
                 <!-- 商品資訊 -->
-                <div class="md:w-1/2 p-8">
+                <div class="md:w-1/2 p-8" x-data="createQuantityManager()" 
+                     data-unit-price="{{ product.price }}" data-max-stock="{{ product.stock }}">
                     <div class="mb-6">
                         <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ product.name }}</h1>
-                        <p class="text-4xl font-bold text-[#0056B3] mb-6" data-unit-price="{{ product.price }}" data-max-stock="{{ product.stock }}">NT$ {{ product.price }}</p>
+                        <p class="text-4xl font-bold text-[#0056B3] mb-6">NT$ {{ product.price }}</p>
                     </div>
                     
                     <div class="space-y-4 mb-8">
@@ -62,12 +63,19 @@
                             購買數量
                         </label>
                         <div class="flex items-center space-x-3">
-                            <button type="button" id="decrease-quantity" class="w-8 h-8 flex items-center justify-center bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300 transition duration-200">
+                            <button type="button" @click="decrease()" 
+                                    :disabled="!canDecrease"
+                                    :class="canDecrease ? 'bg-gray-200 text-gray-600 hover:bg-gray-300' : 'bg-gray-100 text-gray-400 cursor-not-allowed'"
+                                    class="w-8 h-8 flex items-center justify-center rounded-md transition duration-200">
                                 -
                             </button>
-                            <input type="number" id="quantity" name="quantity" min="1" max="{{ product.stock }}" value="1" 
+                            <input type="number" x-ref="quantityInput" x-model="quantity" 
+                                   min="1" max="{{ product.stock }}" 
                                    class="w-20 text-center border border-gray-300 rounded-md py-1 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-                            <button type="button" id="increase-quantity" class="w-8 h-8 flex items-center justify-center bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300 transition duration-200">
+                            <button type="button" @click="increase()"
+                                    :disabled="!canIncrease"
+                                    :class="canIncrease ? 'bg-gray-200 text-gray-600 hover:bg-gray-300' : 'bg-gray-100 text-gray-400 cursor-not-allowed'"
+                                    class="w-8 h-8 flex items-center justify-center rounded-md transition duration-200">
                                 +
                             </button>
                             <span class="text-sm text-gray-600">/ {{ product.stock }} 件</span>
@@ -79,7 +87,7 @@
                             </div>
                             <div class="flex justify-between items-center mt-1">
                                 <span class="text-gray-700">總價：</span>
-                                <span class="text-xl font-bold text-[#0056B3]" id="total-price">NT$ {{ product.price }}</span>
+                                <span class="text-xl font-bold text-[#0056B3]" x-text="formattedTotalPrice">NT$ {{ product.price }}</span>
                             </div>
                         </div>
                     </div>
@@ -93,12 +101,11 @@
                         <form method="post" action="{% url 'payments:create_payment' %}" id="newebpay-form">
                             {% csrf_token %}
                             <input type="hidden" name="provider" value="newebpay">
-                            <input type="hidden" name="amt" id="newebpay-amt" value="{{ product.price }}">
-                            <input type="hidden" name="quantity" id="newebpay-quantity" value="1">
-                            <input type="hidden" name="item_desc" value="{{ product.name }}|ProductID:{{ product.id }}">
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <input type="hidden" name="quantity" :value="quantity">
                            
-                            <button type="submit" class="w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium text-lg" id="newebpay-btn">
-                                💳 藍新金流 <span id="newebpay-price">NT$ {{ product.price }}</span>
+                            <button type="submit" class="w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium text-lg">
+                                💳 藍新金流 <span x-text="formattedTotalPrice">NT$ {{ product.price }}</span>
                             </button>
                         </form>
                         <p class="text-sm text-blue-600 text-center mt-3">
@@ -113,9 +120,9 @@
                             {% csrf_token %}
                             <input type="hidden" name="provider" value="linepay">
                             <input type="hidden" name="product_id" value="{{ product.id }}">
-                            <input type="hidden" name="quantity" id="linepay-quantity" value="1">
-                            <button type="submit" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition duration-200 font-medium text-lg" id="linepay-btn">
-                                💳 LINE PAY <span id="linepay-price">NT$ {{ product.price }}</span>
+                            <input type="hidden" name="quantity" :value="quantity">
+                            <button type="submit" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition duration-200 font-medium text-lg">
+                                💳 LINE PAY <span x-text="formattedTotalPrice">NT$ {{ product.price }}</span>
                             </button>
                         </form>
                         <p class="text-sm text-green-600 text-center mt-3">

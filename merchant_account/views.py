@@ -12,7 +12,9 @@ from django.utils import timezone
 
 
 from truepay.decorators import no_cache_required
-from .forms import RegisterForm, LoginForm, domain_settings_form
+from .forms import RegisterForm, LoginForm, domain_settings_form, MerchantProfileUpdateForm
+from customers_account.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 from .models import Merchant
 from payments.models import Order, OrderItem, TicketValidation
 from merchant_marketplace.models import Product
@@ -35,7 +37,7 @@ def register(req):
         else:
             for field, errors in form.errors.items():
                 for error in errors:
-                    messages.error(req, f"{form.fields[field].label}: {error}")
+                    messages.error(req, f"{form.fields[field].label if field in form.fields else field}: {error}")
     else:
         form = RegisterForm()
 
@@ -100,8 +102,8 @@ def dashboard(request, subdomain):
         "-created_at"
     )[:5]
 
-    # 計算總收入
-    total_revenue = orders.aggregate(total=Sum("amount"))["total"] or 0
+    # 計算總收入（只計算已付款的訂單，使用鏈式操作更高效）
+    total_revenue = orders.filter(status="paid").aggregate(total=Sum("amount"))["total"] or 0
 
     context = {
         "merchant": request.merchant,
@@ -379,3 +381,50 @@ def verification_records(request, subdomain):
     }
     
     return render(request, "merchant_account/verification_records.html", context)
+
+
+@no_cache_required
+def profile_settings(request, subdomain):
+    """商家會員資料修改頁面"""
+    merchant = request.merchant  # 由中間件提供
+
+    if request.method == "POST":
+        form_type = request.POST.get("form_type")
+        
+        if form_type == "profile":
+            # 處理個人資料修改
+            form = MerchantProfileUpdateForm(request.POST, instance=merchant, user=request.user)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "商家資料已成功更新")
+                return redirect("merchant_account:profile_settings", subdomain)
+            else:
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{form.fields[field].label if field in form.fields else field}: {error}")
+        
+        elif form_type == "password":
+            # 處理密碼修改
+            password_form = PasswordChangeForm(request.user, request.POST)
+            if password_form.is_valid():
+                password_form.save()
+                # 更新 session，避免用戶被登出
+                update_session_auth_hash(request, request.user)
+                messages.success(request, "密碼已成功修改")
+                return redirect("merchant_account:profile_settings", subdomain)
+            else:
+                for field, errors in password_form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{password_form.fields[field].label if field in password_form.fields else field}: {error}")
+    
+    # GET 請求或表單驗證失敗時顯示表單
+    profile_form = MerchantProfileUpdateForm(instance=merchant, user=request.user)
+    password_form = PasswordChangeForm(request.user)
+    
+    context = {
+        "merchant": merchant,
+        "profile_form": profile_form,
+        "password_form": password_form,
+    }
+    
+    return render(request, "merchant_account/profile_settings.html", context)

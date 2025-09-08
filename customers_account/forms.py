@@ -104,6 +104,15 @@ class CustomerRegistrationForm(forms.ModelForm):
             raise ValidationError("手機號碼格式不正確（格式：09xxxxxxxx）")
         return phone
 
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        existing_members = Member.objects.filter(email=email, member_type="customer")
+        if existing_members.filter(socialaccount__provider="google").exists():
+            raise ValidationError("此電子郵件已透過Google帳號註冊，請使用Google登入。")
+        elif existing_members.exists():
+            raise ValidationError("此電子郵件已被註冊使用，請使用登入功能。")
+        return email
+
     def save(self, commit=True):
         member = Member.objects.create_user(
             username=self.cleaned_data["email"],
@@ -145,7 +154,17 @@ class CustomerLoginForm(forms.Form):
 
         if email and password:
             try:
-                member = Member.objects.get(email=email, member_type="customer")
+                member = Member.objects.filter(
+                    email=email, member_type="customer"
+                ).first()
+
+                if not member:
+                    raise ValidationError("電子郵件或密碼錯誤")
+
+                if not member.has_usable_password():
+                    if member.socialaccount_set.filter(provider="google").exists():
+                        raise ValidationError("您有用過google去登入，請點擊google按鈕")
+
                 if not member.check_password(password):
                     member.login_failed_count += 1
                     member.save(update_fields=["login_failed_count"])
@@ -167,3 +186,154 @@ class CustomerLoginForm(forms.Form):
                 raise ValidationError("電子郵件或密碼錯誤")
 
         return cleaned_data
+
+
+class CustomerProfileUpdateForm(forms.ModelForm):
+    email = forms.EmailField(
+        max_length=254,
+        widget=forms.EmailInput(
+            attrs={
+                "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "placeholder": "請輸入電子郵件",
+            }
+        ),
+        label="電子郵件",
+    )
+
+    class Meta:
+        model = Customer
+        fields = ["name", "id_number", "birth_date", "phone"]
+        widgets = {
+            "name": forms.TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "placeholder": "請輸入姓名",
+                }
+            ),
+            "id_number": forms.TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "placeholder": "請輸入身分證字號",
+                }
+            ),
+            "birth_date": forms.DateInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "type": "date",
+                }
+            ),
+            "phone": forms.TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "placeholder": "請輸入電話號碼",
+                }
+            ),
+        }
+        labels = {
+            "name": "姓名",
+            "id_number": "身分證字號",
+            "birth_date": "生日",
+            "phone": "電話",
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if self.user:
+            self.fields['email'].initial = self.user.email
+
+    def clean_id_number(self):
+        id_number = self.cleaned_data.get("id_number")
+        if id_number and not re.match(r"^[A-Z][12][0-9]{8}$", id_number):
+            raise ValidationError("身分證字號格式不正確")
+        
+        # 檢查是否與其他用戶重複（排除自己）
+        if id_number and Customer.objects.exclude(pk=self.instance.pk).filter(id_number=id_number).exists():
+            raise ValidationError("此身分證字號已被使用")
+        
+        return id_number
+
+    def clean_phone(self):
+        phone = self.cleaned_data.get("phone")
+        if phone and not re.match(r"^09[0-9]{8}$", phone):
+            raise ValidationError("手機號碼格式不正確（格式：09xxxxxxxx）")
+        return phone
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if email and get_user_model().objects.exclude(pk=self.user.pk).filter(email=email).exists():
+            raise ValidationError("此電子郵件已被使用")
+        return email
+
+    def save(self, commit=True):
+        customer = super().save(commit=False)
+        if commit:
+            customer.save()
+            # 更新 Member 的 email
+            if self.user:
+                self.user.email = self.cleaned_data['email']
+                # 更新 username (格式: ID_email)
+                self.user.username = f"{self.user.pk}_{self.cleaned_data['email']}"
+                self.user.save(update_fields=['email', 'username'])
+        return customer
+
+
+class PasswordChangeForm(forms.Form):
+    old_password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "placeholder": "請輸入目前密碼",
+            }
+        ),
+        label="目前密碼",
+    )
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "placeholder": "請輸入新密碼",
+            }
+        ),
+        label="新密碼",
+        min_length=8,
+        help_text="密碼長度至少需要8個字元"
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "placeholder": "確認新密碼",
+            }
+        ),
+        label="確認新密碼",
+    )
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_old_password(self):
+        old_password = self.cleaned_data.get("old_password")
+        if not self.user.check_password(old_password):
+            raise ValidationError("目前密碼錯誤")
+        return old_password
+
+    def clean_confirm_password(self):
+        confirm_password = self.cleaned_data.get("confirm_password")
+        return confirm_password
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get("new_password")
+        confirm_password = cleaned_data.get("confirm_password")
+        
+        if new_password and confirm_password and new_password != confirm_password:
+            self.add_error('confirm_password', "新密碼確認不相符")
+        
+        return cleaned_data
+
+    def save(self):
+        self.user.set_password(self.cleaned_data['new_password'])
+        self.user.save()
+        return self.user

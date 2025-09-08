@@ -85,7 +85,7 @@
             </li>
             
             <li>
-              <a href="#" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
+              <a href="{% url 'merchant_account:profile_settings' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='settings' %}
                 設定 Settings
               </a>

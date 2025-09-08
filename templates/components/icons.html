@@ -153,6 +153,22 @@
   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
 </svg>
 
+{% elif icon == 'contact-person' %}
+<svg class="{{ class|default:'w-5 h-5' }}" fill="currentColor" viewBox="0 0 20 20">
+  <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+</svg>
+
+{% elif icon == 'empty-shop' %}
+<svg class="{{ class|default:'w-24 h-24' }}" fill="currentColor" viewBox="0 0 20 20">
+  <path fill-rule="evenodd" d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5zM10 12a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+</svg>
+
+{% elif icon == 'shield' %}
+<svg class="{{ class|default:'w-5 h-5' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+</svg>
+</svg>
+
 {% elif icon == 'google' %}
 <svg class="{{ class|default:'w-5 h-5' }}" viewBox="0 0 24 24">
   <path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>

@@ -1,3 +1,13 @@
+// 統一的全域錯誤處理函數
+function showGlobalError(message) {
+  console.error('Global:', message);
+  alert(message);
+}
+
+function showGlobalInfo(message) {
+  console.log('Global:', message);
+}
+
 // Alpine.js 圖片預覽組件
 function createImagePreview() {
   return {
@@ -36,8 +46,7 @@ function createImagePreview() {
       };
       
       reader.onerror = () => {
-        console.error('ImagePreview: 讀取檔案時發生錯誤');
-        alert('讀取圖片時發生錯誤，請重新選擇');
+        this.showError('讀取圖片時發生錯誤，請重新選擇');
         this.previewSrc = null;
       };
       
@@ -47,17 +56,22 @@ function createImagePreview() {
     isValidImageFile(file) {
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
       if (!validTypes.includes(file.type)) {
-        alert('請選擇有效的圖片檔案 (JPG, PNG, GIF, WebP)');
+        this.showError('請選擇有效的圖片檔案 (JPG, PNG, GIF, WebP)');
         return false;
       }
       
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
-        alert('圖片檔案大小不能超過 5MB');
+        this.showError('圖片檔案大小不能超過 5MB');
         return false;
       }
       
       return true;
+    },
+    
+    showError(message) {
+      console.error('ImagePreview:', message);
+      alert(message);
     }
   };
 }
@@ -71,8 +85,10 @@ window.createImagePreview = createImagePreview;
 // 付款倒數計時功能
 // Alpine.js 付款倒數計時組件
 function createPaymentTimer(config = {}) {
+  const initialDuration = config.duration || 5;
   return {
-    countdown: config.duration || 5,
+    countdown: initialDuration,
+    initialDuration: initialDuration,
     formId: config.formId || 'newebpay-form',
     timer: null,
     isRunning: false,
@@ -111,7 +127,7 @@ function createPaymentTimer(config = {}) {
     
     resetTimer() {
       this.pauseTimer();
-      this.countdown = config.duration || 5;
+      this.countdown = this.initialDuration;
     },
     
     completeTimer() {
@@ -122,12 +138,17 @@ function createPaymentTimer(config = {}) {
       if (form) {
         form.submit();
       } else {
-        console.error(`PaymentTimer: 無法提交表單，找不到 ID 為 ${this.formId} 的表單`);
+        this.showError(`無法提交表單，找不到 ID 為 ${this.formId} 的表單`);
       }
     },
     
     destroy() {
       this.pauseTimer();
+    },
+    
+    showError(message) {
+      console.error('PaymentTimer:', message);
+      alert(message);
     }
   };
 }
@@ -145,7 +166,7 @@ function handleConfirmDelete(element) {
     if (form) {
       form.submit();
     } else {
-      console.error(`找不到 ID 為 ${formId} 的表單`);
+      showGlobalError(`找不到 ID 為 ${formId} 的表單`);
     }
   }
 }
@@ -159,10 +180,10 @@ function handleUseMerchantPhone(element) {
     if (phoneInput) {
       phoneInput.value = merchantPhone;
     } else {
-      console.error(`找不到 ID 為 ${targetId} 的輸入欄位`);
+      showGlobalError(`找不到 ID 為 ${targetId} 的輸入欄位`);
     }
   } else {
-    console.warn('未提供商家電話資料');
+    showGlobalInfo('未提供商家電話資料');
   }
 }
 
@@ -172,13 +193,13 @@ function createMobileMenu() {
     isOpen: false,
     
     init() {
-      // 視窗大小變化時自動關閉選單
+      // 視窗大小變化時自動關閉選單（使用 passive 監聽器提升效能）
       this.$nextTick(() => {
         window.addEventListener('resize', () => {
           if (window.innerWidth >= 768) { // md breakpoint
             this.isOpen = false;
           }
-        });
+        }, { passive: true });
       });
     },
     
@@ -239,11 +260,18 @@ window.createMobileMenu = createMobileMenu;
 // 導航管理器 - 統一處理導航連結的樣式和無障礙性
 class NavigationManager {
   constructor() {
-    this.currentPath = window.location.pathname;
+    this._currentPath = null; // 快取路徑
     this.baseClasses = 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]';
     this.activeClasses = 'text-[#0056B3] font-medium bg-blue-50';
     this.inactiveClasses = 'text-gray-700';
     this.logoutClasses = 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-red-600';
+  }
+  
+  get currentPath() {
+    if (!this._currentPath) {
+      this._currentPath = window.location.pathname;
+    }
+    return this._currentPath;
   }
 
   isActive(element) {
@@ -316,24 +344,28 @@ function createQuantityManager(config = {}) {
     },
     
     extractPriceAndStock() {
-      // 從頁面中提取單價
+      this.extractPrice();
+      this.extractStock();
+    },
+    
+    extractPrice() {
       const priceElement = document.querySelector('[data-unit-price]');
       if (priceElement) {
         this.unitPrice = parseInt(priceElement.dataset.unitPrice) || 0;
       }
-      
-      // 從頁面中提取最大庫存
+    },
+    
+    extractStock() {
       const stockElement = document.querySelector('[data-max-stock]');
       if (stockElement) {
         this.maxStock = parseInt(stockElement.dataset.maxStock) || 0;
+        return;
       }
       
       // 如果沒有 data 屬性，嘗試從輸入框的 max 屬性獲取
-      if (this.maxStock === 0) {
-        const quantityInput = this.$refs.quantityInput;
-        if (quantityInput) {
-          this.maxStock = parseInt(quantityInput.getAttribute('max')) || 0;
-        }
+      const quantityInput = this.$refs.quantityInput;
+      if (quantityInput) {
+        this.maxStock = parseInt(quantityInput.getAttribute('max')) || 0;
       }
     },
     
@@ -406,7 +438,7 @@ document.addEventListener('alpine:init', () => {
           this.fallbackCopyTextToClipboard(ticketCode);
         }
       } catch (error) {
-        console.error('複製失敗:', error);
+        this.showError('複製失敗: ' + error.message);
         this.fallbackCopyTextToClipboard(ticketCode);
       }
     },
@@ -430,10 +462,10 @@ document.addEventListener('alpine:init', () => {
         if (successful) {
           this.showCopySuccess();
         } else {
-          console.error('舊版複製方法失敗');
+          this.showError('舊版複製方法失敗');
         }
       } catch (err) {
-        console.error('複製失敗:', err);
+        this.showError('複製失敗: ' + err.message);
       }
       
       document.body.removeChild(textArea);
@@ -444,12 +476,85 @@ document.addEventListener('alpine:init', () => {
       setTimeout(() => {
         this.copyButtonText = '複製票券代碼';
       }, 2000);
+    },
+    
+    showError(message) {
+      console.error('TicketCopy:', message);
     }
   }));
 });
 
-export { ImagePreview, PaymentTimer };
+// Alpine.js 票券掃描管理組件
+function createTicketScanManager() {
+  return {
+    isLoading: false,
+    
+    async restartScan(restartUrl, csrfToken) {
+      if (this.isLoading) return;
+      
+      this.isLoading = true;
+      
+      try {
+        const response = await fetch(restartUrl, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const html = await response.text();
+        
+        const scanResultElement = document.getElementById('scan-result');
+        if (scanResultElement) {
+          scanResultElement.innerHTML = html;
+        } else {
+          console.error('TicketScanManager: 找不到 scan-result 元素');
+          return;
+        }
+        
+        this.resetScanState();
+        
+        window.dispatchEvent(new CustomEvent('restart-scanning'));
+        
+      } catch (error) {
+        console.error('TicketScanManager: 重啟掃描失敗', error);
+        alert('重新掃描失敗，請重新整理頁面後再試');
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    
+    resetScanState() {
+      const ticketInput = document.querySelector('input[name=ticket_code]');
+      if (ticketInput) {
+        ticketInput.value = '';
+        ticketInput.focus();
+      }
+    },
+    
+    get restartButtonClass() {
+      const baseClasses = 'w-full py-4 px-6 rounded-xl font-medium text-lg transition-all focus:ring-4';
+      const loadingClasses = 'opacity-50 cursor-not-allowed';
+      const normalClasses = 'hover:bg-opacity-90';
+      
+      return this.isLoading ? 
+        `${baseClasses} ${loadingClasses}` : 
+        `${baseClasses} ${normalClasses}`;
+    },
+    
+    get restartButtonText() {
+      return this.isLoading ? '處理中...' : null;
+    }
+  };
+}
+
 // 將函數掛載到全域供 Alpine.js 使用
+window.createTicketScanManager = createTicketScanManager;
 window.createQuantityManager = createQuantityManager;
 
 // 導出 Alpine.js 組件創建函數和 NavigationManager
@@ -458,5 +563,6 @@ export {
   createPaymentTimer, 
   createMobileMenu,
   createQuantityManager,
+  createTicketScanManager,
   NavigationManager
 };

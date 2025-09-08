@@ -38,17 +38,15 @@ logger = logging.getLogger(__name__)
 
 def _extract_payment_parameters(request, payment_data=None):
     """統一提取付款參數邏輯"""
-    # 從 POST 資料提取
+    # 從 POST 資料提取安全參數
     provider = request.POST.get("provider")
     product_id = request.POST.get("product_id")
-    amt = request.POST.get("amt")
-    item_desc = request.POST.get("item_desc")
     quantity = request.POST.get("quantity", "1")  # 預設數量為 1
 
-    return provider, product_id, amt, item_desc, quantity
+    return provider, product_id, quantity
 
 
-def _create_order_for_payment(customer, provider, product_id, amount, item_desc, quantity):
+def _create_order_for_payment(customer, provider, product_id, quantity):
     """統一訂單創建邏輯"""
     try:
         quantity = int(quantity)
@@ -63,16 +61,8 @@ def _create_order_for_payment(customer, provider, product_id, amount, item_desc,
 
     product = get_object_or_404(Product, id=int(product_id), is_active=True)
 
-    # 根據不同的金流處理金額
-    if provider == "newebpay":
-        # 藍新金流：驗證前端計算的金額是否正確
-        expected_amount = product.price * quantity
-        if int(amount) != expected_amount:
-            raise ValueError("金額不符")
-
-    elif provider == "linepay":
-        # LINE Pay：後端計算總金額
-        amount = product.price * quantity
+    # 統一由後端計算總金額（安全處理）
+    amount = product.price * quantity
 
     # 庫存檢查
     if product.stock < quantity:
@@ -103,7 +93,7 @@ def create_payment(request):
             messages.info(request, "請使用客戶帳號登入以完成付款")
             return redirect("/customers/login/")
         # 提取付款參數
-        provider, product_id, amt, item_desc, quantity = _extract_payment_parameters(
+        provider, product_id, quantity = _extract_payment_parameters(
             request, None
         )
 
@@ -127,7 +117,7 @@ def create_payment(request):
 
         # 創建訂單
         order = _create_order_for_payment(
-            customer, provider, product_id, amt, item_desc, quantity
+            customer, provider, product_id, quantity
         )
 
         # 處理不同的金流

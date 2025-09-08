@@ -161,9 +161,7 @@
                                     {% csrf_token %}
                                     <input type="hidden" name="provider" value="newebpay">
                                     <input type="hidden" name="product_id" value="{{ product.id }}">
-                                    <input type="hidden" name="amt" :value="totalPrice">
                                     <input type="hidden" name="quantity" :value="quantity">
-                                    <input type="hidden" name="item_desc" value="{{ product.name }}">
                                    
                                     <button type="submit" class="w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium text-lg">
                                         💳 藍新金流 <span x-text="formattedTotalPrice">NT$ {{ product.price }}</span>

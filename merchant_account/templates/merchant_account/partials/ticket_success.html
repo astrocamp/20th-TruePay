@@ -76,13 +76,14 @@
             </form>
         {% endif %}
         
-        <button type="button" 
-                class="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-xl hover:bg-gray-200 font-medium transition-all" 
-                hx-post="{% url 'merchant_account:restart_scan' merchant.subdomain %}"
-                hx-target="#scan-result"
-                hx-swap="innerHTML">
-            繼續驗證其他票券
-        </button>
+        <div x-data="createTicketScanManager()">
+            <button type="button" 
+                    :class="restartButtonClass + ' bg-gray-100 text-gray-700 hover:bg-gray-200 py-3'"
+                    :disabled="isLoading"
+                    @click="restartScan('{% url 'merchant_account:restart_scan' merchant.subdomain %}', '{{ csrf_token }}')">
+                <span x-text="restartButtonText || '繼續驗證其他票券'"></span>
+            </button>
+        </div>
     </div>
 
     <!-- 核銷後驗證畫面 -->

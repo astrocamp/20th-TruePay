@@ -10,4 +10,5 @@ urlpatterns = [
     path("dashboard/", views.dashboard, name="dashboard"),
     path("purchase-history/", views.purchase_history, name="purchase_history"),
     path("ticket-wallet/", views.ticket_wallet, name="ticket_wallet"),
+    path("profile-settings/", views.profile_settings, name="profile_settings"),
 ]

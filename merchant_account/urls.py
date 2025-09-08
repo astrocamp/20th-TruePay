@@ -28,4 +28,9 @@ urlpatterns = [
         views.transaction_history,
         name="transaction_history",
     ),
+    path(
+        "profile-settings/<slug:subdomain>/",
+        views.profile_settings,
+        name="profile_settings",
+    ),
 ]
