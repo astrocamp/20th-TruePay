@@ -52,6 +52,12 @@
                 >{{ product.created_at|date:"Y/m/d H:i" }}</span
               >
             </div>
+            <div class="flex items-start">
+              <span class="text-gray-600 font-medium w-20">狀態：</span>
+              <span class="{% if product.is_active %}text-cis-secondary{% else %}text-gray-500{% endif %} font-medium">
+                {% if product.is_active %}上架中{% else %}已下架{% endif %}
+              </span>
+            </div>
           </div>
 
           <!-- 操作按鈕 -->
@@ -80,7 +86,22 @@
                 開啟收款頁面
               </a>
             </div>
-          </div>         
+          </div>      
+
+          <div class="pt-4 border-t border-gray-200">
+            <div class="flex gap-4">
+              <a href="{% url 'public_store:payment_page' request.merchant.subdomain product.id %}"
+                class="flex-1 text-center py-3 px-4 rounded-lg text-sm transition duration-200 bg-brand-grayLight text-cis-secondary hover:bg-cis-secondary-hover border border-cis-secondary"
+                target="_blank">
+                商品上架
+              </a>
+              <a href="{% url 'public_store:payment_page' request.merchant.subdomain product.id %}"
+                class="flex-1 text-center py-3 px-4 rounded-lg text-sm transition duration-200 bg-brand-grayLight text-cis-accent hover:bg-cis-accent-hover border border-cis-accent"
+                target="_blank">
+                商品下架
+              </a>
+            </div>
+        </div>         
 
           <!-- 隱藏的刪除表單 -->
           <form

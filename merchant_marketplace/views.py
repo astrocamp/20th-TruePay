@@ -18,11 +18,27 @@ def index(request, subdomain):
 @no_cache_required
 def detail(request, subdomain, id):
     product = get_object_or_404(Product, id=id, merchant=request.merchant)
-    if request.method == "POST" and request.POST.get("action") == "delete":
-        product.is_active = False
-        product.save()
-        messages.success(request, "商品已刪除")
-        return redirect("merchant_marketplace:index", request.merchant.subdomain)
+    
+    if request.method == "POST":
+        action = request.POST.get("action")
+        
+        if action == "activate":
+            product.is_active = True
+            product.save()
+            messages.success(request, "商品已上架")
+            return redirect("merchant_marketplace:detail", request.merchant.subdomain, product.id)
+            
+        elif action == "deactivate":
+            product.is_active = False
+            product.save()
+            messages.success(request, "商品已下架")
+            return redirect("merchant_marketplace:detail", request.merchant.subdomain, product.id)
+            
+        elif action == "delete":
+            product.is_active = False
+            product.save()
+            messages.success(request, "商品已刪除")
+            return redirect("merchant_marketplace:index", request.merchant.subdomain)
 
     return render(request, "merchant_marketplace/detail.html", {"product": product})
 
