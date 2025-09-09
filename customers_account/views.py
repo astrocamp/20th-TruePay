@@ -3,7 +3,6 @@ from django.contrib import messages
 from django.contrib.auth import login as django_login, logout as django_logout
 from django.db.models import Sum
 from django.db import transaction
-from django.core.mail import send_mail
 from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
 from django.urls import reverse
 from django.conf import settings
@@ -25,7 +24,7 @@ from django.contrib.auth import update_session_auth_hash
 from .models import Customer
 from payments.models import Order, OrderItem
 from merchant_account.models import Merchant
-
+from django.core.mail import send_mail
 
 def register(request):
     if request.method == "POST":
@@ -542,10 +541,16 @@ def forgot_password(request):
         if form.is_valid():
             email = form.cleaned_data["email"]
             
-            try:
-                # 取得用戶
+            try: 
                 Member = get_user_model()
-                member = Member.objects.get(email=email, member_type="customer")
+                member = Member.objects.filter(
+                    email=email, 
+                    member_type="customer"
+                ).order_by('-id').first()
+                
+                if not member:
+                    messages.error(request, "此電子郵件未註冊")
+                    return render(request, "customers/forgot_password.html", {"form": form})
                 
                 # 使用 Django signing 生成重設 token
                 signer = TimestampSigner()
@@ -556,37 +561,45 @@ def forgot_password(request):
                     reverse('customers_account:reset_password', kwargs={'token': token})
                 )
                 
-                # 發送郵件
-                subject = 'TruePay - 密碼重設請求'
+                # 使用 Django send_mail（就像商家歡迎郵件一樣）
+                subject = "TruePay - 密碼重設請求"
                 message = f"""
-親愛的 {member.customer.name}，
+親愛的用戶，
 
 您好！我們收到您的密碼重設請求。
 
-請點擊以下連結重設您的密碼：
+請複製以下連結到瀏覽器中重設您的密碼：
 {reset_url}
 
 此連結將在 30 分鐘後過期。
 
 如果您沒有提出此請求，請忽略此郵件。
 
-祝好，
+為保護您的帳號安全，請勿將此連結分享給他人。
+
+祝您使用愉快！
 TruePay 團隊
                 """
                 
-                send_mail(
-                    subject=subject,
-                    message=message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[email],
-                    fail_silently=False,
-                )
+                try:
+                    send_mail(
+                        subject,
+                        message,
+                        settings.DEFAULT_FROM_EMAIL,
+                        [email],
+                        fail_silently=False,
+                    )
+                    print(f"✅ 密碼重設郵件已發送給 {email}")
+                    messages.success(request, "密碼重設連結已發送到您的電子郵件，請檢查收件匣")
+                    
+                except Exception as e:
+                    print(f"❌ 郵件發送失敗：{e}")
+                    messages.error(request, "發送郵件時發生錯誤，請稍後再試")
                 
-                messages.success(request, "密碼重設連結已發送到您的電子郵件，請檢查收件匣")
                 return redirect("customers_account:login")
                 
             except Exception as e:
-                messages.error(request, "發送郵件時發生錯誤，請稍後再試")
+                messages.error(request, f"發送郵件時發生錯誤：{str(e)}")
                 
         else:
             # 表單驗證失敗，顯示錯誤訊息
