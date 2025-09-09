@@ -1,6 +1,6 @@
 {% extends "layouts/default.html" %}
 {% block content %}
-<div class="max-w-2xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md" x-data="backupCodes()">
+<div class="max-w-2xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md" x-data="createBackupCodes({{ backup_tokens|safe }})">
     <h1 class="text-2xl font-bold text-center text-gray-800 mb-8">
         {% if is_regenerate %}
             🔄 新的備用恢復代碼
@@ -78,7 +78,7 @@
             </label>
         </div>
         
-        <button @click="goToDashboard" 
+        <button @click="goToDashboard('{% if next_url %}{{ next_url }}{% endif %}', '{% url 'customers_account:dashboard' %}')" 
                 :disabled="!confirmed"
                 :class="confirmed ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'"
                 class="w-full text-white py-3 px-6 rounded-lg transition duration-200 font-medium">
@@ -95,46 +95,4 @@
         </a>
     </div>
 </div>
-
-<script>
-function backupCodes() {
-    return {
-        backupTokens: {{ backup_tokens|safe }},
-        copied: false,
-        confirmed: false,
-        
-        copyAllCodes() {
-            const codesText = this.backupTokens.join('\n');
-            navigator.clipboard.writeText(codesText).then(() => {
-                this.copied = true;
-                setTimeout(() => {
-                    this.copied = false;
-                }, 2000);
-            });
-        },
-        
-        downloadCodes() {
-            const codesText = this.backupTokens.join('\n');
-            const blob = new Blob([`TruePay 二階段驗證備用恢復代碼\n生成時間：${new Date().toLocaleString()}\n\n${codesText}\n\n重要提醒：\n- 每個代碼只能使用一次\n- 請妥善保管，遺失後無法復原\n- 可在個人設定中重新生成`], 
-                               { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'truepay-backup-codes.txt';
-            a.click();
-            URL.revokeObjectURL(url);
-        },
-        
-        goToDashboard() {
-            if (this.confirmed) {
-                {% if next_url %}
-                    window.location.href = "{{ next_url }}";
-                {% else %}
-                    window.location.href = "{% url 'customers_account:dashboard' %}";
-                {% endif %}
-            }
-        }
-    }
-}
-</script>
 {% endblock %}
