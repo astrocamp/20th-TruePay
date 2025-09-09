@@ -18,6 +18,9 @@ urlpatterns = [
     # 訂單限制錯誤頁面
     path("order-limit-error/", views.order_limit_error, name="order_limit_error"),
     
+    # TOTP 驗證頁面
+    path("totp_verify/", views.totp_verify, name="totp_verify"),
+    
     # 藍新金流回調
     path("newebpay/return/", newebpay_return, name="newebpay_return"),
     path("newebpay/notify/", newebpay_notify, name="newebpay_notify"),

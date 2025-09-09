@@ -10,6 +10,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.db import transaction
 from functools import wraps
+from django.utils.dateparse import parse_datetime
 
 from .models import Order
 from customers_account.models import Customer
@@ -160,6 +161,19 @@ def create_payment(request):
 
         # 透過 user 找到對應的 Customer
         customer = Customer.objects.get(member=request.user)
+        
+        # 檢查是否需要 TOTP 驗證
+        if customer.totp_enabled and not customer.is_totp_recently_verified(minutes=10):
+            # 需要 TOTP 驗證，將訂單資訊存在 session 中並跳轉到驗證頁面
+            request.session['pending_payment'] = {
+                'provider': provider,
+                'product_id': product_id,
+                'quantity': quantity,
+                'timestamp': timezone.now().isoformat()
+            }
+            
+            # 跳轉到 TOTP 驗證頁面
+            return redirect('payments:totp_verify')
 
         # 創建訂單
         order = _create_order_for_payment(
@@ -298,3 +312,97 @@ def order_limit_error(request):
     }
     
     return render(request, "payments/order_limit_error.html", context)
+
+
+@customer_login_required
+def totp_verify(request):
+    """TOTP 驗證頁面 - 用於付款前驗證"""
+    try:
+        customer = Customer.objects.get(member=request.user)
+    except Customer.DoesNotExist:
+        messages.error(request, "客戶資料不存在")
+        return redirect("pages:home")
+    
+    # 檢查是否有待處理的付款
+    pending_payment = request.session.get('pending_payment')
+    if not pending_payment:
+        messages.error(request, "無待處理的付款訂單")
+        return redirect("pages:home")
+    
+    # 檢查 session 是否過期（10分鐘）
+    try:
+        timestamp = parse_datetime(pending_payment['timestamp'])
+        if timezone.now() - timestamp > timedelta(minutes=10):
+            del request.session['pending_payment']
+            messages.error(request, "付款請求已過期，請重新開始")
+            return redirect("pages:home")
+    except (KeyError, TypeError, ValueError):
+        del request.session['pending_payment']
+        messages.error(request, "付款請求無效")
+        return redirect("pages:home")
+    
+    # 確保用戶已啟用 TOTP
+    if not customer.totp_enabled:
+        del request.session['pending_payment']
+        messages.error(request, "您尚未啟用二階段驗證")
+        return redirect("customers_account:totp_setup")
+    
+    # 處理 TOTP 驗證
+    if request.method == 'POST':
+        totp_code = request.POST.get('totp_code', '').strip()
+        
+        if not totp_code:
+            messages.error(request, "請輸入驗證代碼")
+        elif len(totp_code) != 6 or not totp_code.isdigit():
+            messages.error(request, "驗證代碼格式錯誤")
+        elif customer.verify_totp(totp_code):
+            # TOTP 驗證成功，繼續處理付款
+            try:
+                # 創建訂單
+                order = _create_order_for_payment(
+                    customer, 
+                    pending_payment['provider'], 
+                    pending_payment['product_id'], 
+                    pending_payment['quantity']
+                )
+                
+                # 清理 session
+                del request.session['pending_payment']
+                
+                # 處理不同的金流
+                if pending_payment['provider'] == "newebpay":
+                    return process_newebpay(order, request)
+                elif pending_payment['provider'] == "linepay":
+                    return process_linepay(order, request)
+                else:
+                    messages.error(request, "不支援的付款方式")
+                    return redirect("pages:home")
+                    
+            except Exception as e:
+                logger.error(f"TOTP 驗證後創建付款失敗: {e}")
+                messages.error(request, "付款處理失敗，請重試")
+                return redirect("pages:home")
+        else:
+            messages.error(request, "驗證代碼錯誤，請重新輸入")
+    
+    # 獲取產品資訊用於顯示
+    try:
+        product = Product.objects.get(id=pending_payment['product_id'])
+        total_amount = product.price * int(pending_payment['quantity'])
+    except Product.DoesNotExist:
+        del request.session['pending_payment']
+        messages.error(request, "商品不存在")
+        return redirect("pages:home")
+    
+    context = {
+        'customer': customer,
+        'product': product,
+        'quantity': pending_payment['quantity'],
+        'total_amount': total_amount,
+        'provider_display': {
+            'newebpay': '藍新金流',
+            'linepay': 'LINE Pay'
+        }.get(pending_payment['provider'], pending_payment['provider'])
+    }
+    
+    return render(request, 'payments/totp_verify.html', context)
