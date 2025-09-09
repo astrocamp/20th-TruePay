@@ -96,7 +96,6 @@ def newebpay_return(request):
         if not result_data:
             # 嘗試尋找最近的已付款訂單作為後備方案
             try:
-                from django.utils import timezone
                 from datetime import timedelta
                 
                 # 查找最近5分鐘內狀態變為paid的藍新金流訂單
