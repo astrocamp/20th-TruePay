@@ -9,9 +9,13 @@ from payments.models import OrderItem
 
 @no_cache_required
 def index(request, subdomain):
-    products = Product.objects.filter(
-        merchant=request.merchant, is_active=True
-    ).order_by("-created_at")
+    status = request.GET.get("status")
+    products = Product.objects.filter(merchant=request.merchant)
+    if status == "active":
+        products = products.filter(is_active=True)
+    elif status == "inactive":
+        products = products.filter(is_active=False)
+    products = products.order_by("-created_at")
     return render(request, "merchant_marketplace/index.html", {"products": products})
 
 
