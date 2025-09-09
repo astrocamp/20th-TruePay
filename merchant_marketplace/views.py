@@ -68,6 +68,7 @@ def new(request, subdomain):
                 phone_number=request.POST.get("phone_number"),
                 verification_timing=request.POST.get("verification_timing", "before_redeem"),
                 merchant=request.merchant,
+                is_active=False,  # 預設為下架
             )
 
             messages.success(request, "商品新增成功！")
