@@ -492,13 +492,12 @@ def cancel_order(request, order_id):
         return redirect("customers_account:purchase_history")
     
     try:
+        # 透過 user 找到對應的 Customer
+        customer = Customer.objects.get(member=request.user)
+        
         with transaction.atomic():
-            # 透過 user 找到對應的 Customer
-            customer = Customer.objects.get(member=request.user)
-            
             # 取得訂單並檢查權限
-            order = get_object_or_404(
-                Order.objects.select_for_update(), 
+            order = Order.objects.select_for_update().get(
                 id=order_id, 
                 customer=customer
             )
@@ -518,6 +517,9 @@ def cancel_order(request, order_id):
     except Customer.DoesNotExist:
         messages.error(request, "客戶資料不存在")
         return redirect("pages:home")
+    except Order.DoesNotExist:
+        messages.error(request, "訂單不存在或您沒有權限操作")
+        return redirect("customers_account:purchase_history")
     except Exception as e:
         messages.error(request, "取消訂單失敗，請稍後再試")
         return redirect("customers_account:purchase_history")
