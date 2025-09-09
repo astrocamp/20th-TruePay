@@ -354,20 +354,24 @@ class ForgotPasswordForm(forms.Form):
 
     def clean_email(self):
         email = self.cleaned_data.get("email")
-        try:
-            member = Member.objects.get(email=email, member_type="customer")
-            
-            # 檢查是否為 Google 登入用戶
-            if not member.has_usable_password():
-                if member.socialaccount_set.filter(provider="google").exists():
-                    raise ValidationError("您使用 Google 帳號登入，無法重設密碼。請使用 Google 登入。")
-            
-            # 檢查帳號是否啟用
-            if not member.is_active:
-                raise ValidationError("此帳號已停用，請聯絡客服")
-                
-        except Member.DoesNotExist:
+        
+        # 查找符合條件的客戶帳號（取最新的一個）
+        member = Member.objects.filter(
+            email=email, 
+            member_type="customer"
+        ).order_by('-id').first()
+        
+        if not member:
             raise ValidationError("此電子郵件未註冊，請檢查輸入是否正確")
+        
+        # 檢查是否為 Google 登入用戶
+        if not member.has_usable_password():
+            if member.socialaccount_set.filter(provider="google").exists():
+                raise ValidationError("您使用 Google 帳號登入，無法重設密碼。請使用 Google 登入。")
+        
+        # 檢查帳號是否啟用
+        if not member.is_active:
+            raise ValidationError("此帳號已停用，請聯絡客服")
         
         return email
 
