@@ -6,6 +6,10 @@ from truepay.decorators import customer_login_required
 from django.core.paginator import Paginator
 from django.utils import timezone
 from django.db.models import Q, Count
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+import json
 from .forms import CustomerRegistrationForm, CustomerLoginForm, CustomerProfileUpdateForm, PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from .models import Customer
@@ -273,3 +277,198 @@ def profile_settings(request):
     }
     
     return render(request, "customers/profile_settings.html", context)
+
+
+# TOTP 二階段驗證相關視圖
+@customer_login_required
+def totp_setup(request):
+    """TOTP 設置頁面 - 顯示 QR Code"""
+    try:
+        customer = Customer.objects.get(member=request.user)
+    except Customer.DoesNotExist:
+        messages.error(request, "客戶資料不存在")
+        return redirect("pages:home")
+    
+    # 如果已經啟用 TOTP，重導向到設定頁面
+    if customer.totp_enabled:
+        messages.info(request, "您已經啟用二階段驗證")
+        return redirect("customers_account:totp_manage")
+    
+    # 生成新的 TOTP 密鑰和 QR Code
+    customer.generate_totp_secret()
+    qr_code = customer.generate_qr_code()
+    
+    context = {
+        'customer': customer,
+        'qr_code': qr_code,
+        'totp_secret': customer.totp_secret_key,
+    }
+    
+    return render(request, 'customers/totp_setup.html', context)
+
+
+@customer_login_required
+def totp_enable(request):
+    """啟用 TOTP - 驗證用戶輸入的代碼"""
+    try:
+        customer = Customer.objects.get(member=request.user)
+    except Customer.DoesNotExist:
+        messages.error(request, "客戶資料不存在")
+        return redirect("pages:home")
+    
+    if request.method == 'POST':
+        totp_code = request.POST.get('totp_code', '').strip()
+        
+        if not totp_code:
+            messages.error(request, "請輸入驗證代碼")
+            return redirect("customers_account:totp_setup")
+        
+        # 臨時驗證 TOTP 代碼
+        import pyotp
+        if customer.totp_secret_key:
+            totp = pyotp.TOTP(customer.totp_secret_key)
+            if totp.verify(totp_code, valid_window=1):
+                # 驗證成功，啟用 TOTP
+                customer.enable_totp()
+                backup_tokens = customer.backup_tokens
+                
+                messages.success(request, "二階段驗證已成功啟用！請保存您的備用恢復代碼。")
+                return render(request, 'customers/totp_backup_codes.html', {
+                    'customer': customer,
+                    'backup_tokens': backup_tokens
+                })
+            else:
+                messages.error(request, "驗證代碼錯誤，請重新輸入")
+        else:
+            messages.error(request, "設置錯誤，請重新開始設置")
+    
+    return redirect("customers_account:totp_setup")
+
+
+@customer_login_required
+def totp_manage(request):
+    """TOTP 管理頁面 - 顯示當前狀態和管理選項"""
+    try:
+        customer = Customer.objects.get(member=request.user)
+    except Customer.DoesNotExist:
+        messages.error(request, "客戶資料不存在")
+        return redirect("pages:home")
+    
+    context = {
+        'customer': customer,
+        'backup_tokens': customer.backup_tokens if customer.totp_enabled else [],
+    }
+    
+    return render(request, 'customers/totp_manage.html', context)
+
+
+@customer_login_required
+def totp_disable(request):
+    """停用 TOTP"""
+    try:
+        customer = Customer.objects.get(member=request.user)
+    except Customer.DoesNotExist:
+        messages.error(request, "客戶資料不存在")
+        return redirect("pages:home")
+    
+    if request.method == 'POST':
+        # 要求用戶確認密碼或 TOTP 代碼
+        password = request.POST.get('password', '').strip()
+        totp_code = request.POST.get('totp_code', '').strip()
+        
+        # 驗證密碼
+        if password and request.user.check_password(password):
+            customer.disable_totp()
+            messages.success(request, "二階段驗證已停用")
+            return redirect("customers_account:profile_settings")
+        # 或驗證 TOTP 代碼
+        elif totp_code and customer.verify_totp(totp_code):
+            customer.disable_totp()
+            messages.success(request, "二階段驗證已停用")
+            return redirect("customers_account:profile_settings")
+        else:
+            messages.error(request, "密碼或驗證代碼錯誤")
+    
+    return redirect("customers_account:totp_manage")
+
+
+@customer_login_required
+def regenerate_backup_tokens(request):
+    """重新生成備用恢復代碼"""
+    try:
+        customer = Customer.objects.get(member=request.user)
+    except Customer.DoesNotExist:
+        messages.error(request, "客戶資料不存在")
+        return redirect("pages:home")
+    
+    if not customer.totp_enabled:
+        messages.error(request, "請先啟用二階段驗證")
+        return redirect("customers_account:totp_setup")
+    
+    if request.method == 'POST':
+        # 驗證 TOTP 代碼
+        totp_code = request.POST.get('totp_code', '').strip()
+        
+        if totp_code and customer.verify_totp(totp_code):
+            backup_tokens = customer.generate_backup_tokens()
+            messages.success(request, "備用恢復代碼已重新生成！請保存新的代碼。")
+            return render(request, 'customers/totp_backup_codes.html', {
+                'customer': customer,
+                'backup_tokens': backup_tokens,
+                'is_regenerate': True
+            })
+        else:
+            messages.error(request, "驗證代碼錯誤")
+    
+    return redirect("customers_account:totp_manage")
+
+
+# AJAX API 用於交易過程中驗證 TOTP
+@csrf_exempt
+@require_http_methods(["POST"])
+@customer_login_required
+def verify_totp_api(request):
+    """API 端點用於驗證 TOTP 代碼"""
+    try:
+        customer = Customer.objects.get(member=request.user)
+        data = json.loads(request.body)
+        totp_code = data.get('totp_code', '').strip()
+        
+        if not customer.totp_enabled:
+            return JsonResponse({
+                'success': False,
+                'error': '二階段驗證未啟用'
+            })
+        
+        if not totp_code:
+            return JsonResponse({
+                'success': False,
+                'error': '請輸入驗證代碼'
+            })
+        
+        if customer.verify_totp(totp_code):
+            return JsonResponse({
+                'success': True,
+                'message': '驗證成功'
+            })
+        else:
+            return JsonResponse({
+                'success': False,
+                'error': '驗證代碼錯誤'
+            })
+            
+    except Customer.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': '客戶資料不存在'
+        })
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': '無效的請求格式'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': '系統錯誤'
+        })
