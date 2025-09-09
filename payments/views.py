@@ -343,7 +343,11 @@ def totp_verify(request):
             del request.session['pending_payment']
             messages.error(request, "付款請求已過期，請重新開始")
             return redirect("pages:home")
-    except (KeyError, TypeError, ValueError):
+    except (KeyError, TypeError):
+        del request.session['pending_payment']
+        messages.error(request, "付款請求無效")
+        return redirect("pages:home")
+    except ValueError:
         del request.session['pending_payment']
         messages.error(request, "付款請求無效")
         return redirect("pages:home")
