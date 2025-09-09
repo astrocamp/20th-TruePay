@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from merchant_account.models import Merchant
 from merchant_marketplace.models import Product
+from customers_account.models import Customer
 
 
 def shop_overview(request, subdomain):
@@ -27,7 +28,6 @@ def payment_page(request, subdomain, id):
     customer = None
     if is_customer:
         try:
-            from customers_account.models import Customer
             customer = Customer.objects.get(member=request.user)
         except Customer.DoesNotExist:
             pass

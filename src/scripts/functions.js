@@ -559,6 +559,19 @@ window.createQuantityManager = createQuantityManager;
 
 // Alpine.js TOTP 備用代碼管理組件
 function createBackupCodes(backupTokens) {
+    // 如果沒有直接傳入備用代碼，從 JSON script 元素讀取
+    if (!backupTokens) {
+        const backupTokensScript = document.getElementById('backup-tokens-data');
+        if (backupTokensScript) {
+            try {
+                backupTokens = JSON.parse(backupTokensScript.textContent);
+            } catch (error) {
+                console.error('解析備用代碼資料失敗:', error);
+                backupTokens = [];
+            }
+        }
+    }
+    
     return {
         backupTokens: backupTokens || [],
         copied: false,
