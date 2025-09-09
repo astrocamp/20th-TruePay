@@ -10,6 +10,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
+import pyotp
 from .forms import CustomerRegistrationForm, CustomerLoginForm, CustomerProfileUpdateForm, PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from .models import Customer
@@ -328,7 +329,6 @@ def totp_enable(request):
             return redirect("customers_account:totp_setup")
         
         # 臨時驗證 TOTP 代碼
-        import pyotp
         if customer.totp_secret_key:
             totp = pyotp.TOTP(customer.totp_secret_key)
             if totp.verify(totp_code, valid_window=1):
