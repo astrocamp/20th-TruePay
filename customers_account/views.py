@@ -3,6 +3,11 @@ from django.contrib import messages
 from django.contrib.auth import login as django_login, logout as django_logout
 from django.db.models import Sum
 from django.db import transaction
+from django.core.mail import send_mail
+from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
+from django.urls import reverse
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from truepay.decorators import customer_login_required
 from django.core.paginator import Paginator
 from django.utils import timezone
@@ -12,7 +17,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
 import pyotp
-from .forms import CustomerRegistrationForm, CustomerLoginForm, CustomerProfileUpdateForm, PasswordChangeForm
+from .forms import (
+    CustomerRegistrationForm, CustomerLoginForm, CustomerProfileUpdateForm, 
+    PasswordChangeForm, ForgotPasswordForm, PasswordResetForm
+)
 from django.contrib.auth import update_session_auth_hash
 from .models import Customer
 from payments.models import Order, OrderItem
@@ -528,3 +536,114 @@ def cancel_order(request, order_id):
     except Exception as e:
         messages.error(request, "取消訂單失敗，請稍後再試")
         return redirect("customers_account:purchase_history")
+
+
+def forgot_password(request):
+    """忘記密碼頁面"""
+    if request.method == "POST":
+        form = ForgotPasswordForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data["email"]
+            
+            try:
+                # 取得用戶
+                Member = get_user_model()
+                member = Member.objects.get(email=email, member_type="customer")
+                
+                # 使用 Django signing 生成重設 token
+                signer = TimestampSigner()
+                token = signer.sign(str(member.id))
+                
+                # 建立重設連結
+                reset_url = request.build_absolute_uri(
+                    reverse('customers_account:reset_password', kwargs={'token': token})
+                )
+                
+                # 發送郵件
+                subject = 'TruePay - 密碼重設請求'
+                message = f"""
+親愛的 {member.customer.name}，
+
+您好！我們收到您的密碼重設請求。
+
+請點擊以下連結重設您的密碼：
+{reset_url}
+
+此連結將在 30 分鐘後過期。
+
+如果您沒有提出此請求，請忽略此郵件。
+
+祝好，
+TruePay 團隊
+                """
+                
+                send_mail(
+                    subject=subject,
+                    message=message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[email],
+                    fail_silently=False,
+                )
+                
+                messages.success(request, "密碼重設連結已發送到您的電子郵件，請檢查收件匣")
+                return redirect("customers_account:login")
+                
+            except Exception as e:
+                messages.error(request, "發送郵件時發生錯誤，請稍後再試")
+                
+        else:
+            # 表單驗證失敗，顯示錯誤訊息
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error)
+    else:
+        form = ForgotPasswordForm()
+    
+    return render(request, "customers/forgot_password.html", {"form": form})
+
+
+def reset_password(request, token):
+    """重設密碼頁面"""
+    # 驗證 token
+    signer = TimestampSigner()
+    try:
+        # token 有效期 30 分鐘 (1800 秒)
+        user_id = signer.unsign(token, max_age=1800)
+        
+        # 取得用戶
+        Member = get_user_model()
+        member = Member.objects.get(id=int(user_id), member_type="customer")
+        
+        if request.method == "POST":
+            form = PasswordResetForm(request.POST)
+            if form.is_valid():
+                # 重設密碼
+                new_password = form.cleaned_data["new_password"]
+                member.set_password(new_password)
+                # 清除登入失敗次數
+                member.login_failed_count = 0
+                member.save(update_fields=['password', 'login_failed_count'])
+                
+                messages.success(request, "密碼重設成功！請使用新密碼登入")
+                return redirect("customers_account:login")
+            else:
+                # 表單驗證失敗，顯示錯誤訊息
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(request, error)
+        else:
+            form = PasswordResetForm()
+        
+        context = {
+            "form": form,
+            "token": token,
+            "user_email": member.email,
+        }
+        return render(request, "customers/reset_password.html", context)
+        
+    except SignatureExpired:
+        messages.error(request, "密碼重設連結已過期，請重新申請")
+        return redirect("customers_account:forgot_password")
+    except (BadSignature, ValueError, Member.DoesNotExist):
+        messages.error(request, "無效的重設連結")
+        return redirect("customers_account:forgot_password")
