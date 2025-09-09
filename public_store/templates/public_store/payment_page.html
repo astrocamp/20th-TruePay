@@ -158,8 +158,8 @@
                                             </label>
                                         </div>
                                         
-                                        {% if is_customer and customer.totp_enabled %}
-                                        <!-- 用戶已啟用TOTP -->
+                                        {% if is_customer and customer.totp_enabled and product.verification_timing == 'before_payment' %}
+                                        <!-- 用戶已啟用TOTP且商品需要付款前驗證 -->
                                         <div class="bg-green-50 border border-green-200 rounded-lg p-4">
                                             <div class="flex items-center mb-2">
                                                 <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -169,8 +169,8 @@
                                             </div>
                                             <p class="text-green-700 text-sm">您已完成二階段驗證設定，點擊下方按鈕即可開始付款</p>
                                         </div>
-                                        {% else %}
-                                        <!-- 用戶未啟用TOTP -->
+                                        {% elif is_customer and product.verification_timing == 'before_payment' %}
+                                        <!-- 商品需要付款前驗證但用戶未啟用TOTP -->
                                         <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
                                             <div class="flex items-center mb-2">
                                                 <svg class="w-5 h-5 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,7 +188,7 @@
                                         {% endif %}
                                     </div>
                                     
-                                    {% if is_customer and customer.totp_enabled %}
+                                    {% if is_customer and customer.totp_enabled and product.verification_timing == 'before_payment' %}
                                     <button type="button" 
                                             @click="if(verificationData.terms) { isVerified = true }"
                                             :disabled="!verificationData.terms"
@@ -307,7 +307,7 @@
                             </svg>
                             <span class="text-gray-700 font-medium">24小時客服支援</span>
                         </div>
-                        {% if is_customer and customer.totp_enabled %}
+                        {% if is_customer and customer.totp_enabled and product.verification_timing == 'before_payment' %}
                         <div class="flex items-center">
                             <svg class="w-5 h-5 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.818-4.954A9.959 9.959 0 0121 12c0 5.523-4.477 10-10 10S1 17.523 1 12 5.477 2 11 2a9.959 9.959 0 014.954 1.818"/>

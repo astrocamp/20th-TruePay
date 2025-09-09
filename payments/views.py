@@ -88,7 +88,7 @@ def _extract_payment_parameters(request, payment_data=None):
     return provider, product_id, quantity
 
 
-def _create_order_for_payment(customer, provider, product_id, quantity):
+def _create_order_for_payment(customer, provider, product_id, quantity, product=None):
     """統一訂單創建邏輯"""
     try:
         quantity = int(quantity)
@@ -102,11 +102,11 @@ def _create_order_for_payment(customer, provider, product_id, quantity):
     if not can_create:
         raise ValueError(limit_error_info)
 
-    # 取得商品資訊
-    if not product_id:
-        raise ValueError("缺少商品ID")
-
-    product = get_object_or_404(Product, id=int(product_id), is_active=True)
+    # 取得商品資訊（如果沒有傳入的話）
+    if product is None:
+        if not product_id:
+            raise ValueError("缺少商品ID")
+        product = get_object_or_404(Product, id=int(product_id), is_active=True)
 
     # 統一由後端計算總金額（安全處理）
     amount = product.price * quantity
@@ -162,8 +162,15 @@ def create_payment(request):
         # 透過 user 找到對應的 Customer
         customer = Customer.objects.get(member=request.user)
         
-        # 檢查是否需要 TOTP 驗證
-        if customer.totp_enabled and not customer.is_totp_recently_verified(minutes=10):
+        # 獲取商品資訊以檢查驗證需求
+        if not product_id:
+            raise ValueError("缺少商品ID")
+        product = get_object_or_404(Product, id=int(product_id), is_active=True)
+        
+        # 檢查是否需要 TOTP 驗證（商品要求付款前驗證 + 用戶已啟用TOTP + 尚未通過驗證）
+        if (product.verification_timing == 'before_payment' and 
+            customer.totp_enabled and 
+            not customer.is_totp_recently_verified(minutes=10)):
             # 需要 TOTP 驗證，將訂單資訊存在 session 中並跳轉到驗證頁面
             request.session['pending_payment'] = {
                 'provider': provider,
@@ -175,9 +182,9 @@ def create_payment(request):
             # 跳轉到 TOTP 驗證頁面
             return redirect('payments:totp_verify')
 
-        # 創建訂單
+        # 創建訂單（傳入已獲取的 product 物件以避免重複查詢）
         order = _create_order_for_payment(
-            customer, provider, product_id, quantity
+            customer, provider, product_id, quantity, product
         )
 
         # 處理不同的金流
@@ -358,12 +365,16 @@ def totp_verify(request):
         elif customer.verify_totp(totp_code):
             # TOTP 驗證成功，繼續處理付款
             try:
+                # 獲取商品資訊
+                product = Product.objects.get(id=pending_payment['product_id'])
+                
                 # 創建訂單
                 order = _create_order_for_payment(
                     customer, 
                     pending_payment['provider'], 
                     pending_payment['product_id'], 
-                    pending_payment['quantity']
+                    pending_payment['quantity'],
+                    product
                 )
                 
                 # 清理 session
