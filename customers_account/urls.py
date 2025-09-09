@@ -21,4 +21,5 @@ urlpatterns = [
     
     # TOTP API
     path("api/totp/verify/", views.verify_totp_api, name="verify_totp_api"),
+    path("cancel-order/<int:order_id>/", views.cancel_order, name="cancel_order"),
 ]
