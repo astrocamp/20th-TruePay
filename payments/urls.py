@@ -9,8 +9,14 @@ urlpatterns = [
     # 統一付款入口
     path("create/", views.create_payment, name="create_payment"),
     
+    # 重新付款功能
+    path("retry/<int:order_id>/", views.retry_payment, name="retry_payment"),
+    
     # 付款狀態查詢
     path("status/<int:order_id>/", views.payment_status, name="payment_status"),
+    
+    # 訂單限制錯誤頁面
+    path("order-limit-error/", views.order_limit_error, name="order_limit_error"),
     
     # 藍新金流回調
     path("newebpay/return/", newebpay_return, name="newebpay_return"),

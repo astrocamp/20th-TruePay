@@ -7,6 +7,7 @@ from django.forms import (
     Form,
     EmailField,
 )
+from django import forms
 from .models import Merchant
 from .utils import generate_unique_subdomain
 from django.core.exceptions import ValidationError
@@ -166,24 +167,64 @@ class LoginForm(Form):
         return cleaned_data
 
 
-class domain_settings_form(ModelForm):
-    class Meta:
-        model = Merchant
-        fields = ["subdomain"]
-        labels = {
-            "subdomain": "子網域名稱",
-        }
-        widgets = {
-            "subdomain": TextInput(
-                attrs={
-                    "class": "input",
-                    "placeholder": "在網址上的shop後面會加上您填寫的名稱",
-                }
-            ),
-        }
-        help_texts = {
-            "subdomain": "系統會自動生成",
-        }
+class SubdomainChangeForm(forms.Form):
+    new_subdomain = CharField(
+        max_length=30,
+        min_length=3,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "例如：mystore",
+                "pattern": "[a-zA-Z0-9-]+",
+                "title": "只能使用英文字母、數字和連字號",
+            }
+        ),
+        label="新的子網域名稱",
+    )
+
+    reason = CharField(
+        max_length=200,
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 3,
+                "placeholder": "請說明修改原因...",
+            }
+        ),
+        label="修改原因",
+        required=False,
+    )
+
+    def __init__(self, merchant, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.merchant = merchant
+
+        can_change, message = merchant.can_change_subdomain()
+        if not can_change:
+            self.fields["new_subdomain"].widget.attrs["disabled"] = True
+            self.fields["new_subdomain"].help_text = f"⚠️ {message}"
+
+    def clean_new_subdomain(self):
+        new_subdomain = self.cleaned_data["new_subdomain"].lower().strip()
+        if new_subdomain == self.merchant.subdomain:
+            raise forms.ValidationError("新名稱不能與目前相同")
+
+        is_valid, message = Merchant.validate_subdomain_format(new_subdomain)
+        if not is_valid:
+            raise forms.ValidationError(message)
+
+        if Merchant.objects.filter(subdomain=new_subdomain).exists():
+            raise forms.ValidationError("此子網域名稱已被使用")
+
+        return new_subdomain
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        can_change, message = self.merchant.can_change_subdomain()
+        if not can_change:
+            raise forms.ValidationError(message)
+        return cleaned_data
 
 
 class MerchantProfileUpdateForm(ModelForm):
@@ -200,10 +241,17 @@ class MerchantProfileUpdateForm(ModelForm):
 
     class Meta:
         model = Merchant
-        fields = ["ShopName", "UnifiedNumber", "NationalNumber", "Name", "Address", "Cellphone"]
+        fields = [
+            "ShopName",
+            "UnifiedNumber",
+            "NationalNumber",
+            "Name",
+            "Address",
+            "Cellphone",
+        ]
         labels = {
             "ShopName": "商店名稱",
-            "UnifiedNumber": "統一編號", 
+            "UnifiedNumber": "統一編號",
             "NationalNumber": "身分證號",
             "Name": "負責人姓名",
             "Address": "地址",
@@ -249,31 +297,41 @@ class MerchantProfileUpdateForm(ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)
+        self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
         if self.user:
-            self.fields['email'].initial = self.user.email
+            self.fields["email"].initial = self.user.email
 
     def clean_UnifiedNumber(self):
         unified_number = self.cleaned_data.get("UnifiedNumber")
         if unified_number and len(unified_number) != 8:
             raise ValidationError("統一編號必須為8位數字")
-        
+
         # 檢查是否與其他商家重複（排除自己）
-        if unified_number and Merchant.objects.exclude(pk=self.instance.pk).filter(UnifiedNumber=unified_number).exists():
+        if (
+            unified_number
+            and Merchant.objects.exclude(pk=self.instance.pk)
+            .filter(UnifiedNumber=unified_number)
+            .exists()
+        ):
             raise ValidationError("此統一編號已被使用")
-        
+
         return unified_number
 
     def clean_NationalNumber(self):
         national_number = self.cleaned_data.get("NationalNumber")
         if national_number and len(national_number) != 10:
             raise ValidationError("身分證字號必須為10位")
-        
+
         # 檢查是否與其他商家重複（排除自己）
-        if national_number and Merchant.objects.exclude(pk=self.instance.pk).filter(NationalNumber=national_number).exists():
+        if (
+            national_number
+            and Merchant.objects.exclude(pk=self.instance.pk)
+            .filter(NationalNumber=national_number)
+            .exists()
+        ):
             raise ValidationError("此身分證字號已被使用")
-        
+
         return national_number
 
     def clean_Cellphone(self):
@@ -285,7 +343,7 @@ class MerchantProfileUpdateForm(ModelForm):
     def clean_email(self):
         email = self.cleaned_data.get("email")
         Member = get_user_model()
-        
+
         # 只有在電子郵件實際被修改時才檢查唯一性
         if email and self.user and email != self.user.email:
             if Member.objects.exclude(pk=self.user.pk).filter(email=email).exists():
@@ -298,8 +356,8 @@ class MerchantProfileUpdateForm(ModelForm):
             merchant.save()
             # 更新 Member 的 email
             if self.user:
-                self.user.email = self.cleaned_data['email']
+                self.user.email = self.cleaned_data["email"]
                 # 更新 username (格式: ID_email)
                 self.user.username = f"{self.user.pk}_{self.cleaned_data['email']}"
-                self.user.save(update_fields=['email', 'username'])
+                self.user.save(update_fields=["email", "username"])
         return merchant

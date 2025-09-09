@@ -32,11 +32,21 @@ def process_linepay(order, request):
             settings, "LINEPAY_API_URL", "https://sandbox-api-pay.line.me"
         )
 
+        # 為重新付款生成唯一的 LINE Pay orderId
+        is_retry = order.updated_at != order.created_at
+        if is_retry:
+            # 重新付款時生成唯一的 orderId
+            retry_suffix = str(int(timezone.now().timestamp()))
+            linepay_order_id = f"{order.id}-retry-{retry_suffix}"
+        else:
+            # 首次付款使用原始訂單ID
+            linepay_order_id = str(order.id)
+
         # 準備付款資料
         order_data = {
             "amount": int(order.amount),
             "currency": "TWD",
-            "orderId": str(order.id),
+            "orderId": linepay_order_id,
             "packages": [
                 {
                     "id": str(order.product.id),
@@ -97,16 +107,25 @@ def linepay_confirm(request):
     """LINE Pay 確認付款"""
     try:
         transaction_id = request.GET.get("transactionId")
-        order_id = request.GET.get("orderId")
+        linepay_order_id = request.GET.get("orderId")
 
-        if not transaction_id or not order_id:
+        if not transaction_id or not linepay_order_id:
             return render(
                 request,
                 "payments/linepay/payment_result.html",
                 {"success": False, "message": "缺少必要參數"},
             )
 
-        order = get_object_or_404(Order, id=order_id)
+        # 解析 LINE Pay orderId 以獲取真實的訂單ID
+        # 格式可能是 "123" 或 "123-retry-1693817234"
+        if "-retry-" in linepay_order_id:
+            # 重新付款的情況，提取原始訂單ID
+            real_order_id = linepay_order_id.split("-retry-")[0]
+        else:
+            # 首次付款的情況
+            real_order_id = linepay_order_id
+
+        order = get_object_or_404(Order, id=int(real_order_id))
 
         # 使用系統統一 LINE Pay 設定
         channel_id = settings.LINEPAY_CHANNEL_ID

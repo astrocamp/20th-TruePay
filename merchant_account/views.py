@@ -3,7 +3,6 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
-from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.db.models import Sum, Count, Q
 from django.db import models
@@ -12,10 +11,15 @@ from django.utils import timezone
 
 
 from truepay.decorators import no_cache_required
-from .forms import RegisterForm, LoginForm, domain_settings_form, MerchantProfileUpdateForm
+from .forms import (
+    RegisterForm,
+    LoginForm,
+    SubdomainChangeForm,
+    MerchantProfileUpdateForm,
+)
 from customers_account.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
-from .models import Merchant
+from .models import Merchant, SubdomainRedirect
 from payments.models import Order, OrderItem, TicketValidation
 from merchant_marketplace.models import Product
 from payments.models import Order
@@ -37,7 +41,10 @@ def register(req):
         else:
             for field, errors in form.errors.items():
                 for error in errors:
-                    messages.error(req, f"{form.fields[field].label if field in form.fields else field}: {error}")
+                    messages.error(
+                        req,
+                        f"{form.fields[field].label if field in form.fields else field}: {error}",
+                    )
     else:
         form = RegisterForm()
 
@@ -52,7 +59,9 @@ def login(req):
             member = form.cleaned_data["member"]
             merchant = form.cleaned_data["merchant"]
 
-            django_login(req, member, backend='django.contrib.auth.backends.ModelBackend')
+            django_login(
+                req, member, backend="django.contrib.auth.backends.ModelBackend"
+            )
 
             messages.success(req, "歡迎進入！！！")
             return redirect("merchant_account:dashboard", merchant.subdomain)
@@ -103,7 +112,9 @@ def dashboard(request, subdomain):
     )[:5]
 
     # 計算總收入（只計算已付款的訂單，使用鏈式操作更高效）
-    total_revenue = orders.filter(status="paid").aggregate(total=Sum("amount"))["total"] or 0
+    total_revenue = (
+        orders.filter(status="paid").aggregate(total=Sum("amount"))["total"] or 0
+    )
 
     context = {
         "merchant": request.merchant,
@@ -115,23 +126,6 @@ def dashboard(request, subdomain):
     }
 
     return render(request, "merchant_account/dashboard.html", context)
-
-
-@no_cache_required
-def domain_settings(request, subdomain):
-    if request.method == "POST":
-        form = domain_settings_form(request.POST, instance=request.merchant)
-        if form.is_valid():
-            update_merchant = form.save()
-            messages.success(request, "網域名稱已更新")
-            return redirect(
-                "merchant_account:domain_settings", update_merchant.subdomain
-            )
-        else:
-            messages.error(request, "設定失敗，請檢查內容")
-    else:
-        form = domain_settings_form(instance=request.merchant)
-    return render(request, "merchant_account/domain_settings.html", {"form": form})
 
 
 @no_cache_required
@@ -306,22 +300,19 @@ def restart_scan(request, subdomain):
 def verification_records(request, subdomain):
     """票券使用紀錄頁面 - 顯示該商家的已使用票券記錄"""
     merchant = request.merchant
-    
+
     # 取得篩選參數
-    product_filter = request.GET.get('product', '')
-    date_filter = request.GET.get('date', '')
-    customer_filter = request.GET.get('customer', '')
-    
+    product_filter = request.GET.get("product", "")
+    date_filter = request.GET.get("date", "")
+    customer_filter = request.GET.get("customer", "")
+
     # 基本查詢：取得該商家的所有已使用票券
-    used_tickets = OrderItem.objects.select_related(
-        'order__customer__member',
-        'product',
-        'order'
-    ).filter(
-        product__merchant=merchant,
-        status='used'
-    ).order_by('-used_at')
-    
+    used_tickets = (
+        OrderItem.objects.select_related("order__customer__member", "product", "order")
+        .filter(product__merchant=merchant, status="used")
+        .order_by("-used_at")
+    )
+
     # 商品篩選
     if product_filter:
         try:
@@ -329,57 +320,57 @@ def verification_records(request, subdomain):
             used_tickets = used_tickets.filter(product_id=product_id)
         except (ValueError, TypeError):
             pass
-    
+
     # 客戶篩選
     if customer_filter:
         used_tickets = used_tickets.filter(
             order__customer__member__email__icontains=customer_filter
         )
-    
+
     # 日期篩選
     if date_filter:
         try:
-            filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
+            filter_date = datetime.strptime(date_filter, "%Y-%m-%d").date()
             used_tickets = used_tickets.filter(used_at__date=filter_date)
         except ValueError:
             pass
-    
+
     # 統計資料（合併為單一 aggregate 查詢）
-    
+
     all_used_tickets = OrderItem.objects.filter(
-        product__merchant=merchant,
-        status='used'
+        product__merchant=merchant, status="used"
     )
     usage_stats = all_used_tickets.aggregate(
-        total_tickets=Count('id'),
-        total_revenue=Sum('order__unit_price'),
-        today_tickets=Count('id', filter=Q(used_at__date=timezone.now().date())),
-        products_count=Count('product', distinct=True)
+        total_tickets=Count("id"),
+        total_revenue=Sum("order__unit_price"),
+        today_tickets=Count("id", filter=Q(used_at__date=timezone.now().date())),
+        products_count=Count("product", distinct=True),
     )
-    usage_stats['total_revenue'] = usage_stats.get('total_revenue') or 0
-    
+    usage_stats["total_revenue"] = usage_stats.get("total_revenue") or 0
+
     # 取得商品列表（用於篩選下拉選單）
-    products = Product.objects.filter(
-        merchant=merchant,
-        orderitem__status='used'
-    ).distinct().order_by('name')
-    
+    products = (
+        Product.objects.filter(merchant=merchant, orderitem__status="used")
+        .distinct()
+        .order_by("name")
+    )
+
     # 分頁處理
     paginator = Paginator(used_tickets, 15)  # 每頁顯示15筆記錄
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
-        'merchant': merchant,
-        'used_tickets': page_obj,
-        'page_obj': page_obj,
-        'usage_stats': usage_stats,
-        'products': products,
-        'product_filter': product_filter,
-        'customer_filter': customer_filter,
-        'date_filter': date_filter,
+        "merchant": merchant,
+        "used_tickets": page_obj,
+        "page_obj": page_obj,
+        "usage_stats": usage_stats,
+        "products": products,
+        "product_filter": product_filter,
+        "customer_filter": customer_filter,
+        "date_filter": date_filter,
     }
-    
+
     return render(request, "merchant_account/verification_records.html", context)
 
 
@@ -390,10 +381,12 @@ def profile_settings(request, subdomain):
 
     if request.method == "POST":
         form_type = request.POST.get("form_type")
-        
+
         if form_type == "profile":
             # 處理個人資料修改
-            form = MerchantProfileUpdateForm(request.POST, instance=merchant, user=request.user)
+            form = MerchantProfileUpdateForm(
+                request.POST, instance=merchant, user=request.user
+            )
             if form.is_valid():
                 form.save()
                 messages.success(request, "商家資料已成功更新")
@@ -401,8 +394,11 @@ def profile_settings(request, subdomain):
             else:
                 for field, errors in form.errors.items():
                     for error in errors:
-                        messages.error(request, f"{form.fields[field].label if field in form.fields else field}: {error}")
-        
+                        messages.error(
+                            request,
+                            f"{form.fields[field].label if field in form.fields else field}: {error}",
+                        )
+
         elif form_type == "password":
             # 處理密碼修改
             password_form = PasswordChangeForm(request.user, request.POST)
@@ -415,16 +411,43 @@ def profile_settings(request, subdomain):
             else:
                 for field, errors in password_form.errors.items():
                     for error in errors:
-                        messages.error(request, f"{password_form.fields[field].label if field in password_form.fields else field}: {error}")
-    
+                        messages.error(
+                            request,
+                            f"{password_form.fields[field].label if field in password_form.fields else field}: {error}",
+                        )
+
     # GET 請求或表單驗證失敗時顯示表單
     profile_form = MerchantProfileUpdateForm(instance=merchant, user=request.user)
     password_form = PasswordChangeForm(request.user)
-    
+
     context = {
         "merchant": merchant,
         "profile_form": profile_form,
         "password_form": password_form,
     }
-    
+
     return render(request, "merchant_account/profile_settings.html", context)
+
+
+@no_cache_required
+def subdomain_management(request, subdomain):
+    merchant = request.merchant
+
+    can_change, status_message = merchant.can_change_subdomain()
+
+    history = merchant.subdomain_history or []
+    redirects = merchant.subdomain_redirects.filter(is_active=True)[:3]
+
+    # 創建表單實例供模板使用
+    form = SubdomainChangeForm(merchant)
+
+    context = {
+        "merchant": merchant,
+        "can_change": can_change,
+        "status_message": status_message,
+        "history": history[-3:],  # 三筆
+        "redirects": redirects,
+        "current_subdomain": merchant.subdomain,
+        "form": form,
+    }
+    return render(request, "merchant_account/domain_settings.html", context)

@@ -29,11 +29,20 @@ def process_newebpay(order, request):
         hash_key = settings.NEWEBPAY_HASH_KEY
         hash_iv = settings.NEWEBPAY_HASH_IV
 
+        # 檢測是否為重新付款
+        is_retry = order.updated_at != order.created_at
+        
+        # 重新付款時使用當前時間，首次付款使用訂單建立時間
+        if is_retry:
+            timestamp = str(int(timezone.now().timestamp()))
+        else:
+            timestamp = str(int(order.created_at.timestamp()))
+        
         # 準備付款資料
         trade_info_data = {
             "MerchantID": merchant_id,
             "RespondType": "JSON",
-            "TimeStamp": str(int(order.created_at.timestamp())),
+            "TimeStamp": timestamp,
             "Version": "2.0",
             "MerchantOrderNo": order.provider_order_id,  # 使用短格式訂單編號
             "Amt": str(int(order.amount)),
