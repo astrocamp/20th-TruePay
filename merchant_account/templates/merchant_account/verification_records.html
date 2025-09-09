@@ -62,10 +62,10 @@
 
     <!-- 篩選功能 -->
     <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
-        <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
+        <form method="GET" class="flex gap-4 items-end">
+            <div class="flex-1">
                 <label for="product" class="block text-sm font-medium text-gray-700 mb-2">商品</label>
-                <select name="product" id="product" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select name="product" id="product" class="w-full px-2 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-left">
                     <option value="">全部商品</option>
                     {% for product in products %}
                         <option value="{{ product.id }}" {% if product_filter|stringformat:'s' == product.id|stringformat:'s' %}selected{% endif %}>{{ product.name }}</option>
@@ -73,22 +73,28 @@
                 </select>
             </div>
             
-            <div>
+            <div class="flex-1">
                 <label for="customer" class="block text-sm font-medium text-gray-700 mb-2">客戶 Email</label>
                 <input type="text" name="customer" id="customer" value="{{ customer_filter }}" placeholder="搜尋客戶 email"
                        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             
-            <div>
+            <div class="flex-1">
                 <label for="date" class="block text-sm font-medium text-gray-700 mb-2">使用日期</label>
                 <input type="date" name="date" id="date" value="{{ date_filter }}" 
                        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             
-            <div class="flex items-end">
-                <button type="submit" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200">
+            <div class="flex-1">
+                <label for="order" class="block text-sm font-medium text-gray-700 mb-2">訂單編號</label>
+                <input type="text" name="order" id="order" value="{{ order_filter }}" placeholder="搜尋訂單編號"
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div class="flex-none">
+                <button type="submit" class="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200 whitespace-nowrap">
                     {% include 'components/icons.html' with icon='filter' %}
-                    篩選
+                    <span>篩選</span>
                 </button>
             </div>
         </form>
@@ -163,7 +169,7 @@
                         </div>
                         <div class="flex space-x-2">
                             {% if page_obj.has_previous %}
-                                <a href="?{% if product_filter %}product={{ product_filter }}&{% endif %}{% if customer_filter %}customer={{ customer_filter }}&{% endif %}{% if date_filter %}date={{ date_filter }}&{% endif %}page={{ page_obj.previous_page_number }}" 
+                                <a href="?{% if product_filter %}product={{ product_filter }}&{% endif %}{% if customer_filter %}customer={{ customer_filter }}&{% endif %}{% if date_filter %}date={{ date_filter }}&{% endif %}{% if order_filter %}order={{ order_filter }}&{% endif %}page={{ page_obj.previous_page_number }}" 
                                    class="px-3 py-2 text-sm text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
                                     上一頁
                                 </a>
@@ -174,7 +180,7 @@
                             </span>
                             
                             {% if page_obj.has_next %}
-                                <a href="?{% if product_filter %}product={{ product_filter }}&{% endif %}{% if customer_filter %}customer={{ customer_filter }}&{% endif %}{% if date_filter %}date={{ date_filter }}&{% endif %}page={{ page_obj.next_page_number }}" 
+                                <a href="?{% if product_filter %}product={{ product_filter }}&{% endif %}{% if customer_filter %}customer={{ customer_filter }}&{% endif %}{% if date_filter %}date={{ date_filter }}&{% endif %}{% if order_filter %}order={{ order_filter }}&{% endif %}page={{ page_obj.next_page_number }}" 
                                    class="px-3 py-2 text-sm text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
                                     下一頁
                                 </a>

@@ -302,10 +302,11 @@ def verification_records(request, subdomain):
     merchant = request.merchant
 
     # 取得篩選參數
-    product_filter = request.GET.get("product", "")
-    date_filter = request.GET.get("date", "")
-    customer_filter = request.GET.get("customer", "")
-
+    product_filter = request.GET.get('product', '')
+    date_filter = request.GET.get('date', '')
+    customer_filter = request.GET.get('customer', '')
+    order_filter = request.GET.get('order', '')
+    
     # 基本查詢：取得該商家的所有已使用票券
     used_tickets = (
         OrderItem.objects.select_related("order__customer__member", "product", "order")
@@ -334,7 +335,13 @@ def verification_records(request, subdomain):
             used_tickets = used_tickets.filter(used_at__date=filter_date)
         except ValueError:
             pass
-
+    
+    # 訂單編號篩選
+    if order_filter:
+        used_tickets = used_tickets.filter(
+            order__provider_order_id__icontains=order_filter
+        )
+    
     # 統計資料（合併為單一 aggregate 查詢）
 
     all_used_tickets = OrderItem.objects.filter(
@@ -361,14 +368,15 @@ def verification_records(request, subdomain):
     page_obj = paginator.get_page(page_number)
 
     context = {
-        "merchant": merchant,
-        "used_tickets": page_obj,
-        "page_obj": page_obj,
-        "usage_stats": usage_stats,
-        "products": products,
-        "product_filter": product_filter,
-        "customer_filter": customer_filter,
-        "date_filter": date_filter,
+        'merchant': merchant,
+        'used_tickets': page_obj,
+        'page_obj': page_obj,
+        'usage_stats': usage_stats,
+        'products': products,
+        'product_filter': product_filter,
+        'customer_filter': customer_filter,
+        'date_filter': date_filter,
+        'order_filter': order_filter,
     }
 
     return render(request, "merchant_account/verification_records.html", context)
