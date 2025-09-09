@@ -333,8 +333,12 @@ def totp_enable(request):
             totp = pyotp.TOTP(customer.totp_secret_key)
             if totp.verify(totp_code, valid_window=1):
                 # 驗證成功，啟用 TOTP
-                customer.enable_totp()
-                backup_tokens = customer.backup_tokens
+                customer.totp_enabled = True
+                if not customer.totp_secret_key:
+                    customer.generate_totp_secret()
+                # 生成備用代碼並獲取明文版本
+                backup_tokens = customer.generate_backup_tokens()
+                customer.save()
                 
                 # 檢查是否有next參數
                 next_url = request.GET.get('next') or request.POST.get('next')
