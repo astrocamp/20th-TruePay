@@ -4,22 +4,45 @@ from merchant_marketplace.models import Product
 from customers_account.models import Customer
 
 
-def shop_overview(request, subdomain):
+def shop_overview(request, subdomain=None):
     """商店總覽頁面 - 客戶查看商家的所有商品"""
-    try:
-        merchant = Merchant.objects.get(subdomain=subdomain)
-        products = Product.objects.filter(merchant=merchant, is_active=True).order_by(
-            "-created_at"
-        )
-        context = {"merchant": merchant, "products": products}
-        return render(request, "public_store/shop_overview.html", context)
-    except Merchant.DoesNotExist:
-        return redirect("pages:home")
+    if hasattr(request, "merchant") and request.domain_type == "own_domain":
+        merchant = request.merchant
+    else:
+        if not subdomain:
+            return redirect("pages:home")
+        try:
+            merchant = Merchant.objects.get(subdomain=subdomain)
+        except Merchant.DoesNotExist:
+            return redirect("pages:home")
+    products = Product.objects.filter(merchant=merchant, is_active=True).order_by(
+        "-created_at"
+    )
+    context = {"merchant": merchant, "products": products}
+    return render(request, "public_store/shop_overview.html", context)
 
 
-def payment_page(request, subdomain, id):
+def payment_page(request, subdomain=None, id=None):
     """商品收款頁面 - 客戶進行付款"""
-    product = get_object_or_404(Product, id=id, is_active=True)
+
+    if hasattr(request, "merchant") and request.domain_type == "own_domain":
+        merchant = request.merchant
+
+        if id is not None:
+            product_id = id
+        else:
+            product_id = subdomain
+    else:
+        if not subdomain or not id:
+            return redirect("pages:home")
+        try:
+            merchant = Merchant.objects.get(subdomain=subdomain)
+        except Merchant.DoesNotExist:
+            return redirect("pages:home")
+        product.id = id
+    product = get_object_or_404(
+        Product, id=product_id, merchant=merchant, is_active=True
+    )
     is_customer = (
         request.user.is_authenticated and request.user.member_type == "customer"
     )

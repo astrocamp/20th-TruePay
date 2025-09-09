@@ -1,13 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
 from django.core.paginator import Paginator
 from django.db.models import Sum, Count, Q
-from django.db import models
 from django.views.decorators.http import require_POST
 from django.utils import timezone
+from django.db.models import Sum
 
 
 from truepay.decorators import no_cache_required
@@ -16,15 +16,16 @@ from .forms import (
     LoginForm,
     SubdomainChangeForm,
     MerchantProfileUpdateForm,
+    MerchantOwnDomainForm,
 )
+from .services import DomainVerificationService
 from customers_account.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
-from .models import Merchant, SubdomainRedirect
+from .models import Merchant, SubdomainRedirect, MerchantOwnDomain
 from payments.models import Order, OrderItem, TicketValidation
 from merchant_marketplace.models import Product
 from payments.models import Order
 from datetime import datetime
-from django.db.models import Sum
 
 
 def register(req):
@@ -437,6 +438,7 @@ def profile_settings(request, subdomain):
     return render(request, "merchant_account/profile_settings.html", context)
 
 
+# 商家子網域
 @no_cache_required
 def subdomain_management(request, subdomain):
     merchant = request.merchant
@@ -459,3 +461,72 @@ def subdomain_management(request, subdomain):
         "form": form,
     }
     return render(request, "merchant_account/domain_settings.html", context)
+
+
+# 商家自訂網域
+@no_cache_required
+def own_domain_list(request, subdomain):
+    merchant = request.merchant
+    domains = MerchantOwnDomain.objects.filter(merchant=merchant)
+    form = MerchantOwnDomainForm()
+
+    return render(
+        request,
+        "merchant_account/own_domain_list.html",
+        {"merchant": merchant, "domains": domains, "form": form},
+    )
+
+
+@no_cache_required
+def own_domain_add(request, subdomain):
+    merchant = request.merchant
+
+    if request.method == "POST":
+        form = MerchantOwnDomainForm(request.POST)
+        if form.is_valid():
+            domain_obj = form.save(commit=False)
+            domain_obj.merchant = merchant
+            domain_obj.save()
+
+            messages.success(
+                request,
+                f"網域 {domain_obj.domain_name} 已新增，請設定 DNS 記錄後進行驗證",
+            )
+            return redirect(
+                "merchant_account:own_domain_detail",
+                subdomain=subdomain,
+                pk=domain_obj.pk,
+            )
+        else:
+            for error in form.errors.values():
+                messages.error(request, error[0])
+    return redirect("merchant_account:own_domain_list", subdomain=subdomain)
+
+
+@no_cache_required
+def own_domain_detail(request, subdomain, pk):
+    merchant = request.merchant
+    domain_obj = get_object_or_404(MerchantOwnDomain, pk=pk, merchant=merchant)
+    if request.method == "POST":
+        action = request.POST.get("action")
+
+        if action == "verify":
+            success, message = DomainVerificationService.verify_domain_ownership(
+                domain_obj
+            )
+            if success:
+                messages.success(request, message)
+            else:
+                messages.error(request, message)
+        elif action == "delete":
+            domain_name = domain_obj.domain_name
+            domain_obj.delete()
+            messages.success(request, f"網域 {domain_name} 已刪除")
+            return redirect("merchant_account:own_domain_list", subdomain=subdomain)
+
+    instructions = DomainVerificationService.get_verification_instructions(domain_obj)
+    return render(
+        request,
+        "merchant_account/own_domain_detail.html",
+        {"merchant": merchant, "domain_obj": domain_obj, "instructions": instructions},
+    )

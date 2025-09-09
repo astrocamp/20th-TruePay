@@ -43,4 +43,19 @@ urlpatterns = [
         views.profile_settings,
         name="profile_settings",
     ),
+    path(
+        "own-domains/<slug:subdomain>/",
+        views.own_domain_list,
+        name="own_domain_list",
+    ),
+    path(
+        "own-domains/add/<slug:subdomain>/",
+        views.own_domain_add,
+        name="own_domain_add",
+    ),
+    path(
+        "own-domains/detail/<slug:subdomain>/<int:pk>/",
+        views.own_domain_detail,
+        name="own_domain_detail",
+    ),
 ]
