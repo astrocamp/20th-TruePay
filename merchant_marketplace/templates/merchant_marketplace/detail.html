@@ -90,18 +90,55 @@
 
           <div class="pt-4 border-t border-gray-200">
             <div class="flex gap-4">
-              <a href="{% url 'public_store:payment_page' request.merchant.subdomain product.id %}"
-                class="flex-1 text-center py-3 px-4 rounded-lg text-sm transition duration-200 bg-brand-grayLight text-cis-secondary hover:bg-cis-secondary-hover border border-cis-secondary"
-                target="_blank">
+              <!-- 上架按鈕 -->
+              <button
+                type="button"
+                data-action="confirm-delete"
+                data-form-id="activateForm"
+                data-message="確定要上架這個商品嗎？上架後顧客就能購買。"
+                class="flex-1 text-center py-3 px-4 rounded-lg text-sm transition duration-200 {% if product.is_active %}bg-gray-100 text-gray-400 cursor-not-allowed{% else %}bg-brand-grayLight text-cis-secondary hover:bg-cis-secondary hover:text-white border border-cis-secondary{% endif %}"
+                {% if product.is_active %}disabled{% endif %}
+              >
+                {% include 'components/icons.html' with icon='check-mark' class='w-4 h-4 inline mr-1' %}
                 商品上架
-              </a>
-              <a href="{% url 'public_store:payment_page' request.merchant.subdomain product.id %}"
-                class="flex-1 text-center py-3 px-4 rounded-lg text-sm transition duration-200 bg-brand-grayLight text-cis-accent hover:bg-cis-accent-hover border border-cis-accent"
-                target="_blank">
+              </button>
+              
+              <!-- 下架按鈕 -->
+              <button
+                type="button"
+                data-action="confirm-delete"
+                data-form-id="deactivateForm"
+                data-message="確定要下架這個商品嗎？下架後顧客將無法購買。"
+                class="flex-1 text-center py-3 px-4 rounded-lg text-sm transition duration-200 {% if not product.is_active %}bg-gray-100 text-gray-400 cursor-not-allowed{% else %}bg-brand-grayLight text-cis-accent hover:bg-cis-accent hover:text-white border border-cis-accent{% endif %}"
+                {% if not product.is_active %}disabled{% endif %}
+              >
+                {% include 'components/icons.html' with icon='x-mark' class='w-4 h-4 inline mr-1' %}
                 商品下架
-              </a>
+              </button>
             </div>
         </div>         
+
+          <!-- 隱藏的上架表單 -->
+          <form
+            id="activateForm"
+            action="{% url 'merchant_marketplace:detail' request.merchant.subdomain product.id %}"
+            method="post"
+            style="display: none"
+          >
+            {% csrf_token %}
+            <input type="hidden" name="action" value="activate" />
+          </form>
+
+          <!-- 隱藏的下架表單 -->
+          <form
+            id="deactivateForm"
+            action="{% url 'merchant_marketplace:detail' request.merchant.subdomain product.id %}"
+            method="post"
+            style="display: none"
+          >
+            {% csrf_token %}
+            <input type="hidden" name="action" value="deactivate" />
+          </form>
 
           <!-- 隱藏的刪除表單 -->
           <form
