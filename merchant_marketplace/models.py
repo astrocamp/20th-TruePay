@@ -22,6 +22,12 @@ class Product(models.Model):
         default='before_redeem',
         verbose_name="驗證時間點"
     )
+    ticket_expiry = models.DateTimeField(
+        null=True, 
+        blank=True, 
+        verbose_name="票券有效期限",
+        help_text="設定此商品票券的有效期限，留空則使用系統預設值"
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="創建時間")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="更新時間")
     is_active = models.BooleanField(default=True, verbose_name="是否上架")

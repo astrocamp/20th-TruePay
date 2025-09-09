@@ -59,6 +59,14 @@ def new(request, subdomain):
             if stock < 1:
                 raise ValueError("庫存數量必須至少為 1 件")
                 
+            # 處理票券期限
+            from django.utils import timezone
+            from django.utils.dateparse import parse_datetime
+            
+            ticket_expiry = None
+            if request.POST.get("ticket_expiry"):
+                ticket_expiry = parse_datetime(request.POST.get("ticket_expiry"))
+            
             product = Product.objects.create(
                 name=request.POST.get("name"),
                 description=request.POST.get("description"),
@@ -67,6 +75,7 @@ def new(request, subdomain):
                 image=request.FILES.get("image"),
                 phone_number=request.POST.get("phone_number"),
                 verification_timing=request.POST.get("verification_timing", "before_redeem"),
+                ticket_expiry=ticket_expiry,
                 merchant=request.merchant,
                 is_active=False,  # 預設為下架
             )
@@ -120,6 +129,12 @@ def edit(request, subdomain, id):
             )
             # 更新驗證方式
             product.verification_timing = request.POST.get("verification_timing") or product.verification_timing
+            
+            # 更新票券期限
+            from django.utils.dateparse import parse_datetime
+            if request.POST.get("ticket_expiry"):
+                product.ticket_expiry = parse_datetime(request.POST.get("ticket_expiry"))
+            
             product.save()
             messages.success(request, "商品更新成功！")
             return redirect("merchant_marketplace:index", request.merchant.subdomain)

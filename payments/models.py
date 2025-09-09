@@ -319,6 +319,12 @@ def create_tickets(sender, instance, **kwargs):
                 random_suffix = str(random.randint(1000, 9999))
                 ticket_code = f"TKT{order_suffix}{timestamp}{i:03d}{random_suffix}"
 
+                # 決定票券有效期限：優先使用商品設定，否則使用全域設定
+                if order.product.ticket_expiry:
+                    valid_until = order.product.ticket_expiry
+                else:
+                    valid_until = timezone.now() + timezone.timedelta(days=settings.TICKET_VALIDITY_DAYS)
+                
                 items_to_create.append(
                     OrderItem(
                         order=order,
@@ -326,9 +332,7 @@ def create_tickets(sender, instance, **kwargs):
                         customer=order.customer,
                         ticket_code=ticket_code,
                         status="unused",
-                        # 設定票券有效期限
-                        valid_until=timezone.now()
-                        + timezone.timedelta(days=settings.TICKET_VALIDITY_DAYS),
+                        valid_until=valid_until,
                     )
                 )
 
