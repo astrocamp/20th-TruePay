@@ -11,4 +11,5 @@ urlpatterns = [
     path("purchase-history/", views.purchase_history, name="purchase_history"),
     path("ticket-wallet/", views.ticket_wallet, name="ticket_wallet"),
     path("profile-settings/", views.profile_settings, name="profile_settings"),
+    path("cancel-order/<int:order_id>/", views.cancel_order, name="cancel_order"),
 ]

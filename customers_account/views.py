@@ -1,7 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login as django_login, logout as django_logout
 from django.db.models import Sum
+from django.db import transaction
 from truepay.decorators import customer_login_required
 from django.core.paginator import Paginator
 from django.utils import timezone
@@ -273,3 +274,42 @@ def profile_settings(request):
     }
     
     return render(request, "customers/profile_settings.html", context)
+
+
+@customer_login_required
+def cancel_order(request, order_id):
+    """取消待付款訂單"""
+    if request.method != "POST":
+        messages.error(request, "無效的請求方式")
+        return redirect("customers_account:purchase_history")
+    
+    try:
+        with transaction.atomic():
+            # 透過 user 找到對應的 Customer
+            customer = Customer.objects.get(member=request.user)
+            
+            # 取得訂單並檢查權限
+            order = get_object_or_404(
+                Order.objects.select_for_update(), 
+                id=order_id, 
+                customer=customer
+            )
+            
+            # 檢查訂單狀態，只能取消待付款的訂單
+            if order.status != "pending":
+                messages.error(request, f"此訂單狀態為「{order.get_status_display()}」，無法取消")
+                return redirect("customers_account:purchase_history")
+            
+            # 更新訂單狀態為已取消
+            order.status = "cancelled"
+            order.save(update_fields=['status', 'updated_at'])
+            
+        messages.success(request, f"訂單 {order.provider_order_id} 已成功取消")
+        return redirect("customers_account:purchase_history")
+        
+    except Customer.DoesNotExist:
+        messages.error(request, "客戶資料不存在")
+        return redirect("pages:home")
+    except Exception as e:
+        messages.error(request, "取消訂單失敗，請稍後再試")
+        return redirect("customers_account:purchase_history")
