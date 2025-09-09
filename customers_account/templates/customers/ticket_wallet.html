@@ -116,8 +116,8 @@
                 {% if ticket.valid_until %}
                 <div>
                   <span class="font-medium">有效期限：</span>
-                  <span class="{% if ticket.valid_until < now %}text-red-600{% endif %}">
-                    {{ ticket.valid_until|date:"Y年m月d日" }}
+                    <span class="{% if ticket.valid_until < now %}text-red-600{% endif %}">
+                      {{ ticket.valid_until|date:"Y年m月d日 H:i" }}
                   </span>
                 </div>
                 {% endif %}
