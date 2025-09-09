@@ -106,17 +106,20 @@ class Customer(models.Model):
         return base64.b64encode(buffer.getvalue()).decode()
     
     def verify_totp(self, token):
-        """驗證 TOTP 代碼"""
+        """驗證 TOTP 代碼或備用恢復代碼"""
+        from django.contrib.auth.hashers import check_password
+        
         if not self.totp_secret_key or not self.totp_enabled:
             return False
         
         # 檢查是否為備用恢復代碼
-        if token in self.backup_tokens:
-            # 移除已使用的備用代碼
-            self.backup_tokens = [t for t in self.backup_tokens if t != token]
-            self.totp_verified_at = timezone.now()
-            self.save(update_fields=['backup_tokens', 'totp_verified_at'])
-            return True
+        for hashed_token in self.backup_tokens:
+            if check_password(token, hashed_token):
+                # 移除已使用的備用代碼
+                self.backup_tokens.remove(hashed_token)
+                self.totp_verified_at = timezone.now()
+                self.save(update_fields=['backup_tokens', 'totp_verified_at'])
+                return True
         
         # 驗證 TOTP 代碼
         totp = pyotp.TOTP(self.totp_secret_key)
@@ -128,15 +131,19 @@ class Customer(models.Model):
         return False
     
     def generate_backup_tokens(self, count=8):
-        """生成備用恢復代碼"""
-        tokens = []
+        """生成備用恢復代碼並安全儲存其雜湊值"""
+        from django.contrib.auth.hashers import make_password
+        
+        plaintext_tokens = []
+        hashed_tokens = []
         for _ in range(count):
             token = ''.join(secrets.choice('0123456789') for _ in range(8))
-            tokens.append(token)
+            plaintext_tokens.append(token)
+            hashed_tokens.append(make_password(token))
         
-        self.backup_tokens = tokens
+        self.backup_tokens = hashed_tokens
         self.save(update_fields=['backup_tokens'])
-        return tokens
+        return plaintext_tokens
     
     def enable_totp(self):
         """啟用 TOTP 功能"""
