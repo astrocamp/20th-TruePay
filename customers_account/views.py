@@ -432,7 +432,6 @@ def regenerate_backup_tokens(request):
 
 
 # AJAX API 用於交易過程中驗證 TOTP
-@csrf_exempt
 @require_http_methods(["POST"])
 @customer_login_required
 def verify_totp_api(request):
