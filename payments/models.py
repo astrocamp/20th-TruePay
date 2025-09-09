@@ -164,6 +164,7 @@ class OrderItem(models.Model):
     STATUS_CHOICES = [
         ("unused", "未使用"),
         ("used", "已使用"),
+        ("expired", "已過期"),
     ]
 
     # === 基本資訊 ===

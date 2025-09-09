@@ -162,6 +162,10 @@ def ticket_wallet(request):
     merchant_filter = request.GET.get('merchant', '')
     order_filter = request.GET.get('order', '')
     
+    # 先將已過期且未標記的票券狀態更新為 expired（避免每次模板內判斷）
+    now = timezone.now()
+    OrderItem.objects.filter(customer=customer, status='unused', valid_until__lt=now).update(status='expired')
+
     # 基本查詢：取得該客戶的所有票券
     tickets = OrderItem.objects.select_related(
         'product__merchant', 'order'
@@ -190,13 +194,12 @@ def ticket_wallet(request):
             tickets = tickets.filter(order__provider_order_id=order_filter)
     
     # 取得統計資料
-    now = timezone.now()
     all_tickets = OrderItem.objects.filter(customer=customer)
     ticket_stats = all_tickets.aggregate(
         total=Count('id'),
         unused=Count('id', filter=Q(status='unused')),
         used=Count('id', filter=Q(status='used')),
-        expired=Count('id', filter=Q(status='unused', valid_until__lt=now))
+        expired=Count('id', filter=Q(status='expired'))
     )
     
     # 取得所有相關商家（用於篩選下拉選單）

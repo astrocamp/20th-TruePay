@@ -96,6 +96,8 @@
                 <h3 class="text-lg font-semibold text-gray-900">{{ ticket.product.name }}</h3>
                 {% if ticket.status == 'unused' %}
                   <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">未使用</span>
+                {% elif ticket.status == 'expired' %}
+                  <span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">已過期</span>
                 {% else %}
                   <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">已使用</span>
                 {% endif %}
@@ -137,6 +139,12 @@
                         :class="showQR ? 'bg-gray-600' : 'bg-blue-600 hover:bg-blue-700'">
                   {% include 'components/icons.html' with icon='qr-code' class='w-4 h-4 inline mr-2' %}
                   <span x-text="showQR ? '收起' : '顯示QR Code'">顯示QR Code</span>
+                </button>
+              {% elif ticket.status == 'expired' %}
+                <button type="button" class="px-4 py-2 bg-gray-300 text-gray-500 rounded-md cursor-not-allowed text-sm"
+                        @click="alert('票券已過期，無法顯示 QR Code')">
+                  {% include 'components/icons.html' with icon='qr-code' class='w-4 h-4 inline mr-2' %}
+                  顯示QR Code
                 </button>
               {% else %}
                 <div class="text-sm text-gray-500">
