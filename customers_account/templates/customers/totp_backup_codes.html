@@ -82,7 +82,11 @@
                 :disabled="!confirmed"
                 :class="confirmed ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'"
                 class="w-full text-white py-3 px-6 rounded-lg transition duration-200 font-medium">
-            ✅ 我已保存代碼，前往儀表板
+            {% if next_url %}
+                ✅ 我已保存代碼，返回購買頁面
+            {% else %}
+                ✅ 我已保存代碼，前往儀表板
+            {% endif %}
         </button>
         
         <a href="{% url 'customers_account:totp_manage' %}" 
@@ -123,7 +127,11 @@ function backupCodes() {
         
         goToDashboard() {
             if (this.confirmed) {
-                window.location.href = "{% url 'customers_account:dashboard' %}";
+                {% if next_url %}
+                    window.location.href = "{{ next_url }}";
+                {% else %}
+                    window.location.href = "{% url 'customers_account:dashboard' %}";
+                {% endif %}
             }
         }
     }

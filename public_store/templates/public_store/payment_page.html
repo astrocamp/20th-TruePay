@@ -28,17 +28,48 @@
                 </div>
                 
                 <!-- 商品資訊 -->
-                <div class="md:w-1/2 p-8" x-data="{ 
-                    ...createQuantityManager(),
+                <div class="md:w-1/2 p-8" x-data="{
+                    // 數量管理
+                    quantity: 1,
+                    unitPrice: {{ product.price }},
+                    maxStock: {{ product.stock }},
+                    
+                    get totalPrice() {
+                        return this.unitPrice * this.quantity;
+                    },
+                    
+                    get formattedTotalPrice() {
+                        return `NT$ ${this.totalPrice.toLocaleString()}`;
+                    },
+                    
+                    decrease() {
+                        if (this.quantity > 1) {
+                            this.quantity--;
+                        }
+                    },
+                    
+                    increase() {
+                        if (this.quantity < this.maxStock) {
+                            this.quantity++;
+                        }
+                    },
+                    
+                    get canDecrease() {
+                        return this.quantity > 1;
+                    },
+                    
+                    get canIncrease() {
+                        return this.quantity < this.maxStock;
+                    },
+                    
+                    // 驗證相關
                     needsVerification: '{{ product.verification_timing }}' === 'before_payment',
                     isVerified: false,
                     termsAgreed: false,
                     verificationData: {
-                        terms: false,
-                        identity: '',
-                        phone: ''
+                        terms: false
                     }
-                }" 
+                }"
                      data-unit-price="{{ product.price }}" data-max-stock="{{ product.stock }}">
                     <div class="mb-6">
                         <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ product.name }}</h1>
@@ -108,14 +139,14 @@
                         {% if product.stock > 0 %}
                             <!-- 付款前驗證區塊 -->
                             <div x-show="needsVerification && !isVerified" class="mb-6">
-                                <div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6">
+                                <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
                                     <div class="flex items-center mb-4">
-                                        <svg class="w-6 h-6 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.728-.833-2.498 0L4.316 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                                        <svg class="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.818-4.954A9.959 9.959 0 0121 12c0 5.523-4.477 10-10 10S1 17.523 1 12 5.477 2 11 2a9.959 9.959 0 014.954 1.818"/>
                                         </svg>
-                                        <h3 class="text-lg font-bold text-yellow-800">🔐 購買前驗證</h3>
+                                        <h3 class="text-lg font-bold text-blue-800">🔐 安全驗證要求</h3>
                                     </div>
-                                    <p class="text-yellow-700 mb-6">此商品需要在付款前完成身分驗證，請填寫以下資訊：</p>
+                                    <p class="text-blue-700 mb-6">此商品需要二階段驗證才能購買，請先完成安全設定</p>
                                     
                                     <div class="space-y-4">
                                         <div>
@@ -127,28 +158,45 @@
                                             </label>
                                         </div>
                                         
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-2">身分驗證</label>
-                                            <input type="text" x-model="verificationData.identity" 
-                                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                                   placeholder="請輸入身分證字號或護照號碼">
+                                        {% if is_customer and customer.totp_enabled %}
+                                        <!-- 用戶已啟用TOTP -->
+                                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                            <div class="flex items-center mb-2">
+                                                <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.818-4.954A9.959 9.959 0 0121 12c0 5.523-4.477 10-10 10S1 17.523 1 12 5.477 2 11 2a9.959 9.959 0 014.954 1.818"/>
+                                                </svg>
+                                                <span class="text-green-800 font-medium">✅ 二階段驗證已啟用</span>
+                                            </div>
+                                            <p class="text-green-700 text-sm">您已完成二階段驗證設定，點擊下方按鈕即可開始付款</p>
                                         </div>
-                                        
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-2">聯絡電話</label>
-                                            <input type="tel" x-model="verificationData.phone" 
-                                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                                   placeholder="請輸入聯絡電話">
+                                        {% else %}
+                                        <!-- 用戶未啟用TOTP -->
+                                        <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                                            <div class="flex items-center mb-2">
+                                                <svg class="w-5 h-5 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.728-.833-2.498 0L4.316 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                                                </svg>
+                                                <span class="text-orange-800 font-medium">⚠️ 需要設定二階段驗證</span>
+                                            </div>
+                                            <p class="text-orange-700 text-sm mb-3">此商品需要二階段驗證才能購買，請先完成安全設定：</p>
+                                            <a href="{% url 'customers_account:totp_setup' %}?next={{ request.get_full_path }}" 
+                                               class="inline-block bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition duration-200 text-sm font-medium">
+                                                🔧 立即設定二階段驗證
+                                            </a>
+                                            <p class="text-xs text-orange-600 mt-2">💡 設定完成後將自動返回此頁面</p>
                                         </div>
+                                        {% endif %}
                                     </div>
                                     
+                                    {% if is_customer and customer.totp_enabled %}
                                     <button type="button" 
-                                            @click="if(verificationData.terms && verificationData.identity && verificationData.phone) { isVerified = true }"
-                                            :disabled="!verificationData.terms || !verificationData.identity || !verificationData.phone"
-                                            :class="verificationData.terms && verificationData.identity && verificationData.phone ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-gray-400 cursor-not-allowed'"
+                                            @click="if(verificationData.terms) { isVerified = true }"
+                                            :disabled="!verificationData.terms"
+                                            :class="verificationData.terms ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
                                             class="w-full text-white py-3 px-6 rounded-lg transition duration-200 font-medium text-lg mt-6">
-                                        ✓ 完成驗證，繼續付款
+                                        ✓ 確認條款，開始付款
                                     </button>
+                                    {% endif %}
                                 </div>
                             </div>
                             

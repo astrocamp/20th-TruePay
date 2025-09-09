@@ -27,6 +27,9 @@
         
         <form method="post" action="{% url 'customers_account:totp_enable' %}" class="space-y-4" x-ref="totpForm">
             {% csrf_token %}
+            {% if next_url %}
+                <input type="hidden" name="next" value="{{ next_url }}">
+            {% endif %}
             <div>
                 <label for="totp_code" class="block text-sm font-medium text-gray-700 mb-2">
                     驗證代碼 (6位數字)

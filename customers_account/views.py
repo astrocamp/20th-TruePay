@@ -298,10 +298,14 @@ def totp_setup(request):
     customer.generate_totp_secret()
     qr_code = customer.generate_qr_code()
     
+    # 檢查是否有next參數
+    next_url = request.GET.get('next')
+    
     context = {
         'customer': customer,
         'qr_code': qr_code,
         'totp_secret': customer.totp_secret_key,
+        'next_url': next_url,
     }
     
     return render(request, 'customers/totp_setup.html', context)
@@ -332,10 +336,14 @@ def totp_enable(request):
                 customer.enable_totp()
                 backup_tokens = customer.backup_tokens
                 
+                # 檢查是否有next參數
+                next_url = request.GET.get('next') or request.POST.get('next')
+                
                 messages.success(request, "二階段驗證已成功啟用！請保存您的備用恢復代碼。")
                 return render(request, 'customers/totp_backup_codes.html', {
                     'customer': customer,
-                    'backup_tokens': backup_tokens
+                    'backup_tokens': backup_tokens,
+                    'next_url': next_url
                 })
             else:
                 messages.error(request, "驗證代碼錯誤，請重新輸入")

@@ -22,5 +22,19 @@ def payment_page(request, subdomain, id):
     is_customer = (
         request.user.is_authenticated and request.user.member_type == "customer"
     )
-    context = {"product": product, "is_customer": is_customer}
+    
+    # 如果是已登入的客戶，取得Customer物件以檢查TOTP狀態
+    customer = None
+    if is_customer:
+        try:
+            from customers_account.models import Customer
+            customer = Customer.objects.get(member=request.user)
+        except Customer.DoesNotExist:
+            pass
+    
+    context = {
+        "product": product, 
+        "is_customer": is_customer,
+        "customer": customer
+    }
     return render(request, "public_store/payment_page.html", context)
