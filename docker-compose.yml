@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: truepay
+      POSTGRES_USER: truepay
+      POSTGRES_PASSWORD: truepay123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DEBUG=True
+      - DJANGO_SETTINGS_MODULE=truepay.settings
+      - DB_NAME=truepay
+      - DB_USER=truepay
+      - DB_PASSWORD=truepay123
+      - DB_HOST=db
+      - DB_PORT=5432
+    volumes:
+      - .:/app
+    command: >
+      sh -c "uv run python manage.py migrate &&
+             uv run python manage.py runserver 0.0.0.0:8000"
+volumes:
+  postgres_data:

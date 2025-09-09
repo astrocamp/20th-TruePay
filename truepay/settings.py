@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from .domain_config import get_allowed_hosts
 
 # Load environment variables from .env file
 load_dotenv()
@@ -37,6 +38,7 @@ DEBUG = True
 NGROK_URL = os.getenv("NGROK_URL")
 if not NGROK_URL:
     raise ValueError("請在 .env 檔案中設定 NGROK_URL=your-ngrok-id.ngrok-free.app")
+
 
 ALLOWED_HOSTS = [
     "127.0.0.1",

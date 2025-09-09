@@ -12,8 +12,12 @@ products/
 wheels/
 node_modules
 
+# Static files (built from src)
+static/
+
 # Environment variables
 .env
+.env.production
 
 # Virtual environment
 .venv/
@@ -46,6 +50,10 @@ build/
 .claude/
 
 ngrok.exe
-
-
 static/
+
+
+
+config.yml
+docker-compose.prod.yml
+truepay-key-new.pem
