@@ -557,6 +557,92 @@ function createTicketScanManager() {
 window.createTicketScanManager = createTicketScanManager;
 window.createQuantityManager = createQuantityManager;
 
+// Alpine.js TOTP 備用代碼管理組件
+function createBackupCodes(backupTokens) {
+    return {
+        backupTokens: backupTokens || [],
+        copied: false,
+        confirmed: false,
+        
+        async copyAllCodes() {
+            const codesText = this.backupTokens.join('\n');
+            
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(codesText);
+                    this.showCopySuccess();
+                } else {
+                    this.fallbackCopyTextToClipboard(codesText);
+                }
+            } catch (error) {
+                this.fallbackCopyTextToClipboard(codesText);
+            }
+        },
+        
+        fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            
+            textArea.style.top = '0';
+            textArea.style.left = '0';
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    this.showCopySuccess();
+                }
+            } catch (err) {
+                console.error('複製失敗:', err.message);
+            }
+            
+            document.body.removeChild(textArea);
+        },
+        
+        showCopySuccess() {
+            this.copied = true;
+            setTimeout(() => {
+                this.copied = false;
+            }, 2000);
+        },
+        
+        downloadCodes() {
+            const codesText = this.backupTokens.join('\n');
+            const content = `TruePay 二階段驗證備用恢復代碼
+生成時間：${new Date().toLocaleString()}
+
+${codesText}
+
+重要提醒：
+- 每個代碼只能使用一次
+- 請妥善保管，遺失後無法復原
+- 可在個人設定中重新生成`;
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'truepay-backup-codes.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        },
+        
+        goToDashboard(nextUrl, dashboardUrl) {
+            if (this.confirmed) {
+                window.location.href = nextUrl || dashboardUrl;
+            }
+        }
+    };
+}
+
+// 將函數掛載到全域供 Alpine.js 使用
+window.createBackupCodes = createBackupCodes;
+
 // 導出 Alpine.js 組件創建函數和 NavigationManager
 export { 
   createImagePreview,
@@ -564,5 +650,6 @@ export {
   createMobileMenu,
   createQuantityManager,
   createTicketScanManager,
+  createBackupCodes,
   NavigationManager
 };
