@@ -9,7 +9,8 @@ export default defineConfig({
         emptyOutDir: false,
         rollupOptions:{
             input: {
-                app: resolve(__dirname,'src/scripts/app.js')
+                app: resolve(__dirname,'src/scripts/app.js'),
+                qr: resolve(__dirname,'src/scripts/qr-generator.js')
             },
             output: {
                 entryFileNames:"scripts/[name].js",
