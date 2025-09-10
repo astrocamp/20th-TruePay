@@ -10,7 +10,9 @@ export default defineConfig({
         rollupOptions:{
             input: {
                 app: resolve(__dirname,'src/scripts/app.js'),
-                qr: resolve(__dirname,'src/scripts/qr-generator.js')
+                qr: resolve(__dirname,'src/scripts/qr-generator.js'),
+                scanner: resolve(__dirname,'src/scripts/qr-scanner.js'),
+                'qr-component': resolve(__dirname,'src/scripts/qr-scanner-component.js')
             },
             output: {
                 entryFileNames:"scripts/[name].js",
