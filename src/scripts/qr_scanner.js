@@ -1,77 +1,80 @@
 import jsQR from 'jsqr';
 
 /**
- * QR Code掃描器類
+ * 商家端 QR 掃描功能
+ * 使用瀏覽器原生 Camera API 和 jsQR 函式庫
  */
 class QRScanner {
     constructor() {
         this.video = null;
         this.canvas = null;
         this.context = null;
-        this.isScanning = false;
         this.stream = null;
-        this.onScanCallback = null;
-        this.onErrorCallback = null;
+        this.scanning = false;
+        this.animationFrame = null;
     }
 
     /**
      * 初始化掃描器
-     * @param {HTMLVideoElement} videoElement - 影片元素
-     * @param {HTMLCanvasElement} canvasElement - 畫布元素
-     * @param {Function} onScan - 掃描成功回調
-     * @param {Function} onError - 錯誤回調
      */
-    init(videoElement, canvasElement, onScan, onError) {
+    async init(videoElement, canvasElement) {
         this.video = videoElement;
         this.canvas = canvasElement;
         this.context = this.canvas.getContext('2d');
-        this.onScanCallback = onScan;
-        this.onErrorCallback = onError;
-        
-        // 設置畫布尺寸
-        this.canvas.width = 300;
-        this.canvas.height = 300;
+
+        // 設定 canvas 大小
+        this.canvas.width = 640;
+        this.canvas.height = 480;
     }
 
     /**
      * 開始掃描
      */
-    async startScanning() {
-        if (this.isScanning) return;
-
+    async startScan() {
         try {
-            // 請求攝影機權限
+            console.log('🎥 啟動相機...');
+            
+            // 取得相機權限
             this.stream = await navigator.mediaDevices.getUserMedia({
                 video: {
-                    facingMode: 'environment', // 後置攝影機
-                    width: { ideal: 300 },
-                    height: { ideal: 300 }
+                    width: { ideal: 640 },
+                    height: { ideal: 480 },
+                    facingMode: 'environment' // 使用後置相機
                 }
             });
 
             this.video.srcObject = this.stream;
             this.video.play();
-            this.isScanning = true;
 
-            // 等待影片準備就緒
-            this.video.addEventListener('loadedmetadata', () => {
-                this.scanFrame();
-            });
+            this.scanning = true;
+            this.scanFrame();
+
+            return { success: true };
 
         } catch (error) {
-            console.error('Cannot access camera:', error);
-            if (this.onErrorCallback) {
-                this.onErrorCallback('無法存取攝影機，請確認權限設定');
-            }
+            console.error('❌ 相機啟動失敗:', error);
+            return { 
+                success: false, 
+                error: error.name === 'NotAllowedError' ? 
+                    '請允許使用相機權限' : 
+                    '無法啟動相機: ' + error.message 
+            };
         }
     }
 
     /**
      * 停止掃描
      */
-    stopScanning() {
-        this.isScanning = false;
+    stopScan() {
+        console.log('🛑 停止掃描');
         
+        this.scanning = false;
+        
+        if (this.animationFrame) {
+            cancelAnimationFrame(this.animationFrame);
+            this.animationFrame = null;
+        }
+
         if (this.stream) {
             this.stream.getTracks().forEach(track => track.stop());
             this.stream = null;
@@ -83,69 +86,64 @@ class QRScanner {
     }
 
     /**
-     * 掃描幀
+     * 掃描框架
      */
     scanFrame() {
-        if (!this.isScanning || !this.video || this.video.readyState !== this.video.HAVE_ENOUGH_DATA) {
-            if (this.isScanning) {
-                requestAnimationFrame(() => this.scanFrame());
+        if (!this.scanning) return;
+
+        if (this.video.readyState === this.video.HAVE_ENOUGH_DATA) {
+            // 將影片畫面複製到 canvas
+            this.context.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
+            
+            // 獲取圖像數據
+            const imageData = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+            
+            // 使用 jsQR 解析 QR code
+            const qrResult = jsQR(imageData.data, imageData.width, imageData.height);
+            
+            if (qrResult) {
+                console.log('✅ 掃描到 QR code:', qrResult.data);
+                this.onQRDetected(qrResult.data);
+                return; // 找到 QR code，停止掃描
             }
-            return;
         }
 
-        // 將影片畫面繪製到畫布
-        this.context.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
-        
-        // 獲取影像資料
-        const imageData = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
-        
-        // 使用jsQR解析QR code
-        const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
-        
-        if (qrCode) {
-            // 成功掃描到QR code
-            if (this.onScanCallback) {
-                this.onScanCallback(qrCode.data);
+        // 繼續掃描下一框架
+        this.animationFrame = requestAnimationFrame(() => this.scanFrame());
+    }
+
+    /**
+     * QR code 被偵測到時的回調
+     */
+    onQRDetected(data) {
+        try {
+            // 解析 QR code 資料
+            const qrData = JSON.parse(data);
+            
+            if (qrData.type === 'ticket_voucher' && qrData.ticket_code) {
+                console.log('🎫 偵測到票券 QR code:', qrData.ticket_code);
+                
+                // 觸發自訂事件
+                const event = new CustomEvent('qr-scanned', {
+                    detail: { ticketCode: qrData.ticket_code }
+                });
+                document.dispatchEvent(event);
+                
+                this.stopScan();
+            } else {
+                console.warn('⚠️ 不是有效的票券 QR code');
+                // 繼續掃描
+                this.animationFrame = requestAnimationFrame(() => this.scanFrame());
             }
-        } else {
-            // 繼續掃描下一幀
-            requestAnimationFrame(() => this.scanFrame());
+        } catch (error) {
+            console.warn('⚠️ QR code 格式錯誤:', error);
+            // 繼續掃描
+            this.animationFrame = requestAnimationFrame(() => this.scanFrame());
         }
     }
 }
 
-// 全局QR掃描器實例
+// 全域 QR 掃描器實例
 window.qrScanner = new QRScanner();
 
-/**
- * 初始化QR掃描功能
- * @param {string} videoId - 影片元素ID
- * @param {string} canvasId - 畫布元素ID
- * @param {Function} onScan - 掃描成功回調
- * @param {Function} onError - 錯誤回調
- */
-window.initQRScanner = function(videoId, canvasId, onScan, onError) {
-    const video = document.getElementById(videoId);
-    const canvas = document.getElementById(canvasId);
-    
-    if (!video || !canvas) {
-        console.error('Video or canvas element not found');
-        return;
-    }
-    
-    window.qrScanner.init(video, canvas, onScan, onError);
-};
-
-/**
- * 開始QR掃描
- */
-window.startQRScanning = function() {
-    return window.qrScanner.startScanning();
-};
-
-/**
- * 停止QR掃描
- */
-window.stopQRScanning = function() {
-    window.qrScanner.stopScanning();
-};
+console.log('📷 QR 掃描器已載入');

@@ -1,4 +1,5 @@
 {% extends "customers_layout/dashboard_base.html" %}
+{% load static %}
 {% block title %}票券錢包 - TruePay{% endblock %}
 
 {% block content %}
@@ -79,7 +80,6 @@
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
            x-data="{ 
              showQR: false, 
-             qrGenerated: false,
              needsRedemptionVerification: '{{ ticket.product.verification_timing }}' === 'before_redeem',
              isRedemptionVerified: false,
              redemptionData: {
@@ -130,18 +130,19 @@
                 NT$ {{ ticket.order.unit_price|floatformat:0 }}
               </div>
               
-              {% if ticket.status == 'unused' %}
+              
+              {% if ticket.status == 'unused' and ticket.ticket_code %}
                 <!-- QR Code 顯示按鈕 -->
                 <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
-                        @click="showQR = !showQR; if(showQR && !qrGenerated && (!needsRedemptionVerification || isRedemptionVerified)) { generateQR('qr-{{ ticket.id }}', '{{ ticket.ticket_code }}'); qrGenerated = true; }"
+                        @click="showQR = !showQR"
                         :class="showQR ? 'bg-gray-600' : 'bg-blue-600 hover:bg-blue-700'">
                   {% include 'components/icons.html' with icon='qr-code' class='w-4 h-4 inline mr-2' %}
                   <span x-text="showQR ? '收起' : '顯示QR Code'">顯示QR Code</span>
                 </button>
-              {% else %}
-                <div class="text-sm text-gray-500">
-                  {% include 'components/icons.html' with icon='check-circle' class='w-4 h-4 inline mr-1 text-green-600' %}
-                  已使用
+              {% elif ticket.status == 'unused' and not ticket.ticket_code %}
+                <!-- 沒有票券代碼的提示 -->
+                <div class="px-4 py-2 bg-gray-100 text-gray-600 rounded-md text-sm">
+                  <p>此票券需要更新才能顯示QR Code</p>
                 </div>
               {% endif %}
             </div>
@@ -195,7 +196,7 @@
                 </div>
                 
                 <button type="button" 
-                        @click="if(redemptionData.terms && redemptionData.identity && redemptionData.phone) { isRedemptionVerified = true; if(!qrGenerated) { generateQR('qr-{{ ticket.id }}', '{{ ticket.ticket_code }}'); qrGenerated = true; } }"
+                        @click="if(redemptionData.terms && redemptionData.identity && redemptionData.phone) { isRedemptionVerified = true; }"
                         :disabled="!redemptionData.terms || !redemptionData.identity || !redemptionData.phone"
                         :class="redemptionData.terms && redemptionData.identity && redemptionData.phone ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-400 cursor-not-allowed'"
                         class="w-full text-white py-3 px-6 rounded-lg transition duration-200 font-medium text-lg mt-6">
@@ -208,10 +209,19 @@
             <div x-show="!needsRedemptionVerification || isRedemptionVerified">
               <div class="bg-gray-50 rounded-lg p-6 text-center">
                 <h4 class="text-lg font-semibold text-gray-900 mb-4">票券 QR Code</h4>
-                <div id="qr-{{ ticket.id }}" class="flex justify-center mb-4"></div>
+                <div class="flex justify-center mb-4">
+                  <img src="data:image/png;base64,{{ ticket.generate_qr_code_image }}" 
+                       alt="票券 QR Code" 
+                       class="rounded-lg" 
+                       style="width: 200px; height: 200px;">
+                </div>
                 <div class="space-y-2">
                   <p class="text-sm text-gray-600">票券代碼</p>
-                  <p class="font-mono text-lg font-semibold bg-white px-3 py-2 rounded border">{{ ticket.ticket_code }}</p>
+                  {% if ticket.ticket_code %}
+                    <p class="font-mono text-lg font-semibold bg-white px-3 py-2 rounded border">{{ ticket.ticket_code }}</p>
+                  {% else %}
+                    <p class="text-sm text-gray-500 bg-gray-100 px-3 py-2 rounded border">票券代碼未生成</p>
+                  {% endif %}
                   <p class="text-sm text-gray-500">{{ ticket.product.name }}</p>
                 </div>
               </div>
@@ -266,9 +276,5 @@
   {% endif %}
 </div>
 
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'scripts/qr.js' %}"></script>
 {% endblock %}
 
