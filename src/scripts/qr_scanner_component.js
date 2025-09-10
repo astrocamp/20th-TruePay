@@ -84,8 +84,8 @@ window.QRScannerComponent = {
             ...this,
             // Alpine生命週期
             init() {
-                // 監聽標籤切換
-                this.$watch('$store.currentTab', (tab) => {
+                // 監聽父組件的標籤切換
+                this.$watch('$parent.currentTab', (tab) => {
                     if (tab === 'qr') {
                         this.$nextTick(() => this.startScan());
                     } else {
