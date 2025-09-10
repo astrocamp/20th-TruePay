@@ -42,8 +42,14 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
     NGROK_URL,
+    "truepay.tw",
 ]
 
+# CSRF 設定 - 信任的來源
+CSRF_TRUSTED_ORIGINS = [
+    "https://truepay.tw",
+    f"https://{NGROK_URL}",
+]
 
 # Application definition
 
