@@ -7,35 +7,35 @@ import requests
 
 class DomainVerificationService:
     @staticmethod
-    def verify_domain_ownership(domain_obj):
+    def verify_domain_ownership(merchant_domain):
 
         txt_success, txt_message = DomainVerificationService._verify_txt_record(
-            domain_obj
+            merchant_domain
         )
         if not txt_success:
             return False, f"所有權驗證失敗：{txt_message}"
         http_success, http_message = DomainVerificationService._verify_http_access(
-            domain_obj
+            merchant_domain
         )
         if not http_success:
             return False, f"網站訪問測試失敗：{http_message}"
 
-        domain_obj.is_verified = True
-        domain_obj.verified_at = timezone.now()
-        domain_obj.save(update_fields=["is_verified", "verified_at"])
+        merchant_domain.is_verified = True
+        merchant_domain.verified_at = timezone.now()
+        merchant_domain.save(update_fields=["is_verified", "verified_at"])
         return True, "網域驗證成功！"
 
     @staticmethod
-    def _verify_txt_record(domain_obj):
+    def _verify_txt_record(merchant_domain):
         try:
-            verification_record_name = f"_truepay-verification.{domain_obj.domain_name}"
+            verification_record_name = f"_truepay-verification.{merchant_domain.domain_name}"
             resolver = dns.resolver.Resolver()
             resolver.timeout = 10
 
             answers = resolver.resolve(verification_record_name, "TXT")
             for answer in answers:
                 txt_content = answer.to_text().strip('"')
-                if txt_content == domain_obj.verification_token:
+                if txt_content == merchant_domain.verification_token:
                     return True, "TXT 記錄驗證成功"
             return False, "找不到正確的驗證記錄"
         except dns.resolver.NXDOMAIN:
@@ -48,10 +48,10 @@ class DomainVerificationService:
             return False, f"DNS 查詢錯誤: {str(e)}"
 
     @staticmethod
-    def _verify_http_access(domain_obj):
+    def _verify_http_access(merchant_domain):
         try:
             # 嘗試 HTTP，如果重導向到 HTTPS 也接受
-            url = f"http://{domain_obj.domain_name}"
+            url = f"http://{merchant_domain.domain_name}"
             response = requests.get(url, timeout=10, allow_redirects=True, verify=False)
             
             # 接受 200 狀態碼（正常）或 307/302 重導向
@@ -74,11 +74,11 @@ class DomainVerificationService:
             return False, f"網站訪問錯誤: {str(e)}"
 
     @staticmethod
-    def get_verification_instructions(domain_obj):
+    def get_verification_instructions(merchant_domain):
         return {
             "record_type": "TXT",
             "record_name": "_truepay-verification",
-            "record_value": domain_obj.verification_token,
+            "record_value": merchant_domain.verification_token,
             "instructions": [
                 "📌 DNS 設定步驟：",
                 "",
@@ -87,7 +87,7 @@ class DomainVerificationService:
                 "新增 TXT 記錄：",
                 "   • 類型：TXT",
                 "   • 名稱：_truepay-verification",
-                f"  • 值：{domain_obj.verification_token}",
+                f"  • 值：{merchant_domain.verification_token}",
                 "儲存設定後等待 DNS 生效（2-10 分鐘）",
                 "點擊下方「驗證網域」按鈕",
                 "💡 驗證成功後，客戶就能透過您的網域訪問商店了！",

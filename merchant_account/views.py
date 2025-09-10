@@ -303,11 +303,11 @@ def verification_records(request, subdomain):
     merchant = request.merchant
 
     # 取得篩選參數
-    product_filter = request.GET.get('product', '')
-    date_filter = request.GET.get('date', '')
-    customer_filter = request.GET.get('customer', '')
-    order_filter = request.GET.get('order', '')
-    
+    product_filter = request.GET.get("product", "")
+    date_filter = request.GET.get("date", "")
+    customer_filter = request.GET.get("customer", "")
+    order_filter = request.GET.get("order", "")
+
     # 基本查詢：取得該商家的所有已使用票券
     used_tickets = (
         OrderItem.objects.select_related("order__customer__member", "product", "order")
@@ -336,13 +336,13 @@ def verification_records(request, subdomain):
             used_tickets = used_tickets.filter(used_at__date=filter_date)
         except ValueError:
             pass
-    
+
     # 訂單編號篩選
     if order_filter:
         used_tickets = used_tickets.filter(
             order__provider_order_id__icontains=order_filter
         )
-    
+
     # 統計資料（合併為單一 aggregate 查詢）
 
     all_used_tickets = OrderItem.objects.filter(
@@ -369,15 +369,15 @@ def verification_records(request, subdomain):
     page_obj = paginator.get_page(page_number)
 
     context = {
-        'merchant': merchant,
-        'used_tickets': page_obj,
-        'page_obj': page_obj,
-        'usage_stats': usage_stats,
-        'products': products,
-        'product_filter': product_filter,
-        'customer_filter': customer_filter,
-        'date_filter': date_filter,
-        'order_filter': order_filter,
+        "merchant": merchant,
+        "used_tickets": page_obj,
+        "page_obj": page_obj,
+        "usage_stats": usage_stats,
+        "products": products,
+        "product_filter": product_filter,
+        "customer_filter": customer_filter,
+        "date_filter": date_filter,
+        "order_filter": order_filter,
     }
 
     return render(request, "merchant_account/verification_records.html", context)
@@ -443,12 +443,30 @@ def profile_settings(request, subdomain):
 def subdomain_management(request, subdomain):
     merchant = request.merchant
 
-    can_change, status_message = merchant.can_change_subdomain()
+    if request.method == "POST":
+        form = SubdomainChangeForm(merchant, request.POST)
+        if form.is_valid():
+            try:
+                new_subdomain = form.cleaned_data["new_subdomain"]
+                reason = form.cleaned_data.get("reason", "商家主動修改")
 
+                merchant.change_subdomain(new_subdomain, reason)
+
+                messages.success(request, f"子網域已成功修改為 {new_subdomain}")
+
+                return redirect("merchant_account:subdomain_management", new_subdomain)
+
+            except ValueError as e:
+                messages.error(request, str(e))
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{form.fields[field].label}: {error}")
+
+    can_change, status_message = merchant.can_change_subdomain()
     history = merchant.subdomain_history or []
     redirects = merchant.subdomain_redirects.filter(is_active=True)[:3]
 
-    # 創建表單實例供模板使用
     form = SubdomainChangeForm(merchant)
 
     context = {
@@ -506,27 +524,27 @@ def own_domain_add(request, subdomain):
 @no_cache_required
 def own_domain_detail(request, subdomain, pk):
     merchant = request.merchant
-    domain_obj = get_object_or_404(MerchantOwnDomain, pk=pk, merchant=merchant)
+    merchant_domain = get_object_or_404(MerchantOwnDomain, pk=pk, merchant=merchant)
     if request.method == "POST":
         action = request.POST.get("action")
 
         if action == "verify":
             success, message = DomainVerificationService.verify_domain_ownership(
-                domain_obj
+                merchant_domain
             )
             if success:
                 messages.success(request, message)
             else:
                 messages.error(request, message)
         elif action == "delete":
-            domain_name = domain_obj.domain_name
-            domain_obj.delete()
+            domain_name = merchant_domain.domain_name
+            merchant_domain.delete()
             messages.success(request, f"網域 {domain_name} 已刪除")
             return redirect("merchant_account:own_domain_list", subdomain=subdomain)
 
-    instructions = DomainVerificationService.get_verification_instructions(domain_obj)
+    instructions = DomainVerificationService.get_verification_instructions(merchant_domain)
     return render(
         request,
         "merchant_account/own_domain_detail.html",
-        {"merchant": merchant, "domain_obj": domain_obj, "instructions": instructions},
+        {"merchant": merchant, "merchant_domain": merchant_domain, "instructions": instructions},
     )

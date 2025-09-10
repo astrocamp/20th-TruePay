@@ -45,7 +45,10 @@ ALLOWED_HOSTS = [
     "localhost",
     NGROK_URL,
     "truepay.tw",
+    "*.ushionagisa.work",  # 支援所有子域名
+    ".ushionagisa.work",  # 包含根域名
 ]
+BASE_DOMAIN = "ushionagisa.work"
 
 # CSRF 設定 - 信任的來源
 CSRF_TRUSTED_ORIGINS = [
@@ -80,12 +83,12 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "truepay.security_middleware.SecurityHeadersMiddleware",
+    # "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 暫時禁用以便本地開發
     "django.middleware.cache.UpdateCacheMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "allauth.account.middleware.AccountMiddleware",
     "truepay.security_middleware.SessionSecurityMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -255,6 +258,7 @@ SESSION_COOKIE_HTTPONLY = True  # 防止 XSS 攻擊
 SESSION_COOKIE_SAMESITE = "Lax"  # CSRF 保護
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 瀏覽器關閉時清除 Session
 SESSION_COOKIE_AGE = 3600  # Session 1小時後過期
+# SESSION_COOKIE_DOMAIN = ".ushionagisa.work"  # 讓子網域共享 session - 暫時註解以便本地開發
 
 # 快取設定（防止敏感頁面被快取）
 CACHE_MIDDLEWARE_SECONDS = 0  # 不快取頁面

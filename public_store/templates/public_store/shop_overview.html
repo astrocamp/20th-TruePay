@@ -91,7 +91,7 @@
 
               <!-- 購買按鈕 -->
               <div class="mt-6">
-                 <a href="{% if request.domain_type == 'own_domain' %}/pay/{{ product.id }}/{% else %}{% url 'public_store:payment_page' merchant.subdomain product.id %}{% endif %}" 
+                 <a href="/pay/{{ product.id }}/"
                     class="w-full bg-[#0056B3] hover:bg-[#00408A] text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center group">
                     <span>立即購買</span>{% include 'components/icons.html' with icon='arrow-right' class='w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform' %}
                  </a>
