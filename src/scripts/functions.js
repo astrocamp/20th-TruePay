@@ -329,6 +329,11 @@ function createQuantityManager(config = {}) {
     unitPrice: 0,
     maxStock: 0,
     
+    // 驗證相關變數
+    needsVerification: config.needsVerification || false,
+    isVerified: config.isVerified || false,
+    verificationData: config.verificationData || { terms: false },
+    
     init() {
       // 從頁面中提取價格和庫存資訊
       this.extractPriceAndStock();
