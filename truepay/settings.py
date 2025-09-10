@@ -242,6 +242,8 @@ CSRF_TRUSTED_ORIGINS = [
     "https://ccore.newebpay.com",
     "http://127.0.0.1:8000",
     f"https://{NGROK_URL}",
+    "http://ushionagisa.work",
+    "https://ushionagisa.work",
 ]
 
 # 登入相關設定
