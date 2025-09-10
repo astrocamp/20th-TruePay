@@ -39,7 +39,7 @@ def payment_page(request, subdomain=None, id=None):
             merchant = Merchant.objects.get(subdomain=subdomain)
         except Merchant.DoesNotExist:
             return redirect("pages:home")
-        product.id = id
+        product_id = id
     product = get_object_or_404(
         Product, id=product_id, merchant=merchant, is_active=True
     )
