@@ -1,0 +1,95 @@
+{% extends "layouts/default.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md" x-data="totpSetup()">
+    <h1 class="text-2xl font-bold text-center text-gray-800 mb-8">🔐 設定二階段驗證</h1>
+    
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-bold text-blue-800 mb-4">步驟 1: 掃描 QR Code</h2>
+        <p class="text-blue-700 mb-4">
+            請使用您的 Google Authenticator 或其他 TOTP 應用程式掃描以下 QR Code：
+        </p>
+        
+        <div class="text-center mb-4">
+            <img src="data:image/png;base64,{{ qr_code }}" alt="TOTP QR Code" class="mx-auto border rounded">
+        </div>
+        
+        <div class="bg-white border border-blue-300 rounded p-3">
+            <p class="text-sm text-gray-600 mb-2"><strong>手動輸入密鑰：</strong></p>
+            <code class="bg-gray-100 px-2 py-1 rounded text-sm">{{ totp_secret }}</code>
+        </div>
+    </div>
+    
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-bold text-yellow-800 mb-4">步驟 2: 輸入驗證代碼</h2>
+        <p class="text-yellow-700 mb-4">
+            掃描完成後，請輸入應用程式顯示的 6 位數驗證代碼：
+        </p>
+        
+        <form method="post" action="{% url 'customers_account:totp_enable' %}" class="space-y-4" x-ref="totpForm">
+            {% csrf_token %}
+            {% if next_url %}
+                <input type="hidden" name="next" value="{{ next_url }}">
+            {% endif %}
+            <div>
+                <label for="totp_code" class="block text-sm font-medium text-gray-700 mb-2">
+                    驗證代碼 (6位數字)
+                </label>
+                <input type="text" 
+                       id="totp_code" 
+                       name="totp_code" 
+                       x-model="totpCode"
+                       @input="handleTotpInput"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-center text-lg"
+                       placeholder="000000"
+                       maxlength="6"
+                       pattern="[0-9]{6}"
+                       required>
+            </div>
+            
+            <button type="submit" 
+                    class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200 font-medium"
+                    :disabled="totpCode.length !== 6">
+                ✓ 驗證並啟用二階段驗證
+            </button>
+        </form>
+    </div>
+    
+    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <h3 class="font-bold text-gray-800 mb-2">💡 重要提醒</h3>
+        <ul class="text-sm text-gray-600 space-y-1">
+            <li>• 請確保您的手機時間與伺服器時間同步</li>
+            <li>• 建議下載 Google Authenticator、Microsoft Authenticator 或 Authy</li>
+            <li>• 啟用後您將獲得備用恢復代碼，請妥善保存</li>
+            <li>• 每次高額交易都需要進行二階段驗證</li>
+        </ul>
+    </div>
+    
+    <div class="text-center mt-6">
+        <a href="{% url 'customers_account:profile_settings' %}" 
+           class="text-gray-600 hover:text-gray-800 underline">
+            ← 返回個人設定
+        </a>
+    </div>
+</div>
+
+<script>
+function totpSetup() {
+    return {
+        totpCode: '',
+        
+        handleTotpInput() {
+            // 只允許數字
+            this.totpCode = this.totpCode.replace(/\D/g, '');
+            
+            // 自動提交表單當輸入滿 6 位數
+            if (this.totpCode.length === 6) {
+                // 延遲 500ms 提交，讓用戶看到完整輸入
+                setTimeout(() => {
+                    this.$refs.totpForm.submit();
+                }, 500);
+            }
+        }
+    }
+}
+</script>
+{% endblock %}

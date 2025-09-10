@@ -1,0 +1,228 @@
+{% extends "layouts/default.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md" x-data="totpManage()">
+    <h1 class="text-2xl font-bold text-center text-gray-800 mb-8">🔐 二階段驗證管理</h1>
+    
+    {% if customer.totp_enabled %}
+    <!-- 已啟用狀態 -->
+    <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.818-4.954A9.959 9.959 0 0121 12c0 5.523-4.477 10-10 10S1 17.523 1 12 5.477 2 11 2a9.959 9.959 0 014.954 1.818"/>
+                </svg>
+                <div>
+                    <h2 class="text-lg font-bold text-green-800">二階段驗證已啟用</h2>
+                    <p class="text-sm text-green-700">您的帳戶受到額外安全保護</p>
+                </div>
+            </div>
+            <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                已啟用
+            </div>
+        </div>
+        
+        {% if customer.totp_verified_at %}
+        <p class="text-sm text-green-600">
+            最後驗證時間：{{ customer.totp_verified_at|date:"Y-m-d H:i" }}
+        </p>
+        {% endif %}
+    </div>
+    
+    <!-- 管理選項 -->
+    <div class="space-y-4 mb-6">
+        <!-- 重新生成備用代碼 -->
+        <div class="border border-gray-200 rounded-lg p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-gray-800">備用恢復代碼</h3>
+                    <p class="text-sm text-gray-600">
+                        剩餘 {{ backup_tokens|length }} 個未使用的備用代碼
+                    </p>
+                </div>
+                <button @click="showRegenerateModal = true" 
+                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                    重新生成
+                </button>
+            </div>
+        </div>
+        
+        <!-- 停用二階段驗證 -->
+        <div class="border border-red-200 rounded-lg p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-red-800">停用二階段驗證</h3>
+                    <p class="text-sm text-red-600">
+                        停用後將失去額外的安全保護
+                    </p>
+                </div>
+                <button @click="showDisableModal = true" 
+                        class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200">
+                    停用
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    {% else %}
+    <!-- 未啟用狀態 -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-yellow-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                <div>
+                    <h2 class="text-lg font-bold text-yellow-800">二階段驗證未啟用</h2>
+                    <p class="text-sm text-yellow-700">建議啟用以提升帳戶安全性</p>
+                </div>
+            </div>
+            <div class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
+                未啟用
+            </div>
+        </div>
+        
+        <a href="{% url 'customers_account:totp_setup' %}" 
+           class="block w-full bg-blue-600 text-white text-center py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200 font-medium">
+            🔐 立即啟用二階段驗證
+        </a>
+    </div>
+    {% endif %}
+    
+    <!-- 說明資訊 -->
+    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <h3 class="font-bold text-gray-800 mb-3">📚 關於二階段驗證</h3>
+        <ul class="text-sm text-gray-600 space-y-2">
+            <li>• <strong>什麼是二階段驗證？</strong> 除了密碼外，還需要手機上的驗證代碼才能完成敏感操作</li>
+            <li>• <strong>何時需要驗證？</strong> 高額交易、修改重要設定時會要求輸入驗證代碼</li>
+            <li>• <strong>支援的應用程式：</strong> Google Authenticator、Microsoft Authenticator、Authy 等</li>
+            <li>• <strong>備用恢復代碼：</strong> 當無法使用手機時的備用存取方式</li>
+        </ul>
+    </div>
+    
+    <div class="text-center mt-6">
+        <a href="{% url 'customers_account:profile_settings' %}" 
+           class="text-gray-600 hover:text-gray-800 underline">
+            ← 返回個人設定
+        </a>
+    </div>
+    
+    <!-- 重新生成備用代碼對話框 -->
+    <div x-show="showRegenerateModal" 
+         x-transition
+         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+         @click.self="showRegenerateModal = false">
+        <div class="bg-white rounded-lg p-6 max-w-md mx-4">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">重新生成備用恢復代碼</h3>
+            <p class="text-gray-600 mb-4">
+                重新生成後，所有舊的備用代碼將失效。請輸入當前的驗證代碼確認：
+            </p>
+            
+            <form method="post" action="{% url 'customers_account:regenerate_backup_tokens' %}">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        TOTP 驗證代碼
+                    </label>
+                    <input type="text" 
+                           name="totp_code" 
+                           x-model="regenerateCode"
+                           @input="regenerateCode = regenerateCode.replace(/\D/g, '')"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                           placeholder="000000"
+                           maxlength="6"
+                           required>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button type="button" 
+                            @click="showRegenerateModal = false"
+                            class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition duration-200">
+                        取消
+                    </button>
+                    <button type="submit" 
+                            :disabled="regenerateCode.length !== 6"
+                            class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition duration-200">
+                        確認重新生成
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 停用驗證對話框 -->
+    <div x-show="showDisableModal" 
+         x-transition
+         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+         @click.self="showDisableModal = false">
+        <div class="bg-white rounded-lg p-6 max-w-md mx-4">
+            <h3 class="text-lg font-bold text-red-800 mb-4">停用二階段驗證</h3>
+            <p class="text-gray-600 mb-4">
+                停用後將失去額外的安全保護。請輸入您的密碼或當前的驗證代碼確認：
+            </p>
+            
+            <form method="post" action="{% url 'customers_account:totp_disable' %}" x-data="{ method: 'password' }">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <div class="flex space-x-4 mb-3">
+                        <label class="flex items-center">
+                            <input type="radio" x-model="method" value="password" class="mr-2">
+                            使用密碼
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" x-model="method" value="totp" class="mr-2">
+                            使用驗證代碼
+                        </label>
+                    </div>
+                    
+                    <div x-show="method === 'password'">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            帳戶密碼
+                        </label>
+                        <input type="password" 
+                               name="password" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                               placeholder="請輸入您的密碼">
+                    </div>
+                    
+                    <div x-show="method === 'totp'">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            TOTP 驗證代碼
+                        </label>
+                        <input type="text" 
+                               name="totp_code" 
+                               x-model="disableCode"
+                               @input="disableCode = disableCode.replace(/\D/g, '')"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 text-center"
+                               placeholder="000000"
+                               maxlength="6">
+                    </div>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button type="button" 
+                            @click="showDisableModal = false"
+                            class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition duration-200">
+                        取消
+                    </button>
+                    <button type="submit" 
+                            class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition duration-200">
+                        確認停用
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function totpManage() {
+    return {
+        showRegenerateModal: false,
+        showDisableModal: false,
+        regenerateCode: '',
+        disableCode: ''
+    }
+}
+</script>
+{% endblock %}
