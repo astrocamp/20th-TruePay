@@ -5,6 +5,10 @@ import random
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import transaction
+import qrcode
+from io import BytesIO
+import base64
+import json
 
 
 def default_provider_raw_data():
