@@ -28,13 +28,16 @@
                 </div>
                 
                 <!-- 商品資訊 -->
-                <div class="md:w-1/2 p-8" 
-                     x-data="createQuantityManager({
-                         needsVerification: '{{ product.verification_timing }}' === 'before_payment',
-                         isVerified: false,
-                         verificationData: { terms: false }
-                     })" 
-                     data-unit-price="{{ product.price }}" data-max-stock="{{ product.stock }}">
+
+                <div class="md:w-1/2 p-8" x-data="createQuantityManager()" 
+                     data-unit-price="{{ product.price }}" data-max-stock="{{ product.stock }}"
+                     x-init="
+                         needsVerification = '{{ product.verification_timing }}' === 'before_payment';
+                         isVerified = false;
+                         termsAgreed = false;
+                         verificationData = { terms: false, identity: '', phone: '' };
+                     ">
+
                     <div class="mb-6">
                         <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ product.name }}</h1>
                         <p class="text-4xl font-bold text-[#0056B3] mb-6">NT$ {{ product.price }}</p>

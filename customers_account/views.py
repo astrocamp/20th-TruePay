@@ -281,6 +281,7 @@ def profile_settings(request):
     return render(request, "customers/profile_settings.html", context)
 
 
+
 # TOTP 二階段驗證相關視圖
 @customer_login_required
 def totp_setup(request):
@@ -484,6 +485,7 @@ def verify_totp_api(request):
             'success': False,
             'error': '系統錯誤'
         })
+
 @customer_login_required
 def cancel_order(request, order_id):
     """取消待付款訂單"""
