@@ -1,7 +1,7 @@
 {% extends 'merchant_layout/dashboard_base.html' %}
   {% load static %}
 
-  {% block title %}{{ domain_obj.domain_name }} - 網域設定{% endblock %}
+  {% block title %}{{ merchant_domain.domain_name }} - 網域設定{% endblock %}
 
   {% block content %}
   <div class="max-w-4xl mx-auto p-6 space-y-6">
@@ -18,9 +18,9 @@
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
               <div>
-                  <h1 class="text-2xl font-bold text-gray-900">{{ domain_obj.domain_name }}</h1>
+                  <h1 class="text-2xl font-bold text-gray-900">{{ merchant_domain.domain_name }}</h1>
                   <div class="flex items-center gap-4 mt-2">
-                      {% if domain_obj.is_verified %}
+                      {% if merchant_domain.is_verified %}
                           <span class="inline-flex items-center gap-1 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
                               {% include 'components/icons.html' with icon='check-circle' %}
                               已驗證
@@ -33,14 +33,14 @@
                       {% endif %}
 
                       <span class="text-sm text-gray-600">
-                          新增於 {{ domain_obj.created_at|date:"Y-m-d H:i" }}
+                          新增於 {{ merchant_domain.created_at|date:"Y-m-d H:i" }}
                       </span>
                   </div>
               </div>
 
               <!-- 操作按鈕 -->
               <div class="flex items-center gap-3">
-                  {% if not domain_obj.is_verified %}
+                  {% if not merchant_domain.is_verified %}
                       <form method="post" class="inline">
                           {% csrf_token %}
                           <input type="hidden" name="action" value="verify">
@@ -66,7 +66,7 @@
       </div>
 
       <!-- DNS 設定指示 -->
-      {% if not domain_obj.is_verified %}
+      {% if not merchant_domain.is_verified %}
       <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-6">
           <div class="flex items-start gap-3">
               <div class="text-yellow-600 mt-1">
@@ -125,12 +125,12 @@
               <div>
                   <h3 class="text-lg font-semibold text-green-900 mb-2">網域驗證成功！</h3>
                   <p class="text-green-800">
-                      您的網域 <code class="bg-green-100 px-2 py-1 rounded">{{ domain_obj.domain_name}}</code>
+                      您的網域 <code class="bg-green-100 px-2 py-1 rounded">{{ merchant_domain.domain_name}}</code>
                       已成功驗證，現在客戶可以透過此網址訪問您的商店。
                   </p>
-                  {% if domain_obj.verified_at %}
+                  {% if merchant_domain.verified_at %}
                   <p class="text-green-700 text-sm mt-2">
-                      驗證時間：{{ domain_obj.verified_at|date:"Y-m-d H:i:s" }}
+                      驗證時間：{{ merchant_domain.verified_at|date:"Y-m-d H:i:s" }}
                   </p>
                   {% endif %}
               </div>

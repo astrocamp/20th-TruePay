@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login as django_login, logout as django_logout
+from django.http import HttpResponseRedirect
+from urllib.parse import urlparse
 from django.db.models import Sum
 from django.db import transaction
 from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
@@ -60,7 +62,12 @@ def login(request):
             next_url = request.GET.get("next") or request.POST.get("next")
             if next_url:
                 messages.success(request, "登入成功")
-                return redirect(next_url)
+                # 驗證 next_url 的安全性
+                parsed_url = urlparse(next_url)
+                if parsed_url.netloc and not parsed_url.netloc.endswith('.ushionagisa.work'):
+                    # 如果有網域名稱但不是我們的網域，則重導向到預設頁面
+                    return redirect("customers_account:dashboard")
+                return HttpResponseRedirect(next_url)
             else:
                 messages.success(request, "登入成功")
                 return redirect("pages:marketplace")  # 跳轉到商品總覽
