@@ -205,7 +205,7 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_HOST_USER = "resend"
 EMAIL_HOST_PASSWORD = os.getenv("RESEND_API_KEY")
-DEFAULT_FROM_EMAIL = "TruePay <noreply@ushionagisa.work>"
+DEFAULT_FROM_EMAIL = "TruePay <noreply@truepay.tw>"
 
 # 藍新金流設定
 NEWEBPAY_MERCHANT_ID = os.getenv("NEWEBPAY_MERCHANT_ID")
