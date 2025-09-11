@@ -286,6 +286,7 @@ class OrderItem(models.Model):
         """
         from django.core.mail import send_mail
         from django.conf import settings
+        from django.urls import reverse
         
         if not self.should_send_expiry_notification():
             return False
@@ -294,41 +295,63 @@ class OrderItem(models.Model):
             customer_email = self.customer.member.email
             customer_name = self.customer.name or "親愛的用戶"
             
-            subject = "🚨 TruePay 緊急提醒 - 您的票券將在 5 分鐘後到期！"
+            # 根據票券是否已過期調整標題和內容
+            now = timezone.now()
+            if now > self.valid_until:
+                subject = "⏰ TruePay 通知 - 您的票券已過期"
+                timing_message = "您的票券已過期"
+                urgency_level = "提醒"
+            else:
+                subject = "🚨 TruePay 緊急提醒 - 您的票券即將到期！"
+                timing_message = "您的票券即將到期"
+                urgency_level = "緊急提醒"
+            
+            # 生成消費者登入和票券錢包連結
+            base_url = f"https://{settings.NGROK_URL}" if hasattr(settings, 'NGROK_URL') else "https://truepay.tw"
+            login_url = f"{base_url}/customers/login/"
+            wallet_url = f"{base_url}/customers/ticket-wallet/"
             
             message = f"""
 {customer_name}，您好！
 
-🚨 緊急提醒：您的票券將在 5 分鐘後到期！
-
-請立即前往商家使用，避免票券失效：
+{urgency_level}：{timing_message}！
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📋 票券詳細資訊
+📋 票券資訊
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🎫 票券代碼：{self.ticket_code}
 🏪 商家名稱：{self.product.merchant.ShopName}
 🛍️ 商品名稱：{self.product.name}
 💰 票券價值：NT$ {self.order.unit_price}
 ⏰ 到期時間：{self.valid_until.strftime("%Y年%m月%d日 %H:%M")}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 查看票券詳情
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+請登入您的 TruePay 帳戶查看完整票券資訊：
+
+📱 票券錢包：{wallet_url}
+
+如果您尚未登入，請先登入：
+🔐 登入連結：{login_url}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📞 商家聯絡資訊
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🏪 {self.product.merchant.ShopName}
-📞 {self.product.phone_number}
+📞 如需協助請直接聯繫商家
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ⚠️ 重要提醒：
-• 此為最後通知，票券過期後將無法使用
-• 請立即前往商家出示票券代碼進行核銷
-• 如有疑問請直接聯繫商家
+• 請在票券錢包中查看完整的票券資訊和 QR Code
+• 前往商家時請出示票券 QR Code 進行核銷
+• 如有疑問請直接聯繫商家或 TruePay 客服
 
 感謝您使用 TruePay！
-TruePay 團隊
+TruePay 客服團隊
             """
             
             send_mail(
