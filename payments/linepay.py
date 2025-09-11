@@ -1,22 +1,23 @@
+import base64
 import hashlib
 import hmac
-import base64
 import json
-import requests
 import logging
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render, redirect
-from django.conf import settings
-from django.utils import timezone
-from django.contrib.auth import login as django_login
-from accounts.models import Member
+from urllib.parse import urlencode
 
-from .models import Order
+import requests
+from django.conf import settings
+from django.contrib.auth import login as django_login
 from django.db import transaction
 from django.db.models import F
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 
+from accounts.models import Member
+from .models import Order
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +100,20 @@ def process_linepay(order, request):
 
     except Exception as e:
         logger.error(f"LINE Pay 處理失敗: {e}")
+        
+        # 檢查是否為庫存不足錯誤
+        error_msg = str(e)
+        if "庫存不足" in error_msg or "庫存扣減失敗" in error_msg:
+            # 嘗試從訂單中獲取必要資訊
+            try:
+                params = urlencode({
+                    'product_id': order.product.id,
+                    'requested_quantity': order.quantity
+                })
+                return redirect(f"{reverse('payments:stock_insufficient_error')}?{params}")
+            except:
+                pass
+        
         return JsonResponse({"error": "LINE Pay 處理失敗"}, status=500)
 
 
