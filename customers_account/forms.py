@@ -337,3 +337,76 @@ class PasswordChangeForm(forms.Form):
         self.user.set_password(self.cleaned_data['new_password'])
         self.user.save()
         return self.user
+
+
+class ForgotPasswordForm(forms.Form):
+    """忘記密碼表單"""
+    email = forms.EmailField(
+        widget=forms.EmailInput(
+            attrs={
+                "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "placeholder": "請輸入您的電子郵件",
+            }
+        ),
+        label="電子郵件",
+        help_text="我們將發送密碼重設連結到您的電子郵件",
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        
+        # 查找符合條件的客戶帳號（取最新的一個）
+        member = Member.objects.filter(
+            email=email, 
+            member_type="customer"
+        ).order_by('-id').first()
+        
+        if not member:
+            raise ValidationError("此電子郵件未註冊，請檢查輸入是否正確")
+        
+        # 檢查是否為 Google 登入用戶
+        if not member.has_usable_password():
+            if member.socialaccount_set.filter(provider="google").exists():
+                raise ValidationError("您使用 Google 帳號登入，無法重設密碼。請使用 Google 登入。")
+        
+        # 檢查帳號是否啟用
+        if not member.is_active:
+            raise ValidationError("此帳號已停用，請聯絡客服")
+        
+        self.member = member
+        
+        return email
+
+
+class PasswordResetForm(forms.Form):
+    """密碼重設表單"""
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "placeholder": "請輸入新密碼",
+            }
+        ),
+        label="新密碼",
+        min_length=8,
+        help_text="密碼長度至少需要8個字元"
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "placeholder": "確認新密碼",
+            }
+        ),
+        label="確認新密碼",
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get("new_password")
+        confirm_password = cleaned_data.get("confirm_password")
+        
+        if new_password and confirm_password and new_password != confirm_password:
+            self.add_error('confirm_password', "新密碼確認不相符")
+        
+        return cleaned_data
