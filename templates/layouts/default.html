@@ -82,23 +82,27 @@
             </li>
           {% endif %}
         </ul>
+      </div>
+      
       <!-- 手機版選單 (預設隱藏) -->
       <div x-show="isOpen" 
            x-transition
            @click="handleLinkClick($event)"
-           class="md:hidden mt-4 border-t border-brand-grayBorder bg-brand-white"
+           class="md:hidden max-w-screen-xl mx-auto border-brand-grayBorder bg-brand-white relative"
       >
-        <!-- 展開後的品牌名稱和關閉按鈕 -->
-        <div class="px-6 py-4 font-bold text-brand-black text-lg border-b border-brand-grayBorder flex items-center">
+        <!-- 關閉按鈕 -->
+        <button @click="toggle()" class="absolute top-4 right-4 text-2xl text-brand-black focus:outline-none">✕</button>
+        
+        <!-- 展開後的品牌名稱 -->
+        <div class="px-6 py-4 font-bold text-brand-black text-lg border-b border-brand-grayBorder text-center">
           <span>TruePay</span>
-          <button @click="toggle()" class="ml-auto text-2xl text-brand-black focus:outline-none">✕</button>
         </div>
         <ul class="flex flex-col text-base font-medium">
           <li>
             <a
               href="{% url 'pages:home' %}"
               x-bind="navLinkBinding($el)"
-              class="block px-6 py-4 text-brand-black hover:bg-gray-50 transition-colors"
+              class="block px-6 py-4 text-brand-black hover:bg-gray-50 transition-colors text-center"
               >首頁</a
             >
           </li>
@@ -106,7 +110,7 @@
             <a
               href="{% url 'pages:about' %}"
               x-bind="navLinkBinding($el)"
-              class="block px-6 py-4 text-brand-black hover:bg-gray-50 transition-colors"
+              class="block px-6 py-4 text-brand-black hover:bg-gray-50 transition-colors text-center"
               >關於</a
             >
           </li>
@@ -114,7 +118,7 @@
             <a
               href="{% url 'pages:contact' %}"
               x-bind="navLinkBinding($el)"
-              class="block px-6 py-4 text-brand-black hover:bg-gray-50 transition-colors"
+              class="block px-6 py-4 text-brand-black hover:bg-gray-50 transition-colors text-center "
               >聯絡</a
             >
           </li>
@@ -124,6 +128,7 @@
                 <a
                   href="{% get_current_merchant %}"
                   x-bind="navLinkBinding($el)"
+                  class="block px-6 py-4 text-brand-black hover:bg-gray-50 transition-colors text-center"
                   >商家後台</a
                 >
               </li>
@@ -131,6 +136,7 @@
                 <a
                   href="{% url 'merchant_account:logout' %}"
                   x-bind="logoutLinkBinding()"
+                  class="block px-6 py-4 text-brand-black hover:bg-gray-50 transition-colors text-center"
                   >登出</a
                 >
               </li>
@@ -139,6 +145,7 @@
                 <a
                   href="{% url 'customers_account:dashboard' %}"
                   x-bind="navLinkBinding($el)"
+                  class="block px-6 py-4 text-brand-black hover:bg-gray-50 transition-colors text-center"
                   >我的帳戶</a
                 >
               </li>
@@ -146,6 +153,7 @@
                 <a
                   href="{% url 'customers_account:logout' %}"
                   x-bind="logoutLinkBinding()"
+                  class="block px-6 py-4 text-brand-black hover:bg-gray-50 transition-colors text-center"
                   >登出</a
                 >
               </li>
@@ -154,6 +162,7 @@
                 <a
                   href="{% url 'customers_account:dashboard' %}"
                   x-bind="navLinkBinding($el)"
+                  class="block px-6 py-4 text-brand-black hover:bg-gray-50 transition-colors text-center"
                   >我的帳戶</a
                 >
               </li>
@@ -161,6 +170,7 @@
                 <a
                   href="{% url 'customers_account:logout' %}"
                   x-bind="logoutLinkBinding()"
+                  class="block px-6 py-4 text-brand-black hover:bg-gray-50 transition-colors text-center"
                   >登出</a
                 >
               </li>
@@ -170,6 +180,7 @@
               <a
                 href="{% url 'pages:selectrole' %}"
                 x-bind="navLinkBinding($el)"
+                class="block px-6 py-4 text-brand-black hover:bg-gray-50 transition-colors text-center"
                 >登入/註冊</a
               >
             </li>

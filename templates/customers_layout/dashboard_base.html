@@ -8,12 +8,8 @@
   {% load static %}
   <link href="{% static 'styles/app.css' %}" rel="stylesheet" type="text/css" />
   <script src="{% static 'scripts/app.js' %}" defer></script>
-  <style>
-    /* 自訂滾動條（與 Apple 風格接近，低存在感）*/
-    ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#D2D2D7;border-radius:999px}::-webkit-scrollbar-track{background:transparent}
-  </style>
 </head>
-<body class="bg-[#F5F5F7] text-black font-sans scrollbar-apple" x-data="createMobileMenu()">
+<body class="bg-green-100 text-black font-sans scrollbar-apple" x-data="createMobileMenu()">
   <!-- 背景遮罩層（手機版點擊關閉側邊選單） -->
   <div x-show="isOpen" @click="close()" class="fixed inset-0 z-40 bg-black/50 md:hidden transition-opacity" x-transition:enter="transition-opacity ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" aria-label="關閉選單"></div>
 
