@@ -19,14 +19,20 @@ from django.views.decorators.http import require_http_methods
 import json
 import pyotp
 from .forms import (
-    CustomerRegistrationForm, CustomerLoginForm, CustomerProfileUpdateForm, 
-    PasswordChangeForm, ForgotPasswordForm, PasswordResetForm
+    CustomerRegistrationForm,
+    CustomerLoginForm,
+    CustomerProfileUpdateForm,
+    PasswordChangeForm,
+    ForgotPasswordForm,
+    PasswordResetForm,
 )
 from django.contrib.auth import update_session_auth_hash
 from .models import Customer
 from payments.models import Order, OrderItem
 from merchant_account.models import Merchant
 from django.core.mail import send_mail
+from django.conf import settings
+
 
 def register(request):
     if request.method == "POST":
@@ -56,15 +62,19 @@ def login(request):
             customer = form.cleaned_data["customer"]
 
             # 使用 Django 認證系統登入
-            django_login(request, member, backend='django.contrib.auth.backends.ModelBackend')
-         
+            django_login(
+                request, member, backend="django.contrib.auth.backends.ModelBackend"
+            )
+
             # 檢查是否有 next 參數（登入後要重導向的頁面）
             next_url = request.GET.get("next") or request.POST.get("next")
             if next_url:
                 messages.success(request, "登入成功")
                 # 驗證 next_url 的安全性
                 parsed_url = urlparse(next_url)
-                if parsed_url.netloc and not parsed_url.netloc.endswith('.ushionagisa.work'):
+                if parsed_url.netloc and not parsed_url.netloc.endswith(
+                    settings.BASE_DOMAIN
+                ):
                     # 如果有網域名稱但不是我們的網域，則重導向到預設頁面
                     return redirect("customers_account:dashboard")
                 return HttpResponseRedirect(next_url)
@@ -150,7 +160,9 @@ def dashboard(request):
     # 統計資料
     total_orders = orders.count()
     # 只計算已付款訂單的金額（使用 aggregate 更高效）
-    total_amount = orders.filter(status="paid").aggregate(total=Sum("amount"))["total"] or 0
+    total_amount = (
+        orders.filter(status="paid").aggregate(total=Sum("amount"))["total"] or 0
+    )
     pending_orders = orders.filter(status="pending").count()
 
     # 最近5筆購買記錄
@@ -176,25 +188,29 @@ def ticket_wallet(request):
     except Customer.DoesNotExist:
         messages.error(request, "客戶資料不存在")
         return redirect("pages:home")
-    
+
     # 取得篩選參數
-    status_filter = request.GET.get('status', '')
-    merchant_filter = request.GET.get('merchant', '')
-    order_filter = request.GET.get('order', '')
-    
+    status_filter = request.GET.get("status", "")
+    merchant_filter = request.GET.get("merchant", "")
+    order_filter = request.GET.get("order", "")
+
     # 先將已過期且未標記的票券狀態更新為 expired（避免每次模板內判斷）
     now = timezone.now()
-    OrderItem.objects.filter(customer=customer, status='unused', valid_until__lt=now).update(status='expired')
+    OrderItem.objects.filter(
+        customer=customer, status="unused", valid_until__lt=now
+    ).update(status="expired")
 
     # 基本查詢：取得該客戶的所有票券
-    tickets = OrderItem.objects.select_related(
-        'product__merchant', 'order'
-    ).filter(customer=customer).order_by('-created_at')
-    
+    tickets = (
+        OrderItem.objects.select_related("product__merchant", "order")
+        .filter(customer=customer)
+        .order_by("-created_at")
+    )
+
     # 狀態篩選
     if status_filter:
         tickets = tickets.filter(status=status_filter)
-    
+
     # 商家篩選
     if merchant_filter:
         try:
@@ -202,7 +218,7 @@ def ticket_wallet(request):
             tickets = tickets.filter(product__merchant_id=merchant_id)
         except (ValueError, TypeError):
             pass
-    
+
     # 訂單編號篩選（支援訂單ID或訂單編號）
     if order_filter:
         # 先嘗試用訂單ID篩選
@@ -212,36 +228,38 @@ def ticket_wallet(request):
         except (ValueError, TypeError):
             # 如果不是數字，則用訂單編號篩選
             tickets = tickets.filter(order__provider_order_id=order_filter)
-    
+
     # 取得統計資料
     all_tickets = OrderItem.objects.filter(customer=customer)
     ticket_stats = all_tickets.aggregate(
-        total=Count('id'),
-        unused=Count('id', filter=Q(status='unused')),
-        used=Count('id', filter=Q(status='used')),
-        expired=Count('id', filter=Q(status='expired'))
+        total=Count("id"),
+        unused=Count("id", filter=Q(status="unused")),
+        used=Count("id", filter=Q(status="used")),
+        expired=Count("id", filter=Q(status="unused", valid_until__lt=now)),
     )
-    
+
     # 取得所有相關商家（用於篩選下拉選單）
-    merchants = Merchant.objects.filter(
-        product__orderitem__customer=customer
-    ).distinct().order_by('ShopName')
-    
+    merchants = (
+        Merchant.objects.filter(product__orderitem__customer=customer)
+        .distinct()
+        .order_by("ShopName")
+    )
+
     # 分頁處理
     paginator = Paginator(tickets, 10)  # 每頁顯示10筆記錄
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
-        'customer': customer,
-        'tickets': page_obj,
-        'page_obj': page_obj,
-        'is_paginated': page_obj.has_other_pages(),
-        'ticket_stats': ticket_stats,
-        'merchants': merchants,
-        'now': now,
+        "customer": customer,
+        "tickets": page_obj,
+        "page_obj": page_obj,
+        "is_paginated": page_obj.has_other_pages(),
+        "ticket_stats": ticket_stats,
+        "merchants": merchants,
+        "now": now,
     }
-    
+
     return render(request, "customers/ticket_wallet.html", context)
 
 
@@ -257,10 +275,12 @@ def profile_settings(request):
 
     if request.method == "POST":
         form_type = request.POST.get("form_type")
-        
+
         if form_type == "profile":
             # 處理個人資料修改
-            form = CustomerProfileUpdateForm(request.POST, instance=customer, user=request.user)
+            form = CustomerProfileUpdateForm(
+                request.POST, instance=customer, user=request.user
+            )
             if form.is_valid():
                 form.save()
                 messages.success(request, "個人資料已成功更新")
@@ -268,8 +288,11 @@ def profile_settings(request):
             else:
                 for field, errors in form.errors.items():
                     for error in errors:
-                        messages.error(request, f"{form.fields[field].label if field in form.fields else field}: {error}")
-        
+                        messages.error(
+                            request,
+                            f"{form.fields[field].label if field in form.fields else field}: {error}",
+                        )
+
         elif form_type == "password":
             # 處理密碼修改
             password_form = PasswordChangeForm(request.user, request.POST)
@@ -282,21 +305,22 @@ def profile_settings(request):
             else:
                 for field, errors in password_form.errors.items():
                     for error in errors:
-                        messages.error(request, f"{password_form.fields[field].label if field in password_form.fields else field}: {error}")
-    
+                        messages.error(
+                            request,
+                            f"{password_form.fields[field].label if field in password_form.fields else field}: {error}",
+                        )
+
     # GET 請求或表單驗證失敗時顯示表單
     profile_form = CustomerProfileUpdateForm(instance=customer, user=request.user)
     password_form = PasswordChangeForm(request.user)
-    
-    
+
     context = {
         "customer": customer,
         "profile_form": profile_form,
         "password_form": password_form,
     }
-    
-    return render(request, "customers/profile_settings.html", context)
 
+    return render(request, "customers/profile_settings.html", context)
 
 
 # TOTP 二階段驗證相關視圖
@@ -308,27 +332,27 @@ def totp_setup(request):
     except Customer.DoesNotExist:
         messages.error(request, "客戶資料不存在")
         return redirect("pages:home")
-    
+
     # 如果已經啟用 TOTP，重導向到設定頁面
     if customer.totp_enabled:
         messages.info(request, "您已經啟用二階段驗證")
         return redirect("customers_account:totp_manage")
-    
+
     # 生成新的 TOTP 密鑰和 QR Code
     customer.generate_totp_secret()
     qr_code = customer.generate_qr_code()
-    
+
     # 檢查是否有next參數
-    next_url = request.GET.get('next')
-    
+    next_url = request.GET.get("next")
+
     context = {
-        'customer': customer,
-        'qr_code': qr_code,
-        'totp_secret': customer.totp_secret_key,
-        'next_url': next_url,
+        "customer": customer,
+        "qr_code": qr_code,
+        "totp_secret": customer.totp_secret_key,
+        "next_url": next_url,
     }
-    
-    return render(request, 'customers/totp_setup.html', context)
+
+    return render(request, "customers/totp_setup.html", context)
 
 
 @customer_login_required
@@ -339,14 +363,14 @@ def totp_enable(request):
     except Customer.DoesNotExist:
         messages.error(request, "客戶資料不存在")
         return redirect("pages:home")
-    
-    if request.method == 'POST':
-        totp_code = request.POST.get('totp_code', '').strip()
-        
+
+    if request.method == "POST":
+        totp_code = request.POST.get("totp_code", "").strip()
+
         if not totp_code:
             messages.error(request, "請輸入驗證代碼")
             return redirect("customers_account:totp_setup")
-        
+
         # 臨時驗證 TOTP 代碼
         if customer.totp_secret_key:
             totp = pyotp.TOTP(customer.totp_secret_key)
@@ -358,21 +382,27 @@ def totp_enable(request):
                 # 生成備用代碼並獲取明文版本
                 backup_tokens = customer.generate_backup_tokens()
                 customer.save()
-                
+
                 # 檢查是否有next參數
-                next_url = request.GET.get('next') or request.POST.get('next')
-                
-                messages.success(request, "二階段驗證已成功啟用！請保存您的備用恢復代碼。")
-                return render(request, 'customers/totp_backup_codes.html', {
-                    'customer': customer,
-                    'backup_tokens': backup_tokens,
-                    'next_url': next_url
-                })
+                next_url = request.GET.get("next") or request.POST.get("next")
+
+                messages.success(
+                    request, "二階段驗證已成功啟用！請保存您的備用恢復代碼。"
+                )
+                return render(
+                    request,
+                    "customers/totp_backup_codes.html",
+                    {
+                        "customer": customer,
+                        "backup_tokens": backup_tokens,
+                        "next_url": next_url,
+                    },
+                )
             else:
                 messages.error(request, "驗證代碼錯誤，請重新輸入")
         else:
             messages.error(request, "設置錯誤，請重新開始設置")
-    
+
     return redirect("customers_account:totp_setup")
 
 
@@ -384,13 +414,13 @@ def totp_manage(request):
     except Customer.DoesNotExist:
         messages.error(request, "客戶資料不存在")
         return redirect("pages:home")
-    
+
     context = {
-        'customer': customer,
-        'backup_tokens': customer.backup_tokens if customer.totp_enabled else [],
+        "customer": customer,
+        "backup_tokens": customer.backup_tokens if customer.totp_enabled else [],
     }
-    
-    return render(request, 'customers/totp_manage.html', context)
+
+    return render(request, "customers/totp_manage.html", context)
 
 
 @customer_login_required
@@ -401,12 +431,12 @@ def totp_disable(request):
     except Customer.DoesNotExist:
         messages.error(request, "客戶資料不存在")
         return redirect("pages:home")
-    
-    if request.method == 'POST':
+
+    if request.method == "POST":
         # 要求用戶確認密碼或 TOTP 代碼
-        password = request.POST.get('password', '').strip()
-        totp_code = request.POST.get('totp_code', '').strip()
-        
+        password = request.POST.get("password", "").strip()
+        totp_code = request.POST.get("totp_code", "").strip()
+
         # 驗證密碼
         if password and request.user.check_password(password):
             customer.disable_totp()
@@ -419,7 +449,7 @@ def totp_disable(request):
             return redirect("customers_account:profile_settings")
         else:
             messages.error(request, "密碼或驗證代碼錯誤")
-    
+
     return redirect("customers_account:totp_manage")
 
 
@@ -431,26 +461,30 @@ def regenerate_backup_tokens(request):
     except Customer.DoesNotExist:
         messages.error(request, "客戶資料不存在")
         return redirect("pages:home")
-    
+
     if not customer.totp_enabled:
         messages.error(request, "請先啟用二階段驗證")
         return redirect("customers_account:totp_setup")
-    
-    if request.method == 'POST':
+
+    if request.method == "POST":
         # 驗證 TOTP 代碼
-        totp_code = request.POST.get('totp_code', '').strip()
-        
+        totp_code = request.POST.get("totp_code", "").strip()
+
         if totp_code and customer.verify_totp(totp_code):
             backup_tokens = customer.generate_backup_tokens()
             messages.success(request, "備用恢復代碼已重新生成！請保存新的代碼。")
-            return render(request, 'customers/totp_backup_codes.html', {
-                'customer': customer,
-                'backup_tokens': backup_tokens,
-                'is_regenerate': True
-            })
+            return render(
+                request,
+                "customers/totp_backup_codes.html",
+                {
+                    "customer": customer,
+                    "backup_tokens": backup_tokens,
+                    "is_regenerate": True,
+                },
+            )
         else:
             messages.error(request, "驗證代碼錯誤")
-    
+
     return redirect("customers_account:totp_manage")
 
 
@@ -462,46 +496,26 @@ def verify_totp_api(request):
     try:
         customer = Customer.objects.get(member=request.user)
         data = json.loads(request.body)
-        totp_code = data.get('totp_code', '').strip()
-        
+        totp_code = data.get("totp_code", "").strip()
+
         if not customer.totp_enabled:
-            return JsonResponse({
-                'success': False,
-                'error': '二階段驗證未啟用'
-            })
-        
+            return JsonResponse({"success": False, "error": "二階段驗證未啟用"})
+
         if not totp_code:
-            return JsonResponse({
-                'success': False,
-                'error': '請輸入驗證代碼'
-            })
-        
+            return JsonResponse({"success": False, "error": "請輸入驗證代碼"})
+
         if customer.verify_totp(totp_code):
-            return JsonResponse({
-                'success': True,
-                'message': '驗證成功'
-            })
+            return JsonResponse({"success": True, "message": "驗證成功"})
         else:
-            return JsonResponse({
-                'success': False,
-                'error': '驗證代碼錯誤'
-            })
-            
+            return JsonResponse({"success": False, "error": "驗證代碼錯誤"})
+
     except Customer.DoesNotExist:
-        return JsonResponse({
-            'success': False,
-            'error': '客戶資料不存在'
-        })
+        return JsonResponse({"success": False, "error": "客戶資料不存在"})
     except json.JSONDecodeError:
-        return JsonResponse({
-            'success': False,
-            'error': '無效的請求格式'
-        })
+        return JsonResponse({"success": False, "error": "無效的請求格式"})
     except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': '系統錯誤'
-        })
+        return JsonResponse({"success": False, "error": "系統錯誤"})
+
 
 @customer_login_required
 def cancel_order(request, order_id):
@@ -509,30 +523,31 @@ def cancel_order(request, order_id):
     if request.method != "POST":
         messages.error(request, "無效的請求方式")
         return redirect("customers_account:purchase_history")
-    
+
     try:
         # 透過 user 找到對應的 Customer
         customer = Customer.objects.get(member=request.user)
-        
+
         with transaction.atomic():
             # 取得訂單並檢查權限
             order = Order.objects.select_for_update().get(
-                id=order_id, 
-                customer=customer
+                id=order_id, customer=customer
             )
-            
+
             # 檢查訂單狀態，只能取消待付款的訂單
             if order.status != "pending":
-                messages.error(request, f"此訂單狀態為「{order.get_status_display()}」，無法取消")
+                messages.error(
+                    request, f"此訂單狀態為「{order.get_status_display()}」，無法取消"
+                )
                 return redirect("customers_account:purchase_history")
-            
+
             # 更新訂單狀態為已取消
             order.status = "cancelled"
-            order.save(update_fields=['status', 'updated_at'])
-            
+            order.save(update_fields=["status", "updated_at"])
+
         messages.success(request, f"訂單 {order.provider_order_id} 已成功取消")
         return redirect("customers_account:purchase_history")
-        
+
     except Customer.DoesNotExist:
         messages.error(request, "客戶資料不存在")
         return redirect("pages:home")
@@ -552,17 +567,17 @@ def forgot_password(request):
             email = form.cleaned_data["email"]
             # 使用表單中已驗證的 member 物件
             member = form.member
-            
-            try: 
+
+            try:
                 # 使用 Django signing 生成重設 token
                 signer = TimestampSigner()
                 token = signer.sign(str(member.id))
-                
+
                 # 建立重設連結
                 reset_url = request.build_absolute_uri(
-                    reverse('customers_account:reset_password', kwargs={'token': token})
+                    reverse("customers_account:reset_password", kwargs={"token": token})
                 )
-                
+
                 # 使用 Django send_mail（就像商家歡迎郵件一樣）
                 subject = "TruePay - 密碼重設請求"
                 message = f"""
@@ -582,7 +597,7 @@ def forgot_password(request):
 祝您使用愉快！
 TruePay 團隊
                 """
-                
+
                 try:
                     send_mail(
                         subject,
@@ -592,19 +607,21 @@ TruePay 團隊
                         fail_silently=False,
                     )
                     print(f"✅ 密碼重設郵件已發送給 {email}")
-                    messages.success(request, "密碼重設連結已發送到您的電子郵件，請檢查收件匣")
-                    
+                    messages.success(
+                        request, "密碼重設連結已發送到您的電子郵件，請檢查收件匣"
+                    )
+
                 except Exception as e:
                     print(f"❌ 郵件發送失敗：{e}")
                     messages.error(request, "發送郵件時發生錯誤，請稍後再試")
-                
+
                 return redirect("customers_account:login")
-                
+
             except Exception as e:
                 messages.error(request, f"發送郵件時發生錯誤：{str(e)}")
     else:
         form = ForgotPasswordForm()
-    
+
     return render(request, "customers/forgot_password.html", {"form": form})
 
 
@@ -615,11 +632,11 @@ def reset_password(request, token):
     try:
         # token 有效期 30 分鐘 (1800 秒)
         user_id = signer.unsign(token, max_age=1800)
-        
+
         # 取得用戶
         Member = get_user_model()
         member = Member.objects.get(id=int(user_id), member_type="customer")
-        
+
         if request.method == "POST":
             form = PasswordResetForm(request.POST)
             if form.is_valid():
@@ -628,21 +645,21 @@ def reset_password(request, token):
                 member.set_password(new_password)
                 # 清除登入失敗次數
                 member.login_failed_count = 0
-                member.save(update_fields=['password', 'login_failed_count'])
-                
+                member.save(update_fields=["password", "login_failed_count"])
+
                 messages.success(request, "密碼重設成功！請使用新密碼登入")
                 return redirect("customers_account:login")
-            
+
         else:
             form = PasswordResetForm()
-        
+
         context = {
             "form": form,
             "token": token,
             "user_email": member.email,
         }
         return render(request, "customers/reset_password.html", context)
-        
+
     except SignatureExpired:
         messages.error(request, "密碼重設連結已過期，請重新申請")
         return redirect("customers_account:forgot_password")

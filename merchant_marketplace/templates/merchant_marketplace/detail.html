@@ -80,7 +80,7 @@
               </button>
             </div>
             <div class="pt-4 border-t border-gray-200">
-              <a href="{% url 'public_store:payment_page' request.merchant.subdomain product.id %}"
+              <a href="https://{{ request.merchant.subdomain }}.{{ base_domain }}/pay/{{ product.id }}/"
                 class="block w-full bg-green-500 text-white text-center py-3 px-4 rounded-lg text-sm hover:bg-green-600 transition duration-200"
                 target="_blank">
                 開啟收款頁面

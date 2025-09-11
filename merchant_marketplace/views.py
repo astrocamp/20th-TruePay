@@ -3,6 +3,8 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.conf import settings
+import os
 from .models import Product
 from merchant_account.models import Merchant
 from truepay.decorators import no_cache_required
@@ -46,7 +48,11 @@ def detail(request, subdomain, id):
             messages.success(request, "商品已刪除")
             return redirect("merchant_marketplace:index", request.merchant.subdomain)
 
-    return render(request, "merchant_marketplace/detail.html", {"product": product})
+    context = {
+        "product": product,
+        "base_domain": os.getenv("NGROK_URL", settings.BASE_DOMAIN)
+    }
+    return render(request, "merchant_marketplace/detail.html", context)
 
 
 @no_cache_required
