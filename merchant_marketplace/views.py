@@ -1,4 +1,6 @@
-
+from django.utils.dateparse import parse_datetime
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import Product
@@ -60,8 +62,6 @@ def new(request, subdomain):
                 raise ValueError("庫存數量必須至少為 1 件")
                 
             # 處理票券期限
-            from django.utils import timezone
-            from django.utils.dateparse import parse_datetime
             
             ticket_expiry = None
             if request.POST.get("ticket_expiry"):
@@ -131,7 +131,6 @@ def edit(request, subdomain, id):
             product.verification_timing = request.POST.get("verification_timing") or product.verification_timing
             
             # 更新票券期限
-            from django.utils.dateparse import parse_datetime
             if request.POST.get("ticket_expiry"):
                 product.ticket_expiry = parse_datetime(request.POST.get("ticket_expiry"))
             
