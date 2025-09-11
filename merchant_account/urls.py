@@ -49,9 +49,4 @@ urlpatterns = [
         views.sold_tickets_list,
         name="sold_tickets",
     ),
-    path(
-        "ticket_detail/<slug:subdomain>/<int:ticket_id>/",
-        views.ticket_detail,
-        name="ticket_detail",
-    ),
 ]

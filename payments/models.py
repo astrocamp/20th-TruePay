@@ -263,9 +263,13 @@ class OrderItem(models.Model):
         if self.expiry_notification_sent:
             return False
             
-        # 檢查是否在通知時間範圍內（到期前 5 分鐘）
+        # 檢查是否在通知時間範圍內
         now = timezone.now()
         notification_time = self.valid_until - timezone.timedelta(minutes=minutes_before)
+        
+        # 如果票券已經過期但沒有發送過通知，也應該發送
+        if now > self.valid_until:
+            return True
         
         # 允許一定的時間誤差（例如 1 分鐘），避免因執行時間差而錯過
         time_window_start = notification_time - timezone.timedelta(minutes=1)
@@ -348,12 +352,10 @@ TruePay 團隊
     @classmethod
     def send_all_expiry_notifications(cls):
         """
-        發送所有即將到期票券的通知
-        
+        發送所有即將到期或已過期但尚未通知的票券通知
         Returns:
             dict: 執行結果統計
         """
-        # 查找所有需要發送通知的票券
         tickets_to_notify = cls.objects.filter(
             status='unused',
             order__status='paid',
@@ -362,32 +364,34 @@ TruePay 團隊
             customer__isnull=False,
             customer__member__email__isnull=False,
         ).select_related(
-            'customer', 
-            'customer__member', 
-            'product', 
+            'customer',
+            'customer__member',
+            'product',
             'product__merchant',
             'order'
         )
-        
+
         notifications_sent = 0
         errors_count = 0
         total_checked = 0
-        
+        now = timezone.now()
         for ticket in tickets_to_notify:
             total_checked += 1
-            if ticket.should_send_expiry_notification():
-                if ticket.send_expiry_notification():
-                    notifications_sent += 1
-                else:
-                    errors_count += 1
-        
+            # 判斷是否到期前5分鐘內或已過期
+            if ticket.valid_until:
+                notify_time = ticket.valid_until - timezone.timedelta(minutes=5)
+                # 只要現在時間 >= 通知時間（到期前5分鐘），就要發信
+                if now >= notify_time:
+                    if ticket.send_expiry_notification():
+                        notifications_sent += 1
+                    else:
+                        errors_count += 1
         result = {
             'total_checked': total_checked,
             'notifications_sent': notifications_sent,
             'errors_count': errors_count,
             'success_rate': (notifications_sent / total_checked * 100) if total_checked > 0 else 0
         }
-        
         return result
 
     @property
