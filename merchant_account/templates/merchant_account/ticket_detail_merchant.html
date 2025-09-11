@@ -98,17 +98,7 @@
                 </div>
               </div>
             </div>
-            
-            <!-- 右側：操作區域（廠商版本不需要 QR Code） -->
-            <div class="ml-6 text-right">
-              <div class="text-lg font-bold text-gray-900 mb-2">NT$ {{ ticket.order.unit_price }}</div>
-              {% if ticket.status == 'unused' %}
-                <a href="{% url 'merchant_account:ticket_validation' subdomain=merchant.subdomain %}" 
-                   class="inline-block bg-[#0056B3] text-white px-4 py-2 rounded-lg hover:bg-[#00408A] transition duration-200 text-sm">
-                  前往驗證頁面
-                </a>
-              {% endif %}
-            </div>
+          
           </div>
         </div>
       </div>
