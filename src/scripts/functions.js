@@ -661,6 +661,111 @@ ${codesText}
 // 將函數掛載到全域供 Alpine.js 使用
 window.createBackupCodes = createBackupCodes;
 
+// Alpine.js QR Code 掃描器組件
+function createQrScanner(config) {
+    return {
+        status: '點擊下方按鈕以啟動相機進行掃描',
+        isScanning: false,
+        html5QrCode: null,
+        validationUrl: config.validationUrl,
+
+        init() {
+            // 監聽父層的 currentTab 變化，以便在切換頁籤時停止掃描
+            const rootData = Alpine.closest(this.$el, '[x-data]').__x.getUnobservedData();
+            this.$watch(() => rootData.currentTab, (newTab) => {
+                if (newTab !== 'qr' && this.isScanning) {
+                    this.stopScanner();
+                }
+            });
+        },
+
+        startScanner() {
+            if (this.isScanning) return;
+
+            // #qr-reader 元素必須存在
+            const qrReaderEl = document.getElementById("qr-reader");
+            if (!qrReaderEl) {
+                this.status = '錯誤：找不到 ID 為 qr-reader 的掃描器顯示元件。';
+                return;
+            }
+
+            try {
+                this.html5QrCode = new Html5Qrcode("qr-reader");
+                this.isScanning = true;
+                this.status = '正在啟動相機...';
+
+                this.html5QrCode.start(
+                    { facingMode: "environment" },
+                    { fps: 10, qrbox: { width: 250, height: 250 } },
+                    (decodedText) => this.onScanSuccess(decodedText),
+                    () => {} // onScanFailure: do nothing
+                ).catch(err => {
+                    this.status = '無法啟動相機，請檢查瀏覽器權限。';
+                    this.isScanning = false;
+                });
+            } catch (e) {
+                this.status = '啟動掃描器時發生錯誤。';
+                this.isScanning = false;
+            }
+        },
+
+        stopScanner() {
+            if (this.html5QrCode && this.isScanning) {
+                this.html5QrCode.stop()
+                    .then(() => {
+                        this.isScanning = false;
+                        this.status = '點擊下方按鈕以啟動相機進行掃描';
+                    })
+                    .catch(err => {
+                        console.error("QR Scanner failed to stop.", err);
+                        this.isScanning = false; // 強制重設狀態
+                    });
+            }
+        },
+
+        onScanSuccess(decodedText) {
+            const ticketCode = this.parseTicketCode(decodedText);
+            this.status = `掃描成功！正在驗證 ${ticketCode}...`;
+            
+            this.stopScanner();
+
+            // 使用 htmx 提交驗證
+            htmx.ajax('POST', this.validationUrl, {
+                target: '#scan-result',
+                swap: 'innerHTML',
+                values: {
+                    'ticket_code': ticketCode,
+                    'method': 'qr',
+                    'csrfmiddlewaretoken': document.querySelector('form[hx-post] input[name="csrfmiddlewaretoken"]').value
+                }
+            });
+        },
+
+        parseTicketCode(rawText) {
+            try {
+                // 優先嘗試 JSON 解析
+                const cleanedText = rawText.trim();
+                const data = JSON.parse(cleanedText);
+                if (data && data.ticket_code) {
+                    return data.ticket_code;
+                }
+            } catch (e) {
+                // 若 JSON 解析失敗，則使用正規表示式作為備案
+                const match = rawText.match(/"ticket_code"\s*:\s*"(.*?)"/);
+                if (match && match[1]) {
+                    return match[1];
+                }
+            }
+            // 如果兩種方法都失敗，回傳原始文字
+            return rawText;
+        }
+    };
+}
+
+// 將新的掃描器組件掛載到全域
+window.createQrScanner = createQrScanner;
+
+
 // 導出 Alpine.js 組件創建函數和 NavigationManager
 export { 
   createImagePreview,
@@ -669,5 +774,6 @@ export {
   createQuantityManager,
   createTicketScanManager,
   createBackupCodes,
+  createQrScanner, // <--- 新增導出
   NavigationManager
 };
