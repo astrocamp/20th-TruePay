@@ -21,7 +21,7 @@ def payment_page(request, subdomain=None, id=None):
     """商品收款頁面 - 客戶進行付款"""
 
     merchant = request.merchant
-    product_id = id if id is not None else subdomain
+    product_id = id
 
     product = get_object_or_404(
         Product, id=product_id, merchant=merchant, is_active=True

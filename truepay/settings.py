@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-from .domain_config import get_allowed_hosts
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -258,7 +258,9 @@ SESSION_COOKIE_HTTPONLY = True  # 防止 XSS 攻擊
 SESSION_COOKIE_SAMESITE = "Lax"  # CSRF 保護
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 瀏覽器關閉時清除 Session
 SESSION_COOKIE_AGE = 3600  # Session 1小時後過期
-# SESSION_COOKIE_DOMAIN = ".ushionagisa.work"  # 讓子網域共享 session - 暫時註解以便本地開發
+# SESSION_COOKIE_DOMAIN = (
+#     ".ushionagisa.work"  # 讓子網域共享 session - 暫時註解以便本地開發
+# )
 
 # 快取設定（防止敏感頁面被快取）
 CACHE_MIDDLEWARE_SECONDS = 0  # 不快取頁面

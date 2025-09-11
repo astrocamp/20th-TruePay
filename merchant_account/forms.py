@@ -12,6 +12,7 @@ from .models import Merchant, MerchantOwnDomain
 from .utils import generate_unique_subdomain
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
+from django.conf import settings
 import re
 
 
@@ -388,8 +389,8 @@ class MerchantOwnDomainForm(forms.ModelForm):
         domain_pattern = r"^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$"
         if not re.match(domain_pattern, domain_name):
             raise forms.ValidationError("網域格式不正確")
-        if domain_name.endswith(".truepay.tw"):
-            raise forms.ValidationError("不能使用 truepay.tw 的子網域")
+        if domain_name.endswith(f".{settings.BASE_DOMAIN}"):
+            raise forms.ValidationError(f"不能使用 {settings.BASE_DOMAIN} 的子網域")
         if MerchantOwnDomain.objects.filter(domain_name=domain_name).exists():
             raise forms.ValidationError("此網域已被使用")
         return domain_name

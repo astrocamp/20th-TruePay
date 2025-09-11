@@ -28,7 +28,9 @@ class DomainVerificationService:
     @staticmethod
     def _verify_txt_record(merchant_domain):
         try:
-            verification_record_name = f"_truepay-verification.{merchant_domain.domain_name}"
+            verification_record_name = (
+                f"_truepay-verification.{merchant_domain.domain_name}"
+            )
             resolver = dns.resolver.Resolver()
             resolver.timeout = 10
 
@@ -52,8 +54,8 @@ class DomainVerificationService:
         try:
             # 嘗試 HTTP，如果重導向到 HTTPS 也接受
             url = f"http://{merchant_domain.domain_name}"
-            response = requests.get(url, timeout=10, allow_redirects=True, verify=False)
-            
+            response = requests.get(url, timeout=10, allow_redirects=True)
+
             # 接受 200 狀態碼（正常）或 307/302 重導向
             if response.status_code == 200:
                 content_checks = ["TruePay", "誠實商店", "自訂網域管理"]
