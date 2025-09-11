@@ -1,22 +1,26 @@
 import logging
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.cache import never_cache
-from django.urls import reverse
-from django.contrib import messages
-from django.utils import timezone
 from datetime import timedelta
-from django.db import transaction
 from functools import wraps
-from django.utils.dateparse import parse_datetime
+from urllib.parse import urlencode
 
-from .models import Order
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_exempt
+
 from customers_account.models import Customer
 from merchant_marketplace.models import Product
-from .newebpay import process_newebpay
 from .linepay import process_linepay
+from .models import Order
+from .newebpay import process_newebpay
+
+logger = logging.getLogger(__name__)
 
 
 # 增強版的 login_required decorator：加入防快取功能
@@ -35,9 +39,6 @@ def customer_login_required(view_func):
         return response
 
     return _wrapped_view
-
-
-logger = logging.getLogger(__name__)
 
 
 def _check_pending_order_limit(customer, time_window_minutes=10, max_pending_orders=3, is_retry=False):
@@ -204,7 +205,6 @@ def create_payment(request):
         
         # 檢查是否為訂單限制錯誤（error 是 dict 格式）
         if isinstance(error, dict) and 'pending_count' in error:
-            from urllib.parse import urlencode
             params = urlencode({
                 'pending_count': error['pending_count'],
                 'total_pending': error['total_pending'],
@@ -212,8 +212,22 @@ def create_payment(request):
             })
             return redirect(f"{reverse('payments:order_limit_error')}?{params}")
         
-        # 其他錯誤的處理
+        # 檢查是否為庫存不足錯誤
         error_msg = str(error)
+        logger.error(f"付款錯誤: {error_msg}")  # 添加調試日誌
+        if "庫存不足" in error_msg:
+            # 確保我們有必要的參數
+            product_id_param = product_id or request.POST.get('product_id', '')
+            quantity_param = quantity or request.POST.get('quantity', '1')
+            logger.info(f"導向庫存不足錯誤頁面: product_id={product_id_param}, quantity={quantity_param}")
+            
+            params = urlencode({
+                'product_id': product_id_param,
+                'requested_quantity': quantity_param
+            })
+            return redirect(f"{reverse('payments:stock_insufficient_error')}?{params}")
+        
+        # 其他錯誤的處理
         if request.method == "POST":
             return JsonResponse({"error": error_msg}, status=400)
         messages.error(request, error_msg)
@@ -255,8 +269,12 @@ def retry_payment(request, order_id):
             
             # 檢查庫存（防止重新付款時庫存不足）
             if order.product.stock < order.quantity:
-                messages.error(request, f"庫存不足，目前庫存：{order.product.stock} 件，訂單數量：{order.quantity} 件")
-                return redirect("customers_account:purchase_history")
+                # 導向庫存不足錯誤頁面
+                params = urlencode({
+                    'product_id': order.product.id,
+                    'requested_quantity': order.quantity
+                })
+                return redirect(f"{reverse('payments:stock_insufficient_error')}?{params}")
             
             # 記錄重新付款嘗試（更新訂單時間）
             order.save(update_fields=['updated_at'])
@@ -421,3 +439,83 @@ def totp_verify(request):
     }
     
     return render(request, 'payments/totp_verify.html', context)
+
+
+def stock_insufficient_error(request):
+    """庫存不足錯誤頁面"""
+    # 從 URL 參數中獲取必要資訊
+    product_id = request.GET.get('product_id')
+    requested_quantity = request.GET.get('requested_quantity', '1')
+    
+    if not product_id:
+        messages.error(request, "缺少商品資訊")
+        return redirect('pages:home')
+    
+    try:
+        product = get_object_or_404(Product, id=int(product_id), is_active=True)
+        
+        # 構建商品頁面 URL - 根據 public_store URLs 的實際格式
+        # 格式為 /shop/{subdomain}/pay/{id}/
+        product_url = f"/shop/{product.merchant.subdomain}/pay/{product.id}/"
+        
+        context = {
+            'product': product,
+            'requested_quantity': int(requested_quantity),
+            'product_url': product_url,
+        }
+        
+        return render(request, 'payments/stock_insufficient_error.html', context)
+        
+    except (ValueError, Product.DoesNotExist):
+        messages.error(request, "無效的商品資訊")
+        return redirect('pages:home')
+
+
+@csrf_exempt
+def check_stock_api(request):
+    """AJAX API 來檢查商品庫存狀態"""
+    if request.method != 'POST':
+        return JsonResponse({'error': '只支援 POST 請求'}, status=405)
+    
+    try:
+        product_id = request.POST.get('product_id')
+        requested_quantity = int(request.POST.get('quantity', 1))
+        
+        if not product_id:
+            return JsonResponse({'error': '缺少商品ID'}, status=400)
+        
+        if requested_quantity <= 0:
+            return JsonResponse({'error': '數量必須大於 0'}, status=400)
+            
+        # 取得商品資訊
+        product = get_object_or_404(Product, id=int(product_id), is_active=True)
+        
+        # 檢查庫存狀態
+        is_available = product.stock >= requested_quantity
+        
+        response_data = {
+            'product_id': product.id,
+            'product_name': product.name,
+            'current_stock': product.stock,
+            'requested_quantity': requested_quantity,
+            'is_available': is_available,
+            'max_available': product.stock,
+            'is_sold_out': product.stock == 0,
+            'is_low_stock': product.stock > 0 and product.stock <= 5,
+        }
+        
+        if not is_available:
+            if product.stock == 0:
+                response_data['message'] = '很抱歉，此商品已售完'
+            else:
+                response_data['message'] = f'庫存不足，目前剩餘 {product.stock} 件'
+        else:
+            response_data['message'] = '庫存充足'
+        
+        return JsonResponse(response_data)
+        
+    except (ValueError, Product.DoesNotExist):
+        return JsonResponse({'error': '商品不存在或已下架'}, status=404)
+    except Exception as e:
+        logger.error(f"檢查庫存 API 錯誤: {e}")
+        return JsonResponse({'error': '系統錯誤，請稍後再試'}, status=500)

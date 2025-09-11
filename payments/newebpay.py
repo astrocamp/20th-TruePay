@@ -1,22 +1,24 @@
-import hashlib
 import base64
+import hashlib
 import json
 import logging
+from datetime import timedelta
+from urllib.parse import urlencode
+
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-from django.utils import timezone
-from django.shortcuts import render
 from django.contrib.auth import login as django_login
-from accounts.models import Member
-
-from .models import Order
-
 from django.db import transaction
 from django.db.models import F
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+
+from accounts.models import Member
+from .models import Order
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +79,19 @@ def process_newebpay(order, request):
 
     except Exception as e:
         logger.error(f"藍新金流處理失敗: {e}")
-        from django.http import JsonResponse
+        
+        # 檢查是否為庫存不足錯誤
+        error_msg = str(e)
+        if "庫存不足" in error_msg or "庫存扣減失敗" in error_msg:
+            # 嘗試從訂單中獲取必要資訊
+            try:
+                params = urlencode({
+                    'product_id': order.product.id,
+                    'requested_quantity': order.quantity
+                })
+                return redirect(f"{reverse('payments:stock_insufficient_error')}?{params}")
+            except:
+                pass
 
         return JsonResponse({"error": "藍新金流處理失敗"}, status=500)
 
@@ -96,8 +110,6 @@ def newebpay_return(request):
         if not result_data:
             # 嘗試尋找最近的已付款訂單作為後備方案
             try:
-                from datetime import timedelta
-                
                 # 查找最近5分鐘內狀態變為paid的藍新金流訂單
                 recent_paid_order = Order.objects.filter(
                     provider="newebpay",
@@ -106,7 +118,6 @@ def newebpay_return(request):
                 ).order_by('-paid_at').first()
                 
                 if recent_paid_order:
-                    from django.shortcuts import render
                     return render(
                         request,
                         "payments/newebpay/payment_success.html",
@@ -115,7 +126,6 @@ def newebpay_return(request):
             except Exception:
                 pass
             
-            from django.shortcuts import render
             return render(
                 request,
                 "payments/newebpay/payment_result.html",
@@ -161,16 +171,12 @@ def newebpay_return(request):
                 except Exception as e:
                     logger.warning(f"藍新金流付款成功後恢復登入狀態失敗: {e}")
 
-            from django.shortcuts import render
-
             return render(
                 request,
                 "payments/newebpay/payment_success.html",
                 {"success": True, "order": order, "message": "付款成功"},
             )
         else:
-            from django.shortcuts import render
-
             return render(
                 request,
                 "payments/newebpay/payment_result.html",
@@ -179,8 +185,6 @@ def newebpay_return(request):
 
     except Exception as e:
         logger.error(f"藍新金流回調處理失敗: {e}")
-        from django.shortcuts import render
-
         return render(
             request,
             "payments/newebpay/payment_result.html",

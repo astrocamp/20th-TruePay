@@ -3,9 +3,7 @@
 <div class="max-w-md mx-auto mt-16 p-6 bg-white rounded-lg shadow-lg" x-data="totpVerify()">
     <div class="text-center mb-8">
         <div class="mx-auto mb-4 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.818-4.954A9.959 9.959 0 0121 12c0 5.523-4.477 10-10 10S1 17.523 1 12 5.477 2 11 2a9.959 9.959 0 014.954 1.818"/>
-            </svg>
+            {% include 'components/icons.html' with icon='shield-check' class='w-8 h-8 text-blue-600' %}
         </div>
         <h1 class="text-2xl font-bold text-gray-900 mb-2">🔐 交易安全驗證</h1>
         <p class="text-gray-600">為了保障您的交易安全，請完成二階段驗證</p>
