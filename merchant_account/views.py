@@ -116,6 +116,34 @@ def dashboard(request, subdomain):
         orders.filter(status="paid").aggregate(total=Sum("amount"))["total"] or 0
     )
 
+    # 票券統計數據
+    tickets = OrderItem.objects.select_related("order", "product", "customer").filter(
+        product__merchant=request.merchant
+    )
+    
+    # 計算各種票券狀態
+    now = timezone.now()
+    ticket_stats = {
+        'total': tickets.count(),
+        'unused': tickets.filter(status='unused').count(),
+        'used': tickets.filter(status='used').count(),
+        'expired': tickets.filter(
+            Q(status='expired') | 
+            Q(valid_until__lt=now, status='unused')
+        ).count()
+    }
+    
+    # 計算即將到期的票券（未來24小時內）
+    expiring_soon = tickets.filter(
+        status='unused',
+        valid_until__lte=now + timezone.timedelta(hours=24),
+        valid_until__gt=now
+    ).count()
+    ticket_stats['expiring_soon'] = expiring_soon
+
+    # 最近售出的票券（最近5張）
+    recent_tickets = tickets.order_by('-created_at')[:5]
+
     context = {
         "merchant": request.merchant,
         "total_products": total_products,
@@ -123,6 +151,8 @@ def dashboard(request, subdomain):
         "total_revenue": total_revenue,
         "recent_products": recent_products,
         "recent_orders": recent_orders,
+        "ticket_stats": ticket_stats,
+        "recent_tickets": recent_tickets,
     }
 
     return render(request, "merchant_account/dashboard.html", context)
@@ -459,3 +489,145 @@ def subdomain_management(request, subdomain):
         "form": form,
     }
     return render(request, "merchant_account/domain_settings.html", context)
+
+
+@no_cache_required
+def sold_tickets_list(request, subdomain):
+    """廠商售出票券列表頁面"""
+    merchant = request.merchant
+    
+    # 基本查詢：該廠商的所有已付款票券
+    tickets = OrderItem.objects.filter(
+        product__merchant=merchant,
+        order__status='paid'
+    ).select_related(
+        'order', 'customer', 'customer__member', 'product'
+    ).order_by('-created_at')
+    
+    # 篩選功能
+    status_filter = request.GET.get('status', 'all')
+    product_filter = request.GET.get('product', 'all')
+    search_query = request.GET.get('search', '')
+    
+    # 狀態篩選
+    if status_filter == 'unused':
+        tickets = tickets.filter(status='unused')
+    elif status_filter == 'used':
+        tickets = tickets.filter(status='used')
+    elif status_filter == 'expired':
+        tickets = tickets.filter(status='expired')
+    
+    # 商品篩選
+    if product_filter != 'all':
+        try:
+            product_id = int(product_filter)
+            tickets = tickets.filter(product_id=product_id)
+        except (ValueError, TypeError):
+            pass
+    
+    # 搜尋功能（客戶姓名、客戶 email、訂單編號）
+    if search_query:
+        tickets = tickets.filter(
+            Q(customer__name__icontains=search_query) |
+            Q(customer__member__email__icontains=search_query) |
+            Q(order__provider_order_id__icontains=search_query)
+        )
+    
+    # 統計資訊
+    all_tickets = OrderItem.objects.filter(
+        product__merchant=merchant,
+        order__status='paid'
+    )
+    
+    stats = {
+        'total_tickets': all_tickets.count(),
+        'unused_tickets': all_tickets.filter(status='unused').count(),
+        'used_tickets': all_tickets.filter(status='used').count(),
+        'expired_tickets': all_tickets.filter(status='expired').count(),
+        'total_revenue': all_tickets.aggregate(
+            total=Sum('order__amount')
+        )['total'] or 0,
+    }
+    
+    # 即將到期的票券（7天內）
+    from datetime import timedelta
+    upcoming_expiry = timezone.now() + timedelta(days=7)
+    stats['expiring_soon'] = all_tickets.filter(
+        status='unused',
+        valid_until__lte=upcoming_expiry,
+        valid_until__gt=timezone.now()
+    ).count()
+    
+    # 獲取廠商的所有商品（用於篩選下拉選單）
+    merchant_products = Product.objects.filter(merchant=merchant).order_by('name')
+    
+    # 分頁功能
+    paginator = Paginator(tickets, 20)  # 每頁20筆
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'merchant': merchant,
+        'tickets': page_obj,
+        'stats': stats,
+        'merchant_products': merchant_products,
+        'current_filters': {
+            'status': status_filter,
+            'product': product_filter,
+            'search': search_query,
+        },
+        'status_choices': OrderItem.STATUS_CHOICES,
+    }
+    
+    return render(request, 'merchant_account/sold_tickets_list.html', context)
+
+
+@no_cache_required  
+def ticket_detail(request, subdomain, ticket_id):
+    """票券詳情頁面 - 重用消費者票券錢包的顯示邏輯"""
+    merchant = request.merchant
+    
+    try:
+        # 廠商只能查看自己商品的票券
+        tickets = OrderItem.objects.filter(
+            id=ticket_id,
+            product__merchant=merchant,
+            order__status='paid'
+        ).select_related(
+            'order', 'customer', 'customer__member', 'product', 'product__merchant'
+        )
+        
+        if not tickets.exists():
+            messages.error(request, "找不到指定的票券或您沒有權限查看")
+            return redirect('merchant_account:sold_tickets', subdomain=subdomain)
+            
+        # 重用消費者票券錢包的邏輯和樣式
+        # 設定統計資訊（只有一張票券）
+        ticket = tickets.first()
+        ticket_stats = {
+            'total': 1,
+            'unused': 1 if ticket.status == 'unused' else 0,
+            'used': 1 if ticket.status == 'used' else 0,
+            'expired': 1 if ticket.status == 'expired' else 0,
+        }
+        
+        # 獲取此票券的驗證記錄
+        validation_records = TicketValidation.objects.filter(
+            ticket=ticket
+        ).order_by('-validation_time')
+        
+        context = {
+            'merchant': merchant,
+            'tickets': tickets,  # 使用複數形式以配合模板
+            'ticket_stats': ticket_stats,
+            'merchants': [],  # 空列表，因為只有一個商家
+            'validation_records': validation_records,
+            'is_merchant_view': True,  # 標記為廠商視圖
+        }
+        
+        # 使用消費者票券錢包的模板，但加入廠商特定的樣式調整
+        return render(request, 'merchant_account/ticket_detail_merchant.html', context)
+        
+    except Exception as e:
+        messages.error(request, "系統錯誤，請稍後再試")
+        return redirect('merchant_account:sold_tickets', subdomain=subdomain)

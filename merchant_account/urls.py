@@ -43,4 +43,15 @@ urlpatterns = [
         views.profile_settings,
         name="profile_settings",
     ),
+    # 票券管理相關路由
+    path(
+        "sold_tickets/<slug:subdomain>/",
+        views.sold_tickets_list,
+        name="sold_tickets",
+    ),
+    path(
+        "ticket_detail/<slug:subdomain>/<int:ticket_id>/",
+        views.ticket_detail,
+        name="ticket_detail",
+    ),
 ]

@@ -1,0 +1,163 @@
+{% extends "merchant_layout/dashboard_base.html" %}
+{% block title %}票券詳情 - TruePay{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+  <!-- 頁面標題和返回按鈕 -->
+  <div class="mb-8 flex justify-between items-center">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">票券詳情</h1>
+      <p class="text-gray-600">查看客戶購買的票券詳細資訊</p>
+    </div>
+    <a href="{% url 'merchant_account:sold_tickets' subdomain=merchant.subdomain %}" 
+       class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-200 flex items-center">
+      ← 返回票券列表
+    </a>
+  </div>
+
+  <!-- 統計卡片 -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div class="text-center">
+        <div class="text-2xl font-bold text-blue-600">{{ ticket_stats.total }}</div>
+        <div class="text-sm text-gray-600">票券詳情</div>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-bold text-green-600">{{ ticket_stats.unused }}</div>
+        <div class="text-sm text-gray-600">未使用</div>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-bold text-gray-600">{{ ticket_stats.used }}</div>
+        <div class="text-sm text-gray-600">已使用</div>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-bold text-red-600">{{ ticket_stats.expired }}</div>
+        <div class="text-sm text-gray-600">已過期</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 票券詳情 - 重用消費者錢包的票券卡片樣式 -->
+  {% if tickets %}
+    <div class="space-y-4">
+      {% for ticket in tickets %}
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="p-6">
+          <div class="flex items-start justify-between">
+            <!-- 左側：票券資訊 -->
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-3">
+                <h3 class="text-lg font-semibold text-gray-900">{{ ticket.product.name }}</h3>
+                {% if ticket.status == 'unused' %}
+                  <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">未使用</span>
+                {% elif ticket.status == 'expired' %}
+                  <span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">已過期</span>
+                {% else %}
+                  <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">已使用</span>
+                {% endif %}
+              </div>
+              
+              <div class="space-y-2 text-sm text-gray-600 mb-4">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium">客戶姓名：</span>
+                  <span>{{ ticket.customer.name }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="font-medium">客戶 Email：</span>
+                  <span>{{ ticket.customer.member.email }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="font-medium">票券價值：</span>
+                  <span class="font-bold text-green-600">NT$ {{ ticket.order.unit_price }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="font-medium">購買時間：</span>
+                  <span>{{ ticket.order.created_at|date:"Y年m月d日 H:i" }}</span>
+                </div>
+                {% if ticket.valid_until %}
+                <div class="flex items-center gap-2">
+                  <span class="font-medium">到期時間：</span>
+                  <span class="{% if ticket.status == 'expired' %}text-red-600{% else %}text-gray-800{% endif %}">
+                    {{ ticket.valid_until|date:"Y年m月d日 H:i" }}
+                  </span>
+                </div>
+                {% endif %}
+                {% if ticket.used_at %}
+                <div class="flex items-center gap-2">
+                  <span class="font-medium">使用時間：</span>
+                  <span>{{ ticket.used_at|date:"Y年m月d日 H:i" }}</span>
+                </div>
+                {% endif %}
+                <div class="flex items-center gap-2">
+                  <span class="font-medium">訂單編號：</span>
+                  <span class="font-mono text-gray-800">{{ ticket.order.provider_order_id }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="font-medium">付款方式：</span>
+                  <span>{{ ticket.order.get_payment_method_display }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 右側：操作區域（廠商版本不需要 QR Code） -->
+            <div class="ml-6 text-right">
+              <div class="text-lg font-bold text-gray-900 mb-2">NT$ {{ ticket.order.unit_price }}</div>
+              {% if ticket.status == 'unused' %}
+                <a href="{% url 'merchant_account:ticket_validation' subdomain=merchant.subdomain %}" 
+                   class="inline-block bg-[#0056B3] text-white px-4 py-2 rounded-lg hover:bg-[#00408A] transition duration-200 text-sm">
+                  前往驗證頁面
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- 驗證記錄 -->
+  {% if validation_records %}
+  <div class="mt-6 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+      <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.818-4.954A9.959 9.959 0 0121 12c0 5.523-4.477 10-10 10S1 17.523 1 12 5.477 2 11 2a9.959 9.959 0 014.954 1.818"/>
+      </svg>
+      驗證記錄
+    </h3>
+    <div class="overflow-x-auto">
+      <table class="min-w-full">
+        <thead>
+          <tr class="border-b border-gray-200">
+            <th class="text-left py-3 text-sm font-medium text-gray-600">驗證時間</th>
+            <th class="text-left py-3 text-sm font-medium text-gray-600">驗證結果</th>
+            <th class="text-left py-3 text-sm font-medium text-gray-600">驗證方式</th>
+            <th class="text-left py-3 text-sm font-medium text-gray-600">IP 位址</th>
+            <th class="text-left py-3 text-sm font-medium text-gray-600">失敗原因</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for record in validation_records %}
+          <tr class="border-b border-gray-100 hover:bg-gray-50">
+            <td class="py-3 text-sm text-gray-800">{{ record.validation_time|date:"Y/m/d H:i:s" }}</td>
+            <td class="py-3 text-sm">
+              {% if record.status == 'success' %}
+                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">成功</span>
+              {% elif record.status == 'failed' %}
+                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">失敗</span>
+              {% else %}
+                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">無權限</span>
+              {% endif %}
+            </td>
+            <td class="py-3 text-sm text-gray-800">{{ record.get_validation_method_display }}</td>
+            <td class="py-3 text-sm text-gray-600">{{ record.ip_address|default:"-" }}</td>
+            <td class="py-3 text-sm text-gray-600">{{ record.failure_reason|default:"-" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
