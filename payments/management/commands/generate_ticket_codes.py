@@ -24,6 +24,8 @@ class Command(BaseCommand):
         self.stdout.write(f'找到 {count} 張沒有 ticket_code 的票券')
         
         updated_count = 0
+        tickets_to_update = []
+        
         for ticket in tickets_without_code:
             # 生成唯一的 ticket_code
             while True:
@@ -34,9 +36,13 @@ class Command(BaseCommand):
                 # 檢查是否重複
                 if not OrderItem.objects.filter(ticket_code=ticket_code).exists():
                     ticket.ticket_code = ticket_code
-                    ticket.save(update_fields=['ticket_code'])
-                    updated_count += 1
+                    tickets_to_update.append(ticket)
                     break
+        
+        # 批次更新
+        if tickets_to_update:
+            OrderItem.objects.bulk_update(tickets_to_update, ['ticket_code'])
+            updated_count = len(tickets_to_update)
         
         self.stdout.write(
             self.style.SUCCESS(
