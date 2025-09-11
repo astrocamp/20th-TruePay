@@ -540,18 +540,10 @@ def forgot_password(request):
         form = ForgotPasswordForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data["email"]
+            # 使用表單中已驗證的 member 物件
+            member = form.member
             
             try: 
-                Member = get_user_model()
-                member = Member.objects.filter(
-                    email=email, 
-                    member_type="customer"
-                ).order_by('-id').first()
-                
-                if not member:
-                    messages.error(request, "此電子郵件未註冊")
-                    return render(request, "customers/forgot_password.html", {"form": form})
-                
                 # 使用 Django signing 生成重設 token
                 signer = TimestampSigner()
                 token = signer.sign(str(member.id))
@@ -600,12 +592,6 @@ TruePay 團隊
                 
             except Exception as e:
                 messages.error(request, f"發送郵件時發生錯誤：{str(e)}")
-                
-        else:
-            # 表單驗證失敗，顯示錯誤訊息
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, error)
     else:
         form = ForgotPasswordForm()
     
@@ -636,11 +622,7 @@ def reset_password(request, token):
                 
                 messages.success(request, "密碼重設成功！請使用新密碼登入")
                 return redirect("customers_account:login")
-            else:
-                # 表單驗證失敗，顯示錯誤訊息
-                for field, errors in form.errors.items():
-                    for error in errors:
-                        messages.error(request, error)
+            
         else:
             form = PasswordResetForm()
         
