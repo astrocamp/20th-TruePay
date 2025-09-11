@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 from django.utils import timezone
 from payments.models import OrderItem
 import random
@@ -10,9 +11,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # 找出所有沒有 ticket_code 或 ticket_code 為空的票券
         tickets_without_code = OrderItem.objects.filter(
-            ticket_code__isnull=True
-        ).union(
-            OrderItem.objects.filter(ticket_code='')
+            Q(ticket_code__isnull=True) | Q(ticket_code='')
         )
         
         count = tickets_without_code.count()
