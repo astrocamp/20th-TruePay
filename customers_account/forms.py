@@ -373,6 +373,8 @@ class ForgotPasswordForm(forms.Form):
         if not member.is_active:
             raise ValidationError("此帳號已停用，請聯絡客服")
         
+        self.member = member
+        
         return email
 
 
@@ -398,16 +400,6 @@ class PasswordResetForm(forms.Form):
         ),
         label="確認新密碼",
     )
-
-    def clean_new_password(self):
-        new_password = self.cleaned_data.get("new_password")
-        if len(new_password) < 8:
-            raise ValidationError("密碼長度至少需要8個字元")
-        return new_password
-
-    def clean_confirm_password(self):
-        confirm_password = self.cleaned_data.get("confirm_password")
-        return confirm_password
 
     def clean(self):
         cleaned_data = super().clean()
