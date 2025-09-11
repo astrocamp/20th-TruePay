@@ -50,7 +50,6 @@ build/
 .claude/
 
 ngrok.exe
-config.yml
 
 
 static/

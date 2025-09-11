@@ -174,7 +174,7 @@ class SubdomainRedirectMiddleware:
         if any(re.match(pattern, path) for pattern in allowed_patterns):
             return None
 
-        scheme = "http" if request.is_secure() else "http"
+        scheme = "https" if request.is_secure() else "http"
         base_domain = os.getenv("NGROK_URL", settings.BASE_DOMAIN)
         redirect_url = f"{scheme}://{base_domain}/"
         return HttpResponseRedirect(redirect_url)
