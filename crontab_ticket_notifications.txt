@@ -1,0 +1,79 @@
+# TruePay 票券到期通知排程設定
+# 此檔案包含票券到期通知的 cron 設定範例
+
+# =============================================================================
+# 票券到期通知排程
+# =============================================================================
+
+# 選項 1: 每分鐘執行一次（最即時，但系統負載較高）
+# * * * * * cd /path/to/truepay && python manage.py send_ticket_notifications
+
+# 選項 2: 每 5 分鐘執行一次（推薦）
+# */5 * * * * cd /path/to/truepay && python manage.py send_ticket_notifications
+
+# 選項 3: 每 10 分鐘執行一次（較低負載）
+# */10 * * * * cd /path/to/truepay && python manage.py send_ticket_notifications
+
+# =============================================================================
+# 使用方式:
+# =============================================================================
+# 
+# 1. 編輯 crontab:
+#    crontab -e
+# 
+# 2. 將下面的設定複製到 crontab 中（取消註解）:
+#    */5 * * * * cd /absolute/path/to/truepay && python manage.py send_ticket_notifications
+# 
+# 3. 確認路徑設定:
+#    - 將 "/absolute/path/to/truepay" 替換為實際的專案路徑
+#    - 確保 Python 環境路徑正確（可能需要使用虛擬環境的 Python）
+# 
+# 4. 範例完整設定:
+#    */5 * * * * cd /home/user/truepay && /home/user/truepay/.venv/bin/python manage.py send_ticket_notifications >> /var/log/truepay_notifications.log 2>&1
+# 
+# =============================================================================
+# 進階設定
+# =============================================================================
+
+# 加入日誌記錄（推薦）
+# */5 * * * * cd /path/to/truepay && python manage.py send_ticket_notifications >> /var/log/truepay_notifications.log 2>&1
+
+# 只在營業時間執行（例如：每天 8:00-22:00）
+# */5 8-22 * * * cd /path/to/truepay && python manage.py send_ticket_notifications
+
+# 避免在系統維護時間執行（例如：避開凌晨 2:00-4:00）
+# */5 0-1,5-23 * * * cd /path/to/truepay && python manage.py send_ticket_notifications
+
+# =============================================================================
+# Windows 系統設定（使用工作排程器）
+# =============================================================================
+# 
+# 在 Windows 系統上，請使用「工作排程器」來設定定時任務：
+# 
+# 1. 開啟「工作排程器」
+# 2. 建立基本工作
+# 3. 設定觸發程序為「每 5 分鐘」
+# 4. 設定動作為「啟動程式」
+# 5. 程式路徑：python.exe 的完整路徑
+# 6. 參數：manage.py send_ticket_notifications
+# 7. 起始於：專案根目錄
+# 
+# 範例設定：
+# 程式：C:\Users\username\Desktop\project\20th-TruePay-master\.venv\Scripts\python.exe
+# 參數：manage.py send_ticket_notifications
+# 起始於：C:\Users\username\Desktop\project\20th-TruePay-master
+
+# =============================================================================
+# 監控和除錯
+# =============================================================================
+
+# 測試命令（手動執行）
+# python manage.py send_ticket_notifications --dry-run --verbose
+
+# 檢查 cron 是否正常運作
+# tail -f /var/log/truepay_notifications.log
+
+# 查看系統 cron 日誌
+# tail -f /var/log/cron
+
+# =============================================================================

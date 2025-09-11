@@ -177,6 +177,7 @@ class OrderItem(models.Model):
 
     # === 票券有效性 ===
     valid_until = models.DateTimeField("有效期限", null=True, blank=True)
+    expiry_notification_sent = models.DateTimeField("到期通知發送時間", null=True, blank=True)
 
     # === 外鍵關聯 ===
     order = models.ForeignKey(
@@ -234,6 +235,160 @@ class OrderItem(models.Model):
         self.save(update_fields=["status", "used_at"])
 
         return True, "票券使用成功"
+
+    def should_send_expiry_notification(self, minutes_before=5):
+        """
+        檢查是否應該發送到期通知
+        
+        Args:
+            minutes_before (int): 到期前幾分鐘發送通知
+            
+        Returns:
+            bool: 是否應該發送通知
+        """
+        # 檢查基本條件
+        if not self.valid_until:
+            return False
+            
+        if self.status != "unused":
+            return False
+            
+        if not self.order.is_paid():
+            return False
+            
+        if not self.customer or not self.customer.member or not self.customer.member.email:
+            return False
+            
+        # 檢查是否已經發送過通知
+        if self.expiry_notification_sent:
+            return False
+            
+        # 檢查是否在通知時間範圍內（到期前 5 分鐘）
+        now = timezone.now()
+        notification_time = self.valid_until - timezone.timedelta(minutes=minutes_before)
+        
+        # 允許一定的時間誤差（例如 1 分鐘），避免因執行時間差而錯過
+        time_window_start = notification_time - timezone.timedelta(minutes=1)
+        time_window_end = notification_time + timezone.timedelta(minutes=1)
+        
+        return time_window_start <= now <= time_window_end
+    
+    def send_expiry_notification(self):
+        """
+        發送到期通知郵件
+        
+        Returns:
+            bool: 發送是否成功
+        """
+        from django.core.mail import send_mail
+        from django.conf import settings
+        
+        if not self.should_send_expiry_notification():
+            return False
+            
+        try:
+            customer_email = self.customer.member.email
+            customer_name = self.customer.name or "親愛的用戶"
+            
+            subject = "🚨 TruePay 緊急提醒 - 您的票券將在 5 分鐘後到期！"
+            
+            message = f"""
+{customer_name}，您好！
+
+🚨 緊急提醒：您的票券將在 5 分鐘後到期！
+
+請立即前往商家使用，避免票券失效：
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 票券詳細資訊
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎫 票券代碼：{self.ticket_code}
+🏪 商家名稱：{self.product.merchant.ShopName}
+🛍️ 商品名稱：{self.product.name}
+💰 票券價值：NT$ {self.order.unit_price}
+⏰ 到期時間：{self.valid_until.strftime("%Y年%m月%d日 %H:%M")}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📞 商家聯絡資訊
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏪 {self.product.merchant.ShopName}
+📞 {self.product.phone_number}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ 重要提醒：
+• 此為最後通知，票券過期後將無法使用
+• 請立即前往商家出示票券代碼進行核銷
+• 如有疑問請直接聯繫商家
+
+感謝您使用 TruePay！
+TruePay 團隊
+            """
+            
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[customer_email],
+                fail_silently=False,
+            )
+            
+            # 記錄通知發送時間
+            self.expiry_notification_sent = timezone.now()
+            self.save(update_fields=['expiry_notification_sent'])
+            
+            return True
+            
+        except Exception as e:
+            # 這裡可以記錄錯誤日誌
+            return False
+
+    @classmethod
+    def send_all_expiry_notifications(cls):
+        """
+        發送所有即將到期票券的通知
+        
+        Returns:
+            dict: 執行結果統計
+        """
+        # 查找所有需要發送通知的票券
+        tickets_to_notify = cls.objects.filter(
+            status='unused',
+            order__status='paid',
+            valid_until__isnull=False,
+            expiry_notification_sent__isnull=True,
+            customer__isnull=False,
+            customer__member__email__isnull=False,
+        ).select_related(
+            'customer', 
+            'customer__member', 
+            'product', 
+            'product__merchant',
+            'order'
+        )
+        
+        notifications_sent = 0
+        errors_count = 0
+        total_checked = 0
+        
+        for ticket in tickets_to_notify:
+            total_checked += 1
+            if ticket.should_send_expiry_notification():
+                if ticket.send_expiry_notification():
+                    notifications_sent += 1
+                else:
+                    errors_count += 1
+        
+        result = {
+            'total_checked': total_checked,
+            'notifications_sent': notifications_sent,
+            'errors_count': errors_count,
+            'success_rate': (notifications_sent / total_checked * 100) if total_checked > 0 else 0
+        }
+        
+        return result
 
     @property
     def ticket_info(self):
