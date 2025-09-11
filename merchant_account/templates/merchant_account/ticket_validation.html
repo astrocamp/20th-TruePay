@@ -6,7 +6,10 @@
 {% block content %}
 <div class="max-w-4xl mx-auto space-y-6" x-data="{ 
     currentTab: 'manual', 
-    ticketCode: ''
+    ticketCode: '',
+    qrScanner: createQrScanner({
+        validationUrl: '{% url 'merchant_account:validate_ticket' request.merchant.subdomain %}'
+    })
 }">
     <!-- 驗證方式選擇 -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
@@ -56,13 +59,13 @@
         <!-- QR Code 掃描區域 -->
         <div x-show="currentTab === 'qr'" x-transition class="space-y-6">
             <div id="qr-reader" class="w-full max-w-md mx-auto bg-gray-100 rounded-xl overflow-hidden border border-gray-200"></div>
-            <p id="qr-reader-status" class="text-center text-gray-500">點擊下方按鈕以啟動相機進行掃描</p>
+            <p x-text="qrScanner.status" class="text-center text-gray-500"></p>
             <div id="scanner-controls">
-                <button id="start-scan-btn"
+                <button @click="qrScanner.isScanning ? qrScanner.stopScanner() : qrScanner.startScanner()"
                         type="button"
                         class="w-full bg-[#0056B3] text-white py-4 px-6 rounded-xl hover:bg-[#00408A] focus:ring-4 focus:ring-blue-100 font-medium text-lg transition-all flex items-center justify-center gap-3">
                     {% include 'components/icons.html' with icon='camera' class='w-6 h-6' %}
-                    開始掃描
+                    <span x-text="qrScanner.isScanning ? '停止掃描' : '開始掃描'"></span>
                 </button>
             </div>
         </div>
@@ -81,100 +84,5 @@
 
 {% block extra_js %}
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const qrReaderId = "qr-reader";
-    const validationUrl = "{% url 'merchant_account:validate_ticket' request.merchant.subdomain %}";
-    let html5QrCode;
-
-    const getCsrfToken = () => {
-        const csrfInput = document.querySelector('form[hx-post] input[name="csrfmiddlewaretoken"]');
-        return csrfInput ? csrfInput.value : '';
-    };
-
-    const onScanSuccess = (decodedText, decodedResult) => {
-        const statusEl = document.getElementById('qr-reader-status');
-        const startBtn = document.getElementById('start-scan-btn');
-        let ticketCode = decodedText; // Default to the raw text
-
-        // --- NEW AGGRESSIVE PARSING LOGIC ---
-        try {
-            // First, try to parse as JSON, as it's the most robust method.
-            const cleanedText = decodedText.trim();
-            const data = JSON.parse(cleanedText);
-            if (data && data.ticket_code) {
-                ticketCode = data.ticket_code;
-            }
-        } catch (e) {
-            // If JSON parsing fails, try a regex as a fallback.
-            console.error("JSON.parse failed, trying regex fallback.", e);
-            const match = decodedText.match(/"ticket_code"\s*:\s*"(.*?)"/);
-            if (match && match[1]) {
-                ticketCode = match[1];
-            }
-        }
-        // --- END PARSING LOGIC ---
-
-        if (html5QrCode && html5QrCode.isScanning) {
-            if(statusEl) statusEl.textContent = `掃描成功！正在驗證 ${ticketCode}...`;
-            html5QrCode.stop().then(() => {
-                if(startBtn) startBtn.style.display = 'block';
-                htmx.ajax('POST', validationUrl, {
-                    target: '#scan-result',
-                    swap: 'innerHTML',
-                    values: {
-                        'ticket_code': ticketCode,
-                        'method': 'qr',
-                        'csrfmiddlewaretoken': getCsrfToken()
-                    }
-                });
-            }).catch(err => {
-                if(statusEl) statusEl.textContent = '掃描器關閉失敗，請刷新頁面。';
-            });
-        }
-    };
-
-    const startScanner = () => {
-        const statusEl = document.getElementById('qr-reader-status');
-        const startBtn = document.getElementById('start-scan-btn');
-        
-        try {
-            const qrReaderEl = document.getElementById(qrReaderId);
-            if (!qrReaderEl) {
-                if(statusEl) statusEl.textContent = '錯誤：找不到掃描器元件。';
-                return;
-            }
-
-            html5QrCode = new Html5Qrcode(qrReaderId);
-            
-            if(startBtn) startBtn.style.display = 'none';
-            if(statusEl) statusEl.textContent = '正在啟動相機...';
-
-            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-
-            html5QrCode.start(
-                { facingMode: "environment" }, 
-                config, 
-                onScanSuccess, 
-                () => {} // onScanFailure, do nothing
-            ).catch(err => {
-                if(statusEl) statusEl.textContent = '無法啟動相機，請檢查瀏覽器權限。';
-                if(startBtn) startBtn.style.display = 'block';
-            });
-        } catch (e) {
-            if(statusEl) statusEl.textContent = '啟動掃描器時發生未知錯誤。';
-            if(startBtn) startBtn.style.display = 'block';
-        }
-    };
-
-    // Event Delegation
-    document.body.addEventListener('click', function(event) {
-        const startBtn = event.target.closest('#start-scan-btn');
-        if (startBtn) {
-            startScanner();
-        }
-    });
-});
-</script>
 {% endblock %}
 

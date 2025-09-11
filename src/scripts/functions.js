@@ -670,13 +670,8 @@ function createQrScanner(config) {
         validationUrl: config.validationUrl,
 
         init() {
-            // 監聽父層的 currentTab 變化，以便在切換頁籤時停止掃描
-            const rootData = Alpine.closest(this.$el, '[x-data]').__x.getUnobservedData();
-            this.$watch(() => rootData.currentTab, (newTab) => {
-                if (newTab !== 'qr' && this.isScanning) {
-                    this.stopScanner();
-                }
-            });
+            // 初始化完成，準備掃描
+            console.log('QR Scanner initialized');
         },
 
         startScanner() {
@@ -699,7 +694,7 @@ function createQrScanner(config) {
                     { fps: 10, qrbox: { width: 250, height: 250 } },
                     (decodedText) => this.onScanSuccess(decodedText),
                     () => {} // onScanFailure: do nothing
-                ).catch(err => {
+                ).catch(() => {
                     this.status = '無法啟動相機，請檢查瀏覽器權限。';
                     this.isScanning = false;
                 });
@@ -716,7 +711,7 @@ function createQrScanner(config) {
                         this.isScanning = false;
                         this.status = '點擊下方按鈕以啟動相機進行掃描';
                     })
-                    .catch(err => {
+                    .catch((err) => {
                         console.error("QR Scanner failed to stop.", err);
                         this.isScanning = false; // 強制重設狀態
                     });
@@ -749,7 +744,7 @@ function createQrScanner(config) {
                 if (data && data.ticket_code) {
                     return data.ticket_code;
                 }
-            } catch (e) {
+            } catch {
                 // 若 JSON 解析失敗，則使用正規表示式作為備案
                 const match = rawText.match(/"ticket_code"\s*:\s*"(.*?)"/);
                 if (match && match[1]) {
