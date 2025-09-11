@@ -8,6 +8,23 @@ function showGlobalInfo(message) {
   console.log('Global:', message);
 }
 
+// 獲取 CSRF Token 的通用函數
+function getCsrfToken() {
+  // 優先從 cookie 獲取
+  const cookieValue = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('csrftoken='))
+    ?.split('=')[1];
+  
+  if (cookieValue) {
+    return cookieValue;
+  }
+  
+  // 備案：從 DOM 獲取
+  const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+  return csrfInput ? csrfInput.value : '';
+}
+
 // Alpine.js 圖片預覽組件
 function createImagePreview() {
   return {
@@ -731,7 +748,7 @@ function createQrScanner(config) {
                 values: {
                     'ticket_code': ticketCode,
                     'method': 'qr',
-                    'csrfmiddlewaretoken': document.querySelector('form[hx-post] input[name="csrfmiddlewaretoken"]').value
+                    'csrfmiddlewaretoken': getCsrfToken()
                 }
             });
         },
