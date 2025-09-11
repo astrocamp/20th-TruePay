@@ -210,11 +210,14 @@ function createMobileMenu() {
     isOpen: false,
     
     init() {
-      // 視窗大小變化時自動關閉選單（使用 passive 監聽器提升效能）
+       // 初始狀態：手機版關閉選單，桌面版不受影響
+      this.isOpen = false;
+      
+      // 視窗大小變化時，如果切換到桌面版就關閉手機版選單狀態
       this.$nextTick(() => {
         window.addEventListener('resize', () => {
           if (window.innerWidth >= 768) { // md breakpoint
-            this.isOpen = false;
+            this.isOpen = false; // 重置手機版選單狀態
           }
         }, { passive: true });
       });
