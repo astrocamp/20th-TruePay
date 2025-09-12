@@ -1,8 +1,20 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from products.models import Product
 
 
 def home(req):
     return render(req, "pages/home.html")
+
+
+def marketplace(req):
+    # 取得所有已發布的商品，按照建立時間排序
+    products = Product.objects.filter(is_active=True).select_related('merchant').order_by('-created_at')
+    
+    context = {
+        'products': products,
+        'page_title': '商品總覽'
+    }
+    return render(req, "pages/marketplace.html", context)
 
 
 def about(req):
