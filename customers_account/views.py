@@ -63,7 +63,7 @@ def login(request):
                 return redirect(next_url)
             else:
                 messages.success(request, "登入成功")
-                return redirect("customers_account:dashboard")  # 跳轉到消費者儀表板
+                return redirect("pages:marketplace")  # 跳轉到商品總覽
         else:
             for error in form.non_field_errors():
                 messages.error(request, error)

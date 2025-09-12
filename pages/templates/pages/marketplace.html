@@ -1,0 +1,138 @@
+{% extends 'layouts/default.html' %}
+{% load static %}
+
+{% block title %}商品總覽 - TruePay{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- 頁面標題 -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">商品總覽</h1>
+        <p class="text-gray-600">探索各大商家的精選商品</p>
+    </div>
+
+    <!-- 商品篩選 -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-500">
+                共找到 {{ products.paginator.count }} 個商品
+            </p>
+            <p class="text-sm text-gray-500">
+                第 {{ products.number }} 頁，共 {{ products.paginator.num_pages }} 頁
+            </p>
+        </div>
+    </div>
+
+    <!-- 商品列表 -->
+    {% if products %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {% for product in products %}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all group">
+            <!-- 商品圖片 -->
+            <div class="aspect-square overflow-hidden bg-gray-50">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" 
+                         alt="{{ product.name }}" 
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                {% else %}
+                    <div class="w-full h-full flex items-center justify-center bg-gray-100">
+                        {% include 'components/icons.html' with icon='image-placeholder' class='w-12 h-12 text-gray-400' %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- 商品資訊 -->
+            <div class="p-4">
+                <div class="mb-2">
+                    <h3 class="font-semibold text-gray-900 text-lg truncate mb-1">{{ product.name }}</h3>
+                    <p class="text-sm text-gray-500 mb-2">{{ product.merchant.ShopName }}</p>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="text-2xl font-bold text-brand-blue">
+                        NT$ {{ product.price|floatformat:0 }}
+                    </div>
+                    
+                    <!-- 庫存狀態 -->
+                    {% if product.stock > 0 %}
+                        <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                            庫存 {{ product.stock }}
+                        </span>
+                    {% else %}
+                        <span class="text-xs text-red-600 bg-red-50 px-2 py-1 rounded-full">
+                            已售完
+                        </span>
+                    {% endif %}
+                </div>
+
+                <!-- 商品描述 -->
+                {% if product.description %}
+                <p class="text-sm text-gray-600 mt-3 line-clamp-2">{{ product.description }}</p>
+                {% endif %}
+
+                <!-- 購買按鈕 -->
+                <div class="mt-4">
+                    {% if product.stock > 0 %}
+                        <a href="{% url 'public_store:shop_overview' product.merchant.subdomain %}" 
+                           class="block w-full bg-brand-blue text-white text-center py-2 px-4 rounded-xl hover:bg-brand-blueHover transition-all font-medium">
+                            前往商家
+                        </a>
+                    {% else %}
+                        <button class="block w-full bg-gray-300 text-gray-500 text-center py-2 px-4 rounded-xl cursor-not-allowed font-medium">
+                            已售完
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- 沒有商品時的顯示 -->
+    <div class="text-center py-16">
+        <div class="mb-4">
+            {% include 'components/icons.html' with icon='warning' class='w-16 h-16 text-gray-300 mx-auto' %}
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">目前沒有商品</h3>
+        <p class="text-gray-500">請稍後再來查看，或許會有新商品上架！</p>
+    </div>
+    {% endif %}
+
+    <!-- 分頁導航 -->
+    {% if products.has_other_pages %}
+    <div class="flex justify-center mt-12">
+        <nav class="flex space-x-2">
+            {% if products.has_previous %}
+                <a href="?page=1" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    首頁
+                </a>
+                <a href="?page={{ products.previous_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    上一頁
+                </a>
+            {% endif %}
+
+            {% for num in products.paginator.page_range %}
+                {% if products.number == num %}
+                    <span class="px-3 py-2 text-sm font-medium text-white bg-brand-blue border border-brand-blue rounded-md">
+                        {{ num }}
+                    </span>
+                {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                    <a href="?page={{ num }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                        {{ num }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+
+            {% if products.has_next %}
+                <a href="?page={{ products.next_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    下一頁
+                </a>
+                <a href="?page={{ products.paginator.num_pages }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    最後頁
+                </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
