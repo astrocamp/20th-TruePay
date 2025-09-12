@@ -279,7 +279,7 @@ ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_UNIQUE_EMAIL = True
 
 # 登入重導向設定
-LOGIN_REDIRECT_URL = "/customers/dashboard/"
+LOGIN_REDIRECT_URL = "/marketplace/"
 LOGOUT_REDIRECT_URL = "/"
 
 # Social Account 配置

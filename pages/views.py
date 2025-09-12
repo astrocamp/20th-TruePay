@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from products.models import Product
+from merchant_marketplace.models import Product
 
 
 def home(req):
