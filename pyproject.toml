@@ -20,4 +20,5 @@ dependencies = [
     "qrcode[pil]>=7.4.2",
     "requests>=2.32.5",
     "resend>=2.13.0",
+    "django-celery-beat>=2.8.1",
 ]

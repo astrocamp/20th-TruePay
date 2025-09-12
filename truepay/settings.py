@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     "storages",
     "payments",
     "accounts",
+    "django_celery_beat",  # Celery Beat 排程器
 ]
 
 MIDDLEWARE = [
@@ -321,4 +322,103 @@ SOCIALACCOUNT_PROVIDERS = {
             "key": "",
         },
     }
+}
+
+# =============================================================================
+# Celery 配置
+# =============================================================================
+
+# Celery Broker URL (RabbitMQ)
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+
+# Celery Result Backend (可選，用於儲存任務結果)
+CELERY_RESULT_BACKEND = 'rpc://'
+
+# 任務結果過期時間（秒）
+CELERY_RESULT_EXPIRES = 3600
+
+# 接受的內容類型
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+# 時區設定
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_ENABLE_UTC = True
+
+# Celery Beat 排程器設定
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# 定期任務排程設定
+from celery.schedules import crontab
+CELERY_BEAT_SCHEDULE = {
+    # 每分鐘檢查票券到期狀況
+    'check-ticket-expiry-every-minute': {
+        'task': 'payments.check_ticket_expiry',
+        'schedule': crontab(),  # 每分鐘執行
+        'options': {
+            'expires': 55,  # 任務55秒後過期，避免堆積
+        }
+    },
+    # 每小時清理過期票券狀態
+    'cleanup-expired-tickets-hourly': {
+        'task': 'payments.cleanup_expired_tickets',
+        'schedule': crontab(minute=0),  # 每小時整點執行
+        'options': {
+            'expires': 3300,  # 55分鐘後過期
+        }
+    },
+    # 每日 23:00 發送統計報表
+    'daily-ticket-report': {
+        'task': 'payments.send_daily_ticket_report',
+        'schedule': crontab(hour=23, minute=0),  # 每日 23:00
+        'options': {
+            'expires': 3300,  # 55分鐘後過期
+        }
+    },
+}
+
+# 任務路由（可選）
+CELERY_TASK_ROUTES = {
+    'payments.*': {'queue': 'payments'},
+    'payments.check_ticket_expiry': {'queue': 'high_priority'},
+}
+
+# Worker 設定
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_TASK_ACKS_LATE = True
+
+# 日誌設定
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'celery.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'payments.tasks': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'celery': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
 }
