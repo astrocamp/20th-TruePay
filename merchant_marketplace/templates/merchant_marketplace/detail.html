@@ -80,11 +80,19 @@
               </button>
             </div>
             <div class="pt-4 border-t border-gray-200">
+              <!-- 本地開發使用 -->
+              <a href="{% url 'public_store:payment_page' product.id %}"
+                class="block w-full bg-green-500 text-white text-center py-3 px-4 rounded-lg text-sm hover:bg-green-600 transition duration-200"
+                target="_blank">
+                開啟收款頁面
+              </a>
+              <!-- 正式部署使用（需啟用 SubdomainRedirectMiddleware）
               <a href="https://{{ request.merchant.subdomain }}.{{ base_domain }}/pay/{{ product.id }}/"
                 class="block w-full bg-green-500 text-white text-center py-3 px-4 rounded-lg text-sm hover:bg-green-600 transition duration-200"
                 target="_blank">
                 開啟收款頁面
               </a>
+              -->
             </div>
           </div>      
 

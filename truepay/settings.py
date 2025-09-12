@@ -83,7 +83,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "truepay.security_middleware.SecurityHeadersMiddleware",
-    # "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 暫時禁用以便本地開發
+    # "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 本地開發時禁用
     "django.middleware.cache.UpdateCacheMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "allauth.account.middleware.AccountMiddleware",
