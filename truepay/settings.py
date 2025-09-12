@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -38,18 +39,16 @@ NGROK_URL = os.getenv("NGROK_URL")
 if not NGROK_URL:
     raise ValueError("請在 .env 檔案中設定 NGROK_URL=your-ngrok-id.ngrok-free.app")
 
+
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
     NGROK_URL,
     "truepay.tw",
+    "*.ushionagisa.work",  # 支援所有子域名
+    ".ushionagisa.work",  # 包含根域名
 ]
-
-# CSRF 設定 - 信任的來源
-CSRF_TRUSTED_ORIGINS = [
-    "https://truepay.tw",
-    f"https://{NGROK_URL}",
-]
+BASE_DOMAIN = "ushionagisa.work"
 
 # Application definition
 
@@ -78,12 +77,12 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "truepay.security_middleware.SecurityHeadersMiddleware",
+    # "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 本地開發時禁用
     "django.middleware.cache.UpdateCacheMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "allauth.account.middleware.AccountMiddleware",
     "truepay.security_middleware.SessionSecurityMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -235,11 +234,17 @@ PAYMENT_CANCEL_URL = f"https://{NGROK_URL}/payments/newebpay/cancel/"
 LINEPAY_CONFIRM_URL = f"https://{NGROK_URL}/payments/linepay/confirm/"
 LINEPAY_CANCEL_URL = f"https://{NGROK_URL}/payments/linepay/cancel/"
 
-# CSRF 豁免設定（金流回調需要）
+# CSRF 設定 - 信任的來源（包含金流回調需要的網域）
 CSRF_TRUSTED_ORIGINS = [
-    "https://ccore.newebpay.com",
+    # 正式網域
+    "https://truepay.tw",
+    # 本地開發
     "http://127.0.0.1:8000",
+    "http://localhost:8000",
+    # ngrok 測試環境
     f"https://{NGROK_URL}",
+    # 金流回調需要
+    "https://ccore.newebpay.com",
 ]
 
 # 登入相關設定
@@ -251,6 +256,9 @@ SESSION_COOKIE_HTTPONLY = True  # 防止 XSS 攻擊
 SESSION_COOKIE_SAMESITE = "Lax"  # CSRF 保護
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 瀏覽器關閉時清除 Session
 SESSION_COOKIE_AGE = 3600  # Session 1小時後過期
+# SESSION_COOKIE_DOMAIN = (
+#     ".ushionagisa.work"  # 讓子網域共享 session - 暫時註解以便本地開發
+# )
 
 # 快取設定（防止敏感頁面被快取）
 CACHE_MIDDLEWARE_SECONDS = 0  # 不快取頁面
@@ -263,12 +271,7 @@ X_FRAME_OPTIONS = "DENY"
 
 AUTH_USER_MODEL = "accounts.Member"
 
-# Django Sites Framework (required for allauth)
-# 根據 NGROK_URL 判斷環境選擇 Site ID
-# 本地開發 (localhost/127.0.0.1): SITE_ID=1 (127.0.0.1:8000)
-# 正式環境 (truepay.tw): SITE_ID=2 (truepay.tw)
 SITE_ID = 1
-
 # Authentication backends
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",

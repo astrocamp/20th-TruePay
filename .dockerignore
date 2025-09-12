@@ -1,0 +1,48 @@
+# Git 相關
+.git
+.gitignore
+
+# Python 相關
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Django 相關
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+
+# 開發工具
+.vscode
+.idea
+*.swp
+*.swo
+
+# 環境變數
+.env
+.env.local
+.env.production
+
+# Node.js (如果有前端工具)
+node_modules
+npm-debug.log
+
+# 作業系統
+.DS_Store
+Thumbs.db
+
+# Docker 相關
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# 其他
+README.md
+*.md

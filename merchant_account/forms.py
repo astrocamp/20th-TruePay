@@ -8,10 +8,12 @@ from django.forms import (
     EmailField,
 )
 from django import forms
-from .models import Merchant
+from .models import Merchant, MerchantOwnDomain
 from .utils import generate_unique_subdomain
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
+from django.conf import settings
+import re
 
 
 Member = get_user_model()
@@ -361,3 +363,34 @@ class MerchantProfileUpdateForm(ModelForm):
                 self.user.username = f"{self.user.pk}_{self.cleaned_data['email']}"
                 self.user.save(update_fields=["email", "username"])
         return merchant
+
+
+class MerchantOwnDomainForm(forms.ModelForm):
+
+    class Meta:
+        model = MerchantOwnDomain
+        fields = ["domain_name"]
+        widgets = {
+            "domain_name": forms.TextInput(
+                attrs={
+                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "placeholder": "例如: www.myshop.com 或 myshop.com",
+                    "required": True,
+                }
+            )
+        }
+        labels = {"domain_name": "自訂網域名稱"}
+
+    def clean_domain_name(self):
+        domain_name = self.cleaned_data.get("domain_name", "").strip().lower()
+        if not domain_name:
+            raise forms.ValidationError("請輸入網域名稱")
+
+        domain_pattern = r"^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$"
+        if not re.match(domain_pattern, domain_name):
+            raise forms.ValidationError("網域格式不正確")
+        if domain_name.endswith(f".{settings.BASE_DOMAIN}"):
+            raise forms.ValidationError(f"不能使用 {settings.BASE_DOMAIN} 的子網域")
+        if MerchantOwnDomain.objects.filter(domain_name=domain_name).exists():
+            raise forms.ValidationError("此網域已被使用")
+        return domain_name
