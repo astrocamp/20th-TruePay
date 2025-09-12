@@ -8,8 +8,6 @@
   {% load static %}
   <link href="{% static 'styles/app.css' %}" rel="stylesheet" type="text/css" />
   <script src="{% static 'scripts/app.js' %}" defer></script>
-  <!-- HTMX for AJAX functionality -->
-  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
   <style>
     /* 自訂滾動條（與 Apple 風格接近，低存在感）*/
     ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#D2D2D7;border-radius:999px}::-webkit-scrollbar-track{background:transparent}
@@ -131,5 +129,6 @@
       </footer>
     </div>
   </div>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>
