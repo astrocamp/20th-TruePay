@@ -314,56 +314,45 @@ class OrderItem(models.Model):
             base_url = f"https://{settings.NGROK_URL}" if hasattr(settings, 'NGROK_URL') else "https://truepay.tw"
             login_url = f"{base_url}/customers/login/"
             wallet_url = f"{base_url}/customers/ticket-wallet/"
-            
-            message = f"""
-{customer_name}，您好！
 
-{urgency_level}：{timing_message}！
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📋 票券資訊
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🏪 商家名稱：{self.product.merchant.ShopName}
-🛍️ 商品名稱：{self.product.name}
-💰 票券價值：NT$ {self.order.unit_price}
-⏰ 到期時間：{self.valid_until.strftime("%Y年%m月%d日 %H:%M")}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔗 查看票券詳情
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-請登入您的 TruePay 帳戶查看完整票券資訊：
-
-📱 票券錢包：{wallet_url}
-
-如果您尚未登入，請先登入：
-🔐 登入連結：{login_url}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📞 商家聯絡資訊
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🏪 {self.product.merchant.ShopName}
-📞 如需協助請直接聯繫商家
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-⚠️ 重要提醒：
-• 請在票券錢包中查看完整的票券資訊和 QR Code
-• 前往商家時請出示票券 QR Code 進行核銷
-• 如有疑問請直接聯繫商家或 TruePay 客服
-
-感謝您使用 TruePay！
+            # HTML 內容
+            html_message = f"""
+<div style='font-family: Arial, sans-serif; font-size: 16px; color: #222;'>
+<p>{customer_name}，您好！</p>
+<p><b>{urgency_level}：</b>{timing_message}！</p>
+<hr style='margin: 18px 0;'>
+<b>📋 票券資訊</b><br>
+🏪 商家名稱：{self.product.merchant.ShopName}<br>
+🛍️ 商品名稱：{self.product.name}<br>
+💰 票券價值：NT$ {self.order.unit_price}<br>
+⏰ 到期時間：{self.valid_until.strftime("%Y年%m月%d日 %H:%M")}<br>
+<hr style='margin: 18px 0;'>
+<b>🔗 查看票券詳情</b><br>
+請登入您的 TruePay 帳戶查看完整票券資訊：<br>
+📱 票券錢包：<a href='{wallet_url}' style='color: #0056B3;' target='_blank'>{wallet_url}</a><br>
+如果您尚未登入，請先登入：<br>
+🔐 登入連結：<a href='{login_url}' style='color: #0056B3;' target='_blank'>{login_url}</a><br>
+<hr style='margin: 18px 0;'>
+<b>📞 商家聯絡資訊</b><br>
+🏪 {self.product.merchant.ShopName}<br>
+📞 如需協助請直接聯繫商家<br>
+<hr style='margin: 18px 0;'>
+⚠️ <b>重要提醒：</b><br>
+• 請在票券錢包中查看完整的票券資訊和 QR Code<br>
+• 前往商家時請出示票券 QR Code 進行核銷<br>
+• 如有疑問請直接聯繫商家或 TruePay 客服<br>
+<br>
+感謝您使用 TruePay！<br>
 TruePay 客服團隊
+</div>
             """
-            
             send_mail(
                 subject=subject,
-                message=message,
+                message=html_message,  # 純文字備用
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[customer_email],
                 fail_silently=False,
+                html_message=html_message,
             )
             
             # 記錄通知發送時間

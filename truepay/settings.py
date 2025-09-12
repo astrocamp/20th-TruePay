@@ -199,13 +199,31 @@ DEFAULT_FILE_STORAGE = "merchant_marketplace.storage_backends.MediaStorage"
 MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.resend.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
-EMAIL_HOST_USER = "resend"
-EMAIL_HOST_PASSWORD = os.getenv("RESEND_API_KEY")
-DEFAULT_FROM_EMAIL = "TruePay <noreply@truepay.tw>"
+
+# 郵件服務提供商切換 (環境變數: EMAIL_PROVIDER)
+# 支援值: 'resend' 或 'mailtrap'
+EMAIL_PROVIDER = os.getenv("EMAIL_PROVIDER", "mailtrap").lower()
+
+if EMAIL_PROVIDER == "resend":
+    # Resend 郵件服務設定 (正式環境)
+    EMAIL_HOST = "smtp.resend.com"
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_USE_SSL = False
+    EMAIL_HOST_USER = "resend"
+    EMAIL_HOST_PASSWORD = os.getenv("RESEND_API_KEY")
+    DEFAULT_FROM_EMAIL = "TruePay <noreply@truepay.tw>"
+elif EMAIL_PROVIDER == "mailtrap":
+    # Mailtrap 郵件測試服務設定 (測試環境)
+    EMAIL_HOST = "smtp.mailtrap.io"
+    EMAIL_PORT = 2525
+    EMAIL_USE_TLS = True
+    EMAIL_USE_SSL = False
+    EMAIL_HOST_USER = os.getenv("MAILTRAP_USERNAME")
+    EMAIL_HOST_PASSWORD = os.getenv("MAILTRAP_PASSWORD")
+    DEFAULT_FROM_EMAIL = "TruePay <noreply@truepay.tw>"
+else:
+    raise ValueError(f"不支援的郵件服務提供商: {EMAIL_PROVIDER}。請使用 'resend' 或 'mailtrap'")
 
 # 藍新金流設定
 NEWEBPAY_MERCHANT_ID = os.getenv("NEWEBPAY_MERCHANT_ID")
