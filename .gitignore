@@ -39,7 +39,6 @@ env/
 ehthumbs.db
 Thumbs.db
 
-
 # Python
 *.egg-info/
 dist/
@@ -50,9 +49,6 @@ build/
 .claude/
 
 ngrok.exe
-
-
-static/
 
 
 

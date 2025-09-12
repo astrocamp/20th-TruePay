@@ -67,7 +67,7 @@
               </a>
             </li>
             <li>
-              <a href="{% url 'public_store:shop_overview' %}" 
+              <a href="{% url 'public_store:shop_overview' merchant.subdomain %}" 
                 target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
                 {% include 'components/icons.html' with icon='cube' %}
                 商品總覽

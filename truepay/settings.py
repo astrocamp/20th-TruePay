@@ -50,12 +50,6 @@ ALLOWED_HOSTS = [
 ]
 BASE_DOMAIN = "ushionagisa.work"
 
-# CSRF 設定 - 信任的來源
-CSRF_TRUSTED_ORIGINS = [
-    "https://truepay.tw",
-    f"https://{NGROK_URL}",
-]
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -240,13 +234,17 @@ PAYMENT_CANCEL_URL = f"https://{NGROK_URL}/payments/newebpay/cancel/"
 LINEPAY_CONFIRM_URL = f"https://{NGROK_URL}/payments/linepay/confirm/"
 LINEPAY_CANCEL_URL = f"https://{NGROK_URL}/payments/linepay/cancel/"
 
-# CSRF 豁免設定（金流回調需要）
+# CSRF 設定 - 信任的來源（包含金流回調需要的網域）
 CSRF_TRUSTED_ORIGINS = [
-    "https://ccore.newebpay.com",
+    # 正式網域
+    "https://truepay.tw",
+    # 本地開發
     "http://127.0.0.1:8000",
+    "http://localhost:8000",
+    # ngrok 測試環境
     f"https://{NGROK_URL}",
-    "http://ushionagisa.work",
-    "https://ushionagisa.work",
+    # 金流回調需要
+    "https://ccore.newebpay.com",
 ]
 
 # 登入相關設定
@@ -273,12 +271,7 @@ X_FRAME_OPTIONS = "DENY"
 
 AUTH_USER_MODEL = "accounts.Member"
 
-# Django Sites Framework (required for allauth)
-# 根據 NGROK_URL 判斷環境選擇 Site ID
-# 本地開發 (localhost/127.0.0.1): SITE_ID=1 (127.0.0.1:8000)
-# 正式環境 (truepay.tw): SITE_ID=2 (truepay.tw)
-SITE_ID = 1 if NGROK_URL in ["127.0.0.1:8000", "localhost:8000"] else 2
-
+SITE_ID = 1
 # Authentication backends
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",

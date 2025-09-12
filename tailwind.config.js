@@ -2,6 +2,9 @@
 export default {
   safelist: [
     'bg-brand-grayLight',
+    'bg-brand-blue',
+    'bg-brand-blueHover',
+    'hover:bg-brand-blueHover',
     'text-cis-secondary',
     'hover:bg-cis-secondary-hover',
     'border-cis-secondary',

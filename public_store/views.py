@@ -11,10 +11,8 @@ def shop_overview(request, subdomain=None):
 
     # 本地開發：通過 subdomain 參數找到商家
     if not hasattr(request, "merchant") or request.merchant is None:
-        if request.user.is_authenticated and request.user.member_type == "merchant":
-            merchant = request.user.merchant  # 使用登入商家的商店
-        elif subdomain:
-            merchant = get_object_or_404(Merchant, subdomain=subdomain, is_active=True)
+        if subdomain:
+            merchant = get_object_or_404(Merchant, subdomain=subdomain)
         else:
             return render(request, "pages/home.html")
     # else:
