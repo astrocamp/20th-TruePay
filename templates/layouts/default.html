@@ -60,50 +60,17 @@
           {% if user.is_authenticated %}
             {% if user.member_type == "merchant" %}
               <li>
-                <a
-                  href="{% get_current_merchant %}"
-                  x-bind="navLinkBinding($el)"
-                  >商家後台</a
-                >
-              </li>
-              <li>
-                <a
-                  href="{% url 'merchant_account:logout' %}"
-                  x-bind="logoutLinkBinding()"
-                  >登出</a
-                >
-              </li>
-            {% elif user.member_type == "customer" %}
-              <li>
-                <a
-                  href="{% url 'customers_account:dashboard' %}"
-                  x-bind="navLinkBinding($el)"
-                  >我的帳戶</a
-                >
-              </li>
-              <li>
-                <a
-                  href="{% url 'customers_account:logout' %}"
-                  x-bind="logoutLinkBinding()"
-                  >登出</a
-                >
+                <a href="{% get_current_merchant %}" x-bind="navLinkBinding($el)">商家後台</a>
               </li>
             {% else %}
               <li>
-                <a
-                  href="{% url 'customers_account:dashboard' %}"
-                  x-bind="navLinkBinding($el)"
-                  >我的帳戶</a
-                >
-              </li>
-              <li>
-                <a
-                  href="{% url 'customers_account:logout' %}"
-                  x-bind="logoutLinkBinding()"
-                  >登出</a
-                >
+                <a href="{% url 'customers_account:dashboard' %}" x-bind="navLinkBinding($el)">我的帳戶</a>
               </li>
             {% endif %}
+            <li>
+              <a href="{% if user.member_type == 'merchant' %}{% url 'merchant_account:logout' %}{% else %}{% url 'customers_account:logout' %}{% endif %}"
+                 x-bind="logoutLinkBinding()">登出</a>
+            </li>
           {% else %}
             <li>
               <a

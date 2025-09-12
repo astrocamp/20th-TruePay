@@ -131,6 +131,17 @@
                 </button>
             </div>
         </div>
+
+        <!-- 商品票券有效期限 -->
+        <div>
+            <label for="ticket_expiry" class="block text-sm font-medium text-gray-700 mb-2">
+                商品票券有效期限 <span class="text-red-500">*</span>
+            </label>
+            <input type="datetime-local" id="ticket_expiry" name="ticket_expiry" required value="{{ product.ticket_expiry|date:'Y-m-d\\TH:i' }}"
+                   {% if has_tickets %}disabled{% endif %}
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent {% if has_tickets %}bg-gray-100 text-gray-500{% endif %}">
+            <p class="text-sm text-gray-500 mt-1">請選擇票券到期日與時間（最小單位：分鐘）。票券將於此時間自動失效。</p>
+        </div>
         
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-4">
@@ -238,7 +249,6 @@
                 <li>• 修改後的資訊將立即生效</li>
                 <li>• 請確保所有資訊都是最新且正確的</li>
                 <li>• 圖片會自動上傳至 AWS S3</li>
-                <li>• 如需下架商品，請到商品詳情頁面操作</li>
             </ul>
         </div>
         
