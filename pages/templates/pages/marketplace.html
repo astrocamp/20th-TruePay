@@ -49,7 +49,7 @@
                 </div>
 
                 <div class="flex items-center justify-between">
-                    <div class="text-2xl font-bold text-brand-blue">
+                    <div class="text-2xl font-bold text-cis-primary">
                         NT$ {{ product.price|floatformat:0 }}
                     </div>
                     
@@ -74,7 +74,7 @@
                 <div class="mt-4">
                     {% if product.stock > 0 %}
                         <a href="{% url 'public_store:shop_overview' product.merchant.subdomain %}" 
-                           class="block w-full bg-brand-blue text-white text-center py-2 px-4 rounded-xl hover:bg-brand-blueHover transition-all font-medium">
+                           class="block w-full bg-cis-primary text-white text-center py-2 px-4 rounded-xl hover:bg-cis-primaryHover transition-all font-medium">
                             前往商家
                         </a>
                     {% else %}
@@ -113,7 +113,7 @@
 
             {% for num in products.paginator.page_range %}
                 {% if products.number == num %}
-                    <span class="px-3 py-2 text-sm font-medium text-white bg-brand-blue border border-brand-blue rounded-md">
+                    <span class="px-3 py-2 text-sm font-medium text-white bg-cis-primary border border-cis-primary rounded-md">
                         {{ num }}
                     </span>
                 {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
