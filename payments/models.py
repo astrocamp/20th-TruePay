@@ -254,7 +254,7 @@ class OrderItem(models.Model):
         if not self.valid_until:
             return False
             
-        if self.status != "unused":
+        if self.status not in ["unused", "expired"]:
             return False
             
         if not self.order.is_paid():
@@ -271,15 +271,15 @@ class OrderItem(models.Model):
         now = timezone.now()
         notification_time = self.valid_until - timezone.timedelta(minutes=minutes_before)
         
-        # 如果票券已經過期但沒有發送過通知，也應該發送
-        if now > self.valid_until:
+        # 定義通知時間窗口：到期前6分鐘到過期後30分鐘
+        window_start = notification_time - timezone.timedelta(minutes=1)  # 到期前6分鐘開始
+        window_end = self.valid_until + timezone.timedelta(minutes=30)    # 過期後30分鐘內
+        
+        # 只在合理的時間窗口內發送通知
+        if window_start <= now <= window_end:
             return True
-        
-        # 允許一定的時間誤差（例如 1 分鐘），避免因執行時間差而錯過
-        time_window_start = notification_time - timezone.timedelta(minutes=1)
-        time_window_end = notification_time + timezone.timedelta(minutes=1)
-        
-        return time_window_start <= now <= time_window_end
+            
+        return False
     
     def send_expiry_notification(self):
         """
@@ -373,7 +373,7 @@ TruePay 客服團隊
             dict: 執行結果統計
         """
         tickets_to_notify = cls.objects.filter(
-            status='unused',
+            status__in=['unused', 'expired'],
             order__status='paid',
             valid_until__isnull=False,
             expiry_notification_sent__isnull=True,
