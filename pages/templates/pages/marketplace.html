@@ -15,7 +15,10 @@
     <div class="mb-8">
         <div class="flex items-center justify-between">
             <p class="text-sm text-gray-500">
-                共找到 {{ products.count }} 個商品
+                共找到 {{ products.paginator.count }} 個商品
+            </p>
+            <p class="text-sm text-gray-500">
+                第 {{ products.number }} 頁，共 {{ products.paginator.num_pages }} 頁
             </p>
         </div>
     </div>
@@ -92,6 +95,43 @@
         </div>
         <h3 class="text-lg font-medium text-gray-900 mb-2">目前沒有商品</h3>
         <p class="text-gray-500">請稍後再來查看，或許會有新商品上架！</p>
+    </div>
+    {% endif %}
+
+    <!-- 分頁導航 -->
+    {% if products.has_other_pages %}
+    <div class="flex justify-center mt-12">
+        <nav class="flex space-x-2">
+            {% if products.has_previous %}
+                <a href="?page=1" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    首頁
+                </a>
+                <a href="?page={{ products.previous_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    上一頁
+                </a>
+            {% endif %}
+
+            {% for num in products.paginator.page_range %}
+                {% if products.number == num %}
+                    <span class="px-3 py-2 text-sm font-medium text-white bg-brand-blue border border-brand-blue rounded-md">
+                        {{ num }}
+                    </span>
+                {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                    <a href="?page={{ num }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                        {{ num }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+
+            {% if products.has_next %}
+                <a href="?page={{ products.next_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    下一頁
+                </a>
+                <a href="?page={{ products.paginator.num_pages }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    最後頁
+                </a>
+            {% endif %}
+        </nav>
     </div>
     {% endif %}
 </div>
