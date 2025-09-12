@@ -28,16 +28,6 @@
                 </div>
                 
                 <!-- 商品資訊 -->
-<<<<<<< HEAD
-                     <div class="md:w-1/2 p-8" 
-                            x-data="{ 
-                                ...createQuantityManager(),
-                                needsVerification: '{{ product.verification_timing }}' === 'before_payment',
-                                isVerified: false,
-                                verificationData: { terms: false, identity: '', phone: '' }
-                            }"
-                            data-unit-price="{{ product.price }}" data-max-stock="{{ product.stock }}">
-=======
 
                 <div class="md:w-1/2 p-8" x-data="createQuantityManager()" 
                      data-unit-price="{{ product.price }}" data-max-stock="{{ product.stock }}" 
@@ -49,7 +39,6 @@
                          verificationData = { terms: false, identity: '', phone: '' };
                      ">
 
->>>>>>> 9c3e56a288a97a8ae1e6d7a5ba040a849534c7de
                     <div class="mb-6">
                         <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ product.name }}</h1>
                         <p class="text-4xl font-bold text-[#0056B3] mb-6">NT$ {{ product.price }}</p>
@@ -182,18 +171,11 @@
                                         {% endif %}
                                     </div>
                                     
-<<<<<<< HEAD
-                    <button type="button" 
-                        @click="if(verificationData.terms && verificationData.identity && verificationData.phone) { isVerified = true }"
-                        :disabled="!(verificationData.terms && verificationData.identity && verificationData.phone)"
-                                            :class="verificationData.terms && verificationData.identity && verificationData.phone ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-gray-400 cursor-not-allowed'"
-=======
                                     {% if is_customer and customer.totp_enabled and product.verification_timing == 'before_payment' %}
                                     <button type="button" 
                                             @click="if(verificationData.terms) { isVerified = true }"
                                             :disabled="!verificationData.terms"
                                             :class="verificationData.terms ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
->>>>>>> 9c3e56a288a97a8ae1e6d7a5ba040a849534c7de
                                             class="w-full text-white py-3 px-6 rounded-lg transition duration-200 font-medium text-lg mt-6">
                                         ✓ 確認條款，開始付款
                                     </button>
