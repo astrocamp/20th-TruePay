@@ -46,7 +46,7 @@
                 </div>
 
                 <div class="flex items-center justify-between">
-                    <div class="text-2xl font-bold text-[#0056B3]">
+                    <div class="text-2xl font-bold text-brand-blue">
                         NT$ {{ product.price|floatformat:0 }}
                     </div>
                     
@@ -71,7 +71,7 @@
                 <div class="mt-4">
                     {% if product.stock > 0 %}
                         <a href="{% url 'public_store:shop_overview' product.merchant.subdomain %}" 
-                           class="block w-full bg-[#0056B3] text-white text-center py-2 px-4 rounded-xl hover:bg-[#00408A] transition-all font-medium">
+                           class="block w-full bg-brand-blue text-white text-center py-2 px-4 rounded-xl hover:bg-brand-blueHover transition-all font-medium">
                             前往商家
                         </a>
                     {% else %}
