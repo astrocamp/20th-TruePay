@@ -1,4 +1,6 @@
-
+from django.utils.dateparse import parse_datetime
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import Product
@@ -9,20 +11,40 @@ from payments.models import OrderItem
 
 @no_cache_required
 def index(request, subdomain):
-    products = Product.objects.filter(
-        merchant=request.merchant, is_active=True
-    ).order_by("-created_at")
+    status = request.GET.get("status")
+    products = Product.objects.filter(merchant=request.merchant)
+    if status == "active":
+        products = products.filter(is_active=True)
+    elif status == "inactive":
+        products = products.filter(is_active=False)
+    products = products.order_by("-created_at")
     return render(request, "merchant_marketplace/index.html", {"products": products})
 
 
 @no_cache_required
 def detail(request, subdomain, id):
     product = get_object_or_404(Product, id=id, merchant=request.merchant)
-    if request.method == "POST" and request.POST.get("action") == "delete":
-        product.is_active = False
-        product.save()
-        messages.success(request, "商品已刪除")
-        return redirect("merchant_marketplace:index", request.merchant.subdomain)
+    
+    if request.method == "POST":
+        action = request.POST.get("action")
+        
+        if action == "activate":
+            product.is_active = True
+            product.save()
+            messages.success(request, "商品已上架")
+            return redirect("merchant_marketplace:detail", request.merchant.subdomain, product.id)
+            
+        elif action == "deactivate":
+            product.is_active = False
+            product.save()
+            messages.success(request, "商品已下架")
+            return redirect("merchant_marketplace:detail", request.merchant.subdomain, product.id)
+            
+        elif action == "delete":
+            product.is_active = False
+            product.save()
+            messages.success(request, "商品已刪除")
+            return redirect("merchant_marketplace:index", request.merchant.subdomain)
 
     return render(request, "merchant_marketplace/detail.html", {"product": product})
 
@@ -39,6 +61,12 @@ def new(request, subdomain):
             if stock < 1:
                 raise ValueError("庫存數量必須至少為 1 件")
                 
+            # 處理票券期限
+            
+            ticket_expiry = None
+            if request.POST.get("ticket_expiry"):
+                ticket_expiry = parse_datetime(request.POST.get("ticket_expiry"))
+            
             product = Product.objects.create(
                 name=request.POST.get("name"),
                 description=request.POST.get("description"),
@@ -47,7 +75,9 @@ def new(request, subdomain):
                 image=request.FILES.get("image"),
                 phone_number=request.POST.get("phone_number"),
                 verification_timing=request.POST.get("verification_timing", "before_redeem"),
+                ticket_expiry=ticket_expiry,
                 merchant=request.merchant,
+                is_active=False,  # 預設為下架
             )
 
             messages.success(request, "商品新增成功！")
@@ -99,6 +129,11 @@ def edit(request, subdomain, id):
             )
             # 更新驗證方式
             product.verification_timing = request.POST.get("verification_timing") or product.verification_timing
+            
+            # 更新票券期限
+            if request.POST.get("ticket_expiry"):
+                product.ticket_expiry = parse_datetime(request.POST.get("ticket_expiry"))
+            
             product.save()
             messages.success(request, "商品更新成功！")
             return redirect("merchant_marketplace:index", request.merchant.subdomain)

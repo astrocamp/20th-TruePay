@@ -1,5 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  safelist: [
+    'bg-brand-grayLight',
+    'text-cis-secondary',
+    'hover:bg-cis-secondary-hover',
+    'border-cis-secondary',
+    'text-cis-accent',
+    'hover:bg-cis-accent-hover',
+    'border-cis-accent',
+  ],
   content: [
     "./templates/**/*.html",
     "./pages/templates/**/*.html",
