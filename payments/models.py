@@ -5,6 +5,10 @@ import random
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import transaction
+import qrcode
+from io import BytesIO
+import base64
+import json
 
 
 def default_provider_raw_data():
@@ -248,6 +252,63 @@ class OrderItem(models.Model):
             "verification_timing": self.product.verification_timing,
             "requires_post_verification": self.product.verification_timing == 'after_redeem',
         }
+    
+    def generate_qr_code_data(self):
+        """生成QR code資料內容"""
+        qr_data = {
+            "ticket_code": self.ticket_code,
+            "type": "ticket_voucher",
+            "version": "1.0",
+            "product_id": self.product.id,
+            "merchant_id": self.product.merchant.id
+        }
+        return json.dumps(qr_data)
+    
+    def generate_qr_code_image(self):
+        """生成QR code圖片的base64編碼"""
+        # 獲取QR code資料
+        qr_data = self.generate_qr_code_data()
+        
+        # 創建QR code
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_M,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(qr_data)
+        qr.make(fit=True)
+        
+        # 生成圖片
+        img = qr.make_image(fill_color="black", back_color="white")
+        
+        # 轉換為base64
+        buffer = BytesIO()
+        img.save(buffer, format='PNG')
+        buffer.seek(0)
+        
+        return base64.b64encode(buffer.getvalue()).decode()
+    
+    @classmethod
+    def get_ticket_from_qr_data(cls, qr_data):
+        """從QR code資料中取得票券"""
+        try:
+            data = json.loads(qr_data)
+            if data.get("type") != "ticket_voucher":
+                return None, "無效的QR code類型"
+            
+            ticket_code = data.get("ticket_code")
+            if not ticket_code:
+                return None, "QR code中缺少票券代碼"
+                
+            try:
+                ticket = cls.objects.get(ticket_code=ticket_code)
+                return ticket, None
+            except cls.DoesNotExist:
+                return None, "找不到對應的票券"
+                
+        except json.JSONDecodeError:
+            return None, "QR code格式錯誤"
 
 
 class TicketValidation(models.Model):
