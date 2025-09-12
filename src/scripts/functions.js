@@ -210,11 +210,14 @@ function createMobileMenu() {
     isOpen: false,
     
     init() {
-      // 視窗大小變化時自動關閉選單（使用 passive 監聽器提升效能）
+       // 初始狀態：手機版關閉選單，桌面版不受影響
+      this.isOpen = false;
+      
+      // 視窗大小變化時，如果切換到桌面版就關閉手機版選單狀態
       this.$nextTick(() => {
         window.addEventListener('resize', () => {
           if (window.innerWidth >= 768) { // md breakpoint
-            this.isOpen = false;
+            this.isOpen = false; // 重置手機版選單狀態
           }
         }, { passive: true });
       });
@@ -345,6 +348,13 @@ function createQuantityManager(config = {}) {
     quantity: 1,
     unitPrice: 0,
     maxStock: 0,
+    productId: null,
+    
+    // 即時庫存驗證相關變數
+    stockCheckLoading: false,
+    stockWarningMessage: '',
+    lastStockCheck: 0,
+    stockCheckInterval: null,
     
     // 驗證相關變數
     needsVerification: config.needsVerification || false,
@@ -354,6 +364,7 @@ function createQuantityManager(config = {}) {
     init() {
       // 從頁面中提取價格和庫存資訊
       this.extractPriceAndStock();
+      this.extractProductId();
       
       // 設置初始數量
       const quantityInput = this.$refs.quantityInput;
@@ -363,6 +374,16 @@ function createQuantityManager(config = {}) {
       
       // 驗證並更新初始狀態
       this.validateQuantity();
+      
+      // 啟動定期庫存檢查（每30秒檢查一次）
+      this.startPeriodicStockCheck();
+    },
+    
+    destroy() {
+      // 清理定時器
+      if (this.stockCheckInterval) {
+        clearInterval(this.stockCheckInterval);
+      }
     },
     
     extractPriceAndStock() {
@@ -383,7 +404,137 @@ function createQuantityManager(config = {}) {
         this.maxStock = parseInt(stockElement.dataset.maxStock) || 0;
         return;
       }
+    },
+    
+    extractProductId() {
+      const productElement = document.querySelector('[data-product-id]');
+      if (productElement) {
+        this.productId = productElement.dataset.productId;
+      }
       
+      // 如果找不到 data-product-id，嘗試從表單中提取
+      const productInput = document.querySelector('input[name="product_id"]');
+      if (productInput && productInput.value) {
+        this.productId = productInput.value;
+      }
+    },
+    
+    // 啟動定期庫存檢查
+    startPeriodicStockCheck() {
+      if (!this.productId) return;
+      
+      // 立即執行一次檢查
+      this.checkStockStatus();
+      
+      // 每30秒檢查一次
+      this.stockCheckInterval = setInterval(() => {
+        this.checkStockStatus();
+      }, 30000);
+    },
+    
+    // 檢查庫存狀態
+    async checkStockStatus() {
+      if (!this.productId || this.stockCheckLoading) return;
+      
+      // 避免過於頻繁的請求（至少間隔5秒）
+      const now = Date.now();
+      if (now - this.lastStockCheck < 5000) return;
+      
+      this.stockCheckLoading = true;
+      this.lastStockCheck = now;
+      
+      try {
+        const formData = new FormData();
+        formData.append('product_id', this.productId);
+        formData.append('quantity', this.quantity.toString());
+        
+        // 添加 CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (csrfToken) {
+          formData.append('csrfmiddlewaretoken', csrfToken.value);
+        }
+        
+        const response = await fetch('/payments/api/check-stock/', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          this.handleStockCheckResponse(data);
+        } else {
+          console.warn('庫存檢查請求失敗:', response.status);
+        }
+      } catch (error) {
+        console.warn('庫存檢查發生錯誤:', error);
+      } finally {
+        this.stockCheckLoading = false;
+      }
+    },
+    
+    // 處理庫存檢查回應
+    handleStockCheckResponse(data) {
+      const oldMaxStock = this.maxStock;
+      this.maxStock = data.max_available;
+      
+      // 清除之前的警告訊息
+      this.stockWarningMessage = '';
+      
+      // 如果庫存發生變化，顯示通知
+      if (oldMaxStock !== this.maxStock && oldMaxStock > 0) {
+        if (data.is_sold_out) {
+          this.stockWarningMessage = '很抱歉，商品已售完！頁面將自動更新。';
+          this.autoRefreshPage();
+        } else if (!data.is_available) {
+          this.stockWarningMessage = `庫存已更新：目前僅剩 ${this.maxStock} 件`;
+          this.quantity = Math.min(this.quantity, this.maxStock);
+        } else if (data.is_low_stock) {
+          this.stockWarningMessage = `注意：庫存偏低，僅剩 ${this.maxStock} 件`;
+        }
+      }
+      
+      // 如果當前選擇的數量超過庫存，自動調整
+      if (this.quantity > this.maxStock) {
+        this.quantity = Math.max(1, this.maxStock);
+      }
+      
+      // 更新庫存顯示元素
+      this.updateStockDisplay(data);
+    },
+    
+    // 更新頁面中的庫存顯示
+    updateStockDisplay(data) {
+      const stockElements = document.querySelectorAll('[data-stock-display]');
+      stockElements.forEach(element => {
+        element.textContent = `${data.current_stock} 件`;
+      });
+      
+      const stockStatusElements = document.querySelectorAll('[data-stock-status]');
+      stockStatusElements.forEach(element => {
+        element.innerHTML = '';
+        if (data.is_sold_out) {
+          element.innerHTML = '<span class="text-red-600 font-medium">（已售完）</span>';
+        } else if (data.is_low_stock) {
+          element.innerHTML = '<span class="text-orange-600 font-medium">（庫存不足）</span>';
+        }
+      });
+    },
+    
+    // 自動重新整理頁面
+    autoRefreshPage() {
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    },
+    
+    // 手動觸發庫存檢查
+    async refreshStock() {
+      this.lastStockCheck = 0; // 重設檢查時間，強制執行
+      await this.checkStockStatus();
+    },
+    
+    // 原有的 extractStock 方法的其餘部分
+    extractStockFromInput() {
       // 如果沒有 data 屬性，嘗試從輸入框的 max 屬性獲取
       const quantityInput = this.$refs.quantityInput;
       if (quantityInput) {
@@ -777,6 +928,22 @@ function createQrScanner(config) {
 // 將新的掃描器組件掛載到全域
 window.createQrScanner = createQrScanner;
 
+// URL 參數處理工具函數
+function handleRefreshParameter() {
+    // 自動重新整理庫存狀態的功能
+    if (window.location.search.includes('refresh=1')) {
+        // 移除 URL 中的 refresh 參數，避免無限重新整理
+        const url = new URL(window.location);
+        url.searchParams.delete('refresh');
+        window.history.replaceState({}, document.title, url.pathname + url.search);
+    }
+}
+
+// 當頁面載入時自動執行 refresh 參數處理
+document.addEventListener('DOMContentLoaded', handleRefreshParameter);
+
+// 將函數掛載到全域
+window.handleRefreshParameter = handleRefreshParameter;
 
 // 導出 Alpine.js 組件創建函數和 NavigationManager
 export { 

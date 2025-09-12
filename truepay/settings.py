@@ -264,7 +264,10 @@ X_FRAME_OPTIONS = "DENY"
 AUTH_USER_MODEL = "accounts.Member"
 
 # Django Sites Framework (required for allauth)
-SITE_ID = 1
+# 根據 NGROK_URL 判斷環境選擇 Site ID
+# 本地開發 (localhost/127.0.0.1): SITE_ID=1 (127.0.0.1:8000)
+# 正式環境 (truepay.tw): SITE_ID=2 (truepay.tw)
+SITE_ID = 1 if NGROK_URL in ["127.0.0.1:8000", "localhost:8000"] else 2
 
 # Authentication backends
 AUTHENTICATION_BACKENDS = [
