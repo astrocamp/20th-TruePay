@@ -265,6 +265,9 @@ def ticket_wallet(request):
             request.session.pop('redemption_verified', None)
             request.session.pop('redemption_verified_time', None)
 
+    # 檢查是否需要自動展開特定票券的QR Code
+    show_qr_ticket_id = request.GET.get('show_qr')
+
     context = {
         "customer": customer,
         "tickets": page_obj,
@@ -274,6 +277,7 @@ def ticket_wallet(request):
         "merchants": merchants,
         "now": now,
         "is_redemption_verified": is_redemption_verified,
+        "show_qr_ticket_id": show_qr_ticket_id,
     }
 
     return render(request, "customers/ticket_wallet.html", context)
@@ -699,7 +703,7 @@ def totp_verify_for_redemption(request):
 
     # 取得票券資訊
     ticket_id = request.GET.get('ticket_id')
-    next_url = request.GET.get('next', '/customers/ticket-wallet/')
+    next_url = request.GET.get('next', reverse('customers_account:ticket_wallet'))
     
     ticket = None
     if ticket_id:
@@ -714,14 +718,22 @@ def totp_verify_for_redemption(request):
         
         if not totp_code:
             messages.error(request, "請輸入驗證代碼")
+        elif len(totp_code) != 6 or not totp_code.isdigit():
+            messages.error(request, "驗證代碼格式錯誤")
         elif customer.verify_totp(totp_code):
             # 驗證成功，設定session表示已通過核銷前驗證
             request.session['redemption_verified'] = True
             request.session['redemption_verified_time'] = timezone.now().timestamp()
-            messages.success(request, "驗證成功！現在可以查看票券 QR Code")
+
+            if ticket_id:
+                messages.success(request, "✅ 驗證成功！正在跳轉到票券錢包查看 QR Code...")
+                next_url += f'?show_qr={ticket_id}'
+            else:
+                messages.success(request, "✅ 驗證成功！正在跳轉到票券錢包...")
+
             return redirect(next_url)
         else:
-            messages.error(request, "驗證代碼錯誤，請重試")
+            messages.error(request, "❌ 驗證代碼錯誤！請檢查：\n• 代碼是否為6位數字\n• 代碼是否已過期（每30秒更新）\n• Google Authenticator 時間是否正確")
 
     context = {
         'customer': customer,

@@ -79,7 +79,7 @@
       {% for ticket in tickets %}
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
            x-data="{ 
-             showQR: false, 
+             showQR: {{ show_qr_ticket_id|yesno:'true,false' }} && '{{ show_qr_ticket_id }}' === '{{ ticket.id }}', 
              needsRedemptionVerification: '{{ ticket.product.verification_timing }}' === 'before_redeem',
              isRedemptionVerified: {{ is_redemption_verified|yesno:'true,false' }},
              redemptionData: {
@@ -87,7 +87,8 @@
                phone: '',
                terms: false
              }
-           }">
+           }" 
+           x-init="if (showQR) { setTimeout(() => { $el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100); }">
         <div class="p-6">
           <div class="flex items-start justify-between">
             <!-- 左側：票券資訊 -->

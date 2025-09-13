@@ -965,13 +965,19 @@ function createTotpVerifyRedemption() {
         
         submitForm() {
             if (this.totpCode.length === 6) {
-                document.querySelector('form').submit();
+                console.log('提交表單，驗證碼:', this.totpCode);
+                const form = document.querySelector('form');
+                if (form) {
+                    form.submit();
+                } else {
+                    console.error('找不到表單元素');
+                }
             }
         },
         
         cancelVerification() {
             if (confirm('確定要取消驗證嗎？您將無法查看票券 QR Code。')) {
-                // 使用相對路徑返回票券錢包
+                // 返回票券錢包頁面
                 window.location.href = '/customers/ticket-wallet/';
             }
         }
