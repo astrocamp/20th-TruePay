@@ -728,7 +728,11 @@ def totp_verify_for_redemption(request):
 
             if ticket_id:
                 messages.success(request, "✅ 驗證成功！正在跳轉到票券錢包查看 QR Code...")
-                next_url += f'?show_qr={ticket_id}'
+                # 安全地添加查詢參數
+                if '?' in next_url:
+                    next_url += f'&show_qr={ticket_id}'
+                else:
+                    next_url += f'?show_qr={ticket_id}'
             else:
                 messages.success(request, "✅ 驗證成功！正在跳轉到票券錢包...")
 
