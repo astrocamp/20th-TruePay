@@ -73,10 +73,16 @@
                 <!-- 購買按鈕 -->
                 <div class="mt-4">
                     {% if product.stock > 0 %}
-                        <a href="{% url 'public_store:shop_overview' product.merchant.subdomain %}" 
-                           class="block w-full bg-cis-primary text-white text-center py-2 px-4 rounded-xl hover:bg-cis-primaryHover transition-all font-medium">
-                            前往商家
-                        </a>
+                        {% if product.merchant.subdomain %}
+                            <a href="{% url 'public_store:shop_overview' product.merchant.subdomain %}" 
+                               class="block w-full bg-cis-primary text-white text-center py-2 px-4 rounded-xl hover:bg-cis-primaryHover transition-all font-medium">
+                                前往商家
+                            </a>
+                        {% else %}
+                            <button class="block w-full bg-gray-400 text-gray-600 text-center py-2 px-4 rounded-xl cursor-not-allowed font-medium">
+                                商家未設定
+                            </button>
+                        {% endif %}
                     {% else %}
                         <button class="block w-full bg-gray-300 text-gray-500 text-center py-2 px-4 rounded-xl cursor-not-allowed font-medium">
                             已售完
