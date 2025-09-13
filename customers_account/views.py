@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import Http404
 from django.contrib import messages
 from django.contrib.auth import login as django_login, logout as django_logout
 from django.http import HttpResponseRedirect
@@ -258,7 +259,7 @@ def ticket_wallet(request):
     is_redemption_verified = False
     if redemption_verified and redemption_verified_time:
         current_time = timezone.now().timestamp()
-        if current_time - redemption_verified_time <= 600:  # 10分鐘
+        if current_time - redemption_verified_time <= settings.REDEMPTION_VERIFICATION_TIMEOUT:
             is_redemption_verified = True
         else:
             # 清除過期的驗證狀態

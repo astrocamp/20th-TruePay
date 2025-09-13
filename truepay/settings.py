@@ -271,6 +271,9 @@ X_FRAME_OPTIONS = "DENY"
 
 AUTH_USER_MODEL = "accounts.Member"
 
+# 核銷前驗證設定
+REDEMPTION_VERIFICATION_TIMEOUT = 600  # 10 minutes in seconds
+
 SITE_ID = 1
 # Authentication backends
 AUTHENTICATION_BACKENDS = [
