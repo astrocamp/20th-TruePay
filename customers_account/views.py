@@ -250,6 +250,21 @@ def ticket_wallet(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
+    # 檢查是否已通過核銷前驗證
+    redemption_verified = request.session.get('redemption_verified', False)
+    redemption_verified_time = request.session.get('redemption_verified_time')
+    
+    # 驗證是否在有效時間內（10分鐘）
+    is_redemption_verified = False
+    if redemption_verified and redemption_verified_time:
+        current_time = timezone.now().timestamp()
+        if current_time - redemption_verified_time <= 600:  # 10分鐘
+            is_redemption_verified = True
+        else:
+            # 清除過期的驗證狀態
+            request.session.pop('redemption_verified', None)
+            request.session.pop('redemption_verified_time', None)
+
     context = {
         "customer": customer,
         "tickets": page_obj,
@@ -258,6 +273,7 @@ def ticket_wallet(request):
         "ticket_stats": ticket_stats,
         "merchants": merchants,
         "now": now,
+        "is_redemption_verified": is_redemption_verified,
     }
 
     return render(request, "customers/ticket_wallet.html", context)
@@ -666,3 +682,50 @@ def reset_password(request, token):
     except (BadSignature, ValueError, Member.DoesNotExist):
         messages.error(request, "無效的重設連結")
         return redirect("customers_account:forgot_password")
+
+
+@customer_login_required
+def totp_verify_for_redemption(request):
+    """核銷前2FA驗證頁面"""
+    try:
+        customer = Customer.objects.get(member=request.user)
+    except Customer.DoesNotExist:
+        messages.error(request, "客戶資料不存在")
+        return redirect("pages:home")
+
+    if not customer.totp_enabled:
+        messages.error(request, "請先啟用二階段驗證")
+        return redirect("customers_account:totp_setup")
+
+    # 取得票券資訊
+    ticket_id = request.GET.get('ticket_id')
+    next_url = request.GET.get('next', '/customers/ticket-wallet/')
+    
+    ticket = None
+    if ticket_id:
+        try:
+            ticket = get_object_or_404(OrderItem, id=ticket_id, customer=customer)
+        except:
+            messages.error(request, "票券不存在或無權存取")
+            return redirect("customers_account:ticket_wallet")
+
+    if request.method == 'POST':
+        totp_code = request.POST.get('totp_code', '').strip()
+        
+        if not totp_code:
+            messages.error(request, "請輸入驗證代碼")
+        elif customer.verify_totp(totp_code):
+            # 驗證成功，設定session表示已通過核銷前驗證
+            request.session['redemption_verified'] = True
+            request.session['redemption_verified_time'] = timezone.now().timestamp()
+            messages.success(request, "驗證成功！現在可以查看票券 QR Code")
+            return redirect(next_url)
+        else:
+            messages.error(request, "驗證代碼錯誤，請重試")
+
+    context = {
+        'customer': customer,
+        'ticket': ticket,
+        'next_url': next_url,
+    }
+    return render(request, 'customers/totp_verify_for_redemption.html', context)

@@ -1,0 +1,121 @@
+{% extends "layouts/default.html" %}
+{% load static %}
+{% block content %}
+<div class="max-w-md mx-auto mt-16 p-6 bg-white rounded-lg shadow-lg" x-data="createTotpVerifyRedemption()">
+    <div class="text-center mb-8">
+        <div class="mx-auto mb-4 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+            {% include 'components/icons.html' with icon='shield-check' class='w-8 h-8 text-blue-600' %}
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">🔐 核銷前安全驗證</h1>
+        <p class="text-gray-600">為了保障票券安全，請完成二階段驗證才能查看 QR Code</p>
+    </div>
+    
+    <!-- 票券資訊 -->
+    {% if ticket %}
+    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+        <h3 class="font-semibold text-gray-900 mb-3">票券資訊</h3>
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+                <span class="text-gray-600">商品:</span>
+                <span class="text-gray-900">{{ ticket.product.name }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-600">商家:</span>
+                <span class="text-gray-900">{{ ticket.product.merchant.ShopName }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-600">購買時間:</span>
+                <span class="text-gray-900">{{ ticket.created_at|date:"Y年m月d日 H:i" }}</span>
+            </div>
+            <div class="flex justify-between font-semibold text-lg pt-2 border-t">
+                <span class="text-gray-900">票券價值:</span>
+                <span class="text-blue-600">NT$ {{ ticket.order.unit_price|floatformat:0 }}</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mb-4 p-3 rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <!-- 驗證表單 -->
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <div class="text-center mb-6">
+            <p class="text-gray-700 mb-2">請輸入 Google Authenticator 上顯示的驗證代碼</p>
+            <p class="text-sm text-gray-500">代碼每30秒更新一次</p>
+        </div>
+        
+        <div>
+            <label for="totp_code" class="block text-sm font-medium text-gray-700 mb-2 text-center">
+                驗證代碼 (6位數字)
+            </label>
+            <input type="text" 
+                   id="totp_code" 
+                   name="totp_code" 
+                   x-model="totpCode"
+                   @input="handleInput"
+                   @keydown.enter="submitForm"
+                   class="w-full px-4 py-3 text-center text-2xl font-mono border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="000000"
+                   maxlength="6"
+                   autocomplete="off"
+                   required>
+            <p class="text-xs text-gray-500 text-center mt-2">
+                💡 輸入完成後按 Enter 鍵或點擊「確認驗證」
+            </p>
+        </div>
+        
+        <div class="space-y-3">
+            <button type="submit" 
+                    :disabled="totpCode.length !== 6"
+                    :class="totpCode.length === 6 ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
+                    class="w-full text-white py-3 px-6 rounded-lg transition duration-200 font-medium text-lg">
+                ✅ 確認驗證，查看 QR Code
+            </button>
+            
+            <button type="button" 
+                    @click="cancelVerification"
+                    class="w-full bg-gray-300 text-gray-700 py-2 px-6 rounded-lg hover:bg-gray-400 transition duration-200">
+                取消驗證
+            </button>
+        </div>
+    </form>
+    
+    <!-- 幫助資訊 -->
+    <div class="mt-8 p-4 bg-blue-50 rounded-lg">
+        <h4 class="font-medium text-blue-900 mb-2">📱 找不到驗證代碼？</h4>
+        <ul class="text-sm text-blue-800 space-y-1">
+            <li>• 打開 Google Authenticator 應用程式</li>
+            <li>• 找到「TruePay」項目</li>
+            <li>• 輸入顯示的6位數字代碼</li>
+            <li>• 如果代碼過期，請等待新代碼生成</li>
+        </ul>
+        
+        <div class="mt-3 pt-3 border-t border-blue-200">
+            <p class="text-sm text-blue-700">
+                <span class="font-medium">遺失手機？</span> 
+                您可以前往 
+                <a href="{% url 'customers_account:totp_manage' %}" class="underline">
+                    安全設定
+                </a> 
+                使用備用恢復代碼
+            </p>
+        </div>
+    </div>
+    
+    <!-- 安全提醒 -->
+    <div class="mt-4 text-center">
+        <p class="text-xs text-gray-500">
+            🔒 此頁面使用 SSL 加密保護您的資訊安全
+        </p>
+    </div>
+</div>
+
+{% endblock %}

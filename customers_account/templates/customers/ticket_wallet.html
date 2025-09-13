@@ -81,7 +81,7 @@
            x-data="{ 
              showQR: false, 
              needsRedemptionVerification: '{{ ticket.product.verification_timing }}' === 'before_redeem',
-             isRedemptionVerified: false,
+             isRedemptionVerified: {{ is_redemption_verified|yesno:'true,false' }},
              redemptionData: {
                identity: '',
                phone: '',
