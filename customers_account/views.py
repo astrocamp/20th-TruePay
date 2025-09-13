@@ -709,7 +709,7 @@ def totp_verify_for_redemption(request):
     if ticket_id:
         try:
             ticket = get_object_or_404(OrderItem, id=ticket_id, customer=customer)
-        except:
+        except Http404:
             messages.error(request, "票券不存在或無權存取")
             return redirect("customers_account:ticket_wallet")
 
