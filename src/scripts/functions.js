@@ -975,10 +975,10 @@ function createTotpVerifyRedemption() {
             }
         },
         
-        cancelVerification() {
+        cancelVerification(cancelUrl) {
             if (confirm('確定要取消驗證嗎？您將無法查看票券 QR Code。')) {
-                // 返回票券錢包頁面
-                window.location.href = '/customers/ticket-wallet/';
+                // 返回傳入的 URL，如果未提供則使用預設值
+                window.location.href = cancelUrl || '/customers/ticket-wallet/';
             }
         }
     };

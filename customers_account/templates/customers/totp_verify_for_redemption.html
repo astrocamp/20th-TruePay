@@ -80,8 +80,8 @@
                 ✅ 確認驗證，查看 QR Code
             </button>
             
-            <button type="button" 
-                    @click="cancelVerification"
+            <button type="button"
+                    @click="cancelVerification('{{ next_url }}')"
                     class="w-full bg-gray-300 text-gray-700 py-2 px-6 rounded-lg hover:bg-gray-400 transition duration-200">
                 取消驗證
             </button>
