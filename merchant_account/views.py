@@ -8,7 +8,7 @@ from django.db.models import Sum, Count, Q, Avg
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.db.models import Sum
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from datetime import datetime, timedelta
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
@@ -904,3 +904,207 @@ def export_product_report(request, subdomain):
 
     wb.save(response)
     return response
+
+
+# ===== 圖表數據API端點 =====
+
+@no_cache_required
+def get_sales_chart_data(request, subdomain):
+    """獲取銷售分析圖表數據"""
+    if request.method != 'GET':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'})
+
+    try:
+        merchant = request.merchant
+        days = int(request.GET.get('days', 30))
+        start_date = timezone.now() - timedelta(days=days)
+
+        # 營收趨勢數據（按日分組）
+        trend_data = []
+        trend_labels = []
+
+        # 生成日期範圍
+        current_date = start_date.date()
+        end_date = timezone.now().date()
+
+        while current_date <= end_date:
+            daily_orders = Order.objects.filter(
+                product__merchant=merchant,
+                status='paid',
+                created_at__date=current_date
+            )
+            daily_revenue = daily_orders.aggregate(Sum('amount'))['amount__sum'] or 0
+
+            trend_labels.append(current_date.strftime('%m/%d'))
+            trend_data.append(float(daily_revenue))
+            current_date += timedelta(days=1)
+
+        # 金流方式分析
+        orders = Order.objects.filter(
+            product__merchant=merchant,
+            status='paid',
+            created_at__gte=start_date
+        )
+
+        payment_stats = {}
+        for order in orders:
+            # 根據不同金流提供商確定支付方式
+            if order.provider == 'newebpay':
+                method = order.newebpay_payment_type or '藍新金流'
+            elif order.provider == 'linepay':
+                method = 'LINE Pay'
+            else:
+                method = order.get_provider_display() or '其他'
+
+            if method not in payment_stats:
+                payment_stats[method] = 0
+            payment_stats[method] += float(order.amount)
+
+        payment_labels = list(payment_stats.keys())
+        payment_data = list(payment_stats.values())
+
+        return JsonResponse({
+            'success': True,
+            'data': {
+                'trend_labels': trend_labels,
+                'trend_data': trend_data,
+                'payment_labels': payment_labels,
+                'payment_data': payment_data
+            }
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
+
+
+@no_cache_required
+def get_tickets_chart_data(request, subdomain):
+    """獲取票券營運圖表數據"""
+    if request.method != 'GET':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'})
+
+    try:
+        merchant = request.merchant
+        days = int(request.GET.get('days', 30))
+        start_date = timezone.now() - timedelta(days=days)
+
+        tickets = OrderItem.objects.filter(
+            order__product__merchant=merchant,
+            created_at__gte=start_date
+        )
+
+        # 使用率統計
+        used_tickets = tickets.filter(status='used').count()
+        unused_tickets = tickets.filter(status='unused').count()
+        expired_tickets = tickets.filter(status='expired').count()
+
+        usage_labels = ['已使用', '未使用', '已過期']
+        usage_data = [used_tickets, unused_tickets, expired_tickets]
+
+        # 驗證時間分布（按時間段）
+        time_stats = {
+            '早上 (6-12)': 0,
+            '下午 (12-18)': 0,
+            '晚上 (18-24)': 0,
+            '深夜 (0-6)': 0
+        }
+
+        used_ticket_items = tickets.filter(status='used', used_at__isnull=False)
+        for ticket in used_ticket_items:
+            hour = ticket.used_at.hour
+            if 6 <= hour < 12:
+                time_stats['早上 (6-12)'] += 1
+            elif 12 <= hour < 18:
+                time_stats['下午 (12-18)'] += 1
+            elif 18 <= hour < 24:
+                time_stats['晚上 (18-24)'] += 1
+            else:
+                time_stats['深夜 (0-6)'] += 1
+
+        time_labels = list(time_stats.keys())
+        time_data = list(time_stats.values())
+
+        return JsonResponse({
+            'success': True,
+            'data': {
+                'usage_labels': usage_labels,
+                'usage_data': usage_data,
+                'time_labels': time_labels,
+                'time_data': time_data
+            }
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
+
+
+@no_cache_required
+def get_products_chart_data(request, subdomain):
+    """獲取商品表現圖表數據"""
+    if request.method != 'GET':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'})
+
+    try:
+        merchant = request.merchant
+        days = int(request.GET.get('days', 30))
+        start_date = timezone.now() - timedelta(days=days)
+
+        # 商品銷售排行 (TOP 10)
+        product_sales = {}
+        orders = Order.objects.filter(
+            product__merchant=merchant,
+            status='paid',
+            created_at__gte=start_date
+        )
+
+        for order in orders:
+            product_name = order.product.name
+            if product_name not in product_sales:
+                product_sales[product_name] = 0
+            product_sales[product_name] += 1
+
+        # 排序並取前10名
+        sorted_products = sorted(product_sales.items(), key=lambda x: x[1], reverse=True)[:10]
+        ranking_labels = [item[0] for item in sorted_products]
+        ranking_data = [item[1] for item in sorted_products]
+
+        # 商品類別營收貢獻
+        category_revenue = {}
+        for order in orders:
+            # 簡化分類，可以根據實際商品結構調整
+            if hasattr(order.product, 'category') and order.product.category:
+                category = order.product.category
+            else:
+                # 如果沒有分類，就用商品名稱的前幾個字作為分類
+                category = order.product.name[:6] if len(order.product.name) > 6 else order.product.name
+
+            if category not in category_revenue:
+                category_revenue[category] = 0
+            category_revenue[category] += float(order.amount)
+
+        # 限制顯示的類別數量
+        sorted_categories = sorted(category_revenue.items(), key=lambda x: x[1], reverse=True)[:6]
+        revenue_labels = [item[0] for item in sorted_categories]
+        revenue_data = [item[1] for item in sorted_categories]
+
+        return JsonResponse({
+            'success': True,
+            'data': {
+                'ranking_labels': ranking_labels,
+                'ranking_data': ranking_data,
+                'revenue_labels': revenue_labels,
+                'revenue_data': revenue_data
+            }
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })

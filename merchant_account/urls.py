@@ -79,4 +79,20 @@ urlpatterns = [
         views.export_product_report,
         name="export_products",
     ),
+    # 圖表數據API端點
+    path(
+        "api/chart-data/sales/<slug:subdomain>/",
+        views.get_sales_chart_data,
+        name="api_sales_chart",
+    ),
+    path(
+        "api/chart-data/tickets/<slug:subdomain>/",
+        views.get_tickets_chart_data,
+        name="api_tickets_chart",
+    ),
+    path(
+        "api/chart-data/products/<slug:subdomain>/",
+        views.get_products_chart_data,
+        name="api_products_chart",
+    ),
 ]
