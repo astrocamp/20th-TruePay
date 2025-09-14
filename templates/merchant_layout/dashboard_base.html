@@ -67,18 +67,11 @@
               </a>
             </li>
             <li>
-              {% if request.merchant.subdomain %}
-                <a href="{% url 'public_store:shop_overview' request.merchant.subdomain %}" 
-                  target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
-                  {% include 'components/icons.html' with icon='cube' %}
-                  商品總覽
-                </a>
-              {% else %}
-                <span class="flex items-center gap-3 px-3 py-2 rounded-xl text-gray-400 cursor-not-allowed">
-                  {% include 'components/icons.html' with icon='cube' %}
-                  商品總覽（未設定）
-                </span>
-              {% endif %}
+              <a href="{% url 'public_store:shop_overview' request.merchant.subdomain %}" 
+                target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
+                {% include 'components/icons.html' with icon='cube' %}
+                商品總覽
+              </a>
             </li>
             {% comment %} 正式服 {% endcomment %}
             {% comment %} <li>
@@ -100,11 +93,17 @@
                 票券使用紀錄
               </a>
             </li>
-            
+            <li>
+              <a href="{% url 'merchant_account:reports' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)" @click="$root.close()">
+                {% include 'components/icons.html' with icon='chart-bar' %}
+                報表分析
+              </a>
+            </li>
+
             <li>
               <a href="{% url 'merchant_account:profile_settings' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)" @click="$root.close()">
                 {% include 'components/icons.html' with icon='settings' %}
-                設定 
+                設定
               </a>
             </li>
           </ul>
@@ -129,7 +128,7 @@
       <h1 class="ml-3 text-lg font-semibold text-[#0056B3]">TruePay</h1>
     </div>
     <!-- 主內容 -->
-    <div class="flex-1 p-6">
+    <div class="flex-1 p-3 sm:p-6">
       {% block content %}
       <!-- 子頁面會注入這裡 -->
 

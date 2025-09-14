@@ -58,4 +58,25 @@ urlpatterns = [
         views.own_domain_detail,
         name="own_domain_detail",
     ),
+    # 報表分析相關路由
+    path(
+        "reports/<slug:subdomain>/",
+        views.reports_dashboard,
+        name="reports",
+    ),
+    path(
+        "export/sales/<slug:subdomain>/",
+        views.export_sales_report,
+        name="export_sales",
+    ),
+    path(
+        "export/tickets/<slug:subdomain>/",
+        views.export_ticket_report,
+        name="export_tickets",
+    ),
+    path(
+        "export/products/<slug:subdomain>/",
+        views.export_product_report,
+        name="export_products",
+    ),
 ]
