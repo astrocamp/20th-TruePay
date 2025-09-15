@@ -3,9 +3,6 @@
 
 {% block title %}報表分析 - {{ merchant.ShopName }} - TruePay{% endblock %}
 
-{% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{% endblock %}
 
 {% block content %}
 <!-- 頁面標題 -->
@@ -95,7 +92,7 @@
 </div>
 
 <!-- 報表下載區域 -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6" x-data="reportPreview('{{ merchant.subdomain }}', {{ days }})">
     <!-- 銷售分析報表 -->
     <div class="bg-white rounded-lg shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
         <div class="p-6 border-b border-gray-200">
@@ -114,7 +111,7 @@
                 <li>• 平均訂單金額分析</li>
             </ul>
             <div class="flex space-x-2">
-                <button onclick="openChartModal('sales')"
+                <button @click="openModal('sales')"
                         class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center">
                     <i class="fas fa-chart-pie mr-2"></i> 預覽
                 </button>
@@ -144,7 +141,7 @@
                 <li>• 使用時間分佈分析</li>
             </ul>
             <div class="flex space-x-2">
-                <button onclick="openChartModal('tickets')"
+                <button @click="openModal('tickets')"
                         class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center">
                     <i class="fas fa-chart-pie mr-2"></i> 預覽
                 </button>
@@ -174,7 +171,7 @@
                 <li>• 商品定價效率分析</li>
             </ul>
             <div class="flex space-x-2">
-                <button onclick="openChartModal('products')"
+                <button @click="openModal('products')"
                         class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center">
                     <i class="fas fa-chart-pie mr-2"></i> 預覽
                 </button>
@@ -185,74 +182,64 @@
             </div>
         </div>
     </div>
-</div>
 
-<!-- 使用說明 -->
-<div class="mt-8 bg-blue-50 rounded-lg p-6">
-    <h3 class="text-lg font-medium text-blue-900 mb-3">📋 報表使用說明</h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-800">
-        <div>
-            <h4 class="font-medium mb-2">報表功能</h4>
-            <ul class="space-y-1">
-                <li>• 支援多種時間範圍選擇</li>
-                <li>• 自動生成詳細統計圖表</li>
-                <li>• Excel 格式方便後續分析</li>
-            </ul>
-        </div>
-        <div>
-            <h4 class="font-medium mb-2">更新頻率</h4>
-            <ul class="space-y-1">
-                <li>• 數據即時更新</li>
-                <li>• 建議每週下載分析</li>
-                <li>• 可用於營運決策參考</li>
-            </ul>
-        </div>
-    </div>
-</div>
-
-<!-- 圖表預覽模態視窗 -->
-<div id="chartModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50" onclick="closeChartModal()">
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+    <!-- 圖表預覽模態視窗 -->
+    <div x-show="showModal"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-black bg-opacity-50 z-50"
+         @click="closeModal()">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" @click.stop>
             <div class="p-6">
                 <!-- 模態視窗標題 -->
                 <div class="flex justify-between items-center mb-6">
-                    <h3 id="modalTitle" class="text-xl font-bold text-gray-900"></h3>
-                    <button onclick="closeChartModal()" class="text-gray-400 hover:text-gray-600">
+                    <h3 x-text="modalTitle" class="text-xl font-bold text-gray-900"></h3>
+                    <button @click="closeModal()" class="text-gray-400 hover:text-gray-600">
                         <i class="fas fa-times text-xl"></i>
                     </button>
                 </div>
 
                 <!-- 載入動畫 -->
-                <div id="loadingSpinner" class="flex justify-center items-center py-12">
+                <div x-show="loading" class="flex justify-center items-center py-12">
                     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
                     <span class="ml-3 text-gray-600">載入圖表中...</span>
                 </div>
 
                 <!-- 圖表分頁 -->
-                <div id="chartTabs" class="hidden">
+                <div x-show="!loading && !error">
                     <div class="flex border-b border-gray-200 mb-6">
-                        <button id="tab1" class="py-2 px-4 text-sm font-medium text-center text-blue-600 bg-gray-50 border-b-2 border-blue-600 rounded-t-lg active" onclick="switchTab(1)">
+                        <button @click="switchTab(1)"
+                                :class="activeTab === 1
+                                    ? 'py-2 px-4 text-sm font-medium text-center text-blue-600 bg-gray-50 border-b-2 border-blue-600 rounded-t-lg'
+                                    : 'py-2 px-4 ml-1 text-sm font-medium text-center text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-50'">
                             主要分析
                         </button>
-                        <button id="tab2" class="py-2 px-4 ml-1 text-sm font-medium text-center text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-50" onclick="switchTab(2)">
+                        <button @click="switchTab(2)"
+                                :class="activeTab === 2
+                                    ? 'py-2 px-4 ml-1 text-sm font-medium text-center text-blue-600 bg-gray-50 border-b-2 border-blue-600 rounded-t-lg'
+                                    : 'py-2 px-4 ml-1 text-sm font-medium text-center text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-50'">
                             詳細分佈
                         </button>
                     </div>
 
                     <!-- 主要圖表 -->
-                    <div id="chartTab1" class="chart-tab">
+                    <div x-show="activeTab === 1" class="chart-tab">
                         <canvas id="mainChart" width="800" height="400"></canvas>
                     </div>
 
                     <!-- 輔助圖表 -->
-                    <div id="chartTab2" class="chart-tab hidden">
+                    <div x-show="activeTab === 2" class="chart-tab">
                         <canvas id="subChart" width="800" height="400"></canvas>
                     </div>
                 </div>
 
                 <!-- 錯誤訊息 -->
-                <div id="errorMessage" class="hidden text-center py-12">
+                <div x-show="error" class="text-center py-12">
                     <div class="text-red-500 text-lg mb-2">
                         <i class="fas fa-exclamation-triangle"></i> 載入失敗
                     </div>
@@ -263,281 +250,29 @@
     </div>
 </div>
 
-<script>
-let currentCharts = [];
-const currentDays = {{ days }};
-
-// 打開圖表模態視窗
-function openChartModal(reportType) {
-    const modal = document.getElementById('chartModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    const chartTabs = document.getElementById('chartTabs');
-    const errorMessage = document.getElementById('errorMessage');
-
-    // 清理之前的圖表
-    currentCharts.forEach(chart => chart.destroy());
-    currentCharts = [];
-
-    // 設定標題
-    const titles = {
-        'sales': '銷售分析圖表預覽',
-        'tickets': '票券營運圖表預覽',
-        'products': '商品表現圖表預覽'
-    };
-    modalTitle.textContent = titles[reportType];
-
-    // 顯示模態視窗和載入動畫
-    modal.classList.remove('hidden');
-    loadingSpinner.classList.remove('hidden');
-    chartTabs.classList.add('hidden');
-    errorMessage.classList.add('hidden');
-
-    // 載入圖表數據
-    loadChartData(reportType);
-}
-
-// 關閉圖表模態視窗
-function closeChartModal() {
-    document.getElementById('chartModal').classList.add('hidden');
-    // 清理圖表實例
-    currentCharts.forEach(chart => chart.destroy());
-    currentCharts = [];
-}
-
-// 切換分頁
-function switchTab(tabNumber) {
-    // 更新分頁按鈕樣式
-    document.getElementById('tab1').className = tabNumber === 1
-        ? 'py-2 px-4 text-sm font-medium text-center text-blue-600 bg-gray-50 border-b-2 border-blue-600 rounded-t-lg active'
-        : 'py-2 px-4 ml-1 text-sm font-medium text-center text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-50';
-
-    document.getElementById('tab2').className = tabNumber === 2
-        ? 'py-2 px-4 ml-1 text-sm font-medium text-center text-blue-600 bg-gray-50 border-b-2 border-blue-600 rounded-t-lg active'
-        : 'py-2 px-4 ml-1 text-sm font-medium text-center text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-50';
-
-    // 切換圖表顯示
-    document.getElementById('chartTab1').classList.toggle('hidden', tabNumber !== 1);
-    document.getElementById('chartTab2').classList.toggle('hidden', tabNumber !== 2);
-}
-
-// 載入圖表數據
-function loadChartData(reportType) {
-    const url = `/merchant/api/chart-data/${reportType}/{{ merchant.subdomain }}/?days=${currentDays}`;
-
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                renderCharts(reportType, data.data);
-                document.getElementById('loadingSpinner').classList.add('hidden');
-                document.getElementById('chartTabs').classList.remove('hidden');
-            } else {
-                showError();
-            }
-        })
-        .catch(error => {
-            console.error('載入圖表數據失敗:', error);
-            showError();
-        });
-}
-
-// 顯示錯誤訊息
-function showError() {
-    document.getElementById('loadingSpinner').classList.add('hidden');
-    document.getElementById('errorMessage').classList.remove('hidden');
-}
-
-// 渲染圖表
-function renderCharts(reportType, data) {
-    const mainCtx = document.getElementById('mainChart').getContext('2d');
-    const subCtx = document.getElementById('subChart').getContext('2d');
-
-    if (reportType === 'sales') {
-        // 銷售分析 - 主圖：營收趨勢線圖
-        const mainChart = new Chart(mainCtx, {
-            type: 'line',
-            data: {
-                labels: data.trend_labels,
-                datasets: [{
-                    label: '每日營收 (NT$)',
-                    data: data.trend_data,
-                    borderColor: 'rgb(59, 130, 246)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: '營收趨勢分析'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return 'NT$ ' + value.toLocaleString();
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // 輔助圖：金流方式圓餅圖
-        const subChart = new Chart(subCtx, {
-            type: 'pie',
-            data: {
-                labels: data.payment_labels,
-                datasets: [{
-                    data: data.payment_data,
-                    backgroundColor: [
-                        '#FF6384',
-                        '#36A2EB',
-                        '#FFCE56',
-                        '#4BC0C0',
-                        '#9966FF'
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: '金流方式使用比例'
-                    },
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
-        });
-
-        currentCharts = [mainChart, subChart];
-
-    } else if (reportType === 'tickets') {
-        // 票券營運 - 主圖：使用率圓餅圖
-        const mainChart = new Chart(mainCtx, {
-            type: 'pie',
-            data: {
-                labels: data.usage_labels,
-                datasets: [{
-                    data: data.usage_data,
-                    backgroundColor: ['#10B981', '#EF4444', '#F59E0B']
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: '票券使用率統計'
-                    },
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
-        });
-
-        // 輔助圖：時間分布橫條圖
-        const subChart = new Chart(subCtx, {
-            type: 'bar',
-            data: {
-                labels: data.time_labels,
-                datasets: [{
-                    label: '使用次數',
-                    data: data.time_data,
-                    backgroundColor: 'rgba(59, 130, 246, 0.8)'
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: '驗證時間分布'
-                    }
-                },
-                indexAxis: 'y',
-                scales: {
-                    x: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-
-        currentCharts = [mainChart, subChart];
-
-    } else if (reportType === 'products') {
-        // 商品表現 - 主圖：銷售排行橫條圖
-        const mainChart = new Chart(mainCtx, {
-            type: 'bar',
-            data: {
-                labels: data.ranking_labels,
-                datasets: [{
-                    label: '銷售數量',
-                    data: data.ranking_data,
-                    backgroundColor: 'rgba(16, 185, 129, 0.8)'
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'TOP 10 熱銷商品'
-                    }
-                },
-                indexAxis: 'y',
-                scales: {
-                    x: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-
-        // 輔助圖：營收貢獻圓餅圖
-        const subChart = new Chart(subCtx, {
-            type: 'pie',
-            data: {
-                labels: data.revenue_labels,
-                datasets: [{
-                    data: data.revenue_data,
-                    backgroundColor: [
-                        '#8B5CF6',
-                        '#06B6D4',
-                        '#F59E0B',
-                        '#EF4444',
-                        '#10B981',
-                        '#6B7280'
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: '商品類別營收貢獻'
-                    },
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
-        });
-
-        currentCharts = [mainChart, subChart];
-    }
-}
-</script>
+<!-- 使用說明 -->
+<div class="mt-8 bg-blue-50 rounded-lg p-8">
+    <h3 class="text-lg font-medium text-blue-900 mb-6">📋 報表使用說明</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 text-sm text-blue-800">
+        <div>
+            <h4 class="font-medium mb-3 text-base">報表功能</h4>
+            <ul class="space-y-2">
+                <li>• 支援多種時間範圍選擇（7天、30天、90天）</li>
+                <li>• 自動生成詳細統計圖表與視覺化分析</li>
+                <li>• Excel 格式匯出，方便後續數據分析</li>
+                <li>• 即時預覽功能，快速檢視報表內容</li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="font-medium mb-3 text-base">更新與建議</h4>
+            <ul class="space-y-2">
+                <li>• 數據即時更新，確保資訊準確性</li>
+                <li>• 建議定期下載分析，追蹤營運趨勢</li>
+                <li>• 可用於制定營運決策與策略規劃</li>
+                <li>• 支援多種圖表格式，滿足不同需求</li>
+            </ul>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
