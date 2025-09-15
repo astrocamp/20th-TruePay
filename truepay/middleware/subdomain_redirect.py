@@ -155,7 +155,6 @@ class SubdomainRedirectMiddleware:
 
         return ip in internal_ips
 
-
     def check_truepay_subdomain(self, request):
         """
         檢查 TruePay 子域名（如 shop1.ushionagisa.work）

@@ -57,6 +57,7 @@ BASE_DOMAIN = "truepay.tw"
 # Application definition
 
 INSTALLED_APPS = [
+    "dynamic_host",  # 動態 Host 驗證套件
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -80,6 +81,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "dynamic_host.middleware.AllowedHostMiddleWare",  # 動態 Host 驗證 - 必須放最前面
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",  # 上線後靜態檔案讀取
     "truepay.security_middleware.SecurityHeadersMiddleware",
