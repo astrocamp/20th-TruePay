@@ -1,13 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
 from django.core.paginator import Paginator
 from django.db.models import Sum, Count, Q
-from django.db import models
 from django.views.decorators.http import require_POST
 from django.utils import timezone
+from django.db.models import Sum
 
 
 from truepay.decorators import no_cache_required
@@ -16,15 +16,16 @@ from .forms import (
     LoginForm,
     SubdomainChangeForm,
     MerchantProfileUpdateForm,
+    MerchantOwnDomainForm,
 )
+from .services import DomainVerificationService
 from customers_account.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
-from .models import Merchant, SubdomainRedirect
+from .models import Merchant, SubdomainRedirect, MerchantOwnDomain
 from payments.models import Order, OrderItem, TicketValidation
 from merchant_marketplace.models import Product
 from payments.models import Order
 from datetime import datetime
-from django.db.models import Sum
 
 
 def register(req):
@@ -332,11 +333,11 @@ def verification_records(request, subdomain):
     merchant = request.merchant
 
     # 取得篩選參數
-    product_filter = request.GET.get('product', '')
-    date_filter = request.GET.get('date', '')
-    customer_filter = request.GET.get('customer', '')
-    order_filter = request.GET.get('order', '')
-    
+    product_filter = request.GET.get("product", "")
+    date_filter = request.GET.get("date", "")
+    customer_filter = request.GET.get("customer", "")
+    order_filter = request.GET.get("order", "")
+
     # 基本查詢：取得該商家的所有已使用票券
     used_tickets = (
         OrderItem.objects.select_related("order__customer__member", "product", "order")
@@ -365,13 +366,13 @@ def verification_records(request, subdomain):
             used_tickets = used_tickets.filter(used_at__date=filter_date)
         except ValueError:
             pass
-    
+
     # 訂單編號篩選
     if order_filter:
         used_tickets = used_tickets.filter(
             order__provider_order_id__icontains=order_filter
         )
-    
+
     # 統計資料（合併為單一 aggregate 查詢）
 
     all_used_tickets = OrderItem.objects.filter(
@@ -398,15 +399,15 @@ def verification_records(request, subdomain):
     page_obj = paginator.get_page(page_number)
 
     context = {
-        'merchant': merchant,
-        'used_tickets': page_obj,
-        'page_obj': page_obj,
-        'usage_stats': usage_stats,
-        'products': products,
-        'product_filter': product_filter,
-        'customer_filter': customer_filter,
-        'date_filter': date_filter,
-        'order_filter': order_filter,
+        "merchant": merchant,
+        "used_tickets": page_obj,
+        "page_obj": page_obj,
+        "usage_stats": usage_stats,
+        "products": products,
+        "product_filter": product_filter,
+        "customer_filter": customer_filter,
+        "date_filter": date_filter,
+        "order_filter": order_filter,
     }
 
     return render(request, "merchant_account/verification_records.html", context)
@@ -467,16 +468,35 @@ def profile_settings(request, subdomain):
     return render(request, "merchant_account/profile_settings.html", context)
 
 
+# 商家子網域
 @no_cache_required
 def subdomain_management(request, subdomain):
     merchant = request.merchant
 
-    can_change, status_message = merchant.can_change_subdomain()
+    if request.method == "POST":
+        form = SubdomainChangeForm(merchant, request.POST)
+        if form.is_valid():
+            try:
+                new_subdomain = form.cleaned_data["new_subdomain"]
+                reason = form.cleaned_data.get("reason", "商家主動修改")
 
+                merchant.change_subdomain(new_subdomain, reason)
+
+                messages.success(request, f"子網域已成功修改為 {new_subdomain}")
+
+                return redirect("merchant_account:subdomain_management", new_subdomain)
+
+            except ValueError as e:
+                messages.error(request, str(e))
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{form.fields[field].label}: {error}")
+
+    can_change, status_message = merchant.can_change_subdomain()
     history = merchant.subdomain_history or []
     redirects = merchant.subdomain_redirects.filter(is_active=True)[:3]
 
-    # 創建表單實例供模板使用
     form = SubdomainChangeForm(merchant)
 
     context = {
@@ -495,7 +515,7 @@ def subdomain_management(request, subdomain):
 def sold_tickets_list(request, subdomain):
     """廠商售出票券列表頁面"""
     merchant = request.merchant
-    
+
     # 基本查詢：該廠商的所有已付款票券
     tickets = OrderItem.objects.filter(
         product__merchant=merchant,
@@ -503,12 +523,12 @@ def sold_tickets_list(request, subdomain):
     ).select_related(
         'order', 'customer', 'customer__member', 'product'
     ).order_by('-created_at')
-    
+
     # 篩選功能
     status_filter = request.GET.get('status', 'all')
     product_filter = request.GET.get('product', 'all')
     search_query = request.GET.get('search', '')
-    
+
     # 狀態篩選
     if status_filter == 'unused':
         tickets = tickets.filter(status='unused')
@@ -516,7 +536,7 @@ def sold_tickets_list(request, subdomain):
         tickets = tickets.filter(status='used')
     elif status_filter == 'expired':
         tickets = tickets.filter(status='expired')
-    
+
     # 商品篩選
     if product_filter != 'all':
         try:
@@ -524,7 +544,7 @@ def sold_tickets_list(request, subdomain):
             tickets = tickets.filter(product_id=product_id)
         except (ValueError, TypeError):
             pass
-    
+
     # 搜尋功能（客戶姓名、客戶 email、訂單編號）
     if search_query:
         tickets = tickets.filter(
@@ -532,13 +552,13 @@ def sold_tickets_list(request, subdomain):
             Q(customer__member__email__icontains=search_query) |
             Q(order__provider_order_id__icontains=search_query)
         )
-    
+
     # 統計資訊
     all_tickets = OrderItem.objects.filter(
         product__merchant=merchant,
         order__status='paid'
     )
-    
+
     stats = {
         'total_tickets': all_tickets.count(),
         'unused_tickets': all_tickets.filter(status='unused').count(),
@@ -548,7 +568,7 @@ def sold_tickets_list(request, subdomain):
             total=Sum('order__amount')
         )['total'] or 0,
     }
-    
+
     # 即將到期的票券（7天內）
     from datetime import timedelta
     upcoming_expiry = timezone.now() + timedelta(days=7)
@@ -557,15 +577,15 @@ def sold_tickets_list(request, subdomain):
         valid_until__lte=upcoming_expiry,
         valid_until__gt=timezone.now()
     ).count()
-    
+
     # 獲取廠商的所有商品（用於篩選下拉選單）
     merchant_products = Product.objects.filter(merchant=merchant).order_by('name')
-    
+
     # 分頁功能
     paginator = Paginator(tickets, 20)  # 每頁20筆
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
         'merchant': merchant,
         'tickets': page_obj,
@@ -578,7 +598,74 @@ def sold_tickets_list(request, subdomain):
         },
         'status_choices': OrderItem.STATUS_CHOICES,
     }
-    
+
     return render(request, 'merchant_account/sold_tickets_list.html', context)
 
 
+# 商家自訂網域
+@no_cache_required
+def own_domain_list(request, subdomain):
+    merchant = request.merchant
+    domains = MerchantOwnDomain.objects.filter(merchant=merchant)
+    form = MerchantOwnDomainForm()
+
+    return render(
+        request,
+        "merchant_account/own_domain_list.html",
+        {"merchant": merchant, "domains": domains, "form": form},
+    )
+
+
+@no_cache_required
+def own_domain_add(request, subdomain):
+    merchant = request.merchant
+
+    if request.method == "POST":
+        form = MerchantOwnDomainForm(request.POST)
+        if form.is_valid():
+            domain_obj = form.save(commit=False)
+            domain_obj.merchant = merchant
+            domain_obj.save()
+
+            messages.success(
+                request,
+                f"網域 {domain_obj.domain_name} 已新增，請設定 DNS 記錄後進行驗證",
+            )
+            return redirect(
+                "merchant_account:own_domain_detail",
+                subdomain=subdomain,
+                pk=domain_obj.pk,
+            )
+        else:
+            for error in form.errors.values():
+                messages.error(request, error[0])
+    return redirect("merchant_account:own_domain_list", subdomain=subdomain)
+
+
+@no_cache_required
+def own_domain_detail(request, subdomain, pk):
+    merchant = request.merchant
+    merchant_domain = get_object_or_404(MerchantOwnDomain, pk=pk, merchant=merchant)
+    if request.method == "POST":
+        action = request.POST.get("action")
+
+        if action == "verify":
+            success, message = DomainVerificationService.verify_domain_ownership(
+                merchant_domain
+            )
+            if success:
+                messages.success(request, message)
+            else:
+                messages.error(request, message)
+        elif action == "delete":
+            domain_name = merchant_domain.domain_name
+            merchant_domain.delete()
+            messages.success(request, f"網域 {domain_name} 已刪除")
+            return redirect("merchant_account:own_domain_list", subdomain=subdomain)
+
+    instructions = DomainVerificationService.get_verification_instructions(merchant_domain)
+    return render(
+        request,
+        "merchant_account/own_domain_detail.html",
+        {"merchant": merchant, "merchant_domain": merchant_domain, "instructions": instructions},
+    )

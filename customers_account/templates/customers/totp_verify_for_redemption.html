@@ -1,36 +1,39 @@
 {% extends "layouts/default.html" %}
+{% load static %}
 {% block content %}
-<div class="max-w-md mx-auto mt-16 p-6 bg-white rounded-lg shadow-lg" x-data="totpVerify()">
+<div class="max-w-md mx-auto mt-16 p-6 bg-white rounded-lg shadow-lg" x-data="createTotpVerifyRedemption()">
     <div class="text-center mb-8">
         <div class="mx-auto mb-4 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
             {% include 'components/icons.html' with icon='shield-check' class='w-8 h-8 text-blue-600' %}
         </div>
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">🔐 交易安全驗證</h1>
-        <p class="text-gray-600">為了保障您的交易安全，請完成二階段驗證</p>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">🔐 核銷前安全驗證</h1>
+        <p class="text-gray-600">為了保障票券安全，請完成二階段驗證才能查看 QR Code</p>
     </div>
     
-    <!-- 訂單資訊 -->
+    <!-- 票券資訊 -->
+    {% if ticket %}
     <div class="bg-gray-50 rounded-lg p-4 mb-6">
-        <h3 class="font-semibold text-gray-900 mb-3">訂單資訊</h3>
+        <h3 class="font-semibold text-gray-900 mb-3">票券資訊</h3>
         <div class="space-y-2 text-sm">
             <div class="flex justify-between">
                 <span class="text-gray-600">商品:</span>
-                <span class="text-gray-900">{{ product.name }}</span>
+                <span class="text-gray-900">{{ ticket.product.name }}</span>
             </div>
             <div class="flex justify-between">
-                <span class="text-gray-600">數量:</span>
-                <span class="text-gray-900">{{ quantity }} 件</span>
+                <span class="text-gray-600">商家:</span>
+                <span class="text-gray-900">{{ ticket.product.merchant.ShopName }}</span>
             </div>
             <div class="flex justify-between">
-                <span class="text-gray-600">付款方式:</span>
-                <span class="text-gray-900">{{ provider_display }}</span>
+                <span class="text-gray-600">購買時間:</span>
+                <span class="text-gray-900">{{ ticket.created_at|date:"Y年m月d日 H:i" }}</span>
             </div>
             <div class="flex justify-between font-semibold text-lg pt-2 border-t">
-                <span class="text-gray-900">總金額:</span>
-                <span class="text-blue-600">NT$ {{ total_amount }}</span>
+                <span class="text-gray-900">票券價值:</span>
+                <span class="text-blue-600">NT$ {{ ticket.order.unit_price|floatformat:0 }}</span>
             </div>
         </div>
     </div>
+    {% endif %}
     
     {% if messages %}
         {% for message in messages %}
@@ -57,30 +60,30 @@
                    id="totp_code" 
                    name="totp_code" 
                    x-model="totpCode"
-                   @input="handleInput"
-                   @keydown.enter="submitForm"
+                   @input="handleInput()"
+                   @keydown.enter="$event.preventDefault(); submitForm()"
                    class="w-full px-4 py-3 text-center text-2xl font-mono border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                    placeholder="000000"
                    maxlength="6"
                    autocomplete="off"
                    required>
             <p class="text-xs text-gray-500 text-center mt-2">
-                💡 輸入完成後按 Enter 鍵或點擊「確認付款」
+                💡 輸入完成後按 Enter 鍵或點擊「確認驗證」
             </p>
         </div>
         
         <div class="space-y-3">
             <button type="submit" 
                     :disabled="totpCode.length !== 6"
-                    :class="totpCode.length === 6 ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
-                    class="w-full text-white py-3 px-6 rounded-lg transition duration-200 font-medium text-lg">
-                ✅ 確認付款 NT$ {{ total_amount }}
+                    :class="totpCode.length === 6 ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-400 text-gray-600 cursor-not-allowed'"
+                    class="w-full py-3 px-6 rounded-lg transition duration-200 font-medium text-lg">
+                ✅ 確認驗證，查看 QR Code
             </button>
             
-            <button type="button" 
-                    @click="cancelPayment"
+            <button type="button"
+                    @click="cancelVerification('{{ next_url }}')"
                     class="w-full bg-gray-300 text-gray-700 py-2 px-6 rounded-lg hover:bg-gray-400 transition duration-200">
-                取消付款
+                取消驗證
             </button>
         </div>
     </form>
@@ -115,36 +118,4 @@
     </div>
 </div>
 
-<script>
-function totpVerify() {
-    return {
-        totpCode: '',
-        
-        handleInput() {
-            // 只允許數字輸入
-            this.totpCode = this.totpCode.replace(/\D/g, '');
-            
-            // 自動提交當輸入滿6位數
-            if (this.totpCode.length === 6) {
-                // 延遲一點讓用戶看到完整輸入
-                setTimeout(() => {
-                    this.submitForm();
-                }, 300);
-            }
-        },
-        
-        submitForm() {
-            if (this.totpCode.length === 6) {
-                document.querySelector('form').submit();
-            }
-        },
-        
-        cancelPayment() {
-            if (confirm('確定要取消此次付款嗎？')) {
-                window.location.href = '{% url "pages:home" %}';
-            }
-        }
-    }
-}
-</script>
 {% endblock %}

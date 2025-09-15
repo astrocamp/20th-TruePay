@@ -1,8 +1,9 @@
-# Git
+# Git 相關
 .git
 .gitignore
 
-# Python
+# Python 相關
+.venv
 __pycache__
 *.pyc
 *.pyo
@@ -18,29 +19,37 @@ pip-delete-this-directory.txt
 nosetests.xml
 coverage.xml
 *.cover
-*.log
-.venv/
 .pytest_cache/
 
-# Django
+# Django 相關
 *.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
 media/
 
-# Node
+# Node.js (如果有前端工具)
+node_modules
 node_modules/
+npm-debug.log
 npm-debug.log*
 
-# IDE
+# 開發工具
+.vscode
 .vscode/
+.idea
 .idea/
 *.swp
 *.swo
 *~
 
-# OS
+# 環境變數
+.env
+.env.local
+.env.production
+.env.*.local
+
+# 作業系統
 .DS_Store
 .DS_Store?
 ._*
@@ -49,21 +58,21 @@ npm-debug.log*
 ehthumbs.db
 Thumbs.db
 
-# Docker
+# Docker 相關
 Dockerfile
 .dockerignore
+docker-compose.yml
 docker-compose*.yml
 
-# Environment
-.env
-.env.local
-.env.*.local
-
-# Logs
+# 日誌檔案
 logs/
 *.log
 celery.log
 
-# Temporary files
+# 臨時檔案
 tmp/
 temp/
+
+# 其他
+README.md
+*.md

@@ -15,4 +15,24 @@
       background: transparent;
     }
   }
+  
+  /* 手機觸控優化 */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* 確保按鈕在手機上有足夠的觸控區域 */
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* 防止手機上的雙擊縮放 */
+  .no-double-tap-zoom {
+    touch-action: manipulation;
+  }
 }

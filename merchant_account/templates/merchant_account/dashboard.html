@@ -234,7 +234,7 @@
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 class="text-xl font-bold text-gray-900 mb-6">快速操作</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <a href="{% url 'merchant_marketplace:new' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-[#0056B3] text-white rounded-xl hover:bg-[#00408A] transition-colors">
+            <a href="{% url 'merchant_marketplace:new' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                 {% include 'components/icons.html' with icon='plus' class='w-8 h-8 mb-2' %}
                 <span class="text-sm font-medium">新增商品</span>
             </a>
@@ -249,7 +249,7 @@
                 <span class="text-sm font-medium">交易記錄</span>
             </a>
             
-            <a href="{% url 'merchant_account:subdomain_management' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+            <a href="{% url 'merchant_account:profile_settings' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                 {% include 'components/icons.html' with icon='settings' class='w-8 h-8 mb-2' %}
                 <span class="text-sm font-medium">設定</span>
             </a>

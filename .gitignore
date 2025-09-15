@@ -12,8 +12,12 @@ products/
 wheels/
 node_modules
 
+# Static files (built from src)
+static/
+
 # Environment variables
 .env
+.env.production
 
 # Virtual environment
 .venv/
@@ -35,7 +39,6 @@ env/
 ehthumbs.db
 Thumbs.db
 
-
 # Python
 *.egg-info/
 dist/
@@ -49,8 +52,13 @@ ngrok.exe
 
 static/
 
+# Claude files
 CLAUDE.local.md
-CLAUDE.local.md
-
 COMPONENT_SYSTEM.md
 
+# Config files
+config.yml
+docker-compose.prod.yml
+truepay-key-new.pem
+.editorconfig
+.prettierignore

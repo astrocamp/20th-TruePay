@@ -3,6 +3,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.conf import settings
 from django.utils import timezone
 import re
+import secrets
 
 
 # Create your models here.
@@ -157,3 +158,48 @@ class SubdomainRedirect(models.Model):
         self.redirect_count += 1
         self.last_used = timezone.now()
         self.save(update_fields=["redirect_count", "last_used"])
+
+
+class MerchantOwnDomain(models.Model):
+    merchant = models.ForeignKey(
+        Merchant,
+        on_delete=models.CASCADE,
+        related_name="own_domains",
+        verbose_name="商家",
+    )
+    domain_name = models.CharField(
+        max_length=253,
+        unique=True,
+        verbose_name="網域名稱",
+        help_text="例如: www.shop.com 或 shop.com",
+    )
+    is_verified = models.BooleanField(default=False, verbose_name="已驗證")
+    verification_token = models.CharField(
+        max_length=64, blank=True, verbose_name="驗證Token"
+    )
+    verification_method = models.CharField(
+        max_length=10,
+        choices=[("DNS", "DNS記錄驗證"), ("FILE", "檔案驗證")],
+        default="DNS",
+        verbose_name="驗證方式",
+    )
+    ssl_enabled = models.BooleanField(default=False, verbose_name="SSL已啟用")
+    ssl_certificate_expires = models.DateTimeField(
+        null=True, blank=True, verbose_name="SSL證書到期時間"
+    )
+    is_active = models.BooleanField(default=True, verbose_name="啟用中")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="建立時間")
+    verified_at = models.DateTimeField(null=True, blank=True, verbose_name="驗證時間")
+
+    class Meta:
+        verbose_name = "商家自有網域"
+        verbose_name_plural = "商家自有網域"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.merchant.ShopName} - {self.domain_name}"
+
+    def save(self, *args, **kwargs):
+        if not self.verification_token:
+            self.verification_token = secrets.token_hex(32)
+        super().save(*args, **kwargs)

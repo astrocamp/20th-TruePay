@@ -1,6 +1,4 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import "tailwindcss";
 
 :root {
   --color-brand-blue: #0056B3;
@@ -20,6 +18,9 @@
 
 @layer utilities {
   .bg-brand-grayLight { background-color: var(--color-brand-gray-light) !important; }
+  .bg-brand-blue { background-color: var(--color-brand-blue) !important; }
+  .bg-brand-blueHover { background-color: var(--color-brand-blue-hover) !important; }
+  .hover\:bg-brand-blueHover:hover { background-color: var(--color-brand-blue-hover) !important; }
   .bg-cis-primary { background-color: var(--color-cis-primary) !important; }
   .bg-cis-primary-hover { background-color: var(--color-cis-primary-hover) !important; }
   .hover\:bg-cis-primary-hover:hover { background-color: var(--color-cis-primary-hover) !important; }
@@ -33,4 +34,12 @@
   .border-cis-accent { border-color: var(--color-cis-accent) !important; }
 }
 
+/* 強制生成品牌文字顏色類別 */
+.text-brand-grayDark { color: var(--color-brand-gray-dark) !important; }
+.text-brand-black { color: var(--color-brand-black) !important; }
+.text-brand-grayLight { color: var(--color-brand-gray-light) !important; }
+.text-cis-primary { color: var(--color-cis-primary) !important; }
+.text-brand-blue { color: var(--color-brand-blue) !important; }
+
+/* 引入自訂樣式 */
 @import "./style.css";

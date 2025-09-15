@@ -1,10 +1,10 @@
 {% extends 'merchant_layout/dashboard_base.html' %}
 {% load static %}
-
 {% block title %}票券驗證 - TruePay 廠商儀表板{% endblock %}
-
 {% block content %}
-<div class="max-w-4xl mx-auto space-y-6" x-data="{ 
+<div
+  class="max-w-4xl mx-auto space-y-6"
+  x-data="{ 
     currentTab: 'manual', 
     ticketCode: '',
     qrScanner: createQrScanner({
@@ -72,13 +72,13 @@
         </div>
     </div>
 
-    <!-- 驗證結果顯示區域 -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-        <h2 class="text-xl font-bold text-gray-900 mb-6">驗證結果</h2>
-        <div id="scan-result">
-            {% include 'merchant_account/partials/scan_ready.html' %}
-        </div>
+  <!-- 驗證結果顯示區域 -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+    <h2 class="text-xl font-bold text-gray-900 mb-6">驗證結果</h2>
+    <div id="scan-result">
+      {% include 'merchant_account/partials/scan_ready.html' %}
     </div>
+  </div>
 </div>
 
 {% endblock %}

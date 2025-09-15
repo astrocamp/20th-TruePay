@@ -21,6 +21,7 @@ urlpatterns = [
     
     # TOTP API
     path("api/totp/verify/", views.verify_totp_api, name="verify_totp_api"),
+    path("totp/verify_for_redemption/", views.totp_verify_for_redemption, name="totp_verify_for_redemption"),
 
     path("cancel-order/<int:order_id>/", views.cancel_order, name="cancel_order"),
     path("forgot-password/", views.forgot_password, name="forgot_password"),

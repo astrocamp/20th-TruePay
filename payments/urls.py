@@ -18,6 +18,12 @@ urlpatterns = [
     # 訂單限制錯誤頁面
     path("order-limit-error/", views.order_limit_error, name="order_limit_error"),
     
+    # 庫存不足錯誤頁面
+    path("stock-insufficient-error/", views.stock_insufficient_error, name="stock_insufficient_error"),
+    
+    # 庫存檢查 API
+    path("api/check-stock/", views.check_stock_api, name="check_stock_api"),
+    
     # TOTP 驗證頁面
     path("totp_verify/", views.totp_verify, name="totp_verify"),
     
