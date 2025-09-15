@@ -188,6 +188,8 @@ AWS_S3_OBJECT_PARAMETERS = {
 }
 
 # Media files (uploads)
+
+# Media files (uploads)
 STORAGES = {
     "default": {
         "BACKEND": "merchant_marketplace.storage_backends.MediaStorage",
@@ -196,7 +198,6 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
-DEFAULT_FILE_STORAGE = "merchant_marketplace.storage_backends.MediaStorage"
 MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

@@ -36,9 +36,19 @@ services:
   # Django Web 應用程式
   web:
     build: .
-    command: sh -c "uv run python manage.py migrate && uv run python manage.py collectstatic --noinput && uv run python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "npm run build && uv run python manage.py migrate && uv run python manage.py collectstatic --noinput && uv run python manage.py runserver 0.0.0.0:8000"
     volumes:
-      - .:/app
+      # 只掛載開發時需要的源碼目錄，避免覆蓋編譯結果
+      - ./src:/app/src
+      - ./truepay:/app/truepay
+      - ./accounts:/app/accounts
+      - ./customers_account:/app/customers_account
+      - ./merchant_account:/app/merchant_account
+      - ./merchant_marketplace:/app/merchant_marketplace
+      - ./payments:/app/payments
+      - ./templates:/app/templates
+      - ./manage.py:/app/manage.py
+      # static 目錄不掛載，讓容器內的編譯結果保留
       - static_volume:/app/staticfiles
       - media_volume:/app/media
     ports:
@@ -60,7 +70,13 @@ services:
     build: .
     command: sh -c "uv run celery -A truepay worker --loglevel=info --logfile=/app/logs/celery-worker.log --queues=celery,payments,high_priority"
     volumes:
-      # - .:/app  # ← 暫時註解，避免覆蓋 .venv
+      # 只掛載必要的源碼，不覆蓋編譯結果
+      - ./truepay:/app/truepay
+      - ./accounts:/app/accounts
+      - ./customers_account:/app/customers_account
+      - ./merchant_account:/app/merchant_account
+      - ./merchant_marketplace:/app/merchant_marketplace
+      - ./payments:/app/payments
       - ./logs:/app/logs
     env_file:
       - .env
@@ -86,7 +102,13 @@ services:
     build: .
     command: sh -c "uv run celery -A truepay beat --loglevel=info --logfile=/app/logs/celery-beat.log --scheduler=django_celery_beat.schedulers:DatabaseScheduler"
     volumes:
-      # - .:/app  # ← 暫時註解，避免覆蓋 .venv
+      # 只掛載必要的源碼，不覆蓋編譯結果
+      - ./truepay:/app/truepay
+      - ./accounts:/app/accounts
+      - ./customers_account:/app/customers_account
+      - ./merchant_account:/app/merchant_account
+      - ./merchant_marketplace:/app/merchant_marketplace
+      - ./payments:/app/payments
       - ./logs:/app/logs
     env_file:
       - .env
@@ -117,6 +139,18 @@ services:
     restart: unless-stopped
     profiles:
       - monitoring
+
+  # Ngrok 隧道服務
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    command: http web:8000
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    depends_on:
+      - web
+    profiles:
+      - dev
 
 volumes:
   postgres_data:

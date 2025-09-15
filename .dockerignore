@@ -64,6 +64,10 @@ Dockerfile
 docker-compose.yml
 docker-compose*.yml
 
+# 前端編譯輸出（會在容器內重新編譯）
+static/scripts/
+static/styles/
+
 # 日誌檔案
 logs/
 *.log

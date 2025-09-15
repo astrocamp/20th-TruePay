@@ -27,31 +27,24 @@ RUN apt-get update && apt-get install -y \
 RUN pip install uv
 
 
-# 複製依賴與前端配置檔案
+# 複製 Python 依賴檔案
 COPY pyproject.toml uv.lock ./
-COPY package.json package-lock.json ./
-RUN npm install
 
-# 複製應用程式代碼（只要一次）
-COPY . .
-
-# 安裝 Python 依賴到系統環境（避免 Windows 卷掛載問題）
+# 安裝 Python 依賴
 RUN uv sync --frozen --no-dev
 ENV PATH="/app/.venv/bin:$PATH"
 
-# 安裝 Python 依賴到系統環境（避免 Windows 卷掛載問題）
-RUN uv sync --frozen --no-dev
-ENV PATH="/app/.venv/bin:$PATH"
-
-# 複製前端配置檔案並安裝依賴
+# 複製前端依賴檔案
 COPY package.json package-lock.json ./
+
+# 安裝前端依賴
 RUN npm install
 
 # 複製應用程式代碼
 COPY . .
 
-# 建立日誌目錄
-RUN mkdir -p /app/logs
+# 建立必要目錄
+RUN mkdir -p /app/logs /app/static
 
 # 建置前端資源
 RUN npm run build
