@@ -4,7 +4,8 @@ from django.core.paginator import Paginator
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
 from django.core.paginator import Paginator
-from django.db.models import Sum, Count, Q, Avg
+from django.db.models import Sum, Count, Q, Avg, Case, When, IntegerField
+from django.db.models.functions import TruncDate, ExtractHour
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.db.models import Sum
@@ -657,9 +658,9 @@ def export_sales_report(request, subdomain):
         row += 1
 
     # 金流方式統計
-    ws['A{}'.format(row + 1)] = "金流方式統計"
-    ws['A{}'.format(row + 1)].font = header_font
-    ws['A{}'.format(row + 1)].fill = header_fill
+    ws[f"A{row + 1}"] = "金流方式統計"
+    ws[f"A{row + 1}"].font = header_font
+    ws[f"A{row + 1}"].fill = header_fill
 
     provider_stats = orders.values('provider').annotate(count=Count('id')).order_by('-count')
 
@@ -840,7 +841,7 @@ def export_product_report(request, subdomain):
     for rank, product in enumerate(products, 1):
         revenue = product.revenue or 0
         total_revenue += revenue
-        avg_price = revenue / max(product.order_count, 1) if product.order_count > 0 else product.price
+        avg_price = revenue / product.order_count if product.order_count > 0 else product.price
 
         ws[f'A{row}'] = rank
         ws[f'B{row}'] = product.name
@@ -919,21 +920,29 @@ def get_sales_chart_data(request, subdomain):
         days = int(request.GET.get('days', 30))
         start_date = timezone.now() - timedelta(days=days)
 
-        # 營收趨勢數據（按日分組）
+        # 營收趨勢數據 - 優化為單次查詢
         trend_data = []
         trend_labels = []
 
-        # 生成日期範圍
+        # 使用 TruncDate 配合 annotate 一次性獲取所有日期的營收數據
+        daily_revenues = Order.objects.filter(
+            product__merchant=merchant,
+            status='paid',
+            created_at__gte=start_date
+        ).annotate(
+            date=TruncDate('created_at')
+        ).values('date').annotate(
+            total_revenue=Sum('amount')
+        ).order_by('date')
+
+        revenue_dict = {item['date']: item['total_revenue'] for item in daily_revenues}
+
+        # 生成完整的日期範圍（包含沒有資料的日期）
         current_date = start_date.date()
         end_date = timezone.now().date()
 
         while current_date <= end_date:
-            daily_orders = Order.objects.filter(
-                product__merchant=merchant,
-                status='paid',
-                created_at__date=current_date
-            )
-            daily_revenue = daily_orders.aggregate(Sum('amount'))['amount__sum'] or 0
+            daily_revenue = revenue_dict.get(current_date, 0)
 
             trend_labels.append(current_date.strftime('%m/%d'))
             trend_data.append(float(daily_revenue))
@@ -1004,25 +1013,35 @@ def get_tickets_chart_data(request, subdomain):
         usage_labels = ['已使用', '未使用', '已過期']
         usage_data = [used_tickets, unused_tickets, expired_tickets]
 
-        # 驗證時間分布（按時間段）
-        time_stats = {
-            '早上 (6-12)': 0,
-            '下午 (12-18)': 0,
-            '晚上 (18-24)': 0,
-            '深夜 (0-6)': 0
-        }
+        # 驗證時間分布（按時間段） - 優化為資料庫層面聚合查詢
+        time_distribution = tickets.filter(
+            status='used',
+            used_at__isnull=False
+        ).aggregate(
+            morning=Count(Case(
+                When(used_at__hour__gte=6, used_at__hour__lt=12, then=1),
+                output_field=IntegerField()
+            )),
+            afternoon=Count(Case(
+                When(used_at__hour__gte=12, used_at__hour__lt=18, then=1),
+                output_field=IntegerField()
+            )),
+            evening=Count(Case(
+                When(used_at__hour__gte=18, used_at__hour__lt=24, then=1),
+                output_field=IntegerField()
+            )),
+            night=Count(Case(
+                When(used_at__hour__gte=0, used_at__hour__lt=6, then=1),
+                output_field=IntegerField()
+            ))
+        )
 
-        used_ticket_items = tickets.filter(status='used', used_at__isnull=False)
-        for ticket in used_ticket_items:
-            hour = ticket.used_at.hour
-            if 6 <= hour < 12:
-                time_stats['早上 (6-12)'] += 1
-            elif 12 <= hour < 18:
-                time_stats['下午 (12-18)'] += 1
-            elif 18 <= hour < 24:
-                time_stats['晚上 (18-24)'] += 1
-            else:
-                time_stats['深夜 (0-6)'] += 1
+        time_stats = {
+            '早上 (6-12)': time_distribution['morning'],
+            '下午 (12-18)': time_distribution['afternoon'],
+            '晚上 (18-24)': time_distribution['evening'],
+            '深夜 (0-6)': time_distribution['night']
+        }
 
         time_labels = list(time_stats.keys())
         time_data = list(time_stats.values())
@@ -1055,43 +1074,30 @@ def get_products_chart_data(request, subdomain):
         days = int(request.GET.get('days', 30))
         start_date = timezone.now() - timedelta(days=days)
 
-        # 商品銷售排行 (TOP 10)
-        product_sales = {}
-        orders = Order.objects.filter(
+        # 商品銷售排行 (TOP 10) - 使用資料庫聚合查詢優化
+        product_ranking = Order.objects.filter(
             product__merchant=merchant,
             status='paid',
             created_at__gte=start_date
-        )
+        ).values('product__name').annotate(
+            sales_count=Count('id')
+        ).order_by('-sales_count')[:10]
 
-        for order in orders:
-            product_name = order.product.name
-            if product_name not in product_sales:
-                product_sales[product_name] = 0
-            product_sales[product_name] += 1
+        ranking_labels = [item['product__name'] for item in product_ranking]
+        ranking_data = [item['sales_count'] for item in product_ranking]
 
-        # 排序並取前10名
-        sorted_products = sorted(product_sales.items(), key=lambda x: x[1], reverse=True)[:10]
-        ranking_labels = [item[0] for item in sorted_products]
-        ranking_data = [item[1] for item in sorted_products]
+        # 商品營收排行 (TOP 6) - 使用資料庫聚合查詢優化
+        category_revenue = Order.objects.filter(
+            product__merchant=merchant,
+            status='paid',
+            created_at__gte=start_date
+        ).values('product__name').annotate(
+            total_revenue=Sum('amount')
+        ).order_by('-total_revenue')[:6]
 
-        # 商品類別營收貢獻
-        category_revenue = {}
-        for order in orders:
-            # 簡化分類，可以根據實際商品結構調整
-            if hasattr(order.product, 'category') and order.product.category:
-                category = order.product.category
-            else:
-                # 如果沒有分類，就用商品名稱的前幾個字作為分類
-                category = order.product.name[:6] if len(order.product.name) > 6 else order.product.name
-
-            if category not in category_revenue:
-                category_revenue[category] = 0
-            category_revenue[category] += float(order.amount)
-
-        # 限制顯示的類別數量
-        sorted_categories = sorted(category_revenue.items(), key=lambda x: x[1], reverse=True)[:6]
-        revenue_labels = [item[0] for item in sorted_categories]
-        revenue_data = [item[1] for item in sorted_categories]
+        # 使用完整商品名稱作為標籤
+        revenue_labels = [item['product__name'] for item in category_revenue]
+        revenue_data = [float(item['total_revenue']) for item in category_revenue]
 
         return JsonResponse({
             'success': True,
