@@ -17,12 +17,12 @@
   <div class="min-h-screen grid grid-cols-1 md:grid-cols-[260px_1fr]">
 
     <!-- 側欄（Desktop 固定，Mobile 抽屜） -->
-    <aside class="fixed md:static inset-y-0 left-0 z-50 w-72 md:w-auto translate-x-[-100%] peer-checked:translate-x-0 md:translate-x-0 transition-transform bg-white border-r border-brand-grayBorder">
+    <aside class="fixed md:static inset-y-0 left-0 z-50 w-72 md:w-auto transition-transform bg-white border-r border-brand-grayBorder md:translate-x-0" :class="{ 'translate-x-0': isOpen, '-translate-x-full': !isOpen }">
       <div class="h-full flex flex-col">
         <!-- Logo -->
         <div class="px-6 h-16 flex items-center border-b border-brand-grayBorder">
           <a href="{% url 'pages:marketplace' %}" class="text-xl font-bold text-brand-blue">TruePay</a>
-          <label for="sidebarToggle" class="ml-auto md:hidden cursor-pointer p-2 rounded-lg hover:bg-brand-grayLight" aria-label="關閉選單">✕</label>
+          <button @click="close()" class="ml-auto md:hidden cursor-pointer p-2 rounded-lg hover:bg-brand-grayLight touch-manipulation" aria-label="關閉選單">✕</button>
         </div>
         <!-- 導覽選單 -->
         <nav class="flex-1 overflow-y-auto py-4" x-data="NavigationManager.createAlpineData()" @click="$parent.handleLinkClick($event)">
@@ -65,7 +65,7 @@
     </aside>
 
     <!-- 右側主要區域 -->
-    <main class="flex flex-col min-h-screen bg-[#F5F5F7]">
+    <main class="flex flex-col min-h-screen">
       <!-- 手機版漢堡選單按鈕 -->
       <div class="md:hidden bg-white border-b border-[#D2D2D7] px-4 py-3 flex items-center">
         <button @click="toggle()" class="cursor-pointer p-2 rounded-lg hover:bg-[#F5F5F7] touch-manipulation" aria-label="開啟選單">

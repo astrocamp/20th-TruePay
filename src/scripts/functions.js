@@ -945,6 +945,48 @@ document.addEventListener('DOMContentLoaded', handleRefreshParameter);
 // 將函數掛載到全域
 window.handleRefreshParameter = handleRefreshParameter;
 
+// Alpine.js 核銷前TOTP驗證組件
+function createTotpVerifyRedemption() {
+    return {
+        totpCode: '',
+        
+        handleInput() {
+            // 只允許數字輸入
+            this.totpCode = this.totpCode.replace(/\D/g, '');
+            
+            // 自動提交當輸入滿6位數
+            if (this.totpCode.length === 6) {
+                // 延遲一點讓用戶看到完整輸入
+                setTimeout(() => {
+                    this.submitForm();
+                }, 300);
+            }
+        },
+        
+        submitForm() {
+            if (this.totpCode.length === 6) {
+                console.log('提交表單，驗證碼:', this.totpCode);
+                const form = document.querySelector('form');
+                if (form) {
+                    form.submit();
+                } else {
+                    console.error('找不到表單元素');
+                }
+            }
+        },
+        
+        cancelVerification(cancelUrl) {
+            if (confirm('確定要取消驗證嗎？您將無法查看票券 QR Code。')) {
+                // 返回傳入的 URL，如果未提供則使用預設值
+                window.location.href = cancelUrl || '/customers/ticket-wallet/';
+            }
+        }
+    };
+}
+
+// 將核銷前驗證函數掛載到全域供 Alpine.js 使用
+window.createTotpVerifyRedemption = createTotpVerifyRedemption;
+
 // 導出 Alpine.js 組件創建函數和 NavigationManager
 export { 
   createImagePreview,
@@ -953,6 +995,7 @@ export {
   createQuantityManager,
   createTicketScanManager,
   createBackupCodes,
-  createQrScanner, // <--- 新增導出
+  createQrScanner,
+  createTotpVerifyRedemption, // 新增核銷前TOTP驗證組件
   NavigationManager
 };

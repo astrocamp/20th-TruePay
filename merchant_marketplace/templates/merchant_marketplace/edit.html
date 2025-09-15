@@ -185,15 +185,6 @@
                     </label>
                 </div>
                 
-                <div class="flex items-center">
-                    <input type="radio" id="verify_after_redeem_readonly" name="verification_timing" value="after_redeem" required
-                           {% if product.verification_timing == 'after_redeem' %}checked{% endif %} disabled
-                           class="w-4 h-4 text-gray-400 bg-gray-200 border-gray-300">
-                    <label for="verify_after_redeem_readonly" class="ml-3 text-sm text-gray-500">
-                        <span class="font-medium">核銷後驗證</span>
-                        <span class="block text-xs text-gray-400 mt-1">消費者完成核銷後進行事後驗證</span>
-                    </label>
-                </div>
             </div>
             
             <!-- 隱藏欄位保持原值 -->
@@ -222,15 +213,6 @@
                     </label>
                 </div>
                 
-                <div class="flex items-center">
-                    <input type="radio" id="verify_after_redeem" name="verification_timing" value="after_redeem" required
-                           {% if product.verification_timing == 'after_redeem' %}checked{% endif %}
-                           class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-600 focus:ring-2">
-                    <label for="verify_after_redeem" class="ml-3 text-sm text-gray-700">
-                        <span class="font-medium">核銷後驗證</span>
-                        <span class="block text-xs text-gray-500 mt-1">消費者完成核銷後進行事後驗證</span>
-                    </label>
-                </div>
             </div>
             {% endif %}
             
