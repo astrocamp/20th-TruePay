@@ -23,6 +23,7 @@ class DomainVerificationService:
         merchant_domain.is_verified = True
         merchant_domain.verified_at = timezone.now()
         merchant_domain.save(update_fields=["is_verified", "verified_at"])
+        
         return True, "網域驗證成功！"
 
     @staticmethod
@@ -54,7 +55,10 @@ class DomainVerificationService:
         try:
             # 嘗試 HTTP，如果重導向到 HTTPS 也接受
             url = f"http://{merchant_domain.domain_name}"
-            response = requests.get(url, timeout=10, allow_redirects=True)
+            headers = {
+                'X-TruePay-Verification': 'internal-verification-request'
+            }
+            response = requests.get(url, timeout=10, allow_redirects=True, headers=headers)
 
             # 接受 200 狀態碼（正常）或 307/302 重導向
             if response.status_code == 200:
