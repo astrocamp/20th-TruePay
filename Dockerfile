@@ -26,9 +26,22 @@ RUN apt-get update && apt-get install -y \
 # 安裝 uv
 RUN pip install uv
 
-# 複製依賴配置檔案
+
+# 複製依賴與前端配置檔案
 COPY pyproject.toml uv.lock ./
+COPY package.json package-lock.json ./
+RUN npm install
+
+# 複製應用程式代碼（只要一次）
+COPY . .
+
+# 安裝 Python 依賴到系統環境（避免 Windows 卷掛載問題）
 RUN uv sync --frozen --no-dev
+ENV PATH="/app/.venv/bin:$PATH"
+
+# 安裝 Python 依賴到系統環境（避免 Windows 卷掛載問題）
+RUN uv sync --frozen --no-dev
+ENV PATH="/app/.venv/bin:$PATH"
 
 # 複製前端配置檔案並安裝依賴
 COPY package.json package-lock.json ./
@@ -48,7 +61,7 @@ EXPOSE 8000
 
 # 健康檢查
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD uv run python manage.py check --deploy || exit 1
+    CMD python manage.py check --deploy || exit 1
 
 # 預設命令（可被 docker-compose 覆蓋）
-CMD ["uv", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
