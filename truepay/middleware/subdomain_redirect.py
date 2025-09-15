@@ -4,7 +4,10 @@ import logging
 from django.http import HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.conf import settings
 from merchant_account.models import SubdomainRedirect, MerchantOwnDomain
+from accounts.models import Member
 from django.http import Http404
+from truepay.cross_domain_auth import CrossDomainAuth
+from django.contrib.auth import login
 
 
 logger = logging.getLogger(__name__)
@@ -61,7 +64,8 @@ class SubdomainRedirectMiddleware:
             subdomain = payment_match.group(1)
             product_id = payment_match.group(2)
         if subdomain:
-            subdomain_url = f"https://{subdomain}.{base_domain}{redirect_path}"
+            scheme = "https" if request.is_secure() else "http"
+            subdomain_url = f"{scheme}://{subdomain}.{base_domain}{redirect_path}"
             query_string = request.META.get("QUERY_STRING")
             if query_string:
                 subdomain_url += f"?{query_string}"
@@ -123,7 +127,7 @@ class SubdomainRedirectMiddleware:
             new_path = original_path
 
         scheme = "https" if request.is_secure() else "http"
-        host = request.get_host()
+        host = request.META.get("HTTP_HOST", "")
         query_string = request.META.get("QUERY_STRING", "")
         new_url = f"{scheme}://{host}/{new_path}"
         if query_string:
@@ -131,15 +135,69 @@ class SubdomainRedirectMiddleware:
         return new_url
 
     def check_own_domain(self, request):
-        host = request.get_host().lower()
+        # 手動從 HTTP_HOST 獲取主機名，避免 Django 的 ALLOWED_HOSTS 檢查
+        host = request.META.get("HTTP_HOST", "").lower()
         if ":" in host:
             host = host.split(":")[0]
         try:
+            # 只處理已驗證的域名
             own_domain = MerchantOwnDomain.objects.select_related("merchant").get(
                 domain_name=host, is_verified=True, is_active=True
             )
+
             request.merchant = own_domain.merchant
+            auth_token = request.GET.get("auth_token")
+            if auth_token and (
+                not hasattr(request, "user") or not request.user.is_authenticated
+            ):
+                auth = CrossDomainAuth()
+                token_data = auth.verify_auth_token(auth_token)
+
+                if token_data:
+                    try:
+                        user = Member.objects.get(id=token_data["user_id"])
+                        login(
+                            request,
+                            user,
+                            backend="django.contrib.auth.backends.ModelBackend",
+                        )
+                        request.session.save()
+
+                        clean_url = request.build_absolute_uri().split("?")[0]
+                        query_params = []
+                        for key, value in request.GET.items():
+                            if key != "auth_token":
+                                query_params.append(f"{key}={value}")
+                        if query_params:
+                            clean_url += "?" + "&".join(query_params)
+                        response = HttpResponseRedirect(clean_url)
+                        return response
+
+                    except Member.DoesNotExist:
+                        pass
+
             request.domain_type = "own_domain"
+
+            # 特殊處理：登入相關頁面重導向到主域名
+            if request.path_info.startswith(
+                "/customers/login/"
+            ) or request.path_info.startswith("/accounts/"):
+                scheme = "https" if request.is_secure() else "http"
+                main_domain = os.getenv("NGROK_URL", settings.BASE_DOMAIN)
+
+                # 如果是登入頁面，提取真正的目標頁面
+                if request.path_info.startswith("/customers/login/"):
+                    next_param = request.GET.get("next", "/")
+                    # 構建完整的目標 URL（自訂域名 + 目標路徑）
+                    final_target = f"{scheme}://{host}{next_param}"
+                else:
+                    # OAuth 等其他認證頁面，登入成功後回到自訂域名首頁
+                    final_target = f"{scheme}://{host}/"
+
+                redirect_url = (
+                    f"{scheme}://{main_domain}/customers/login/?next={final_target}"
+                )
+                return HttpResponseRedirect(redirect_url)
 
             # 檢查是否訪問了非商店相關的頁面
             restricted_response = self.check_custom_domain_restrictions(request)
@@ -150,10 +208,39 @@ class SubdomainRedirectMiddleware:
                 request.path_info = "/shop/"
             elif request.path_info.startswith("/pay/"):
                 request.path_info = "/shop" + request.path_info
-            return None
+
+            # 直接處理請求，跳過其他中間件的 ALLOWED_HOSTS 檢查
+            return self.get_response(request)
 
         except MerchantOwnDomain.DoesNotExist:
             return None
+
+    def get_client_ip(self, request):
+        """獲取客戶端真實 IP"""
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(",")[0].strip()
+        else:
+            ip = request.META.get("REMOTE_ADDR")
+        return ip
+
+    def is_internal_request(self, ip):
+        """檢查是否為內部請求"""
+        internal_ips = [
+            "127.0.0.1",
+            "localhost",
+            "::1",
+            "172.17.0.1",  # Docker bridge network
+            "172.18.0.1",  # Docker bridge network
+            "172.19.0.1",  # Docker bridge network
+            "172.20.0.1",  # Docker bridge network
+        ]
+
+        # 也檢查是否來自同一個容器網路
+        if ip and (ip.startswith("172.") or ip.startswith("10.") or ip == "127.0.0.1"):
+            return True
+
+        return ip in internal_ips
 
     def check_custom_domain_restrictions(self, request):
         """
@@ -165,7 +252,6 @@ class SubdomainRedirectMiddleware:
             r"^/$",
             r"^/shop/",
             r"^/pay/",
-            r"^/customers/",
             r"^/payments/",
             r"^/static/",
             r"^/media/",
@@ -183,7 +269,8 @@ class SubdomainRedirectMiddleware:
         """
         檢查 TruePay 子域名（如 shop1.ushionagisa.work）
         """
-        host = request.get_host().lower()
+        # 手動從 HTTP_HOST 獲取主機名，避免 Django 的 ALLOWED_HOSTS 檢查
+        host = request.META.get("HTTP_HOST", "").lower()
         if ":" in host:
             host = host.split(":")[0]
 
@@ -217,23 +304,28 @@ class SubdomainRedirectMiddleware:
                     for path in redirect_to_main_paths
                 ):
                     main_domain = os.getenv("NGROK_URL", settings.BASE_DOMAIN)
+                    scheme = "https" if request.is_secure() else "http"
 
                     # 對於登入頁面，需要處理 next 參數
                     if request.path_info.startswith("/customers/login/"):
                         next_param = request.GET.get("next")
                         if next_param and next_param.startswith("/"):
-                            next_url = f"https://{subdomain}.{main_domain}{next_param}"
+                            next_url = (
+                                f"{scheme}://{subdomain}.{main_domain}{next_param}"
+                            )
                         elif next_param:
                             next_url = next_param
                         else:
-                            next_url = f"https://{subdomain}.{main_domain}/"
+                            next_url = f"{scheme}://{subdomain}.{main_domain}/"
 
                         redirect_url = (
-                            f"https://{main_domain}/customers/login/?next={next_url}"
+                            f"{scheme}://{main_domain}/customers/login/?next={next_url}"
                         )
                     else:
                         # 其他認證相關頁面直接重導向到主網域
-                        redirect_url = f"https://{main_domain}{request.get_full_path()}"
+                        redirect_url = (
+                            f"{scheme}://{main_domain}{request.get_full_path()}"
+                        )
 
                     return HttpResponsePermanentRedirect(redirect_url)
 
@@ -242,7 +334,8 @@ class SubdomainRedirectMiddleware:
                 elif request.path_info.startswith("/pay/"):
                     request.path_info = "/shop" + request.path_info
 
-                return None  # 繼續處理請求
+                # 直接處理請求，跳過其他中間件的 ALLOWED_HOSTS 檢查
+                return self.get_response(request)
 
             except Merchant.DoesNotExist:
                 raise Http404("商店不存在")

@@ -12,6 +12,7 @@ dependencies = [
     "django-debug-toolbar>=6.0.0",
     "django-storages>=1.14.6",
     "dnspython>=2.8.0",
+    "gunicorn>=23.0.0",
     "pillow>=11.3.0",
     "psycopg2-binary>=2.9.0",
     "pycryptodome>=3.23.0",
@@ -21,4 +22,5 @@ dependencies = [
     "qrcode[pil]>=7.4.2",
     "requests>=2.32.5",
     "resend>=2.13.0",
+    "django-dynamic-host>=0.0.2",
 ]

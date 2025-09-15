@@ -30,19 +30,68 @@ media/
 .env.local
 .env.production
 
-# Node.js (如果有前端工具)
+# Node.js 開發相關（但保留生產構建結果）
 node_modules
 npm-debug.log
+.npm
+
+# 前端開發檔案（保留構建後的 static/）
+src/
+.prettierignore
+.editorconfig
+tailwind.config.js
+vite.config.js
+
+# 大型檔案和映像檔案（重要優化）
+*.tar.gz
+*.tar
+*.zip
+*.rar
+*.7z
+
+# 新增的動態 ALLOWED_HOSTS 日誌
+*.log
 
 # 作業系統
 .DS_Store
 Thumbs.db
 
 # Docker 相關
-Dockerfile
+Dockerfile*
 .dockerignore
-docker-compose.yml
+docker-compose*.yml
 
-# 其他
+# Python 緩存和臨時檔案
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+.cache/
+
+# 虛擬環境（如果意外包含）
+.venv/
+venv/
+env/
+
+# 測試和文檔
 README.md
 *.md
+tests/
+coverage/
+docs/
+
+# IDE 和編輯器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 其他開發檔案
+.claude/
+ngrok.exe
+config.yml
+truepay-key-new.pem
+makefile
+Makefile

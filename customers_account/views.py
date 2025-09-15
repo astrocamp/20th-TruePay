@@ -33,6 +33,7 @@ from payments.models import Order, OrderItem
 from merchant_account.models import Merchant
 from django.core.mail import send_mail
 from django.conf import settings
+from truepay.cross_domain_auth import CrossDomainAuth
 
 
 def register(request):
@@ -56,6 +57,11 @@ def register(request):
 
 
 def login(request):
+    def is_custom_domain_url(url):
+        return (
+            url.startswith("http://") or url.startswith("https://")
+        ) and "truepay.tw" not in url
+
     if request.method == "POST":
         form = CustomerLoginForm(request.POST)
         if form.is_valid():
@@ -72,11 +78,17 @@ def login(request):
             if next_url:
                 messages.success(request, "登入成功")
                 # 驗證 next_url 的安全性
+                if is_custom_domain_url(next_url):
+                    auth = CrossDomainAuth()
+                    token = auth.generate_auth_token(member, next_url)
+
+                    separator = "&" if "?" in next_url else "?"
+                    redirect_url = f"{next_url}{separator}auth_token={token}"
+                    return HttpResponseRedirect(redirect_url)
                 parsed_url = urlparse(next_url)
                 if parsed_url.netloc and not parsed_url.netloc.endswith(
                     settings.BASE_DOMAIN
                 ):
-                    # 如果有網域名稱但不是我們的網域，則重導向到預設頁面
                     return redirect("customers_account:dashboard")
                 return HttpResponseRedirect(next_url)
             else:

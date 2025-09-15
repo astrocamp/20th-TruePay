@@ -40,19 +40,14 @@ if not NGROK_URL:
     raise ValueError("請在 .env 檔案中設定 NGROK_URL=your-ngrok-id.ngrok-free.app")
 
 
-ALLOWED_HOSTS = [
-    "127.0.0.1",
-    "localhost",
-    NGROK_URL,
-    "truepay.tw",
-    "*.ushionagisa.work",  # 支援所有子域名
-    ".ushionagisa.work",  # 包含根域名
-]
-BASE_DOMAIN = "ushionagisa.work"
+# 使用 django-dynamic-host 進行動態 Host 驗證
+ALLOWED_HOSTS = ["*"]  # 由 django-dynamic-host 接管驗證
+BASE_DOMAIN = "truepay.tw"
 
 # Application definition
 
 INSTALLED_APPS = [
+    "dynamic_host",  # 動態 Host 驗證套件
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -75,9 +70,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "dynamic_host.middleware.AllowedHostMiddleWare",  # 動態 Host 驗證 - 必須放最前面
     "django.middleware.security.SecurityMiddleware",
     "truepay.security_middleware.SecurityHeadersMiddleware",
-    # "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 本地開發時禁用
     "django.middleware.cache.UpdateCacheMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "allauth.account.middleware.AccountMiddleware",
@@ -85,6 +80,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 自訂網域必需
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.cache.FetchFromCacheMiddleware",
@@ -238,11 +234,15 @@ LINEPAY_CANCEL_URL = f"https://{NGROK_URL}/payments/linepay/cancel/"
 CSRF_TRUSTED_ORIGINS = [
     # 正式網域
     "https://truepay.tw",
+    "https://*.truepay.tw",  # 支援所有 truepay.tw 子域名
+    "http://truepay.tw",
+    "http://*.truepay.tw",  # HTTP 版本的子域名支援
     # 本地開發
     "http://127.0.0.1:8000",
     "http://localhost:8000",
     # ngrok 測試環境
     f"https://{NGROK_URL}",
+    f"http://{NGROK_URL}",  # HTTP 版本
     # 金流回調需要
     "https://ccore.newebpay.com",
 ]
@@ -256,9 +256,7 @@ SESSION_COOKIE_HTTPONLY = True  # 防止 XSS 攻擊
 SESSION_COOKIE_SAMESITE = "Lax"  # CSRF 保護
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 瀏覽器關閉時清除 Session
 SESSION_COOKIE_AGE = 3600  # Session 1小時後過期
-# SESSION_COOKIE_DOMAIN = (
-#     ".ushionagisa.work"  # 讓子網域共享 session - 暫時註解以便本地開發
-# )
+SESSION_COOKIE_DOMAIN = ".truepay.tw"  # 讓子網域共享 session - 暫時註解以便本地開發
 
 # 快取設定（防止敏感頁面被快取）
 CACHE_MIDDLEWARE_SECONDS = 0  # 不快取頁面
@@ -313,3 +311,7 @@ SOCIALACCOUNT_PROVIDERS = {
         },
     }
 }
+
+# Django Dynamic Host 設定
+DYNAMIC_HOST_RESOLVER_FUNC = "truepay.host_validation.validate_host"
+DYNAMIC_HOST_ALLOW_SITES = False  # 不使用 Django sites framework

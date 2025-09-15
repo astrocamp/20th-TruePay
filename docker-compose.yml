@@ -11,22 +11,33 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U truepay"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   web:
-    build: .
+    image: truepay-web:optimized
     ports:
-      - "8000:8000"
+      - "80:8000"
+      - "8000:8000" 
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
     environment:
-      - DEBUG=True
+      - DEBUG=False
       - DJANGO_SETTINGS_MODULE=truepay.settings
       - DB_NAME=truepay
       - DB_USER=truepay
       - DB_PASSWORD=truepay123
       - DB_HOST=db
       - DB_PORT=5432
-    volumes:
-      - .:/app
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
+      - PYTHONIOENCODING=utf-8
+    restart: unless-stopped
     command: >
       sh -c "uv run python manage.py migrate &&
              uv run python manage.py runserver 0.0.0.0:8000"
