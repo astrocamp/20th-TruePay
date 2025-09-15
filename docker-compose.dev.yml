@@ -1,0 +1,84 @@
+# 開發環境用的 Docker Compose 設定
+# 包含更多除錯功能和監控工具
+
+services:
+  # 使用基本 docker-compose.yml 的所有服務
+  postgres:
+    extends:
+      file: docker-compose.yml
+      service: postgres
+    ports:
+      - "5432:5432"
+
+  rabbitmq:
+    extends:
+      file: docker-compose.yml
+      service: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  web:
+    extends:
+      file: docker-compose.yml
+      service: web
+    environment:
+      - DJANGO_DEBUG=True
+      - DJANGO_SETTINGS_MODULE=truepay.settings
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-truepay}
+      - DB_USER=${DB_USER:-truepay}
+      - DB_PASSWORD=${DB_PASSWORD:-truepay123}
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    command: sh -c "python manage.py migrate && python manage.py setup_ticket_schedule && python manage.py runserver 0.0.0.0:8000"
+
+  celery-worker:
+    extends:
+      file: docker-compose.yml
+      service: celery-worker
+    command: sh -c "celery -A truepay worker --loglevel=debug --logfile=/app/logs/celery-worker.log --queues=celery,payments,high_priority --autoscale=10,3"
+
+  celery-beat:
+    extends:
+      file: docker-compose.yml
+      service: celery-beat
+
+  # Celery Flower 監控工具（預設啟動）
+  celery-flower:
+    build: .
+    command: sh -c "celery -A truepay flower --port=5555 --broker=amqp://guest:guest@rabbitmq:5672// --basic_auth=admin:flower123"
+    ports:
+      - "5555:5555"
+    environment:
+      - DJANGO_SETTINGS_MODULE=truepay.settings
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Redis 快取（可選）
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+  redis_data:
+  static_volume:
+  media_volume:

@@ -162,6 +162,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
@@ -329,7 +330,8 @@ SOCIALACCOUNT_PROVIDERS = {
 # =============================================================================
 
 # Celery Broker URL (RabbitMQ)
-CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+# 支援 Docker 環境變數或預設本地設定
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'amqp://guest:guest@localhost:5672//')
 
 # Celery Result Backend (可選，用於儲存任務結果)
 CELERY_RESULT_BACKEND = 'rpc://'
