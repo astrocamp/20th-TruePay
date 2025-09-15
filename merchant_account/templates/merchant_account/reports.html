@@ -91,94 +91,97 @@
     </div>
 </div>
 
-<!-- 報表下載區域 -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6" x-data="reportPreview('{{ merchant.subdomain }}', {{ days }})">
-    <!-- 銷售分析報表 -->
-    <div class="bg-white rounded-lg shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-        <div class="p-6 border-b border-gray-200">
-            <div class="flex items-center">
-                <div>
-                    <h3 class="text-lg font-medium text-gray-900">銷售分析報表</h3>
-                    <p class="text-sm text-gray-600">營收趨勢、訂單狀態、金流分析</p>
+<!-- 報表功能區域 -->
+<div x-data="reportPreview('{{ merchant.subdomain }}', {{ days }})">
+    <!-- 報表下載區域 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 銷售分析報表 -->
+        <div class="bg-white rounded-lg shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">銷售分析報表</h3>
+                        <p class="text-sm text-gray-600">營收趨勢、訂單狀態、金流分析</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6">
+                <ul class="text-sm text-gray-600 space-y-2 mb-4">
+                    <li>• 營收總覽與趨勢分析</li>
+                    <li>• 訂單成功率統計</li>
+                    <li>• 金流方式使用比例</li>
+                    <li>• 平均訂單金額分析</li>
+                </ul>
+                <div class="flex space-x-2">
+                    <button @click="openModal('sales')"
+                            class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center">
+                        <i class="fas fa-chart-pie mr-2"></i> 預覽
+                    </button>
+                    <a href="{% url 'merchant_account:export_sales' subdomain=merchant.subdomain %}?days={{ days }}"
+                       class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200 inline-block text-center">
+                        <i class="fas fa-download mr-2"></i>下載 Excel
+                    </a>
                 </div>
             </div>
         </div>
-        <div class="p-6">
-            <ul class="text-sm text-gray-600 space-y-2 mb-4">
-                <li>• 營收總覽與趨勢分析</li>
-                <li>• 訂單成功率統計</li>
-                <li>• 金流方式使用比例</li>
-                <li>• 平均訂單金額分析</li>
-            </ul>
-            <div class="flex space-x-2">
-                <button @click="openModal('sales')"
-                        class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center">
-                    <i class="fas fa-chart-pie mr-2"></i> 預覽
-                </button>
-                <a href="{% url 'merchant_account:export_sales' subdomain=merchant.subdomain %}?days={{ days }}"
-                   class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200 inline-block text-center">
-                    <i class="fas fa-download mr-2"></i>下載 Excel
-                </a>
-            </div>
-        </div>
-    </div>
 
-    <!-- 票券營運報表 -->
-    <div class="bg-white rounded-lg shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-        <div class="p-6 border-b border-gray-200">
-            <div class="flex items-center">
-                <div>
-                    <h3 class="text-lg font-medium text-gray-900">票券營運報表</h3>
-                    <p class="text-sm text-gray-600">使用率、驗證記錄、過期分析</p>
+        <!-- 票券營運報表 -->
+        <div class="bg-white rounded-lg shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">票券營運報表</h3>
+                        <p class="text-sm text-gray-600">使用率、驗證記錄、過期分析</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6">
+                <ul class="text-sm text-gray-600 space-y-2 mb-4">
+                    <li>• 票券使用率統計</li>
+                    <li>• 驗證成功率分析</li>
+                    <li>• 過期票券損失統計</li>
+                    <li>• 使用時間分佈分析</li>
+                </ul>
+                <div class="flex space-x-2">
+                    <button @click="openModal('tickets')"
+                            class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center">
+                        <i class="fas fa-chart-pie mr-2"></i> 預覽
+                    </button>
+                    <a href="{% url 'merchant_account:export_tickets' subdomain=merchant.subdomain %}?days={{ days }}"
+                       class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200 inline-block text-center">
+                        <i class="fas fa-download mr-2"></i>下載 Excel
+                    </a>
                 </div>
             </div>
         </div>
-        <div class="p-6">
-            <ul class="text-sm text-gray-600 space-y-2 mb-4">
-                <li>• 票券使用率統計</li>
-                <li>• 驗證成功率分析</li>
-                <li>• 過期票券損失統計</li>
-                <li>• 使用時間分佈分析</li>
-            </ul>
-            <div class="flex space-x-2">
-                <button @click="openModal('tickets')"
-                        class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center">
-                    <i class="fas fa-chart-pie mr-2"></i> 預覽
-                </button>
-                <a href="{% url 'merchant_account:export_tickets' subdomain=merchant.subdomain %}?days={{ days }}"
-                   class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200 inline-block text-center">
-                    <i class="fas fa-download mr-2"></i>下載 Excel
-                </a>
-            </div>
-        </div>
-    </div>
 
-    <!-- 商品表現報表 -->
-    <div class="bg-white rounded-lg shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-        <div class="p-6 border-b border-gray-200">
-            <div class="flex items-center">
-                <div>
-                    <h3 class="text-lg font-medium text-gray-900">商品表現報表</h3>
-                    <p class="text-sm text-gray-600">銷量排行、收入貢獻、庫存分析</p>
+        <!-- 商品表現報表 -->
+        <div class="bg-white rounded-lg shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">商品表現報表</h3>
+                        <p class="text-sm text-gray-600">銷量排行、收入貢獻、庫存分析</p>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="p-6">
-            <ul class="text-sm text-gray-600 space-y-2 mb-4">
-                <li>• 商品銷售排行榜</li>
-                <li>• 營收貢獻度分析</li>
-                <li>• 庫存狀況統計</li>
-                <li>• 商品定價效率分析</li>
-            </ul>
-            <div class="flex space-x-2">
-                <button @click="openModal('products')"
-                        class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center">
-                    <i class="fas fa-chart-pie mr-2"></i> 預覽
-                </button>
-                <a href="{% url 'merchant_account:export_products' subdomain=merchant.subdomain %}?days={{ days }}"
-                   class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200 inline-block text-center">
-                    <i class="fas fa-download mr-2"></i>下載 Excel
-                </a>
+            <div class="p-6">
+                <ul class="text-sm text-gray-600 space-y-2 mb-4">
+                    <li>• 商品銷售排行榜</li>
+                    <li>• 營收貢獻度分析</li>
+                    <li>• 庫存狀況統計</li>
+                    <li>• 商品定價效率分析</li>
+                </ul>
+                <div class="flex space-x-2">
+                    <button @click="openModal('products')"
+                            class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center">
+                        <i class="fas fa-chart-pie mr-2"></i> 預覽
+                    </button>
+                    <a href="{% url 'merchant_account:export_products' subdomain=merchant.subdomain %}?days={{ days }}"
+                       class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200 inline-block text-center">
+                        <i class="fas fa-download mr-2"></i>下載 Excel
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -251,7 +254,7 @@
 </div>
 
 <!-- 使用說明 -->
-<div class="mt-8 bg-blue-50 rounded-lg p-8">
+<div class="mt-8 bg-blue-50 rounded-lg p-6">
     <h3 class="text-lg font-medium text-blue-900 mb-6">📋 報表使用說明</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 text-sm text-blue-800">
         <div>
