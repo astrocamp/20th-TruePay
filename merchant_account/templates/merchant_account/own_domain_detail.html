@@ -1,0 +1,197 @@
+{% extends 'merchant_layout/dashboard_base.html' %}
+  {% load static %}
+
+  {% block title %}{{ merchant_domain.domain_name }} - 網域設定{% endblock %}
+
+  {% block content %}
+  <div class="max-w-4xl mx-auto p-6 space-y-6">
+      <!-- 返回按鈕 -->
+      <div>
+          <a href="{% url 'merchant_account:own_domain_list' merchant.subdomain %}" 
+             class="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors duration-200">
+              {% include 'components/icons.html' with icon='arrow-left' %}
+              返回網域列表
+          </a>
+      </div>
+
+      <!-- 網域資訊 -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+              <div>
+                  <h1 class="text-2xl font-bold text-gray-900">{{ merchant_domain.domain_name }}</h1>
+                  <div class="flex items-center gap-4 mt-2">
+                      {% if merchant_domain.is_verified %}
+                          <span class="inline-flex items-center gap-1 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                              {% include 'components/icons.html' with icon='check-circle' %}
+                              已驗證
+                          </span>
+                      {% else %}
+                          <span class="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
+                              {% include 'components/icons.html' with icon='exclamation-triangle' %}
+                              待驗證
+                          </span>
+                      {% endif %}
+
+                      <span class="text-sm text-gray-600">
+                          新增於 {{ merchant_domain.created_at|date:"Y-m-d H:i" }}
+                      </span>
+                  </div>
+              </div>
+
+              <!-- 操作按鈕 -->
+              <div class="flex items-center gap-3">
+                  {% if not merchant_domain.is_verified %}
+                      <form method="post" class="inline">
+                          {% csrf_token %}
+                          <input type="hidden" name="action" value="verify">
+                          <button type="submit" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-1">
+                            {% include 'components/icons.html' with icon='shield-check' %}
+                            驗證網域
+                          </button>
+                      </form>
+                  {% endif %}
+
+                  <form method="post" class="inline" onsubmit="return confirm('確定要刪除此網域嗎？')">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="delete">
+                      <button type="submit" 
+                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-1">
+                        {% include 'components/icons.html' with icon='trash' %}
+                        刪除
+                      </button>
+                  </form>
+              </div>
+          </div>
+      </div>
+
+      <!-- DNS 設定指示 -->
+      {% if not merchant_domain.is_verified %}
+      <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-6">
+          <div class="flex items-start gap-3">
+              <div class="text-yellow-600 mt-1">
+                  {% include 'components/icons.html' with icon='exclamation-triangle' %}
+              </div>
+              <div class="flex-1">
+                  <h3 class="text-lg font-semibold text-yellow-900 mb-3">DNS 設定說明</h3>
+                  <p class="text-yellow-800 mb-4">
+                      請在您的 DNS 管理介面（如 Cloudflare、Namecheap 等）設定以下兩個 DNS 記錄：
+                  </p>
+
+                  <!-- DNS 記錄資訊 -->
+                  <div class="space-y-4 mb-4">
+                      <!-- TXT 記錄 -->
+                      <div class="bg-white rounded-lg border border-yellow-200 p-4">
+                          <h4 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                              <span class="bg-yellow-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">1</span>
+                              TXT 記錄（驗證網域所有權）
+                          </h4>
+                          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                              <div>
+                                  <span class="font-medium text-gray-700">記錄類型：</span>
+                                  <code class="ml-2 bg-gray-100 px-2 py-1 rounded">TXT</code>
+                              </div>
+                              <div>
+                                  <span class="font-medium text-gray-700">記錄名稱：</span>
+                                  <code class="ml-2 bg-gray-100 px-2 py-1 rounded text-xs">_truepay-verification</code>
+                              </div>
+                              <div>
+                                  <span class="font-medium text-gray-700">記錄值：</span>
+                                  <code class="ml-2 bg-gray-100 px-2 py-1 rounded text-xs break-all">{{ merchant_domain.verification_token }}</code>
+                              </div>
+                          </div>
+                      </div>
+
+                      <!-- A 記錄 -->
+                      <div class="bg-white rounded-lg border border-yellow-200 p-4">
+                          <h4 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                              <span class="bg-yellow-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">2</span>
+                              A 記錄（指向我們的伺服器）
+                          </h4>
+                          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                              <div>
+                                  <span class="font-medium text-gray-700">記錄類型：</span>
+                                  <code class="ml-2 bg-gray-100 px-2 py-1 rounded">A</code>
+                              </div>
+                              <div>
+                                  <span class="font-medium text-gray-700">記錄名稱：</span>
+                                  <code class="ml-2 bg-gray-100 px-2 py-1 rounded text-xs">@</code>
+                                  <span class="text-gray-500 text-xs ml-1">（代表根域名）</span>
+                              </div>
+                              <div>
+                                  <span class="font-medium text-gray-700">記錄值：</span>
+                                  <code class="ml-2 bg-gray-100 px-2 py-1 rounded text-xs">54.95.179.51</code>
+                              </div>
+                          </div>
+                          <div class="mt-3 p-3 bg-blue-50 rounded-lg">
+                              <p class="text-blue-800 text-xs">
+                                  <strong>重要：</strong>如果您使用 Cloudflare，請確保將 Proxy 狀態設為「DNS only」（灰色雲朵），不要使用橙色雲朵的 Proxy 模式。
+                              </p>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- 設定步驟 -->
+                  <div class="space-y-3">
+                      <h4 class="font-semibold text-gray-900">設定步驟：</h4>
+                      <div class="space-y-2">
+                          <div class="flex items-start gap-2">
+                              <span class="text-yellow-600 text-sm font-medium">1.</span>
+                              <span class="text-yellow-800 text-sm">登入您的 DNS 管理介面（如 Cloudflare、GoDaddy、Namecheap 等）</span>
+                          </div>
+                          <div class="flex items-start gap-2">
+                              <span class="text-yellow-600 text-sm font-medium">2.</span>
+                              <span class="text-yellow-800 text-sm">添加上方的 <strong>TXT 記錄</strong>（用於驗證網域所有權）</span>
+                          </div>
+                          <div class="flex items-start gap-2">
+                              <span class="text-yellow-600 text-sm font-medium">3.</span>
+                              <span class="text-yellow-800 text-sm">添加上方的 <strong>A 記錄</strong>（將網域指向我們的伺服器）</span>
+                          </div>
+                          <div class="flex items-start gap-2">
+                              <span class="text-yellow-600 text-sm font-medium">4.</span>
+                              <span class="text-yellow-800 text-sm">如果使用 Cloudflare，請將 A 記錄的 Proxy 狀態設為「DNS only」（灰色雲朵）</span>
+                          </div>
+                          <div class="flex items-start gap-2">
+                              <span class="text-yellow-600 text-sm font-medium">5.</span>
+                              <span class="text-yellow-800 text-sm">等待 DNS 傳播完成（通常 5-60 分鐘）</span>
+                          </div>
+                          <div class="flex items-start gap-2">
+                              <span class="text-yellow-600 text-sm font-medium">6.</span>
+                              <span class="text-yellow-800 text-sm">點擊上方的「驗證網域」按鈕進行驗證</span>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="mt-4 p-3 bg-yellow-100 rounded-lg">
+                      <p class="text-yellow-800 text-sm">
+                          <strong>注意：</strong>DNS 設定變更通常需要 5-60 分鐘才會生效。
+                          設定完成後，請點擊上方的「驗證網域」按鈕進行驗證。
+                      </p>
+                  </div>
+              </div>
+          </div>
+      </div>
+      {% else %}
+      <!-- 驗證成功資訊 -->
+      <div class="bg-green-50 border border-green-200 rounded-2xl p-6">
+          <div class="flex items-start gap-3">
+              <div class="text-green-600 mt-1">
+                  {% include 'components/icons.html' with icon='check-circle' %}
+              </div>
+              <div>
+                  <h3 class="text-lg font-semibold text-green-900 mb-2">網域驗證成功！</h3>
+                  <p class="text-green-800">
+                      您的網域 <code class="bg-green-100 px-2 py-1 rounded">{{ merchant_domain.domain_name}}</code>
+                      已成功驗證，現在客戶可以透過此網址訪問您的商店。
+                  </p>
+                  {% if merchant_domain.verified_at %}
+                  <p class="text-green-700 text-sm mt-2">
+                      驗證時間：{{ merchant_domain.verified_at|date:"Y-m-d H:i:s" }}
+                  </p>
+                  {% endif %}
+              </div>
+          </div>
+      </div>
+      {% endif %}
+  </div>
+{% endblock %}
