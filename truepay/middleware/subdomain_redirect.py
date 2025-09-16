@@ -146,36 +146,6 @@ class SubdomainRedirectMiddleware:
             )
 
             request.merchant = own_domain.merchant
-            auth_token = request.GET.get("auth_token")
-            if auth_token and (
-                not hasattr(request, "user") or not request.user.is_authenticated
-            ):
-                auth = CrossDomainAuth()
-                token_data = auth.verify_auth_token(auth_token)
-
-                if token_data:
-                    try:
-                        user = Member.objects.get(id=token_data["user_id"])
-                        login(
-                            request,
-                            user,
-                            backend="django.contrib.auth.backends.ModelBackend",
-                        )
-                        request.session.save()
-
-                        clean_url = request.build_absolute_uri().split("?")[0]
-                        query_params = []
-                        for key, value in request.GET.items():
-                            if key != "auth_token":
-                                query_params.append(f"{key}={value}")
-                        if query_params:
-                            clean_url += "?" + "&".join(query_params)
-                        response = HttpResponseRedirect(clean_url)
-                        return response
-
-                    except Member.DoesNotExist:
-                        pass
-
             request.domain_type = "own_domain"
 
             # 特殊處理：登入相關頁面重導向到主域名

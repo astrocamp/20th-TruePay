@@ -145,7 +145,8 @@
             
             <!-- 二階段驗證設定 -->
             <div class="border border-gray-200 rounded-lg p-6 mb-6">
-                <div class="flex items-center justify-between mb-4">
+                <!-- 桌面版：左右排列 -->
+                <div class="hidden md:flex items-center justify-between mb-4">
                     <div>
                         <h3 class="text-lg font-semibold text-gray-900">二階段驗證 (2FA)</h3>
                         <p class="text-sm text-gray-600 mt-1">
@@ -157,7 +158,7 @@
                         <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
                             ✅ 已啟用
                         </div>
-                        <a href="{% url 'customers_account:totp_manage' %}" 
+                        <a href="{% url 'customers_account:totp_manage' %}"
                            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200 text-sm">
                             管理設定
                         </a>
@@ -165,7 +166,36 @@
                         <div class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
                             ⚠️ 未啟用
                         </div>
-                        <a href="{% url 'customers_account:totp_setup' %}" 
+                        <a href="{% url 'customers_account:totp_setup' %}"
+                           class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200 text-sm">
+                            立即啟用
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- 手機版：垂直排列 -->
+                <div class="md:hidden mb-4">
+                    <div class="mb-3">
+                        <h3 class="text-lg font-semibold text-gray-900">二階段驗證 (2FA)</h3>
+                        <p class="text-sm text-gray-600 mt-1">
+                            為您的帳戶提供額外的安全保護，交易時需要輸入手機應用程式的驗證代碼
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        {% if customer.totp_enabled %}
+                        <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                            ✅ 已啟用
+                        </div>
+                        <a href="{% url 'customers_account:totp_manage' %}"
+                           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200 text-sm">
+                            管理設定
+                        </a>
+                        {% else %}
+                        <div class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
+                            ⚠️ 未啟用
+                        </div>
+                        <a href="{% url 'customers_account:totp_setup' %}"
                            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200 text-sm">
                             立即啟用
                         </a>

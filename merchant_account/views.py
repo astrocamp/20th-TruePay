@@ -18,7 +18,7 @@ from .forms import (
     MerchantProfileUpdateForm,
     MerchantOwnDomainForm,
 )
-from .services import DomainVerificationService
+from .cloudflare_service import CloudflareService
 from customers_account.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from .models import Merchant, SubdomainRedirect, MerchantOwnDomain
@@ -527,24 +527,34 @@ def own_domain_detail(request, subdomain, pk):
     merchant_domain = get_object_or_404(MerchantOwnDomain, pk=pk, merchant=merchant)
     if request.method == "POST":
         action = request.POST.get("action")
+        cloudflare_service = CloudflareService()
 
-        if action == "verify":
-            success, message = DomainVerificationService.verify_domain_ownership(
-                merchant_domain
-            )
+        if action == "setup":
+            success, message = cloudflare_service.setup_merchant_domain(merchant_domain)
+            if success:
+                messages.success(request, message)
+            else:
+                messages.error(request, message)
+        elif action == "verify":
+            success, message = cloudflare_service.verify_cname_record(merchant_domain)
             if success:
                 messages.success(request, message)
             else:
                 messages.error(request, message)
         elif action == "delete":
+            cloudflare_service.delete_dns_record(merchant_domain)
             domain_name = merchant_domain.domain_name
             merchant_domain.delete()
-            messages.success(request, f"網域 {domain_name} 已刪除")
+            messages.success(request, f"網域{domain_name}已刪除")
             return redirect("merchant_account:own_domain_list", subdomain=subdomain)
-
-    instructions = DomainVerificationService.get_verification_instructions(merchant_domain)
+    cloudflare_service = CloudflareService()
+    instructions = cloudflare_service.get_setup_instructions(merchant_domain)
     return render(
         request,
         "merchant_account/own_domain_detail.html",
-        {"merchant": merchant, "merchant_domain": merchant_domain, "instructions": instructions},
+        {
+            "merchant": merchant,
+            "merchant_domain": merchant_domain,
+            "instructions": instructions,
+        },
     )

@@ -173,20 +173,19 @@ class MerchantOwnDomain(models.Model):
         verbose_name="網域名稱",
         help_text="例如: www.shop.com 或 shop.com",
     )
+    cname_target = models.CharField(
+        max_length=253,
+        blank=True,
+        verbose_name="CNAME 目標",
+        help_text="指向的子網域，如: shop123.truepay.tw",
+    )
+    cloudflare_record_id = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Cloudflare 記錄 ID",
+        help_text="用於刪除或修改 DNS 記錄",
+    )
     is_verified = models.BooleanField(default=False, verbose_name="已驗證")
-    verification_token = models.CharField(
-        max_length=64, blank=True, verbose_name="驗證Token"
-    )
-    verification_method = models.CharField(
-        max_length=10,
-        choices=[("DNS", "DNS記錄驗證"), ("FILE", "檔案驗證")],
-        default="DNS",
-        verbose_name="驗證方式",
-    )
-    ssl_enabled = models.BooleanField(default=False, verbose_name="SSL已啟用")
-    ssl_certificate_expires = models.DateTimeField(
-        null=True, blank=True, verbose_name="SSL證書到期時間"
-    )
     is_active = models.BooleanField(default=True, verbose_name="啟用中")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="建立時間")
     verified_at = models.DateTimeField(null=True, blank=True, verbose_name="驗證時間")
@@ -199,7 +198,8 @@ class MerchantOwnDomain(models.Model):
     def __str__(self):
         return f"{self.merchant.ShopName} - {self.domain_name}"
 
-    def save(self, *args, **kwargs):
-        if not self.verification_token:
-            self.verification_token = secrets.token_hex(32)
-        super().save(*args, **kwargs)
+    def get_target_subdomain(self):
+        return f"{self.merchant.subdomain}.truepay.tw"
+
+    def is_cname_setup(self):
+        return bool(self.cloudflare_record_id and self.cname_target)

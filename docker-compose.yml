@@ -17,7 +17,7 @@ services:
       timeout: 5s
       retries: 5
   web:
-    image: truepay-web:optimized
+    image: truepay:latest
     ports:
       - "80:8000"
       - "8000:8000" 
@@ -34,9 +34,6 @@ services:
       - DB_PASSWORD=truepay123
       - DB_HOST=db
       - DB_PORT=5432
-      - LANG=C.UTF-8
-      - LC_ALL=C.UTF-8
-      - PYTHONIOENCODING=utf-8
     restart: unless-stopped
     command: >
       sh -c "uv run python manage.py migrate &&

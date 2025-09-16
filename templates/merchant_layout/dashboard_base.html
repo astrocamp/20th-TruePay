@@ -60,13 +60,13 @@
                 子網域設定 
               </a>
             </li>
-            <li>
+            {% comment %} <li>
               <a href="{% url 'merchant_account:own_domain_list' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='check-circle' %}
                 自訂網域
               </a>
             </li>
-            <li>
+            <li> {% endcomment %}
               <a href="{% url 'public_store:shop_overview' request.merchant.subdomain %}" 
                 target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
                 {% include 'components/icons.html' with icon='cube' %}
