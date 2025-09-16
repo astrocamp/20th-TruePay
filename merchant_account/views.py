@@ -57,7 +57,11 @@ def register(req):
 
 def login(req):
     # 檢查用戶是否已經登入
-    if req.user.is_authenticated and hasattr(req.user, 'member_type') and req.user.member_type == 'merchant':
+    if (
+        req.user.is_authenticated
+        and hasattr(req.user, "member_type")
+        and req.user.member_type == "merchant"
+    ):
         try:
             merchant = Merchant.objects.get(member=req.user)
             messages.info(req, "您已經登入了")
@@ -78,11 +82,20 @@ def login(req):
 
             # 檢查商家審核狀態
             if merchant.verification_status == "pending":
-                messages.warning(req, "您的商家資料正在審核中，部分功能可能受限。審核通過後將開放完整功能。")
+                messages.warning(
+                    req,
+                    "您的商家資料正在審核中，部分功能可能受限。審核通過後將開放完整功能。",
+                )
             elif merchant.verification_status == "rejected":
-                messages.error(req, f"您的商家資料審核未通過。原因：{merchant.rejection_reason or '請聯絡客服了解詳情'}")
+                messages.error(
+                    req,
+                    f"您的商家資料審核未通過。原因：{merchant.rejection_reason or '請聯絡客服了解詳情'}",
+                )
             elif merchant.verification_status == "suspended":
-                messages.error(req, f"您的商家帳號已被暫停。原因：{merchant.rejection_reason or '請聯絡客服了解詳情'}")
+                messages.error(
+                    req,
+                    f"您的商家帳號已被暫停。原因：{merchant.rejection_reason or '請聯絡客服了解詳情'}",
+                )
             elif merchant.verification_status == "approved":
                 messages.success(req, f"歡迎進入，{merchant.ShopName}！")
             else:
@@ -105,7 +118,7 @@ def logout(req):
         return redirect("merchant_account:login")
 
     # 檢查是否為商家用戶
-    if not hasattr(req.user, 'member_type') or req.user.member_type != 'merchant':
+    if not hasattr(req.user, "member_type") or req.user.member_type != "merchant":
         messages.error(req, "權限不足")
         return redirect("merchant_account:login")
 
@@ -264,7 +277,9 @@ def validate_ticket(request, subdomain):
                 "error_message": error_message or "QR code數據無效",
                 "merchant": merchant,
             }
-            return render(request, "merchant_account/partials/ticket_error.html", context)
+            return render(
+                request, "merchant_account/partials/ticket_error.html", context
+            )
 
         ticket_code = ticket.ticket_code
     else:
@@ -279,7 +294,9 @@ def validate_ticket(request, subdomain):
                 "error_message": "找不到此票券代碼",
                 "merchant": merchant,
             }
-            return render(request, "merchant_account/partials/ticket_error.html", context)
+            return render(
+                request, "merchant_account/partials/ticket_error.html", context
+            )
 
     # 檢查票券有效性
     is_valid, message = ticket.is_valid()
@@ -289,9 +306,7 @@ def validate_ticket(request, subdomain):
             "error_message": message,
             "merchant": merchant,
         }
-        return render(
-            request, "merchant_account/partials/ticket_error.html", context
-        )
+        return render(request, "merchant_account/partials/ticket_error.html", context)
 
     # 檢查商家權限
     if ticket.product.merchant != merchant:
@@ -300,9 +315,7 @@ def validate_ticket(request, subdomain):
             "error_message": "您無權限驗證此票券",
             "merchant": merchant,
         }
-        return render(
-            request, "merchant_account/partials/ticket_error.html", context
-        )
+        return render(request, "merchant_account/partials/ticket_error.html", context)
 
     # 票券驗證成功，顯示確認頁面
     context = {
@@ -478,10 +491,12 @@ def profile_settings(request, subdomain):
                 # 如果審核狀態改變了，顯示相應訊息
                 merchant.refresh_from_db()  # 重新載入以獲取最新狀態
                 if old_status != merchant.verification_status:
-                    if merchant.verification_status == 'approved':
+                    if merchant.verification_status == "approved":
                         messages.success(request, "🎉 恭喜！您的商家資料已通過自動審核")
-                    elif merchant.verification_status == 'rejected':
-                        messages.warning(request, "商家資料已更新，但仍需完善部分資訊才能通過審核")
+                    elif merchant.verification_status == "rejected":
+                        messages.warning(
+                            request, "商家資料已更新，但仍需完善部分資訊才能通過審核"
+                        )
                 else:
                     messages.success(request, "商家資料已成功更新")
 
