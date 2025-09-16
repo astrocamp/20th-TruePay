@@ -1,6 +1,6 @@
 {% extends "layouts/default.html" %}
 {% block content %}
-<div class="max-w-md mx-auto mt-16 p-6 bg-white rounded-lg shadow-lg" x-data="totpVerify()">
+<div class="max-w-md mx-auto mt-16 p-6 bg-white rounded-lg shadow-lg" x-data="createTotpVerifyPayment()">
     <div class="text-center mb-8">
         <div class="mx-auto mb-4 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
             {% include 'components/icons.html' with icon='shield-check' class='w-8 h-8 text-blue-600' %}
@@ -57,7 +57,7 @@
                    id="totp_code" 
                    name="totp_code" 
                    x-model="totpCode"
-                   @input="handleInput"
+                   x-on:input="handleInput($event)"
                    @keydown.enter="submitForm"
                    class="w-full px-4 py-3 text-center text-2xl font-mono border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                    placeholder="000000"
@@ -71,10 +71,11 @@
         
         <div class="space-y-3">
             <button type="submit" 
-                    :disabled="totpCode.length !== 6"
-                    :class="totpCode.length === 6 ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
+                    :disabled="totpCode.length !== 6 || isSubmitting"
+                    :class="(totpCode.length === 6 && !isSubmitting) ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
                     class="w-full text-white py-3 px-6 rounded-lg transition duration-200 font-medium text-lg">
-                ✅ 確認付款 NT$ {{ total_amount }}
+                <span x-show="!isSubmitting">✅ 確認付款 NT$ {{ total_amount }}</span>
+                <span x-show="isSubmitting">⏳ 處理中...</span>
             </button>
             
             <button type="button" 
@@ -114,37 +115,4 @@
         </p>
     </div>
 </div>
-
-<script>
-function totpVerify() {
-    return {
-        totpCode: '',
-        
-        handleInput() {
-            // 只允許數字輸入
-            this.totpCode = this.totpCode.replace(/\D/g, '');
-            
-            // 自動提交當輸入滿6位數
-            if (this.totpCode.length === 6) {
-                // 延遲一點讓用戶看到完整輸入
-                setTimeout(() => {
-                    this.submitForm();
-                }, 300);
-            }
-        },
-        
-        submitForm() {
-            if (this.totpCode.length === 6) {
-                document.querySelector('form').submit();
-            }
-        },
-        
-        cancelPayment() {
-            if (confirm('確定要取消此次付款嗎？')) {
-                window.location.href = '{% url "pages:home" %}';
-            }
-        }
-    }
-}
-</script>
 {% endblock %}
