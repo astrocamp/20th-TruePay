@@ -325,7 +325,7 @@ class OrderItem(models.Model):
 🏪 商家名稱：{self.product.merchant.ShopName}<br>
 🛍️ 商品名稱：{self.product.name}<br>
 💰 票券價值：NT$ {self.order.unit_price}<br>
-⏰ 到期時間：{self.valid_until.strftime("%Y年%m月%d日 %H:%M")}<br>
+⏰ 到期時間：{timezone.localtime(self.valid_until).strftime("%Y年%m月%d日 %H:%M")}<br>
 <hr style='margin: 18px 0;'>
 <b>🔗 查看票券詳情</b><br>
 請登入您的 TruePay 帳戶查看完整票券資訊：<br>
