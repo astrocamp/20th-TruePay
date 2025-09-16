@@ -315,7 +315,38 @@ class OrderItem(models.Model):
             login_url = f"{base_url}/customers/login/"
             wallet_url = f"{base_url}/customers/ticket-wallet/"
 
-            # HTML 內容
+            # 純文字版本
+            text_message = f"""{customer_name}，您好！
+
+{urgency_level}：{timing_message}！
+
+=== 票券資訊 ===
+🏪 商家名稱：{self.product.merchant.ShopName}
+🛍️ 商品名稱：{self.product.name}
+💰 票券價值：NT$ {self.order.unit_price}
+⏰ 到期時間：{timezone.localtime(self.valid_until).strftime("%Y年%m月%d日 %H:%M")}
+
+=== 查看票券詳情 ===
+請登入您的 TruePay 帳戶查看完整票券資訊：
+📱 票券錢包：{wallet_url}
+
+如果您尚未登入，請先登入：
+🔐 登入連結：{login_url}
+
+=== 商家聯絡資訊 ===
+🏪 {self.product.merchant.ShopName}
+📞 如需協助請直接聯繫商家
+
+=== 重要提醒 ===
+• 請在票券錢包中查看完整的票券資訊和 QR Code
+• 前往商家時請出示票券 QR Code 進行核銷
+• 如有疑問請直接聯繫商家或 TruePay 客服
+
+感謝您使用 TruePay！
+TruePay 客服團隊
+            """
+
+            # HTML 版本
             html_message = f"""
 <div style='font-family: Arial, sans-serif; font-size: 16px; color: #222;'>
 <p>{customer_name}，您好！</p>
@@ -348,11 +379,11 @@ TruePay 客服團隊
             """
             send_mail(
                 subject=subject,
-                message=html_message,  # 純文字備用
+                message=text_message,  # 純文字版本
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[customer_email],
                 fail_silently=False,
-                html_message=html_message,
+                html_message=html_message,  # HTML 版本
             )
             
             # 記錄通知發送時間
@@ -393,15 +424,11 @@ TruePay 客服團隊
         now = timezone.now()
         for ticket in tickets_to_notify:
             total_checked += 1
-            # 判斷是否到期前5分鐘內或已過期
-            if ticket.valid_until:
-                notify_time = ticket.valid_until - timezone.timedelta(minutes=5)
-                # 只要現在時間 >= 通知時間（到期前5分鐘），就要發信
-                if now >= notify_time:
-                    if ticket.send_expiry_notification():
-                        notifications_sent += 1
-                    else:
-                        errors_count += 1
+            # 讓 send_expiry_notification 內部統一處理時間窗口判斷
+            if ticket.send_expiry_notification():
+                notifications_sent += 1
+            else:
+                errors_count += 1
         result = {
             'total_checked': total_checked,
             'notifications_sent': notifications_sent,
