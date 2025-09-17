@@ -76,7 +76,6 @@ INSTALLED_APPS = [
     "django_celery_beat",  # Celery Beat 排程器
     "rest_framework",  # Django REST framework
     "embed_system",  # 嵌入商品系統
-    "django_celery_beat",  # Celery Beat 排程器
 ]
 
 MIDDLEWARE = [
@@ -118,13 +117,24 @@ WSGI_APPLICATION = "truepay.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+def get_db_host():
+    # 若偵測到本地 runserver、migrate、makemigrations，則用 localhost，否則用 .env 設定
+    import sys
+    local_cmds = {"runserver", "migrate", "makemigrations"}
+    if (
+        os.getenv("DJANGO_DEVELOPMENT") == "True"
+        or (len(sys.argv) > 1 and sys.argv[1] in local_cmds)
+    ):
+        return "localhost"
+    return os.getenv("DB_HOST")
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": os.getenv("DB_NAME"),
         "USER": os.getenv("DB_USER"),
         "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
+        "HOST": get_db_host(),
         "PORT": os.getenv("DB_PORT"),
     }
 }
@@ -168,6 +178,8 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
+    BASE_DIR / "src" / "styles",
+    BASE_DIR / "src" / "scripts",
 ]
 
 # Default primary key field type
