@@ -233,71 +233,84 @@ def ticket_validation_page(request, subdomain):
 def validate_ticket(request, subdomain):
     """驗證票券（手動輸入驗證碼或QR掃描）"""
     merchant = request.merchant
-    ticket_code = request.POST.get("ticket_code", "").strip().upper()
+    raw_ticket_data = request.POST.get("ticket_code", "").strip()
     validation_method = request.POST.get("method", "manual")
 
     # 記錄驗證嘗試
     def create_validation_record(ticket, status, reason=""):
-        return TicketValidation.objects.create(
-            ticket=ticket,
-            merchant=merchant,
-            status=status,
-            failure_reason=reason,
-            validation_method=validation_method,
-            ip_address=request.META.get("REMOTE_ADDR"),
-        )
+        if ticket:
+            return TicketValidation.objects.create(
+                ticket=ticket,
+                merchant=merchant,
+                status=status,
+                failure_reason=reason,
+                validation_method=validation_method,
+                ip_address=request.META.get("REMOTE_ADDR"),
+            )
 
-    if not ticket_code:
+    if not raw_ticket_data:
         context = {
             "error_message": "請輸入票券驗證碼",
             "merchant": merchant,
         }
         return render(request, "merchant_account/partials/ticket_error.html", context)
 
-    try:
-        # 查找票券（OrderItem）
-        ticket = OrderItem.objects.select_related(
-            "order", "product__merchant", "customer"
-        ).get(ticket_code=ticket_code)
-
-        # 檢查票券有效性和商家權限
-        is_valid, message = ticket.is_valid()
-        if not is_valid:
-            create_validation_record(ticket, "failed", message)
+    # 處理QR code數據或手動輸入的票券代碼
+    if validation_method == "qr":
+        # QR code掃描：需要進行HMAC簽名驗證
+        ticket, error_message = OrderItem.get_ticket_from_qr_data(raw_ticket_data)
+        if not ticket:
             context = {
-                "error_message": message,
+                "error_message": error_message or "QR code數據無效",
                 "merchant": merchant,
             }
-            return render(
-                request, "merchant_account/partials/ticket_error.html", context
-            )
+            return render(request, "merchant_account/partials/ticket_error.html", context)
 
-        # 檢查商家權限
-        if ticket.product.merchant != merchant:
-            create_validation_record(ticket, "unauthorized", "您無權限驗證此票券")
+        ticket_code = ticket.ticket_code
+    else:
+        # 手動輸入：直接查找票券代碼
+        ticket_code = raw_ticket_data.upper()
+        try:
+            ticket = OrderItem.objects.select_related(
+                "order", "product__merchant", "customer"
+            ).get(ticket_code=ticket_code)
+        except OrderItem.DoesNotExist:
             context = {
-                "error_message": "您無權限驗證此票券",
+                "error_message": "找不到此票券代碼",
                 "merchant": merchant,
             }
-            return render(
-                request, "merchant_account/partials/ticket_error.html", context
-            )
+            return render(request, "merchant_account/partials/ticket_error.html", context)
 
-        # 票券驗證成功，顯示確認頁面（驗證不需記錄，只有實際使用才記錄）
+    # 檢查票券有效性
+    is_valid, message = ticket.is_valid()
+    if not is_valid:
+        create_validation_record(ticket, "failed", message)
         context = {
-            "ticket_code": ticket_code,
-            "ticket_info": ticket.ticket_info,
+            "error_message": message,
             "merchant": merchant,
         }
-        return render(request, "merchant_account/partials/ticket_success.html", context)
+        return render(
+            request, "merchant_account/partials/ticket_error.html", context
+        )
 
-    except OrderItem.DoesNotExist:
-        # 找不到票券
+    # 檢查商家權限
+    if ticket.product.merchant != merchant:
+        create_validation_record(ticket, "unauthorized", "您無權限驗證此票券")
         context = {
-            "error_message": "找不到此票券代碼",
+            "error_message": "您無權限驗證此票券",
             "merchant": merchant,
         }
-        return render(request, "merchant_account/partials/ticket_error.html", context)
+        return render(
+            request, "merchant_account/partials/ticket_error.html", context
+        )
+
+    # 票券驗證成功，顯示確認頁面
+    context = {
+        "ticket_code": ticket_code,
+        "ticket_info": ticket.ticket_info,
+        "merchant": merchant,
+    }
+    return render(request, "merchant_account/partials/ticket_success.html", context)
 
 
 @no_cache_required
