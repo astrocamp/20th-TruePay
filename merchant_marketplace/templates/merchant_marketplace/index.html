@@ -14,7 +14,7 @@
         <select name="status" id="status" class="border rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-200">
             <option value="" {% if not request.GET.status %}selected{% endif %}>全部</option>
             <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>上架中</option>
-            <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>已下架</option>
+            <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>未上架</option>
         </select>
         <button type="button" onclick="window.location.href=window.location.pathname" class="bg-gray-200 text-gray-700 px-4 py-1 rounded hover:bg-gray-300 ml-2">重設</button>
         <button type="submit" class="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600 ml-2">確認</button>
@@ -51,7 +51,7 @@
                                 {% if product.is_active %}
                                     <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded">上架中</span>
                                 {% else %}
-                                    <span class="bg-red-100 text-red-700 px-2 py-0.5 rounded">已下架</span>
+                                    <span class="bg-red-100 text-red-700 px-2 py-0.5 rounded">未上架</span>
                                 {% endif %}
                             </span>
                             <a href="{% url 'merchant_marketplace:detail' request.merchant.subdomain product.id %}" class="text-blue-600 hover:text-blue-800">

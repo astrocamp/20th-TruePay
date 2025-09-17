@@ -264,7 +264,7 @@ def retry_payment(request, order_id):
             
             # 檢查商品是否仍然有效
             if not order.product.is_active:
-                messages.error(request, "商品已下架，無法重新付款")
+                messages.error(request, "商品未上架，無法重新付款")
                 return redirect("customers_account:purchase_history")
             
             # 檢查庫存（防止重新付款時庫存不足）
@@ -515,7 +515,7 @@ def check_stock_api(request):
         return JsonResponse(response_data)
         
     except (ValueError, Product.DoesNotExist):
-        return JsonResponse({'error': '商品不存在或已下架'}, status=404)
+        return JsonResponse({'error': '商品不存在或未上架'}, status=404)
     except Exception as e:
         logger.error(f"檢查庫存 API 錯誤: {e}")
         return JsonResponse({'error': '系統錯誤，請稍後再試'}, status=500)

@@ -40,7 +40,7 @@ def detail(request, subdomain, id):
         elif action == "deactivate":
             product.is_active = False
             product.save()
-            messages.success(request, "商品已下架")
+            messages.success(request, "商品未上架")
             return redirect("merchant_marketplace:detail", request.merchant.subdomain, product.id)
             
         elif action == "delete":
