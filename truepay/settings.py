@@ -189,6 +189,10 @@ AWS_S3_OBJECT_PARAMETERS = {
 }
 
 # Media files (uploads)
+# 檔案上傳限制設定
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
+FILE_UPLOAD_PERMISSIONS = 0o644  # 檔案權限
 
 # Media files (uploads)
 STORAGES = {
