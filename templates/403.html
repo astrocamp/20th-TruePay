@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>403 - 存取被拒絕 | TruePay</title>
+    <link href="{% static 'styles/app.css' %}" rel="stylesheet" type="text/css" />
+    <script src="{% static 'scripts/app.js' %}" defer></script>
+</head>
+<body class="bg-brand-white text-brand-black font-sans min-h-screen flex flex-col">
+    <!-- 頁首導航欄 -->
+    <nav class="bg-brand-white border-b border-brand-grayBorder px-4 py-3">
+        <div class="max-w-screen-xl mx-auto flex items-center justify-between">
+            <a href="{% url 'pages:home' %}" class="text-lg font-bold text-brand-black md:text-xl">TruePay</a>
+        </div>
+    </nav>
+
+    <!-- 主要內容區域 -->
+    <main class="flex-1 flex items-center justify-center px-6 py-12">
+        <div class="max-w-md w-full text-center">
+            <!-- 403 圖示或數字 -->
+            <div class="mb-8">
+                <div class="text-8xl font-bold text-yellow-500 opacity-20 mb-4">403</div>
+                <div class="w-24 h-24 mx-auto mb-6 bg-yellow-50 rounded-full flex items-center justify-center">
+                    <svg class="w-12 h-12 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- 錯誤訊息 -->
+            <h1 class="text-3xl font-bold text-brand-black mb-4">存取被拒絕</h1>
+            <p class="text-gray-600 mb-8 leading-relaxed">
+                很抱歉，您沒有權限存取此頁面。<br>
+                這可能是因為您尚未登入，或者此功能需要特殊權限。
+            </p>
+
+            <!-- 操作按鈕 -->
+            <div class="space-y-4">
+                <!-- 根據使用者狀態顯示不同按鈕 -->
+                {% if not user.is_authenticated %}
+                    <!-- 未登入使用者 -->
+                    <a href="{% url 'customers_account:login' %}"
+                       class="inline-block w-full bg-brand-blue text-white font-medium py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                        前往登入
+                    </a>
+                    <a href="{% url 'pages:selectrole' %}"
+                       class="inline-block w-full bg-green-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-green-700 transition-colors duration-200">
+                        註冊帳號
+                    </a>
+                {% else %}
+                    <!-- 已登入使用者 -->
+                    {% if user.member_type == "customer" %}
+                        <a href="{% url 'customers_account:dashboard' %}"
+                           class="inline-block w-full bg-brand-blue text-white font-medium py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                            前往消費者儀表板
+                        </a>
+                    {% elif user.member_type == "merchant" %}
+                        <a href="{% url 'merchant_account:dashboard' %}"
+                           class="inline-block w-full bg-brand-blue text-white font-medium py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                            前往商家儀表板
+                        </a>
+                    {% endif %}
+                {% endif %}
+
+                <!-- 返回首頁按鈕 -->
+                <a href="{% url 'pages:home' %}"
+                   class="inline-block w-full bg-brand-grayLight text-brand-black font-medium py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors duration-200">
+                    返回首頁
+                </a>
+
+                <!-- 返回上一頁按鈕 -->
+                <button onclick="history.back()"
+                        class="inline-block w-full bg-gray-100 text-gray-600 font-medium py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors duration-200">
+                    返回上一頁
+                </button>
+            </div>
+
+            <!-- 說明文字 -->
+            <div class="mt-8 pt-6 border-t border-brand-grayBorder">
+                <p class="text-sm text-gray-600 mb-4">可能的原因：</p>
+                <div class="text-sm text-gray-500 space-y-2">
+                    <p>• 您尚未登入系統</p>
+                    <p>• 此功能需要特殊權限</p>
+                    <p>• 您的帳號類型不符合要求</p>
+                    <p>• 連結可能已過期或無效</p>
+                </div>
+            </div>
+
+            <!-- 客服聯絡 -->
+            <div class="mt-6 pt-4 border-t border-brand-grayBorder">
+                <p class="text-xs text-gray-400 mb-2">如需協助，請聯繫：</p>
+                <a href="{% url 'pages:contact' %}" class="text-xs text-brand-blue hover:underline">客服中心</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="bg-brand-grayLight text-center text-sm text-gray-500 py-6">
+        &copy; {{ now|date:"Y" }} TruePay. All rights reserved.
+    </footer>
+</body>
+</html>
