@@ -53,21 +53,6 @@
               x-bind="navLinkBinding($el)"
               >商品總覽</a
             >
-          </li>
-          <li>
-            <a
-              href="{% url 'pages:about' %}"
-              x-bind="navLinkBinding($el)"
-              >關於</a
-            >
-          </li>
-          <li>
-            <a
-              href="{% url 'pages:contact' %}"
-              x-bind="navLinkBinding($el)"
-              >聯絡</a
-            >
-          </li>
           {% if user.is_authenticated %}
             {% if user.member_type == "merchant" %}
               <li>
@@ -122,22 +107,6 @@
               x-bind="navLinkBinding($el)"
               class="block px-6 py-4 text-brand-black hover:bg-gray-50 transition-colors text-center"
               >商品總覽</a
-            >
-          </li>
-          <li>
-            <a
-              href="{% url 'pages:about' %}"
-              x-bind="navLinkBinding($el)"
-              class="block px-6 py-4 text-brand-black hover:bg-gray-50 transition-colors text-center"
-              >關於</a
-            >
-          </li>
-          <li>
-            <a
-              href="{% url 'pages:contact' %}"
-              x-bind="navLinkBinding($el)"
-              class="block px-6 py-4 text-brand-black hover:bg-gray-50 transition-colors text-center "
-              >聯絡</a
             >
           </li>
           {% if user.is_authenticated %}

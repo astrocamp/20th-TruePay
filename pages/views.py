@@ -23,13 +23,5 @@ def marketplace(req):
     return render(req, "pages/marketplace.html", context)
 
 
-def about(req):
-    return render(req, "pages/about.html")
-
-
-def contact(req):
-    return render(req, "pages/contact.html")
-
-
 def selectrole(req):
     return render(req, "pages/selectrole.html")
