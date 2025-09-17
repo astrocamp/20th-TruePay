@@ -265,7 +265,7 @@
             <p>建立時間：{{ product.created_at|date:"Y/m/d H:i" }}</p>
             <p>最後更新：{{ product.updated_at|date:"Y/m/d H:i" }}</p>
             <p>商家：{{ product.merchant.ShopName }}</p>
-            <p>狀態：{% if product.is_active %}上架中{% else %}已下架{% endif %}</p>
+            <p>狀態：{% if product.is_active %}上架中{% else %}未上架{% endif %}</p>
         </div>
     </div>
 </div>
