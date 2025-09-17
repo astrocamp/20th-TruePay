@@ -55,6 +55,11 @@ def register(request):
 
 
 def login(request):
+    # 檢查用戶是否已經登入
+    if request.user.is_authenticated and hasattr(request.user, 'member_type') and request.user.member_type == 'customer':
+        messages.info(request, "您已經登入了")
+        return redirect("pages:marketplace")
+
     if request.method == "POST":
         form = CustomerLoginForm(request.POST)
         if form.is_valid():
@@ -89,6 +94,16 @@ def login(request):
 
 
 def logout(request):
+    # 檢查用戶是否已經登入
+    if not request.user.is_authenticated:
+        messages.warning(request, "您尚未登入")
+        return redirect("customers_account:login")
+
+    # 檢查是否為客戶用戶
+    if not hasattr(request.user, 'member_type') or request.user.member_type != 'customer':
+        messages.error(request, "權限不足")
+        return redirect("customers_account:login")
+
     # 使用 Django 登出（這會清除 session 中的認證資訊）
     django_logout(request)
 

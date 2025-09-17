@@ -7,7 +7,7 @@ from django.conf import settings
 import os
 from .models import Product
 from merchant_account.models import Merchant
-from truepay.decorators import no_cache_required
+from truepay.decorators import no_cache_required, merchant_verified_required
 from payments.models import OrderItem
 
 
@@ -24,6 +24,7 @@ def index(request, subdomain):
 
 
 @no_cache_required
+@merchant_verified_required
 def detail(request, subdomain, id):
     product = get_object_or_404(Product, id=id, merchant=request.merchant)
     
@@ -56,6 +57,7 @@ def detail(request, subdomain, id):
 
 
 @no_cache_required
+@merchant_verified_required
 def new(request, subdomain):
     if request.method == "GET":
         context = {"merchant_phone": request.merchant.Cellphone}
@@ -97,6 +99,7 @@ def new(request, subdomain):
 
 
 @no_cache_required
+@merchant_verified_required
 def edit(request, subdomain, id):
     product = get_object_or_404(Product, id=id)
     if product.merchant_id != request.merchant.id:
