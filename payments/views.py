@@ -268,7 +268,7 @@ def retry_payment(request, order_id):
 
             # 檢查商品是否仍然有效
             if not order.product.is_active:
-                messages.error(request, "商品已下架，無法重新付款")
+                messages.error(request, "商品未上架，無法重新付款")
                 return redirect("customers_account:purchase_history")
 
             # 檢查庫存（防止重新付款時庫存不足）

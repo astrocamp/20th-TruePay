@@ -55,7 +55,7 @@
             <div class="flex items-start">
               <span class="text-gray-600 font-medium w-20">狀態：</span>
               <span class="{% if product.is_active %}text-cis-secondary{% else %}text-gray-500{% endif %} font-medium">
-                {% if product.is_active %}上架中{% else %}已下架{% endif %}
+                {% if product.is_active %}上架中{% else %}未上架{% endif %}
               </span>
             </div>
           </div>
