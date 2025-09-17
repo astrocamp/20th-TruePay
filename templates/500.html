@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>500 - 系統維護中 | TruePay</title>
+    <link href="{% static 'styles/app.css' %}" rel="stylesheet" type="text/css" />
+    <script src="{% static 'scripts/app.js' %}" defer></script>
+</head>
+<body class="bg-brand-white text-brand-black font-sans min-h-screen flex flex-col">
+    <!-- 頁首導航欄 -->
+    <nav class="bg-brand-white border-b border-brand-grayBorder px-4 py-3">
+        <div class="max-w-screen-xl mx-auto flex items-center justify-between">
+            <a href="{% url 'pages:home' %}" class="text-lg font-bold text-brand-black md:text-xl">TruePay</a>
+        </div>
+    </nav>
+
+    <!-- 主要內容區域 -->
+    <main class="flex-1 flex items-center justify-center px-6 py-12">
+        <div class="max-w-md w-full text-center">
+            <!-- 500 圖示或數字 -->
+            <div class="mb-8">
+                <div class="text-8xl font-bold text-red-500 opacity-20 mb-4">500</div>
+                <div class="w-24 h-24 mx-auto mb-6 bg-red-50 rounded-full flex items-center justify-center">
+                    <svg class="w-12 h-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- 錯誤訊息 -->
+            <h1 class="text-3xl font-bold text-brand-black mb-4">系統維護中</h1>
+            <p class="text-gray-600 mb-8 leading-relaxed">
+                很抱歉，系統目前發生技術問題，我們正在緊急修復中。<br>
+                請稍後重新整理頁面，或聯繫客服獲取協助。
+            </p>
+
+            <!-- 操作按鈕 -->
+            <div class="space-y-4">
+                <!-- 返回首頁按鈕 -->
+                <a href="{% url 'pages:home' %}"
+                   class="inline-block w-full bg-brand-blue text-white font-medium py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    返回首頁
+                </a>
+
+                <!-- 重新整理按鈕 -->
+                <button onclick="window.location.reload()"
+                        class="inline-block w-full bg-green-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-green-700 transition-colors duration-200">
+                    重新整理頁面
+                </button>
+
+                <!-- 返回上一頁按鈕 -->
+                <button onclick="history.back()"
+                        class="inline-block w-full bg-brand-grayLight text-brand-black font-medium py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors duration-200">
+                    返回上一頁
+                </button>
+            </div>
+
+            <!-- 客服聯絡資訊 -->
+            <div class="mt-8 pt-6 border-t border-brand-grayBorder">
+                <p class="text-sm text-gray-600 mb-4">如果問題持續發生，請聯繫我們：</p>
+                <div class="flex flex-col space-y-2 text-sm">
+                    <a href="{% url 'pages:contact' %}" class="text-brand-blue hover:underline">聯絡客服</a>
+                    <span class="text-gray-500">或者稍後再試</span>
+                </div>
+            </div>
+
+            <!-- 錯誤ID（僅在DEBUG模式下顯示） -->
+            {% if debug %}
+            <div class="mt-6 pt-4 border-t border-brand-grayBorder">
+                <p class="text-xs text-gray-400">錯誤ID: {{ request.id|default:"Unknown" }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="bg-brand-grayLight text-center text-sm text-gray-500 py-6">
+        &copy; {{ now|date:"Y" }} TruePay. All rights reserved.
+    </footer>
+</body>
+</html>
