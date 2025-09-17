@@ -118,6 +118,7 @@ def logout(req):
         return redirect("merchant_account:login")
 
     # 檢查是否為商家用戶
+
     if not hasattr(req.user, "member_type") or req.user.member_type != "merchant":
         messages.error(req, "權限不足")
         return redirect("merchant_account:login")
@@ -277,9 +278,7 @@ def validate_ticket(request, subdomain):
                 "error_message": error_message or "QR code數據無效",
                 "merchant": merchant,
             }
-            return render(
-                request, "merchant_account/partials/ticket_error.html", context
-            )
+            return render(request, "merchant_account/partials/ticket_error.html", context)
 
         ticket_code = ticket.ticket_code
     else:
@@ -294,9 +293,7 @@ def validate_ticket(request, subdomain):
                 "error_message": "找不到此票券代碼",
                 "merchant": merchant,
             }
-            return render(
-                request, "merchant_account/partials/ticket_error.html", context
-            )
+            return render(request, "merchant_account/partials/ticket_error.html", context)
 
     # 檢查票券有效性
     is_valid, message = ticket.is_valid()
@@ -307,7 +304,6 @@ def validate_ticket(request, subdomain):
             "merchant": merchant,
         }
         return render(request, "merchant_account/partials/ticket_error.html", context)
-
     # 檢查商家權限
     if ticket.product.merchant != merchant:
         create_validation_record(ticket, "unauthorized", "您無權限驗證此票券")
@@ -315,7 +311,17 @@ def validate_ticket(request, subdomain):
             "error_message": "您無權限驗證此票券",
             "merchant": merchant,
         }
-        return render(request, "merchant_account/partials/ticket_error.html", context)
+        return render(
+            request, "merchant_account/partials/ticket_error.html", context
+        )
+
+    # 票券驗證成功，顯示確認頁面
+    context = {
+        "ticket_code": ticket_code,
+        "ticket_info": ticket.ticket_info,
+        "merchant": merchant,
+    }
+    return render(request, "merchant_account/partials/ticket_success.html", context)
 
     # 票券驗證成功，顯示確認頁面
     context = {

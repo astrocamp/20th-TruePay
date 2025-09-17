@@ -155,7 +155,6 @@ class Merchant(models.Model):
         self.save(
             update_fields=["verification_status", "verified_at", "rejection_reason"]
         )
-
         # 可以在這裡加入發送通知郵件的邏輯
         print(f"✅ 商家 {self.ShopName} 已通過審核")
 
@@ -167,7 +166,6 @@ class Merchant(models.Model):
         self.save(
             update_fields=["verification_status", "rejection_reason", "verified_at"]
         )
-
         # 可以在這裡加入發送通知郵件的邏輯
         print(f"❌ 商家 {self.ShopName} 審核被拒絕：{reason}")
 
@@ -336,7 +334,6 @@ class Merchant(models.Model):
             for check in checks
             if check["status"] != "disabled"
         )
-
         return all_passed, checks
 
     def attempt_auto_approval(self):
