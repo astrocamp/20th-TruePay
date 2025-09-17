@@ -22,8 +22,6 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
-  web:
-    image: truepay:latest
     ports:
       - "5673:5672"     # AMQP port
       - "15673:15672"   # 管理介面 port
@@ -80,11 +78,6 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
     depends_on:
       postgres:
-        - DB_NAME=truepay
-        - DB_USER=truepay
-        - DB_PASSWORD=truepay123
-        - DB_HOST=db
-        - DB_PORT=5432
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
