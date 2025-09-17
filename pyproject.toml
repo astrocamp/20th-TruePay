@@ -25,4 +25,5 @@ dependencies = [
     "django-celery-beat>=2.8.1",
     "celery>=5.3.0",
     "whitenoise>=6.10.0",
+    "rabbitmq>=0.2.0",
 ]

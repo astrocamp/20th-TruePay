@@ -31,6 +31,7 @@ ENV PYTHONUNBUFFERED=1 \
 RUN apt-get update && apt-get install -y \
     libpq5 \
     curl \
+    procps \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get autoremove -y \
     && apt-get autoclean
@@ -52,8 +53,10 @@ COPY --chown=appuser:appuser static/ /app/static/
 # 複製應用程式碼
 COPY --chown=appuser:appuser . .
 
-# 建立 staticfiles 目錄並設定權限
-RUN mkdir -p /app/staticfiles && chown appuser:appuser /app/staticfiles
+# 建立 staticfiles 和 logs 目錄並設定權限
+RUN mkdir -p /app/staticfiles /app/logs && \
+    touch /app/celery.log && \
+    chown -R appuser:appuser /app/staticfiles /app/logs /app/celery.log
 
 # 清理不必要的檔案
 RUN rm -rf \

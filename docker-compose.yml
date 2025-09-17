@@ -3,9 +3,9 @@ services:
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: ${DB_NAME:-truepay}
-      POSTGRES_USER: ${DB_USER:-truepay}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-truepay123}
+      POSTGRES_DB: ${DB_NAME:-truepay_db}
+      POSTGRES_USER: ${DB_USER:-weilunting}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-aaa}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -22,8 +22,6 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
-  web:
-    image: truepay:latest
     ports:
       - "5673:5672"     # AMQP port
       - "15673:15672"   # 管理介面 port
@@ -34,32 +32,27 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    restart: unless-stopped
 
   # Django Web 應用程式
   web:
-    build: .
-    command: sh -c "npm run build && uv run python manage.py migrate && uv run python manage.py collectstatic --noinput && uv run python manage.py runserver 0.0.0.0:8000"
+    image: truepay-web:optimized
+    command: sh -c "uv run python manage.py migrate && uv run python manage.py collectstatic --noinput && uv run python manage.py runserver 0.0.0.0:8000"
     volumes:
-      # 只掛載開發時需要的源碼目錄，避免覆蓋編譯結果
-      - ./src:/app/src
-      - ./truepay:/app/truepay
-      - ./accounts:/app/accounts
-      - ./customers_account:/app/customers_account
-      - ./merchant_account:/app/merchant_account
-      - ./merchant_marketplace:/app/merchant_marketplace
-      - ./payments:/app/payments
-      - ./templates:/app/templates
-      - ./manage.py:/app/manage.py
-      # static 目錄不掛載，讓容器內的編譯結果保留
       - static_volume:/app/staticfiles
       - media_volume:/app/media
     ports:
-      - "8000:8000"
+      - "80:8000"
     env_file:
       - .env
     environment:
       - DJANGO_SETTINGS_MODULE=truepay.settings
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-truepay_db}
+      - DB_USER=${DB_USER:-weilunting}
+      - DB_PASSWORD=${DB_PASSWORD:-aaa}
     depends_on:
       postgres:
         condition: service_healthy
@@ -69,29 +62,22 @@ services:
 
   # Celery Worker
   celery-worker:
-    build: .
+    image: truepay-web:optimized
     command: sh -c "uv run celery -A truepay worker --loglevel=info --logfile=/app/logs/celery-worker.log --queues=celery,payments,high_priority"
     volumes:
-      # 只掛載必要的源碼，不覆蓋編譯結果
-      - ./truepay:/app/truepay
-      - ./accounts:/app/accounts
-      - ./customers_account:/app/customers_account
-      - ./merchant_account:/app/merchant_account
-      - ./merchant_marketplace:/app/merchant_marketplace
-      - ./payments:/app/payments
-      - ./logs:/app/logs
+      - logs_volume:/app/logs
     env_file:
       - .env
     environment:
       - DJANGO_SETTINGS_MODULE=truepay.settings
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-truepay_db}
+      - DB_USER=${DB_USER:-weilunting}
+      - DB_PASSWORD=${DB_PASSWORD:-aaa}
     depends_on:
       postgres:
-        - DB_NAME=truepay
-        - DB_USER=truepay
-        - DB_PASSWORD=truepay123
-        - DB_HOST=db
-        - DB_PORT=5432
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
@@ -106,22 +92,20 @@ services:
 
   # Celery Beat 排程器
   celery-beat:
-    build: .
+    image: truepay-web:optimized
     command: sh -c "uv run celery -A truepay beat --loglevel=info --logfile=/app/logs/celery-beat.log --scheduler=django_celery_beat.schedulers:DatabaseScheduler"
     volumes:
-      # 只掛載必要的源碼，不覆蓋編譯結果
-      - ./truepay:/app/truepay
-      - ./accounts:/app/accounts
-      - ./customers_account:/app/customers_account
-      - ./merchant_account:/app/merchant_account
-      - ./merchant_marketplace:/app/merchant_marketplace
-      - ./payments:/app/payments
-      - ./logs:/app/logs
+      - logs_volume:/app/logs
     env_file:
       - .env
     environment:
       - DJANGO_SETTINGS_MODULE=truepay.settings
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-truepay_db}
+      - DB_USER=${DB_USER:-weilunting}
+      - DB_PASSWORD=${DB_PASSWORD:-aaa}
     depends_on:
       postgres:
         condition: service_healthy
@@ -133,7 +117,7 @@ services:
 
   # Celery Flower (可選，用於監控)
   celery-flower:
-    build: .
+    image: truepay-web:optimized
     command: sh -c "uv run celery -A truepay flower --port=5555 --broker=amqp://guest:guest@rabbitmq:5672//"
     ports:
       - "5555:5555"
@@ -153,6 +137,7 @@ volumes:
   rabbitmq_data:
   static_volume:
   media_volume:
+  logs_volume:
 
 networks:
   default:

@@ -54,7 +54,7 @@ node_modules
 npm-debug.log
 .npm
 
-# 前端開發檔案（保留構建後的 static/）
+# 前端開發檔案（但保留已建置的 static/）
 src/
 .prettierignore
 .editorconfig
@@ -86,9 +86,9 @@ Dockerfile*
 docker-compose.yml
 docker-compose*.yml
 
-# 前端編譯輸出（會在容器內重新編譯）
-static/scripts/
-static/styles/
+# 前端編譯輸出（使用本地已編譯的版本）
+# static/scripts/
+# static/styles/
 
 # 日誌檔案
 logs/
