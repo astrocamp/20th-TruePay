@@ -224,8 +224,7 @@ class SubdomainRedirectMiddleware:
                 elif request.path_info.startswith("/pay/"):
                     request.path_info = "/shop" + request.path_info
 
-                # 直接處理請求，跳過其他中間件的 ALLOWED_HOSTS 檢查
-                return self.get_response(request)
+                return None
 
             except Merchant.DoesNotExist:
                 raise Http404("商店不存在")

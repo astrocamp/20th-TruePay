@@ -339,15 +339,6 @@ def decrypt_newebpay_callback(trade_info, trade_sha=None):
 
             # 再次清理可能的尾部字符
             decrypted_data = decrypted_data.rstrip("\x00").rstrip()
-
-            logger.error(f"[DEBUG] 最終清理後的解密資料長度: {len(decrypted_data)}")
-            logger.error(
-                f"[DEBUG] 最終清理後的解密資料前100字元: {decrypted_data[:100]}"
-            )
-            logger.error(
-                f"[DEBUG] 最終清理後的解密資料後20字元: {decrypted_data[-20:]}"
-            )
-
         result_data = json.loads(decrypted_data)
 
         logger.info("成功解密藍新金流回調資料")
@@ -394,12 +385,12 @@ def aes_decrypt(encrypted_data, key, iv):
     """AES 解密 - 藍新金流專用 Zero Padding 方式"""
     try:
         # 藍新金流使用 Zero Padding，不是 PKCS7
-        key_bytes = key.encode('utf-8')[:32].ljust(32, b'\0')
-        iv_bytes = iv.encode('utf-8')[:16].ljust(16, b'\0')
+        key_bytes = key.encode("utf-8")[:32].ljust(32, b"\0")
+        iv_bytes = iv.encode("utf-8")[:16].ljust(16, b"\0")
 
         cipher = AES.new(key_bytes, AES.MODE_CBC, iv_bytes)
         decrypted_data = cipher.decrypt(bytes.fromhex(encrypted_data))
-        result = decrypted_data.rstrip(b'\0').decode("utf-8")
+        result = decrypted_data.rstrip(b"\0").decode("utf-8")
         logger.error(f"[DEBUG] 藍新金流解密成功：Zero Padding")
         return result
     except Exception as e:
