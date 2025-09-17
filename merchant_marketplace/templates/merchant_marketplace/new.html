@@ -66,12 +66,18 @@
         
         <div x-data="createImagePreview()">
             <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
-                商品圖片
+                商品圖片 <span class="text-red-500">*</span>
             </label>
-            <input type="file" id="image" name="image" accept="image/*"
+            <input type="file" id="image" name="image"
+                   accept=".jpg,.jpeg,.png,.gif,.webp"
+                   data-max-size="5242880"
+                   required
                    @change="handleFileChange($event)"
                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-            <p class="text-sm text-gray-500 mt-1">支援 JPG、PNG、GIF 格式，檔案將自動上傳至 AWS S3</p>
+            <p class="text-sm text-gray-500 mt-1">
+                <span class="text-red-600 font-medium">必填：</span>
+                支援 JPG、PNG、GIF、WebP 格式，檔案大小不超過 5MB，尺寸建議在 100px-4096px 之間
+            </p>
             
             <!-- Alpine.js 圖片預覽 -->
             <div x-show="previewSrc" x-transition class="mt-2">
@@ -130,7 +136,8 @@
             <h3 class="text-sm font-medium text-blue-800 mb-2">注意事項：</h3>
             <ul class="text-sm text-blue-700 space-y-1">
                 <li>• 請確保商品資訊真實準確</li>
-                <li>• 商品圖片會自動上傳至 AWS S3，建議使用高品質照片</li>
+                <li>• <strong>商品圖片為必填項目</strong>，會自動上傳至 AWS S3，建議使用高品質照片</li>
+                <li>• 圖片檔案限制：JPG/PNG/GIF/WebP 格式，最大 5MB，尺寸 100px-4096px</li>
                 <li>• 聯絡電話請確保可以正常接聽</li>
                 <li>• 商品價格請合理定價</li>
             </ul>
