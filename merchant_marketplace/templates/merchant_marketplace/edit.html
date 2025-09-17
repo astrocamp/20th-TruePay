@@ -147,8 +147,9 @@
             </label>
             <input type="datetime-local" id="ticket_expiry" name="ticket_expiry" required value="{{ product.ticket_expiry|date:'Y-m-d\\TH:i' }}"
                    {% if has_tickets %}disabled{% endif %}
+                   {% if not has_tickets %}min="{{ current_datetime }}"{% endif %}
                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent {% if has_tickets %}bg-gray-100 text-gray-500{% endif %}">
-            <p class="text-sm text-gray-500 mt-1">請選擇票券到期日與時間（最小單位：分鐘）。票券將於此時間自動失效。</p>
+            <p class="text-sm text-gray-500 mt-1">請選擇票券到期日與時間（最小單位：分鐘）。票券將於此時間自動失效。{% if not has_tickets %}<strong>請注意：不能設定過去的時間。</strong>{% endif %}</p>
         </div>
         
         <div>
