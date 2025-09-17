@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>400 - 請求錯誤 | TruePay</title>
+    <link href="{% static 'styles/app.css' %}" rel="stylesheet" type="text/css" />
+    <script src="{% static 'scripts/app.js' %}" defer></script>
+</head>
+<body class="bg-brand-white text-brand-black font-sans min-h-screen flex flex-col">
+    <!-- 頁首導航欄 -->
+    <nav class="bg-brand-white border-b border-brand-grayBorder px-4 py-3">
+        <div class="max-w-screen-xl mx-auto flex items-center justify-between">
+            <a href="{% url 'pages:home' %}" class="text-lg font-bold text-brand-black md:text-xl">TruePay</a>
+        </div>
+    </nav>
+
+    <!-- 主要內容區域 -->
+    <main class="flex-1 flex items-center justify-center px-6 py-12">
+        <div class="max-w-md w-full text-center">
+            <!-- 400 圖示或數字 -->
+            <div class="mb-8">
+                <div class="text-8xl font-bold text-orange-500 opacity-20 mb-4">400</div>
+                <div class="w-24 h-24 mx-auto mb-6 bg-orange-50 rounded-full flex items-center justify-center">
+                    <svg class="w-12 h-12 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.98-.833-2.75 0L3.064 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- 錯誤訊息 -->
+            <h1 class="text-3xl font-bold text-brand-black mb-4">請求錯誤</h1>
+            <p class="text-gray-600 mb-8 leading-relaxed">
+                很抱歉，您的請求格式不正確或包含無效資料。<br>
+                請檢查輸入的資訊是否正確，然後重新嘗試。
+            </p>
+
+            <!-- 操作按鈕 -->
+            <div class="space-y-4">
+                <!-- 返回上一頁重新填寫 -->
+                <button onclick="history.back()"
+                        class="inline-block w-full bg-brand-blue text-white font-medium py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    返回重新填寫
+                </button>
+
+                <!-- 返回首頁按鈕 -->
+                <a href="{% url 'pages:home' %}"
+                   class="inline-block w-full bg-brand-grayLight text-brand-black font-medium py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors duration-200">
+                    返回首頁
+                </a>
+
+                <!-- 重新整理頁面 -->
+                <button onclick="window.location.reload()"
+                        class="inline-block w-full bg-gray-100 text-gray-600 font-medium py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors duration-200">
+                    重新整理頁面
+                </button>
+            </div>
+
+            <!-- 常見原因說明 -->
+            <div class="mt-8 pt-6 border-t border-brand-grayBorder">
+                <p class="text-sm text-gray-600 mb-4">可能的原因：</p>
+                <div class="text-sm text-gray-500 space-y-2 text-left bg-gray-50 p-4 rounded-lg">
+                    <p>• 表單資料格式不正確</p>
+                    <p>• 必填欄位遺漏或空白</p>
+                    <p>• 檔案大小超過限制</p>
+                    <p>• 特殊字元使用不當</p>
+                    <p>• 網路連線中斷導致資料不完整</p>
+                </div>
+            </div>
+
+            <!-- 解決建議 -->
+            <div class="mt-6 pt-4 border-t border-brand-grayBorder">
+                <p class="text-sm text-gray-600 mb-3">建議解決方式：</p>
+                <div class="text-sm text-gray-500 space-y-2 text-left bg-blue-50 p-4 rounded-lg">
+                    <p>✓ 檢查所有欄位是否正確填寫</p>
+                    <p>✓ 確認檔案格式和大小符合要求</p>
+                    <p>✓ 清除瀏覽器快取後重新嘗試</p>
+                    <p>✓ 使用不同瀏覽器或裝置測試</p>
+                </div>
+            </div>
+
+            <!-- 客服聯絡 -->
+            <div class="mt-6 pt-4 border-t border-brand-grayBorder">
+                <p class="text-xs text-gray-400 mb-2">如果問題持續發生，請聯繫：</p>
+                <a href="{% url 'pages:contact' %}" class="text-xs text-brand-blue hover:underline">客服中心</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="bg-brand-grayLight text-center text-sm text-gray-500 py-6">
+        &copy; {{ now|date:"Y" }} TruePay. All rights reserved.
+    </footer>
+</body>
+</html>
