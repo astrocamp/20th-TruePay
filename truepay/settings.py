@@ -73,6 +73,8 @@ INSTALLED_APPS = [
     "payments",
     "accounts",
     "django_celery_beat",  # Celery Beat 排程器
+    "rest_framework",  # Django REST framework
+    "embed_system",  # 嵌入商品系統
 ]
 
 MIDDLEWARE = [
