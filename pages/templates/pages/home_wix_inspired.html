@@ -33,7 +33,7 @@
         top: 0;
         left: 0;
         right: 0;
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(256, 256, 256);
         backdrop-filter: blur(10px);
         z-index: 1000;
         padding: 1rem 0;
@@ -305,10 +305,10 @@
             TRUEPAY
         </div>
         <ul class="nav-links">
-            <li><a href="#home" class="active">HOME</a></li>
-            <li><a href="#features">FEATURES</a></li>
-            <li><a href="#about">ABOUT</a></li>
-            <li><a href="#contact">CONTACT</a></li>
+            <li><a href="#home" class="active">首頁</a></li>
+            <li><a href="#features">特色</a></li>
+            <li><a href="#about">商品總覽</a></li>
+            <li><a href="#contact">登入/註冊</a></li>
         </ul>
     </div>
 </nav>
@@ -316,16 +316,17 @@
 <!-- Hero Section -->
 <section class="hero-section" id="home">
     <div class="hero-card">
-        <div class="hero-meta">TRUEPAY PRESENTS</div>
+        <div class="hero-meta">TRUEPAY致力於</div>
         <h1 class="hero-title">
-            專為非實體商品<br>
-            設計的金流平台
+            創造非實體商品<br>
+            流通的金流平台
         </h1>
         <p class="hero-subtitle">
-            讓你的線上課程、會員制服務、活動票券，都能快速完成收款。支援所有非實體商品上架，從銷售到交付一站式完成。
+            讓你的線上課程、會員制服務、活動票券，都能快速完成收款。<br>
+            支援所有非實體商品上架，從銷售到交付一站式完成。
         </p>
         <a href="{% url 'merchant_account:register' %}" class="hero-button">
-            商家註冊
+            開始使用！
         </a>
     </div>
 </section>
@@ -368,15 +369,11 @@
 <section class="stats-section">
     <div class="stats-grid">
         <div class="stat-item">
-            <div class="stat-number">5</div>
+            <div class="stat-number">10</div>
             <div class="stat-label">分鐘快速設定</div>
         </div>
         <div class="stat-item">
-            <div class="stat-number">24</div>
-            <div class="stat-label">小時客戶支援</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-number">100</div>
+            <div class="stat-number">100%</div>
             <div class="stat-label">安全保障</div>
         </div>
         <div class="stat-item">
@@ -392,15 +389,15 @@
     <p class="section-subtitle">TruePay 是專為非實體商品交易打造的完整解決方案</p>
     
     <div style="text-align: center; color: #64748b; font-size: 1.1rem; line-height: 1.8; max-width: 800px; margin: 0 auto;">
-        <p>我們深刻理解非實體商品的特殊需求，從線上課程的內容保護、會員服務的訂閱管理，到活動票券的核銷驗證，每一個環節都需要專業的技術支持。</p>
-        <p>TruePay 提供完整的金流服務，讓商家可以專注於內容創作和服務提供，而不需要擔心技術實作的複雜度。</p>
+        <p>我們深刻理解非實體商品的特殊需求，從線上課程的內容保護、活動票券的核銷驗證以及各項購買的數據，每一個環節都需要專業的技術支持。</p>
+        <p>TruePay 提供完整的服務，讓商家可以專注於商品的內容豐富度，而不需要擔心架設網站以及創建賣場的複雜度。</p>
     </div>
 </section>
 
 <!-- CTA Section -->
 <section class="cta-section" id="contact">
     <h2 class="section-title">準備開始了嗎？</h2>
-    <p class="section-subtitle">加入數千位商家的行列，體驗最簡單的非實體商品收款方式</p>
+    <p class="section-subtitle">加入數千位商家的行列，體驗最簡單的非實體商品平台創建</p>
     
     <div style="margin-top: 2rem;">
         <a href="{% url 'merchant_account:register' %}" class="hero-button">

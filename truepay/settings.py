@@ -35,7 +35,7 @@ TICKET_HMAC_KEY = os.getenv(
 SECRET_KEY = "django-insecure-iip1xgbl_eh&cl1p81i9*nuvl)qlb$#gj1e+f1it-a!xu1qjio"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # 從環境變數讀取 ngrok URL (必須在 .env 中設定)
 NGROK_URL = os.getenv("NGROK_URL")
@@ -90,7 +90,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 子網域必需
+    # "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 子網域必需
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.cache.FetchFromCacheMiddleware",
@@ -292,8 +292,8 @@ SESSION_COOKIE_SAMESITE = "Lax"  # CSRF 保護
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 瀏覽器關閉時清除 Session
 SESSION_COOKIE_AGE = 3600  # Session 1小時後過期
 
-SESSION_COOKIE_DOMAIN = f".{BASE_DOMAIN}"
-CSRF_COOKIE_DOMAIN = f".{BASE_DOMAIN}"
+# SESSION_COOKIE_DOMAIN = f".{BASE_DOMAIN}"
+# CSRF_COOKIE_DOMAIN = f".{BASE_DOMAIN}"
 
 
 # 快取設定（防止敏感頁面被快取）
