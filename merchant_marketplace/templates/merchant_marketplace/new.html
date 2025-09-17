@@ -101,8 +101,9 @@
                 商品票券有效期限 <span class="text-red-500">*</span>
             </label>
             <input type="datetime-local" id="ticket_expiry" name="ticket_expiry" required
+                   min="{{ current_datetime }}"
                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0056B3] focus:border-transparent">
-            <p class="text-sm text-gray-500 mt-1">請選擇票券到期日與時間（最小單位：分鐘）。票券將於此時間自動失效。</p>
+            <p class="text-sm text-gray-500 mt-1">請選擇票券到期日與時間（最小單位：分鐘）。票券將於此時間自動失效。<strong>請注意：不能設定過去的時間。</strong></p>
         </div>
         
         <div>
