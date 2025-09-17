@@ -27,21 +27,19 @@ export default {
     extend: {
       colors: {
         brand: {
-          blue: "#0056B3",      // 主深藍
-          blueHover: "#00408A", // Hover 深藍
-          black: "#000000",     // 主黑
-          white: "#FFFFFF",     // 主白
-          grayDark: "#333333",  // 深灰
+          background: "#FDFBF5", // 米色背景
+          text: "#4A4A4A",       // 深灰文字
+          white: "#FFFFFF",     // 純白
           grayLight: "#F5F5F7", // 淺灰
           grayBorder: "#D2D2D7" // 分隔線灰
         },
         cis: {
-          primary: "#003d82",     // CIS 主色 - 深藍
-          primaryHover: "#002a5c", // CIS 主色 Hover
-          secondary: "#00a651",   // CIS 次要色 - 綠色
-          secondaryHover: "#007d3c", // CIS 次要色 Hover
-          accent: "#ff6b35",      // CIS 強調色 - 橙色
-          accentHover: "#e5572e", // CIS 強調色 Hover
+          primary: "#20C997",      // 主色 - 湖水綠/Tiffany 綠
+          primaryHover: "#1BAA80",  // 主色 Hover
+          secondary: "#F39C12",    // 次要色 - 沿用 Logo 的亮黃色
+          secondaryHover: "#E67E22",// 次要色 Hover
+          accent: "#ff6b35",       // 強調色 - 橙色 (可保留或修改)
+          accentHover: "#e5572e",  // 強調色 Hover
         },
       },
     },

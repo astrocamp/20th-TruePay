@@ -52,6 +52,9 @@ COPY --chown=appuser:appuser static/ /app/static/
 # 複製應用程式碼
 COPY --chown=appuser:appuser . .
 
+# 建立 staticfiles 目錄並設定權限
+RUN mkdir -p /app/staticfiles && chown appuser:appuser /app/staticfiles
+
 # 清理不必要的檔案
 RUN rm -rf \
     src/ \
@@ -68,6 +71,9 @@ RUN rm -rf \
 
 # 切換到非特權用戶
 USER appuser
+
+# 收集靜態檔案（設定臨時環境變數）
+RUN NGROK_URL=dummy /app/.venv/bin/python manage.py collectstatic --noinput
 
 EXPOSE 8000
 

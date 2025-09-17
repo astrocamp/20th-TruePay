@@ -35,7 +35,7 @@ TICKET_HMAC_KEY = os.getenv(
 SECRET_KEY = "django-insecure-iip1xgbl_eh&cl1p81i9*nuvl)qlb$#gj1e+f1it-a!xu1qjio"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # 從環境變數讀取 ngrok URL (必須在 .env 中設定)
 NGROK_URL = os.getenv("NGROK_URL")
@@ -43,14 +43,20 @@ if not NGROK_URL:
     raise ValueError("請在 .env 檔案中設定 NGROK_URL=your-ngrok-id.ngrok-free.app")
 
 
-# 使用 django-dynamic-host 進行動態 Host 驗證
-ALLOWED_HOSTS = ["*"]  # 由 django-dynamic-host 接管驗證
+ALLOWED_HOSTS = [
+    "truepay.tw",
+    "*.truepay.tw",
+    ".truepay.tw",  # 加上這行，支援所有子域名
+    "127.0.0.1",
+    "localhost",
+    "54.95.179.51",  # EC2 IP
+    NGROK_URL,  # ngrok 域名
+]
 BASE_DOMAIN = "truepay.tw"
 
 # Application definition
 
 INSTALLED_APPS = [
-    "dynamic_host",  # 動態 Host 驗證套件
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -74,8 +80,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "dynamic_host.middleware.AllowedHostMiddleWare",  # 動態 Host 驗證 - 必須放最前面
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # 上線後靜態檔案讀取
     "truepay.security_middleware.SecurityHeadersMiddleware",
     "django.middleware.cache.UpdateCacheMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -84,7 +90,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 自訂網域必需
+    "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 子網域必需
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.cache.FetchFromCacheMiddleware",
@@ -164,7 +170,6 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -286,8 +291,6 @@ SESSION_COOKIE_AGE = 3600  # Session 1小時後過期
 SESSION_COOKIE_DOMAIN = f".{BASE_DOMAIN}"
 CSRF_COOKIE_DOMAIN = f".{BASE_DOMAIN}"
 
-CLOUDFLARE_API_TOKEN = os.getenv("CLOUDFLARE_API_TOKEN", "")
-CLOUDFLARE_ZONE_ID = os.getenv("CLOUDFLARE_ZONE_ID", "")
 
 # 快取設定（防止敏感頁面被快取）
 CACHE_MIDDLEWARE_SECONDS = 0  # 不快取頁面

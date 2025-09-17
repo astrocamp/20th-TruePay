@@ -3,10 +3,9 @@ import os
 import logging
 from django.http import HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.conf import settings
-from merchant_account.models import SubdomainRedirect, MerchantOwnDomain
+from merchant_account.models import SubdomainRedirect
 from accounts.models import Member
 from django.http import Http404
-from truepay.cross_domain_auth import CrossDomainAuth
 from django.contrib.auth import login
 
 
@@ -22,11 +21,6 @@ class SubdomainRedirectMiddleware:
         path_redirect_response = self.check_path_redirect(request)
         if path_redirect_response:
             return path_redirect_response
-
-        # 檢查自訂域名（如 ushionagisa.work）
-        own_domain_response = self.check_own_domain(request)
-        if own_domain_response:
-            return own_domain_response
 
         # 檢查子域名（如 shop1.ushionagisa.work）
         subdomain_response = self.check_truepay_subdomain(request)
@@ -134,57 +128,6 @@ class SubdomainRedirectMiddleware:
             new_url += f"?{query_string}"
         return new_url
 
-    def check_own_domain(self, request):
-        # 手動從 HTTP_HOST 獲取主機名，避免 Django 的 ALLOWED_HOSTS 檢查
-        host = request.META.get("HTTP_HOST", "").lower()
-        if ":" in host:
-            host = host.split(":")[0]
-        try:
-            # 只處理已驗證的域名
-            own_domain = MerchantOwnDomain.objects.select_related("merchant").get(
-                domain_name=host, is_verified=True, is_active=True
-            )
-
-            request.merchant = own_domain.merchant
-            request.domain_type = "own_domain"
-
-            # 特殊處理：登入相關頁面重導向到主域名
-            if request.path_info.startswith(
-                "/customers/login/"
-            ) or request.path_info.startswith("/accounts/"):
-                scheme = "https" if request.is_secure() else "http"
-                main_domain = os.getenv("NGROK_URL", settings.BASE_DOMAIN)
-
-                # 如果是登入頁面，提取真正的目標頁面
-                if request.path_info.startswith("/customers/login/"):
-                    next_param = request.GET.get("next", "/")
-                    # 構建完整的目標 URL（自訂域名 + 目標路徑）
-                    final_target = f"{scheme}://{host}{next_param}"
-                else:
-                    # OAuth 等其他認證頁面，登入成功後回到自訂域名首頁
-                    final_target = f"{scheme}://{host}/"
-
-                redirect_url = (
-                    f"{scheme}://{main_domain}/customers/login/?next={final_target}"
-                )
-                return HttpResponseRedirect(redirect_url)
-
-            # 檢查是否訪問了非商店相關的頁面
-            restricted_response = self.check_custom_domain_restrictions(request)
-            if restricted_response:
-                return restricted_response
-
-            if request.path_info == "/":
-                request.path_info = "/shop/"
-            elif request.path_info.startswith("/pay/"):
-                request.path_info = "/shop" + request.path_info
-
-            # 直接處理請求，跳過其他中間件的 ALLOWED_HOSTS 檢查
-            return self.get_response(request)
-
-        except MerchantOwnDomain.DoesNotExist:
-            return None
-
     def get_client_ip(self, request):
         """獲取客戶端真實 IP"""
         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
@@ -212,28 +155,6 @@ class SubdomainRedirectMiddleware:
 
         return ip in internal_ips
 
-    def check_custom_domain_restrictions(self, request):
-        """
-        檢查自訂域名是否訪問了受限制的頁面
-        自訂域名只允許訪問商店相關頁面
-        """
-        path = request.path_info.lower()
-        allowed_patterns = [
-            r"^/$",
-            r"^/shop/",
-            r"^/pay/",
-            r"^/payments/",
-            r"^/static/",
-            r"^/media/",
-            r"^/favicon\.ico$",
-        ]
-        if any(re.match(pattern, path) for pattern in allowed_patterns):
-            return None
-
-        scheme = "https" if request.is_secure() else "http"
-        base_domain = os.getenv("NGROK_URL", settings.BASE_DOMAIN)
-        redirect_url = f"{scheme}://{base_domain}/"
-        return HttpResponseRedirect(redirect_url)
 
     def check_truepay_subdomain(self, request):
         """

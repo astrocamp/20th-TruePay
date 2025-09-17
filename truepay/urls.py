@@ -16,9 +16,16 @@ urlpatterns = [
 # 測試錯誤頁面的路由（僅在DEBUG模式下）
 if settings.DEBUG:
     from .test_error_views import (
-        test_404_view, test_500_view, test_403_view, test_400_view,
-        trigger_404_view, trigger_500_view, trigger_403_view, trigger_400_view
+        test_404_view,
+        test_500_view,
+        test_403_view,
+        test_400_view,
+        trigger_404_view,
+        trigger_500_view,
+        trigger_403_view,
+        trigger_400_view,
     )
+
     urlpatterns += [
         path("test/400/", test_400_view, name="test_400"),
         path("test/403/", test_403_view, name="test_403"),

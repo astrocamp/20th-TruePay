@@ -15,7 +15,7 @@
 
     <title>{% block title %}TruePay 首頁{% endblock %}</title>
   </head>
-   <body class="bg-brand-white text-brand-black font-sans">
+   <body class="bg-brand-background text-brand-text font-sans">
     <!-- 導覽列 -->
 
     <nav class="bg-brand-white border-b border-brand-grayBorder px-4 py-3" 
@@ -32,8 +32,11 @@
           </button>
           <!-- 品牌名稱 (桌機版才顯示 / 手機展開時隱藏) -->
           <a href="{% url 'pages:home' %}" 
-             :class="isOpen ? 'hidden' : 'block'"
-             class="text-lg font-bold text-brand-black md:text-xl md:block">TruePay</a>
+             :class="isOpen ? 'hidden' : 'flex'"
+             class="items-center gap-2">
+              <img src="{% static 'images/truepay-logo.png' %}" alt="TruePay Logo" class="h-8 w-auto">
+              <span class="text-lg font-bold text-brand-text md:text-xl">TruePay</span>
+          </a>
       </div>
         <!-- 桌機版選單 -->
         <ul class= "hidden md:flex items-center gap-6 text-sm font-medium">
