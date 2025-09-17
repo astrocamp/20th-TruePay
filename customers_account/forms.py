@@ -15,10 +15,11 @@ class CustomerRegistrationForm(forms.ModelForm):
         widget=forms.PasswordInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "請輸入密碼",
+                "placeholder": "請輸入密碼（至少8個字元）",
             }
         ),
-        label="密碼",
+        label="密碼 *",
+        help_text="密碼長度至少需要8個字元",
     )
 
     password_confirm = forms.CharField(
@@ -29,7 +30,7 @@ class CustomerRegistrationForm(forms.ModelForm):
                 "placeholder": "確認密碼",
             }
         ),
-        label="確認密碼",
+        label="確認密碼 *",
     )
     email = forms.EmailField(
         max_length=254,
@@ -37,9 +38,10 @@ class CustomerRegistrationForm(forms.ModelForm):
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
                 "placeholder": "請輸入電子郵件",
+                "required": True,
             }
         ),
-        label="電子郵件",
+        label="電子郵件 *",
     )
 
     class Meta:
@@ -50,29 +52,31 @@ class CustomerRegistrationForm(forms.ModelForm):
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
                     "placeholder": "請輸入姓名",
+                    "required": True,
                 }
             ),
             "id_number": forms.TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入身分證字號",
+                    "placeholder": "請輸入身分證字號（格式：A123456789）",
                 }
             ),
             "birth_date": forms.DateInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
                     "type": "date",
+                    "max": timezone.now().date().isoformat(),  # 防止選擇未來日期
                 }
             ),
             "phone": forms.TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入電話號碼",
+                    "placeholder": "請輸入電話號碼（格式：09xxxxxxxx）",
                 }
             ),
         }
         labels = {
-            "name": "姓名",
+            "name": "姓名 *",
             "id_number": "身分證字號",
             "birth_date": "生日",
             "phone": "電話",
@@ -94,13 +98,21 @@ class CustomerRegistrationForm(forms.ModelForm):
 
     def clean_id_number(self):
         id_number = self.cleaned_data.get("id_number")
-        if not re.match(r"^[A-Z][12][0-9]{8}$", id_number):
+        if id_number and not re.match(r"^[A-Z][12][0-9]{8}$", id_number):
             raise ValidationError("身分證字號格式不正確")
         return id_number
 
+    def clean_birth_date(self):
+        birth_date = self.cleaned_data.get("birth_date")
+        if birth_date:
+            today = timezone.now().date()
+            if birth_date > today:
+                raise ValidationError("生日不能是未來的日期")
+        return birth_date
+
     def clean_phone(self):
         phone = self.cleaned_data.get("phone")
-        if not re.match(r"^09[0-9]{8}$", phone):
+        if phone and not re.match(r"^09[0-9]{8}$", phone):
             raise ValidationError("手機號碼格式不正確（格式：09xxxxxxxx）")
         return phone
 

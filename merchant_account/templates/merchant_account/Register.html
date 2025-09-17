@@ -22,7 +22,7 @@
         for="{{ form.ShopName.id_for_label }}"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
-        {{ form.ShopName.label }}
+        商店名稱 <span class="text-red-500">*</span>
       </label>
       {{ form.ShopName }}
       {% if form.ShopName.errors %}
@@ -37,7 +37,7 @@
         for="{{ form.UnifiedNumber.id_for_label }}"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
-        {{ form.UnifiedNumber.label }}
+        統一編號 <span class="text-red-500">*</span>
       </label>
       {{ form.UnifiedNumber }}
       {% if form.UnifiedNumber.errors %}
@@ -52,7 +52,7 @@
         for="{{ form.NationalNumber.id_for_label }}"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
-        {{ form.NationalNumber.label }}
+        身分證號 <span class="text-red-500">*</span>
       </label>
       {{ form.NationalNumber }}
       {% if form.NationalNumber.errors %}
@@ -67,7 +67,7 @@
         for="{{ form.email.id_for_label }}"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
-        {{ form.email.label }}
+        電子郵件 <span class="text-red-500">*</span>
       </label>
       {{ form.email }}
       {% if form.email.errors %}
@@ -82,7 +82,7 @@
         for="{{ form.Name.id_for_label }}"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
-        {{ form.Name.label }}
+        負責人姓名 <span class="text-red-500">*</span>
       </label>
       {{ form.Name }}
       {% if form.Name.errors %}
@@ -97,7 +97,7 @@
         for="{{ form.Address.id_for_label }}"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
-        {{ form.Address.label }}
+        地址 <span class="text-red-500">*</span>
       </label>
       {{ form.Address }}
       {% if form.Address.errors %}
@@ -112,7 +112,7 @@
         for="{{ form.Cellphone.id_for_label }}"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
-        {{ form.Cellphone.label }}
+        手機號碼 <span class="text-red-500">*</span>
       </label>
       {{ form.Cellphone }}
       {% if form.Cellphone.errors %}
@@ -127,7 +127,7 @@
         for="{{ form.password.id_for_label }}"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
-        {{ form.password.label }}
+        密碼 <span class="text-red-500">*</span>
       </label>
       {{ form.password }}
       {% if form.password.errors %}
