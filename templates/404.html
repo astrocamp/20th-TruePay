@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404 - 頁面不存在 | TruePay</title>
+    <link href="{% static 'styles/app.css' %}" rel="stylesheet" type="text/css" />
+    <script src="{% static 'scripts/app.js' %}" defer></script>
+</head>
+<body class="bg-brand-white text-brand-black font-sans min-h-screen flex flex-col">
+    <!-- 頁首導航欄 -->
+    <nav class="bg-brand-white border-b border-brand-grayBorder px-4 py-3">
+        <div class="max-w-screen-xl mx-auto flex items-center justify-between">
+            <a href="{% url 'pages:home' %}" class="text-lg font-bold text-brand-black md:text-xl">TruePay</a>
+        </div>
+    </nav>
+
+    <!-- 主要內容區域 -->
+    <main class="flex-1 flex items-center justify-center px-6 py-12">
+        <div class="max-w-md w-full text-center">
+            <!-- 404 圖示或數字 -->
+            <div class="mb-8">
+                <div class="text-8xl font-bold text-brand-blue opacity-20 mb-4">404</div>
+                <div class="w-24 h-24 mx-auto mb-6 bg-brand-grayLight rounded-full flex items-center justify-center">
+                    {% include 'components/icons.html' with icon='error-404' class='w-12 h-12 text-gray-400' %}
+                </div>
+            </div>
+
+            <!-- 錯誤訊息 -->
+            <h1 class="text-3xl font-bold text-brand-black mb-4">頁面不存在</h1>
+            <p class="text-gray-600 mb-8 leading-relaxed">
+                抱歉，您要尋找的頁面不存在或已被移除。<br>
+                請檢查網址是否正確，或返回首頁繼續瀏覽。
+            </p>
+
+            <!-- 操作按鈕 -->
+            <div class="space-y-4">
+                <!-- 返回首頁按鈕 -->
+                <a href="{% url 'pages:home' %}"
+                   class="inline-block w-full bg-brand-blue text-white font-medium py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    返回首頁
+                </a>
+
+                <!-- 返回上一頁按鈕 -->
+                <button onclick="history.back()"
+                        class="inline-block w-full bg-brand-grayLight text-brand-black font-medium py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors duration-200">
+                    返回上一頁
+                </button>
+            </div>
+
+            <!-- 快速連結 -->
+            <div class="mt-8 pt-6 border-t border-brand-grayBorder">
+                <p class="text-sm text-gray-500 mb-4">您也可以前往：</p>
+                <div class="flex flex-wrap justify-center gap-4 text-sm">
+                    <a href="{% url 'pages:marketplace' %}" class="text-brand-blue hover:underline">商品總覽</a>
+                    <a href="{% url 'pages:about' %}" class="text-brand-blue hover:underline">關於我們</a>
+                    <a href="{% url 'pages:contact' %}" class="text-brand-blue hover:underline">聯絡我們</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="bg-brand-grayLight text-center text-sm text-gray-500 py-6">
+        &copy; {{ now|date:"Y" }} TruePay. All rights reserved.
+    </footer>
+</body>
+</html>

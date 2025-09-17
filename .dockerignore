@@ -9,8 +9,17 @@ __pycache__
 *.pyo
 *.pyd
 .Python
+env
 pip-log.txt
 pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.pytest_cache/
 
 # Django 相關
 *.log
@@ -19,29 +28,54 @@ db.sqlite3
 db.sqlite3-journal
 media/
 
+# Node.js (如果有前端工具)
+node_modules
+node_modules/
+npm-debug.log
+npm-debug.log*
+
 # 開發工具
 .vscode
+.vscode/
 .idea
+.idea/
 *.swp
 *.swo
+*~
 
 # 環境變數
 .env
 .env.local
 .env.production
-
-# Node.js (如果有前端工具)
-node_modules
-npm-debug.log
+.env.*.local
 
 # 作業系統
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
 # Docker 相關
 Dockerfile
 .dockerignore
 docker-compose.yml
+docker-compose*.yml
+
+# 前端編譯輸出（會在容器內重新編譯）
+static/scripts/
+static/styles/
+
+# 日誌檔案
+logs/
+*.log
+celery.log
+
+# 臨時檔案
+tmp/
+temp/
 
 # 其他
 README.md

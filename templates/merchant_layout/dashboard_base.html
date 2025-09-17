@@ -53,6 +53,12 @@
                 交易紀錄
               </a>
             </li>
+            <li>
+              <a href="{% url 'merchant_account:sold_tickets' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
+                {% include 'components/icons.html' with icon='ticket' %}
+                售出票券 Sold Tickets
+              </a>
+            </li>
             
             <li>
               <a href="{% url 'merchant_account:subdomain_management' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)" @click="$root.close()">

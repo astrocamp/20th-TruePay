@@ -50,8 +50,13 @@ build/
 
 ngrok.exe
 
+static/
 
+# Claude files
+CLAUDE.local.md
+COMPONENT_SYSTEM.md
 
+# Config files
 config.yml
 docker-compose.prod.yml
 truepay-key-new.pem

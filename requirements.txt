@@ -1,0 +1,25 @@
+# TruePay Dependencies (為 Docker 環境準備)
+# 這個檔案是從 pyproject.toml 自動生成的
+
+boto3>=1.40.13
+cryptography>=45.0.6
+django==5.2.5
+django-allauth>=65.11.1
+django-debug-toolbar>=6.0.0
+django-storages>=1.14.6
+pillow>=11.3.0
+psycopg2-binary>=2.9.0
+pycryptodome>=3.23.0
+pyjwt>=2.10.1
+python-dotenv>=1.0.0
+pyotp>=2.9.0
+qrcode[pil]>=7.4.2
+requests>=2.32.5
+resend>=2.13.0
+django-celery-beat>=2.8.1
+
+# Celery 核心套件
+celery>=5.3.0
+
+# Flower (Celery 監控工具)
+flower>=2.0.0

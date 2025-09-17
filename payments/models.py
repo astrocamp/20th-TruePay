@@ -184,6 +184,7 @@ class OrderItem(models.Model):
 
     # === 票券有效性 ===
     valid_until = models.DateTimeField("有效期限", null=True, blank=True)
+    expiry_notification_sent = models.DateTimeField("到期通知發送時間", null=True, blank=True)
 
     # === 外鍵關聯 ===
     order = models.ForeignKey(
@@ -241,6 +242,203 @@ class OrderItem(models.Model):
         self.save(update_fields=["status", "used_at"])
 
         return True, "票券使用成功"
+
+    def should_send_expiry_notification(self, minutes_before=5):
+        """
+        檢查是否應該發送到期通知
+        
+        Args:
+            minutes_before (int): 到期前幾分鐘發送通知
+            
+        Returns:
+            bool: 是否應該發送通知
+        """
+        # 檢查基本條件
+        if not self.valid_until:
+            return False
+            
+        if self.status not in ["unused", "expired"]:
+            return False
+            
+        if not self.order.is_paid():
+            return False
+            
+        if not self.customer or not self.customer.member or not self.customer.member.email:
+            return False
+            
+        # 檢查是否已經發送過通知
+        if self.expiry_notification_sent:
+            return False
+            
+        # 檢查是否在通知時間範圍內
+        now = timezone.now()
+        notification_time = self.valid_until - timezone.timedelta(minutes=minutes_before)
+        
+        # 定義通知時間窗口：到期前6分鐘到過期後30分鐘
+        window_start = notification_time - timezone.timedelta(minutes=1)  # 到期前6分鐘開始
+        window_end = self.valid_until + timezone.timedelta(minutes=30)    # 過期後30分鐘內
+        
+        # 只在合理的時間窗口內發送通知
+        if window_start <= now <= window_end:
+            return True
+            
+        return False
+    
+    def send_expiry_notification(self):
+        """
+        發送到期通知郵件
+        
+        Returns:
+            bool: 發送是否成功
+        """
+        from django.core.mail import send_mail
+        from django.conf import settings
+        from django.urls import reverse
+        
+        if not self.should_send_expiry_notification():
+            return False
+            
+        try:
+            customer_email = self.customer.member.email
+            customer_name = self.customer.name or "親愛的用戶"
+            
+            # 根據票券是否已過期調整標題和內容
+            now = timezone.now()
+            if now > self.valid_until:
+                subject = "⏰ TruePay 通知 - 您的票券已過期"
+                timing_message = "您的票券已過期"
+                urgency_level = "提醒"
+            else:
+                subject = "🚨 TruePay 緊急提醒 - 您的票券即將到期！"
+                timing_message = "您的票券即將到期"
+                urgency_level = "緊急提醒"
+            
+            # 生成消費者登入和票券錢包連結
+            base_url = f"https://{settings.NGROK_URL}" if hasattr(settings, 'NGROK_URL') else "https://truepay.tw"
+            login_url = f"{base_url}/customers/login/"
+            wallet_url = f"{base_url}/customers/ticket-wallet/"
+
+            # 純文字版本
+            text_message = f"""{customer_name}，您好！
+
+{urgency_level}：{timing_message}！
+
+=== 票券資訊 ===
+🏪 商家名稱：{self.product.merchant.ShopName}
+🛍️ 商品名稱：{self.product.name}
+💰 票券價值：NT$ {self.order.unit_price}
+⏰ 到期時間：{timezone.localtime(self.valid_until).strftime("%Y年%m月%d日 %H:%M")}
+
+=== 查看票券詳情 ===
+請登入您的 TruePay 帳戶查看完整票券資訊：
+📱 票券錢包：{wallet_url}
+
+如果您尚未登入，請先登入：
+🔐 登入連結：{login_url}
+
+=== 商家聯絡資訊 ===
+🏪 {self.product.merchant.ShopName}
+📞 如需協助請直接聯繫商家
+
+=== 重要提醒 ===
+• 請在票券錢包中查看完整的票券資訊和 QR Code
+• 前往商家時請出示票券 QR Code 進行核銷
+• 如有疑問請直接聯繫商家或 TruePay 客服
+
+感謝您使用 TruePay！
+TruePay 客服團隊
+            """
+
+            # HTML 版本
+            html_message = f"""
+<div style='font-family: Arial, sans-serif; font-size: 16px; color: #222;'>
+<p>{customer_name}，您好！</p>
+<p><b>{urgency_level}：</b>{timing_message}！</p>
+<hr style='margin: 18px 0;'>
+<b>📋 票券資訊</b><br>
+🏪 商家名稱：{self.product.merchant.ShopName}<br>
+🛍️ 商品名稱：{self.product.name}<br>
+💰 票券價值：NT$ {self.order.unit_price}<br>
+⏰ 到期時間：{timezone.localtime(self.valid_until).strftime("%Y年%m月%d日 %H:%M")}<br>
+<hr style='margin: 18px 0;'>
+<b>🔗 查看票券詳情</b><br>
+請登入您的 TruePay 帳戶查看完整票券資訊：<br>
+📱 票券錢包：<a href='{wallet_url}' style='color: #0056B3;' target='_blank'>{wallet_url}</a><br>
+如果您尚未登入，請先登入：<br>
+🔐 登入連結：<a href='{login_url}' style='color: #0056B3;' target='_blank'>{login_url}</a><br>
+<hr style='margin: 18px 0;'>
+<b>📞 商家聯絡資訊</b><br>
+🏪 {self.product.merchant.ShopName}<br>
+📞 如需協助請直接聯繫商家<br>
+<hr style='margin: 18px 0;'>
+⚠️ <b>重要提醒：</b><br>
+• 請在票券錢包中查看完整的票券資訊和 QR Code<br>
+• 前往商家時請出示票券 QR Code 進行核銷<br>
+• 如有疑問請直接聯繫商家或 TruePay 客服<br>
+<br>
+感謝您使用 TruePay！<br>
+TruePay 客服團隊
+</div>
+            """
+            send_mail(
+                subject=subject,
+                message=text_message,  # 純文字版本
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[customer_email],
+                fail_silently=False,
+                html_message=html_message,  # HTML 版本
+            )
+            
+            # 記錄通知發送時間
+            self.expiry_notification_sent = timezone.now()
+            self.save(update_fields=['expiry_notification_sent'])
+            
+            return True
+            
+        except Exception as e:
+            # 這裡可以記錄錯誤日誌
+            return False
+
+    @classmethod
+    def send_all_expiry_notifications(cls):
+        """
+        發送所有即將到期或已過期但尚未通知的票券通知
+        Returns:
+            dict: 執行結果統計
+        """
+        tickets_to_notify = cls.objects.filter(
+            status__in=['unused', 'expired'],
+            order__status='paid',
+            valid_until__isnull=False,
+            expiry_notification_sent__isnull=True,
+            customer__isnull=False,
+            customer__member__email__isnull=False,
+        ).select_related(
+            'customer',
+            'customer__member',
+            'product',
+            'product__merchant',
+            'order'
+        )
+
+        notifications_sent = 0
+        errors_count = 0
+        total_checked = 0
+        now = timezone.now()
+        for ticket in tickets_to_notify:
+            total_checked += 1
+            # 讓 send_expiry_notification 內部統一處理時間窗口判斷
+            if ticket.send_expiry_notification():
+                notifications_sent += 1
+            else:
+                errors_count += 1
+        result = {
+            'total_checked': total_checked,
+            'notifications_sent': notifications_sent,
+            'errors_count': errors_count,
+            'success_rate': (notifications_sent / total_checked * 100) if total_checked > 0 else 0
+        }
+        return result
 
     @property
     def ticket_info(self):
