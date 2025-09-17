@@ -21,6 +21,7 @@ dependencies = [
     "qrcode[pil]>=7.4.2",
     "requests>=2.32.5",
     "resend>=2.13.0",
+    "openpyxl>=3.1.5",
     "django-celery-beat>=2.8.1",
     "celery>=5.3.0",
 ]

@@ -23,6 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # 票券設定
 TICKET_VALIDITY_DAYS = 180  # 票券有效期（天數）
+TICKET_HMAC_KEY = os.getenv("TICKET_HMAC_KEY", "default-hmac-key-change-in-production")  # HMAC 簽名密鑰
 
 
 # Quick-start development settings - unsuitable for production
@@ -75,6 +76,7 @@ INSTALLED_APPS = [
     "django_celery_beat",  # Celery Beat 排程器
     "rest_framework",  # Django REST framework
     "embed_system",  # 嵌入商品系統
+    "django_celery_beat",  # Celery Beat 排程器
 ]
 
 MIDDLEWARE = [
