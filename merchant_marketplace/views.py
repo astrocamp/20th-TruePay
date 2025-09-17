@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.conf import settings
 import os
 from .models import Product
+from .forms import ProductForm, ProductEditForm
 from merchant_account.models import Merchant
 from truepay.decorators import no_cache_required, merchant_verified_required
 from payments.models import OrderItem
@@ -60,42 +61,42 @@ def detail(request, subdomain, id):
 @merchant_verified_required
 def new(request, subdomain):
     if request.method == "GET":
-        context = {"merchant_phone": request.merchant.Cellphone}
+        form = ProductForm()
+        context = {
+            "form": form,
+            "merchant_phone": request.merchant.Cellphone
+        }
         return render(request, "merchant_marketplace/new.html", context)
 
     elif request.method == "POST":
-        try:
-            stock = int(request.POST.get("stock", 1))
-            if stock < 1:
-                raise ValueError("庫存數量必須至少為 1 件")
-                
-            # 處理票券期限
-            
-            ticket_expiry = None
-            if request.POST.get("ticket_expiry"):
-                ticket_expiry = parse_datetime(request.POST.get("ticket_expiry"))
-            
-            product = Product.objects.create(
-                name=request.POST.get("name"),
-                description=request.POST.get("description"),
-                price=request.POST.get("price"),
-                stock=stock,
-                image=request.FILES.get("image"),
-                phone_number=request.POST.get("phone_number"),
-                verification_timing=request.POST.get("verification_timing", "before_redeem"),
-                ticket_expiry=ticket_expiry,
-                merchant=request.merchant,
-                is_active=False,  # 預設為下架
-            )
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                stock = form.cleaned_data.get("stock", 1)
+                if stock < 1:
+                    raise ValueError("庫存數量必須至少為 1 件")
 
-            messages.success(request, "商品新增成功！")
-            return redirect("merchant_marketplace:index", request.merchant.subdomain)
+                product = form.save(commit=False)
+                product.merchant = request.merchant
+                product.is_active = False  # 預設為下架
+                product.save()
 
-        except Exception as e:
-            messages.error(request, f"新增失敗：{str(e)}")
-            context = {"merchant_phone": request.merchant.Cellphone}
-            return render(request, "merchant_marketplace/new.html", context)
-    return render(request, "merchant_marketplace/new.html")
+                messages.success(request, "商品新增成功！")
+                return redirect("merchant_marketplace:index", request.merchant.subdomain)
+
+            except Exception as e:
+                messages.error(request, f"新增失敗：{str(e)}")
+        else:
+            # 顯示表單驗證錯誤
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{form.fields[field].label if field in form.fields else field}：{error}")
+
+        context = {
+            "form": form,
+            "merchant_phone": request.merchant.Cellphone
+        }
+        return render(request, "merchant_marketplace/new.html", context)
 
 
 @no_cache_required
@@ -110,47 +111,50 @@ def edit(request, subdomain, id):
     has_tickets = OrderItem.objects.filter(product=product).exists()
 
     if request.method == "GET":
+        form = ProductEditForm(instance=product)
         context = {
-            "product": product, 
+            "form": form,
+            "product": product,
             "merchant_phone": product.merchant.Cellphone,
             "has_tickets": has_tickets
         }
         return render(request, "merchant_marketplace/edit.html", context)
 
     elif request.method == "POST":
-        try:
-            # 如果已有票券，完全禁止修改
-            if has_tickets:
-                raise ValueError("此商品已有售出票券，為確保票券真實性和消費者權益，所有商品資訊已鎖定無法修改")
-            product.name = request.POST.get("name", product.name)
-            product.description = request.POST.get("description", product.description)
-            product.price = request.POST.get("price", product.price)
-            # 更新庫存，允許設為 0（賣完狀態）
-            stock = int(request.POST.get("stock", product.stock))
-            if stock < 0:
-                raise ValueError("庫存數量不能為負數")
-            product.stock = stock
-            # 只有在有新圖片時才更新
-            if request.FILES.get("image"):
-                product.image = request.FILES.get("image")
-            product.phone_number = request.POST.get(
-                "phone_number", product.phone_number
-            )
-            # 更新驗證方式
-            product.verification_timing = request.POST.get("verification_timing") or product.verification_timing
-            
-            # 更新票券期限
-            if request.POST.get("ticket_expiry"):
-                product.ticket_expiry = parse_datetime(request.POST.get("ticket_expiry"))
-            
-            product.save()
-            messages.success(request, "商品更新成功！")
-            return redirect("merchant_marketplace:index", request.merchant.subdomain)
-        except Exception as e:
-            messages.error(request, f"更新失敗：{str(e)}")
+        # 如果已有票券，完全禁止修改
+        if has_tickets:
+            messages.error(request, "此商品已有售出票券，為確保票券真實性和消費者權益，所有商品資訊已鎖定無法修改")
             context = {
-                "product": product, 
+                "form": ProductEditForm(instance=product),
+                "product": product,
                 "merchant_phone": product.merchant.Cellphone,
                 "has_tickets": has_tickets
             }
             return render(request, "merchant_marketplace/edit.html", context)
+
+        form = ProductEditForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            try:
+                stock = form.cleaned_data.get("stock", product.stock)
+                if stock < 0:
+                    raise ValueError("庫存數量不能為負數")
+
+                product = form.save()
+                messages.success(request, "商品更新成功！")
+                return redirect("merchant_marketplace:index", request.merchant.subdomain)
+
+            except Exception as e:
+                messages.error(request, f"更新失敗：{str(e)}")
+        else:
+            # 顯示表單驗證錯誤
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{form.fields[field].label if field in form.fields else field}：{error}")
+
+        context = {
+            "form": form,
+            "product": product,
+            "merchant_phone": product.merchant.Cellphone,
+            "has_tickets": has_tickets
+        }
+        return render(request, "merchant_marketplace/edit.html", context)
