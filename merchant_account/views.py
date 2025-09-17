@@ -13,10 +13,9 @@ from django.http import HttpResponse, JsonResponse
 from datetime import datetime, timedelta
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
-from openpyxl.chart import BarChart, PieChart, Reference
 
 
-from truepay.decorators import no_cache_required
+from truepay.decorators import no_cache_required, merchant_verified_required
 from .forms import (
     RegisterForm,
     LoginForm,
@@ -59,6 +58,15 @@ def register(req):
 
 
 def login(req):
+    # 檢查用戶是否已經登入
+    if req.user.is_authenticated and hasattr(req.user, 'member_type') and req.user.member_type == 'merchant':
+        try:
+            merchant = Merchant.objects.get(member=req.user)
+            messages.info(req, "您已經登入了")
+            return redirect("merchant_account:dashboard", merchant.subdomain)
+        except Merchant.DoesNotExist:
+            pass
+
     if req.method == "POST":
         form = LoginForm(req.POST)
 
@@ -70,7 +78,18 @@ def login(req):
                 req, member, backend="django.contrib.auth.backends.ModelBackend"
             )
 
-            messages.success(req, "歡迎進入！！！")
+            # 檢查商家審核狀態
+            if merchant.verification_status == "pending":
+                messages.warning(req, "您的商家資料正在審核中，部分功能可能受限。審核通過後將開放完整功能。")
+            elif merchant.verification_status == "rejected":
+                messages.error(req, f"您的商家資料審核未通過。原因：{merchant.rejection_reason or '請聯絡客服了解詳情'}")
+            elif merchant.verification_status == "suspended":
+                messages.error(req, f"您的商家帳號已被暫停。原因：{merchant.rejection_reason or '請聯絡客服了解詳情'}")
+            elif merchant.verification_status == "approved":
+                messages.success(req, f"歡迎進入，{merchant.ShopName}！")
+            else:
+                messages.success(req, "歡迎進入！")
+
             return redirect("merchant_account:dashboard", merchant.subdomain)
         else:
             for error in form.non_field_errors():
@@ -82,6 +101,16 @@ def login(req):
 
 
 def logout(req):
+    # 檢查用戶是否已經登入
+    if not req.user.is_authenticated:
+        messages.warning(req, "您尚未登入")
+        return redirect("merchant_account:login")
+
+    # 檢查是否為商家用戶
+    if not hasattr(req.user, 'member_type') or req.user.member_type != 'merchant':
+        messages.error(req, "權限不足")
+        return redirect("merchant_account:login")
+
     django_logout(req)
     # 清除所有 session 資料
     req.session.flush()  # 完全清除 session 並重新生成 session key
@@ -433,8 +462,19 @@ def profile_settings(request, subdomain):
                 request.POST, instance=merchant, user=request.user
             )
             if form.is_valid():
+                old_status = merchant.verification_status
                 form.save()
-                messages.success(request, "商家資料已成功更新")
+
+                # 如果審核狀態改變了，顯示相應訊息
+                merchant.refresh_from_db()  # 重新載入以獲取最新狀態
+                if old_status != merchant.verification_status:
+                    if merchant.verification_status == 'approved':
+                        messages.success(request, "🎉 恭喜！您的商家資料已通過自動審核")
+                    elif merchant.verification_status == 'rejected':
+                        messages.warning(request, "商家資料已更新，但仍需完善部分資訊才能通過審核")
+                else:
+                    messages.success(request, "商家資料已成功更新")
+
                 return redirect("merchant_account:profile_settings", subdomain)
             else:
                 for field, errors in form.errors.items():
@@ -465,10 +505,14 @@ def profile_settings(request, subdomain):
     profile_form = MerchantProfileUpdateForm(instance=merchant, user=request.user)
     password_form = PasswordChangeForm(request.user)
 
+    # 取得詳細的審核狀態資訊
+    verification_info = merchant.get_verification_issues()
+
     context = {
         "merchant": merchant,
         "profile_form": profile_form,
         "password_form": password_form,
+        "verification_info": verification_info,
     }
 
     return render(request, "merchant_account/profile_settings.html", context)
@@ -679,7 +723,9 @@ def own_domain_detail(request, subdomain, pk):
 
 # ===== 報表分析功能 =====
 
+
 @no_cache_required
+@merchant_verified_required
 def reports_dashboard(request, subdomain):
     """報表分析總覽頁面"""
     merchant = request.merchant
