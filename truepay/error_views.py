@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponseNotFound, HttpResponseServerError, HttpResponseForbidden, HttpResponseBadRequest
+from django.utils import timezone
 
 
 def custom_404_view(request, exception=None):
@@ -8,9 +8,9 @@ def custom_404_view(request, exception=None):
     """
     context = {
         'request_path': request.path,
-        'now': request.timestamp if hasattr(request, 'timestamp') else None,
+        'now': timezone.now(),
     }
-    return HttpResponseNotFound(render(request, '404.html', context).content)
+    return render(request, '404.html', context, status=404)
 
 
 def custom_500_view(request):
@@ -20,9 +20,9 @@ def custom_500_view(request):
     context = {
         'request_path': request.path,
         'debug': getattr(request, 'debug', False),
-        'now': request.timestamp if hasattr(request, 'timestamp') else None,
+        'now': timezone.now(),
     }
-    return HttpResponseServerError(render(request, '500.html', context).content)
+    return render(request, '500.html', context, status=500)
 
 
 def custom_403_view(request, exception=None):
@@ -32,9 +32,9 @@ def custom_403_view(request, exception=None):
     context = {
         'request_path': request.path,
         'user': request.user,
-        'now': request.timestamp if hasattr(request, 'timestamp') else None,
+        'now': timezone.now(),
     }
-    return HttpResponseForbidden(render(request, '403.html', context).content)
+    return render(request, '403.html', context, status=403)
 
 
 def custom_400_view(request, exception=None):
@@ -43,6 +43,6 @@ def custom_400_view(request, exception=None):
     """
     context = {
         'request_path': request.path,
-        'now': request.timestamp if hasattr(request, 'timestamp') else None,
+        'now': timezone.now(),
     }
-    return HttpResponseBadRequest(render(request, '400.html', context).content)
+    return render(request, '400.html', context, status=400)
