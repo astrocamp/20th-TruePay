@@ -16,11 +16,11 @@ class Product(models.Model):
     stock = models.PositiveIntegerField(default=1, verbose_name="庫存數量")
     image = models.ImageField(
         upload_to='products/',
-        blank=False,
-        null=False,
+        blank=True,
+        null=True,
         validators=[validate_image_file],
         verbose_name="商品圖片",
-        help_text="支援 JPG、PNG、GIF、WebP 格式，檔案大小不超過 5MB，尺寸建議在 100px-4096px 之間"
+        help_text="支援 JPG、PNG、GIF、WebP 格式，檔案大小不超過 5MB"
     )
     phone_number = models.CharField(max_length=20, verbose_name="電話號碼")
     merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE, verbose_name="商家")
