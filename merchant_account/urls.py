@@ -43,6 +43,13 @@ urlpatterns = [
         views.profile_settings,
         name="profile_settings",
     ),
+    # 票券管理相關路由
+    path(
+        "sold_tickets/<slug:subdomain>/",
+        views.sold_tickets_list,
+        name="sold_tickets",
+    ),
+    # 自有域名管理相關路由
     path(
         "own-domains/<slug:subdomain>/",
         views.own_domain_list,

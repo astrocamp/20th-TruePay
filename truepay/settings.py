@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     "storages",
     "payments",
     "accounts",
+    "django_celery_beat",  # Celery Beat 排程器
 ]
 
 MIDDLEWARE = [
@@ -160,6 +161,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
@@ -186,6 +188,8 @@ AWS_S3_OBJECT_PARAMETERS = {
 }
 
 # Media files (uploads)
+
+# Media files (uploads)
 STORAGES = {
     "default": {
         "BACKEND": "merchant_marketplace.storage_backends.MediaStorage",
@@ -194,17 +198,34 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
-DEFAULT_FILE_STORAGE = "merchant_marketplace.storage_backends.MediaStorage"
 MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.resend.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
-EMAIL_HOST_USER = "resend"
-EMAIL_HOST_PASSWORD = os.getenv("RESEND_API_KEY")
-DEFAULT_FROM_EMAIL = "TruePay <noreply@truepay.tw>"
+
+# 郵件服務提供商切換 (環境變數: EMAIL_PROVIDER)
+# 支援值: 'resend' 或 'mailtrap'
+EMAIL_PROVIDER = os.getenv("EMAIL_PROVIDER", "mailtrap").lower()
+
+if EMAIL_PROVIDER == "resend":
+    # Resend 郵件服務設定 (正式環境)
+    EMAIL_HOST = "smtp.resend.com"
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_USE_SSL = False
+    EMAIL_HOST_USER = "resend"
+    EMAIL_HOST_PASSWORD = os.getenv("RESEND_API_KEY")
+    DEFAULT_FROM_EMAIL = "TruePay <noreply@truepay.tw>"
+elif EMAIL_PROVIDER == "mailtrap":
+    # Mailtrap 郵件測試服務設定 (測試環境)
+    EMAIL_HOST = "smtp.mailtrap.io"
+    EMAIL_PORT = 2525
+    EMAIL_USE_TLS = True
+    EMAIL_USE_SSL = False
+    EMAIL_HOST_USER = os.getenv("MAILTRAP_USERNAME")
+    EMAIL_HOST_PASSWORD = os.getenv("MAILTRAP_PASSWORD")
+    DEFAULT_FROM_EMAIL = "TruePay <noreply@truepay.tw>"
+else:
+    raise ValueError(f"不支援的郵件服務提供商: {EMAIL_PROVIDER}。請使用 'resend' 或 'mailtrap'")
 
 # 藍新金流設定
 NEWEBPAY_MERCHANT_ID = os.getenv("NEWEBPAY_MERCHANT_ID")
@@ -312,4 +333,104 @@ SOCIALACCOUNT_PROVIDERS = {
             "key": "",
         },
     }
+}
+
+# =============================================================================
+# Celery 配置
+# =============================================================================
+
+# Celery Broker URL (RabbitMQ)
+# 支援 Docker 環境變數或預設本地設定
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'amqp://guest:guest@localhost:5672//')
+
+# Celery Result Backend (可選，用於儲存任務結果)
+CELERY_RESULT_BACKEND = 'rpc://'
+
+# 任務結果過期時間（秒）
+CELERY_RESULT_EXPIRES = 3600
+
+# 接受的內容類型
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+# 時區設定
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_ENABLE_UTC = True
+
+# Celery Beat 排程器設定
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# 定期任務排程設定
+from celery.schedules import crontab
+CELERY_BEAT_SCHEDULE = {
+    # 每分鐘檢查票券到期狀況
+    'check-ticket-expiry-every-minute': {
+        'task': 'payments.check_ticket_expiry',
+        'schedule': crontab(),  # 每分鐘執行
+        'options': {
+            'expires': 55,  # 任務55秒後過期，避免堆積
+        }
+    },
+    # 每小時清理過期票券狀態
+    'cleanup-expired-tickets-hourly': {
+        'task': 'payments.cleanup_expired_tickets',
+        'schedule': crontab(minute=0),  # 每小時整點執行
+        'options': {
+            'expires': 3300,  # 55分鐘後過期
+        }
+    },
+    # 每日 23:00 發送統計報表
+    'daily-ticket-report': {
+        'task': 'payments.send_daily_ticket_report',
+        'schedule': crontab(hour=23, minute=0),  # 每日 23:00
+        'options': {
+            'expires': 3300,  # 55分鐘後過期
+        }
+    },
+}
+
+# 任務路由（可選）
+CELERY_TASK_ROUTES = {
+    'payments.*': {'queue': 'payments'},
+    'payments.check_ticket_expiry': {'queue': 'high_priority'},
+}
+
+# Worker 設定
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_TASK_ACKS_LATE = True
+
+# 日誌設定
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'celery.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'payments.tasks': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'celery': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
 }

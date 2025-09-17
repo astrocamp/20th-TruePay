@@ -16,7 +16,6 @@
             <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>上架中</option>
             <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>已下架</option>
         </select>
-        <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600">篩選</button>
         <button type="button" onclick="window.location.href=window.location.pathname" class="bg-gray-200 text-gray-700 px-4 py-1 rounded hover:bg-gray-300 ml-2">重設</button>
         <button type="submit" class="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600 ml-2">確認</button>
     </form>
