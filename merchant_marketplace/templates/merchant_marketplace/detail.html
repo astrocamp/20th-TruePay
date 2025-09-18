@@ -172,7 +172,105 @@
           {{ product.description }}
         </div>
       </div>
+
+      <!-- 嵌入代碼區域 (只對商品擁有者顯示) -->
+      {% if request.merchant.id == product.merchant.id %}
+      <div class="p-8 border-t border-gray-200 bg-gray-50">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">
+          {% include 'components/icons.html' with icon='code' class='w-6 h-6 inline mr-2' %}
+          嵌入代碼
+        </h3>
+        <p class="text-gray-600 mb-6">將以下代碼複製到您的 Google Blogger、WordPress 或其他網站中，讓顧客可以直接購買商品。</p>
+
+        <!-- iframe 嵌入代碼 -->
+        <div class="mb-6">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-lg font-semibold text-gray-700">iframe 嵌入代碼</h4>
+            <span class="text-sm text-gray-500">適用於大部分網站平台</span>
+          </div>
+          <div class="bg-white border border-gray-300 rounded-lg overflow-hidden">
+            <textarea
+              id="iframe-code"
+              readonly
+              class="w-full h-24 p-4 text-sm font-mono bg-gray-50 border-0 resize-none focus:outline-none"
+              onclick="this.select()">{{ iframe_code }}</textarea>
+            <div class="p-3 bg-white border-t border-gray-200">
+              <button
+                onclick="copyToClipboard('iframe-code')"
+                class="bg-[#0056B3] text-white px-4 py-2 rounded hover:bg-[#00408A] transition duration-200 text-sm font-medium">
+                {% include 'components/icons.html' with icon='clipboard' class='w-4 h-4 inline mr-1' %}
+                複製 iframe 代碼
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- JavaScript 嵌入代碼 -->
+        <div class="mb-6">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-lg font-semibold text-gray-700">JavaScript 嵌入代碼</h4>
+            <span class="text-sm text-gray-500">更靈活的嵌入方式</span>
+          </div>
+          <div class="bg-white border border-gray-300 rounded-lg overflow-hidden">
+            <textarea
+              id="script-code"
+              readonly
+              class="w-full h-32 p-4 text-sm font-mono bg-gray-50 border-0 resize-none focus:outline-none"
+              onclick="this.select()">{{ script_code }}</textarea>
+            <div class="p-3 bg-white border-t border-gray-200">
+              <button
+                onclick="copyToClipboard('script-code')"
+                class="bg-[#0056B3] text-white px-4 py-2 rounded hover:bg-[#00408A] transition duration-200 text-sm font-medium">
+                {% include 'components/icons.html' with icon='clipboard' class='w-4 h-4 inline mr-1' %}
+                複製 JavaScript 代碼
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 使用說明 -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h5 class="font-semibold text-blue-800 mb-2">使用說明：</h5>
+          <ul class="text-sm text-blue-700 space-y-1">
+            <li>• <strong>iframe 代碼</strong>：直接貼到網頁 HTML 中，支援大部分平台</li>
+            <li>• <strong>JavaScript 代碼</strong>：提供更好的響應式體驗和自動調整大小</li>
+            <li>• 兩種代碼都會顯示完整的商品資訊和購買按鈕</li>
+            <li>• 顧客點擊購買後會導向到您的 TruePay 收款頁面</li>
+          </ul>
+        </div>
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>
+
+<script>
+// 複製到剪貼簿功能
+function copyToClipboard(elementId) {
+    const element = document.getElementById(elementId);
+    element.select();
+    element.setSelectionRange(0, 99999); // 支援手機版本
+
+    try {
+        document.execCommand('copy');
+
+        // 更新按鈕狀態顯示成功
+        const button = element.parentElement.querySelector('button');
+        const originalContent = button.innerHTML;
+
+        button.innerHTML = '{% include "components/icons.html" with icon="check-mark" class="w-4 h-4 inline mr-1" %}已複製！';
+        button.classList.remove('bg-[#0056B3]', 'hover:bg-[#00408A]');
+        button.classList.add('bg-green-500', 'hover:bg-green-600');
+
+        setTimeout(() => {
+            button.innerHTML = originalContent;
+            button.classList.remove('bg-green-500', 'hover:bg-green-600');
+            button.classList.add('bg-[#0056B3]', 'hover:bg-[#00408A]');
+        }, 2000);
+    } catch (err) {
+        console.error('複製失敗:', err);
+        alert('複製失敗，請手動選取代碼');
+    }
+}
+</script>
 {% endblock %}
