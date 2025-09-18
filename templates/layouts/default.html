@@ -5,12 +5,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+
     <link
       href="{% static 'styles/app.css' %}"
       rel="stylesheet"
       type="text/css"
     />
-    <script src="{% static 'scripts/app.js' %}" defer></script> 
+    <script src="{% static 'scripts/app.js' %}" defer></script>
 
 
     <title>{% block title %}TruePay 首頁{% endblock %}</title>
