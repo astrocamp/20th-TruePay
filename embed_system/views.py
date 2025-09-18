@@ -3,10 +3,9 @@ import json
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
-from django.views import View
 from django.views.generic import TemplateView
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -55,7 +54,7 @@ class ProductDetailAPIView(APIView):
                 {'error': '商品不存在或已下架'},
                 status=status.HTTP_404_NOT_FOUND
             )
-        except Exception as e:
+        except Exception:
             return Response(
                 {'error': '獲取商品資訊失敗'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -91,7 +90,7 @@ class SessionCheckAPIView(APIView):
                 'canManage': can_manage
             })
 
-        except Exception as e:
+        except Exception:
             return Response(
                 {'error': '檢查登入狀態失敗'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -157,7 +156,7 @@ class VerifyTokenAPIView(APIView):
                     status=status.HTTP_401_UNAUTHORIZED
                 )
 
-        except Exception as e:
+        except Exception:
             return Response(
                 {'error': '驗證 Token 失敗'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -234,7 +233,7 @@ class ProductUpdateAPIView(APIView):
                 {'error': '商品不存在'},
                 status=status.HTTP_404_NOT_FOUND
             )
-        except Exception as e:
+        except Exception:
             return Response(
                 {'error': '更新商品失敗'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -284,14 +283,8 @@ class GenerateManageTokenAPIView(APIView):
 
             token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
 
-            # 產生管理 URL
-            manage_url = request.build_absolute_uri(
-                f'/embed/embed/product/{product_id}/?tp_manage={token}'
-            )
-
             return Response({
                 'token': token,
-                'manage_url': manage_url,
                 'expires_in': 1800,  # 30 minutes in seconds
                 'product_id': product_id
             })
@@ -301,7 +294,7 @@ class GenerateManageTokenAPIView(APIView):
                 {'error': '商品不存在或無權限'},
                 status=status.HTTP_404_NOT_FOUND
             )
-        except Exception as e:
+        except Exception:
             return Response(
                 {'error': '產生管理連結失敗'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -351,25 +344,12 @@ class CreateProductFromArticleAPIView(APIView):
                 product.image = request.FILES['cover_image']
                 product.save()
 
-            # 產生嵌入碼
+            # 產生商品連結
             base_url = request.build_absolute_uri('/')[:-1]  # 移除結尾的 /
-
-            iframe_code = f'<iframe src="{base_url}/embed/embed/product/{product.id}/" width="400" height="300" frameborder="0"></iframe>'
-
-            script_code = f'''
-            <div style="width:400px; margin:0 auto;">
-                <div class="truepay-widget" data-id="{product.id}"></div>
-                <script src="{base_url}/embed/embed.js"></script>
-            </div>
-            '''
 
             return Response({
                 'success': True,
                 'product_id': product.id,
-                'embed_codes': {
-                    'iframe': iframe_code,
-                    'script': script_code
-                },
                 'product_url': f'{base_url}/marketplace/shop/{product.merchant.subdomain}/product/{product.id}/',
                 'product': {
                     'id': product.id,
@@ -380,7 +360,7 @@ class CreateProductFromArticleAPIView(APIView):
                 }
             }, status=status.HTTP_201_CREATED)
 
-        except Exception as e:
+        except Exception:
             return Response(
                 {'error': '創建商品失敗'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -425,63 +405,3 @@ class EmbedProductView(TemplateView):
         return context
 
 
-class EmbedJavaScriptView(View):
-    """
-    嵌入 JavaScript 檔案 - /embed.js
-    """
-    def get(self, request):
-        # 取得網站基本 URL
-        base_url = request.build_absolute_uri('/')[:-1]
-
-        js_content = f'''
-(function() {{
-    // TruePay 嵌入商品系統
-    var TruePayWidget = {{
-        baseUrl: '{base_url}',
-
-        init: function() {{
-            var widgets = document.querySelectorAll('.truepay-widget');
-            widgets.forEach(function(widget) {{
-                var productId = widget.getAttribute('data-id');
-                if (productId) {{
-                    TruePayWidget.loadProduct(widget, productId);
-                }}
-            }});
-        }},
-
-        loadProduct: function(container, productId) {{
-            // 創建 iframe
-            var iframe = document.createElement('iframe');
-            iframe.src = this.baseUrl + '/embed/embed/product/' + productId + '/';
-            iframe.style.width = '100%';
-            iframe.style.height = '300px';
-            iframe.style.border = 'none';
-            iframe.style.borderRadius = '8px';
-            iframe.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
-
-            container.appendChild(iframe);
-
-            // 監聽來自 iframe 的訊息
-            window.addEventListener('message', function(event) {{
-                if (event.origin !== TruePayWidget.baseUrl) return;
-
-                if (event.data.type === 'truepay-resize') {{
-                    iframe.style.height = event.data.height + 'px';
-                }}
-            }});
-        }}
-    }};
-
-    // 當 DOM 載入完成時初始化
-    if (document.readyState === 'loading') {{
-        document.addEventListener('DOMContentLoaded', TruePayWidget.init);
-    }} else {{
-        TruePayWidget.init();
-    }}
-}})();
-'''
-
-        return HttpResponse(
-            js_content,
-            content_type='application/javascript; charset=utf-8'
-        )
