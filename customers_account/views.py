@@ -1,24 +1,28 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import Http404
-from django.contrib import messages
-from django.contrib.auth import login as django_login, logout as django_logout
-from django.http import HttpResponseRedirect
-from urllib.parse import urlparse
-from django.db.models import Sum
-from django.db import transaction
-from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
-from django.urls import reverse
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from truepay.decorators import customer_login_required
-from django.core.paginator import Paginator
-from django.utils import timezone
-from django.db.models import Q, Count
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
+# Standard library imports
 import json
+from functools import wraps
+from urllib.parse import urlparse
+
+# Third party imports
 import pyotp
+
+# Django imports
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import get_user_model, login as django_login, logout as django_logout, update_session_auth_hash
+from django.core.mail import send_mail
+from django.core.paginator import Paginator
+from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
+from django.db import transaction
+from django.db.models import Sum, Q, Count
+from django.http import Http404, HttpResponseRedirect, JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
+from django.utils import timezone
+from django.views.decorators.http import require_http_methods
+
+# Local imports
+from truepay.decorators import customer_login_required
 from .forms import (
     CustomerRegistrationForm,
     CustomerLoginForm,
@@ -27,11 +31,9 @@ from .forms import (
     ForgotPasswordForm,
     PasswordResetForm,
 )
-from django.contrib.auth import update_session_auth_hash
 from .models import Customer
 from payments.models import Order, OrderItem
 from merchant_account.models import Merchant
-from django.core.mail import send_mail
 
 
 def register(request):
@@ -777,22 +779,37 @@ def totp_verify_for_redemption(request):
     return render(request, "customers/totp_verify_for_redemption.html", context)
 
 
+def customer_required(view_func):
+    """確保用戶已登入且為客戶的裝飾器"""
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        # 檢查用戶是否已登入
+        if not request.user.is_authenticated:
+            messages.error(request, "請先登入")
+            return redirect("customers_account:login")
+
+        # 檢查是否為客戶
+        if not hasattr(request.user, "member_type") or request.user.member_type != "customer":
+            messages.error(request, "權限不足")
+            return redirect("pages:home")
+
+        # 獲取客戶資料
+        try:
+            customer = Customer.objects.get(member=request.user)
+            # 將客戶資料加入 request 以便 view 使用
+            request.customer = customer
+        except Customer.DoesNotExist:
+            messages.error(request, "客戶資料不存在")
+            return redirect("pages:home")
+
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+@customer_required
 def authenticator_guide(request):
     """Google Authenticator 下載引導頁面"""
-    # 檢查用戶是否已登入且是客戶
-    if not request.user.is_authenticated:
-        messages.error(request, "請先登入")
-        return redirect("customers_account:login")
-
-    if not hasattr(request.user, "member_type") or request.user.member_type != "customer":
-        messages.error(request, "權限不足")
-        return redirect("pages:home")
-
-    try:
-        customer = Customer.objects.get(member=request.user)
-    except Customer.DoesNotExist:
-        messages.error(request, "客戶資料不存在")
-        return redirect("pages:home")
+    customer = request.customer  # 由裝飾器提供
 
     # 如果用戶已經啟用了2FA，直接跳轉到管理頁面
     if customer.totp_enabled:
