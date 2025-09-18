@@ -67,26 +67,12 @@
               </a>
             </li>
             <li>
-              <a href="{% url 'merchant_account:own_domain_list' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
-                {% include 'components/icons.html' with icon='check-circle' %}
-                自訂網域
-              </a>
-            </li>
-            <li>
               <a href="{% url 'public_store:shop_overview' request.merchant.subdomain %}" 
                 target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
                 {% include 'components/icons.html' with icon='cube' %}
                 商品總覽
               </a>
             </li>
-            {% comment %} 正式服 {% endcomment %}
-            {% comment %} <li>
-              <a href="{% url 'public_store:shop_overview' request.merchant.subdomain %}" 
-                target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
-                {% include 'components/icons.html' with icon='cube' %}
-                商品總覽 Shop
-              </a>
-            </li> {% endcomment %}
             <li>
               <a href="{% url 'merchant_account:ticket_validation' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)" @click="$root.close()">
                 {% include 'components/icons.html' with icon='scan-frame' %}

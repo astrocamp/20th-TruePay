@@ -32,7 +32,6 @@ from .models import Customer
 from payments.models import Order, OrderItem
 from merchant_account.models import Merchant
 from django.core.mail import send_mail
-from django.conf import settings
 
 
 def register(request):
@@ -57,7 +56,11 @@ def register(request):
 
 def login(request):
     # 檢查用戶是否已經登入
-    if request.user.is_authenticated and hasattr(request.user, 'member_type') and request.user.member_type == 'customer':
+    if (
+        request.user.is_authenticated
+        and hasattr(request.user, "member_type")
+        and request.user.member_type == "customer"
+    ):
         messages.info(request, "您已經登入了")
         return redirect("pages:marketplace")
 
@@ -65,7 +68,6 @@ def login(request):
         form = CustomerLoginForm(request.POST)
         if form.is_valid():
             member = form.cleaned_data["member"]
-            customer = form.cleaned_data["customer"]
 
             # 使用 Django 認證系統登入
             django_login(
@@ -76,12 +78,10 @@ def login(request):
             next_url = request.GET.get("next") or request.POST.get("next")
             if next_url:
                 messages.success(request, "登入成功")
-                # 驗證 next_url 的安全性
                 parsed_url = urlparse(next_url)
                 if parsed_url.netloc and not parsed_url.netloc.endswith(
                     settings.BASE_DOMAIN
                 ):
-                    # 如果有網域名稱但不是我們的網域，則重導向到預設頁面
                     return redirect("customers_account:dashboard")
                 return HttpResponseRedirect(next_url)
             else:
@@ -103,7 +103,10 @@ def logout(request):
         return redirect("customers_account:login")
 
     # 檢查是否為客戶用戶
-    if not hasattr(request.user, 'member_type') or request.user.member_type != 'customer':
+    if (
+        not hasattr(request.user, "member_type")
+        or request.user.member_type != "customer"
+    ):
         messages.error(request, "權限不足")
         return redirect("customers_account:login")
 
@@ -267,22 +270,25 @@ def ticket_wallet(request):
     page_obj = paginator.get_page(page_number)
 
     # 檢查是否已通過核銷前驗證
-    redemption_verified = request.session.get('redemption_verified', False)
-    redemption_verified_time = request.session.get('redemption_verified_time')
-    
+    redemption_verified = request.session.get("redemption_verified", False)
+    redemption_verified_time = request.session.get("redemption_verified_time")
+
     # 驗證是否在有效時間內（10分鐘）
     is_redemption_verified = False
     if redemption_verified and redemption_verified_time:
         current_time = timezone.now().timestamp()
-        if current_time - redemption_verified_time <= settings.REDEMPTION_VERIFICATION_TIMEOUT:
+        if (
+            current_time - redemption_verified_time
+            <= settings.REDEMPTION_VERIFICATION_TIMEOUT
+        ):
             is_redemption_verified = True
         else:
             # 清除過期的驗證狀態
-            request.session.pop('redemption_verified', None)
-            request.session.pop('redemption_verified_time', None)
+            request.session.pop("redemption_verified", None)
+            request.session.pop("redemption_verified_time", None)
 
     # 檢查是否需要自動展開特定票券的QR Code
-    show_qr_ticket_id = request.GET.get('show_qr')
+    show_qr_ticket_id = request.GET.get("show_qr")
 
     context = {
         "customer": customer,
@@ -718,9 +724,9 @@ def totp_verify_for_redemption(request):
         return redirect("customers_account:totp_setup")
 
     # 取得票券資訊
-    ticket_id = request.GET.get('ticket_id')
-    next_url = request.GET.get('next', reverse('customers_account:ticket_wallet'))
-    
+    ticket_id = request.GET.get("ticket_id")
+    next_url = request.GET.get("next", reverse("customers_account:ticket_wallet"))
+
     ticket = None
     if ticket_id:
         try:
@@ -729,35 +735,40 @@ def totp_verify_for_redemption(request):
             messages.error(request, "票券不存在或無權存取")
             return redirect("customers_account:ticket_wallet")
 
-    if request.method == 'POST':
-        totp_code = request.POST.get('totp_code', '').strip()
-        
+    if request.method == "POST":
+        totp_code = request.POST.get("totp_code", "").strip()
+
         if not totp_code:
             messages.error(request, "請輸入驗證代碼")
         elif len(totp_code) != 6 or not totp_code.isdigit():
             messages.error(request, "驗證代碼格式錯誤")
         elif customer.verify_totp(totp_code):
             # 驗證成功，設定session表示已通過核銷前驗證
-            request.session['redemption_verified'] = True
-            request.session['redemption_verified_time'] = timezone.now().timestamp()
+            request.session["redemption_verified"] = True
+            request.session["redemption_verified_time"] = timezone.now().timestamp()
 
             if ticket_id:
-                messages.success(request, "✅ 驗證成功！正在跳轉到票券錢包查看 QR Code...")
+                messages.success(
+                    request, "✅ 驗證成功！正在跳轉到票券錢包查看 QR Code..."
+                )
                 # 安全地添加查詢參數
-                if '?' in next_url:
-                    next_url += f'&show_qr={ticket_id}'
+                if "?" in next_url:
+                    next_url += f"&show_qr={ticket_id}"
                 else:
-                    next_url += f'?show_qr={ticket_id}'
+                    next_url += f"?show_qr={ticket_id}"
             else:
                 messages.success(request, "✅ 驗證成功！正在跳轉到票券錢包...")
 
             return redirect(next_url)
         else:
-            messages.error(request, "❌ 驗證代碼錯誤！請檢查：\n• 代碼是否為6位數字\n• 代碼是否已過期（每30秒更新）\n• Google Authenticator 時間是否正確")
+            messages.error(
+                request,
+                "❌ 驗證代碼錯誤！請檢查：\n• 代碼是否為6位數字\n• 代碼是否已過期（每30秒更新）\n• Google Authenticator 時間是否正確",
+            )
 
     context = {
-        'customer': customer,
-        'ticket': ticket,
-        'next_url': next_url,
+        "customer": customer,
+        "ticket": ticket,
+        "next_url": next_url,
     }
-    return render(request, 'customers/totp_verify_for_redemption.html', context)
+    return render(request, "customers/totp_verify_for_redemption.html", context)

@@ -1,0 +1,87 @@
+# ==================== 第一階段：Python 環境構建 ====================
+FROM python:3.13-slim AS python-builder
+
+WORKDIR /app
+
+# 安裝系統依賴（僅構建時需要）
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安裝 uv
+RUN pip install --no-cache-dir uv
+
+# 複製 Python 依賴檔案
+COPY pyproject.toml uv.lock ./
+
+# 安裝依賴到虛擬環境
+RUN uv sync --frozen --no-dev
+
+# ==================== 第二階段：最終運行映像 ====================
+FROM python:3.13-slim AS runtime
+
+# 設定環境變數 (移除 UTF-8 編碼設定以測試簽名問題)
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH="/app/.venv/bin:$PATH"
+
+# 安裝運行時依賴（最小化）
+RUN apt-get update && apt-get install -y \
+    libpq5 \
+    curl \
+    procps \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get autoremove -y \
+    && apt-get autoclean
+
+# 安裝 uv（運行時需要）
+RUN pip install --no-cache-dir uv
+
+WORKDIR /app
+
+# 建立非 root 用戶
+RUN adduser --disabled-password --gecos '' --uid 1000 appuser
+
+# 從構建階段複製虛擬環境
+COPY --from=python-builder /app/.venv /app/.venv
+
+# 複製本地已構建的靜態檔案
+COPY --chown=appuser:appuser static/ /app/static/
+
+# 複製應用程式碼
+COPY --chown=appuser:appuser . .
+
+# 建立 staticfiles 和 logs 目錄並設定權限
+RUN mkdir -p /app/staticfiles /app/logs && \
+    touch /app/celery.log && \
+    chown -R appuser:appuser /app/staticfiles /app/logs /app/celery.log
+
+# 清理不必要的檔案
+RUN rm -rf \
+    src/ \
+    node_modules/ \
+    __pycache__/ \
+    .pytest_cache/ \
+    *.tar.gz \
+    *.pem \
+    .DS_Store \
+    .env.* \
+    vite.config.js \
+    tailwind.config.js \
+    package*.json
+
+# 切換到非特權用戶
+USER appuser
+
+# 收集靜態檔案（設定臨時環境變數）
+RUN NGROK_URL=dummy /app/.venv/bin/python manage.py collectstatic --noinput
+
+EXPOSE 8000
+
+# 健康檢查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD /app/.venv/bin/python -c "import requests; requests.get('http://localhost:8000/').raise_for_status()" || exit 1
+# 生產環境使用 Gunicorn
+CMD ["/app/.venv/bin/gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120", "truepay.wsgi:application"]
