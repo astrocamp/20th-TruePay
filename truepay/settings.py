@@ -44,17 +44,12 @@ if not NGROK_URL:
 
 
 ALLOWED_HOSTS = [
-    "truepay.tw",
-    "*.truepay.tw",
-    ".truepay.tw",  # 加上這行，支援所有子域名
+    "highland-activities-editing-nitrogen.trycloudflare.com",
+    ".trycloudflare.com",
     "127.0.0.1",
     "localhost",
-    "54.95.179.51",  # EC2 IP
-    NGROK_URL,  # ngrok 域名
-    ".ngrok-free.app",
-    "*.ngrok-free.app",
 ]
-BASE_DOMAIN = "truepay.tw"
+BASE_DOMAIN = "highland-activities-editing-nitrogen.trycloudflare.com"
 
 # Application definition
 
@@ -85,6 +80,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # 請將下方 Blogger 網址改成你的實際網址
+    "truepay.middleware.security_middleware.CSPFrameAncestorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",  # 上線後靜態檔案讀取
     "truepay.security_middleware.SecurityHeadersMiddleware",
@@ -97,7 +94,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     # "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 子網域必需
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # "django.middleware.clickjacking.XFrameOptionsMiddleware",  # 已改用 CSP frame-ancestors
     "django.middleware.cache.FetchFromCacheMiddleware",
 ]
 
@@ -321,7 +318,7 @@ CACHE_MIDDLEWARE_KEY_PREFIX = "truepay"
 # 安全 Headers
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = "DENY"
+X_FRAME_OPTIONS = "SAMEORIGIN"
 
 AUTH_USER_MODEL = "accounts.Member"
 
