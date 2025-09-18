@@ -1,9 +1,18 @@
 import { defineConfig } from 'vite'
 import { resolve } from "path"
 import tailwindcss from '@tailwindcss/vite'
+import { copyFileSync } from 'fs'
 
 export default defineConfig({
-    plugins: [tailwindcss()],
+    plugins: [
+        tailwindcss(),
+        {
+            name: 'copy-favicon',
+            writeBundle() {
+                copyFileSync('src/favicon.ico', 'static/favicon.ico')
+            }
+        }
+    ],
     build:{
         outDir: 'static',
         emptyOutDir: false,
