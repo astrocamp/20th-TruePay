@@ -286,7 +286,7 @@ class GenerateManageTokenAPIView(APIView):
 
             # 產生管理 URL
             manage_url = request.build_absolute_uri(
-                f'/embed/product/{product_id}/?tp_manage={token}'
+                f'/embed/embed/product/{product_id}/?tp_manage={token}'
             )
 
             return Response({
@@ -354,10 +354,14 @@ class CreateProductFromArticleAPIView(APIView):
             # 產生嵌入碼
             base_url = request.build_absolute_uri('/')[:-1]  # 移除結尾的 /
 
-            iframe_code = f'<iframe src="{base_url}/embed/product/{product.id}/" width="400" height="300" frameborder="0"></iframe>'
+            iframe_code = f'<iframe src="{base_url}/embed/embed/product/{product.id}/" width="400" height="300" frameborder="0"></iframe>'
 
-            script_code = f'''<div class="truepay-widget" data-id="{product.id}"></div>
-<script src="{base_url}/embed/embed.js"></script>'''
+            script_code = f'''
+            <div style="width:400px; margin:0 auto;">
+                <div class="truepay-widget" data-id="{product.id}"></div>
+                <script src="{base_url}/embed/embed.js"></script>
+            </div>
+            '''
 
             return Response({
                 'success': True,
@@ -448,7 +452,7 @@ class EmbedJavaScriptView(View):
         loadProduct: function(container, productId) {{
             // 創建 iframe
             var iframe = document.createElement('iframe');
-            iframe.src = this.baseUrl + '/embed/product/' + productId + '/';
+            iframe.src = this.baseUrl + '/embed/embed/product/' + productId + '/';
             iframe.style.width = '100%';
             iframe.style.height = '300px';
             iframe.style.border = 'none';
