@@ -3,9 +3,6 @@
 
 {% block title %}報表分析 - {{ merchant.ShopName }} - TruePay{% endblock %}
 
-{% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{% endblock %}
 
 {% block content %}
 <!-- 頁面標題 -->
@@ -186,54 +183,6 @@
                     </a>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- 票券營運報表 -->
-    <div class="bg-white rounded-lg shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-        <div class="p-6 border-b border-gray-200">
-            <div class="flex items-center">
-                <div>
-                    <h3 class="text-lg font-medium text-gray-900">票券營運報表</h3>
-                    <p class="text-sm text-gray-600">使用率、驗證記錄、過期分析</p>
-                </div>
-            </div>
-        </div>
-        <div class="p-6">
-            <ul class="text-sm text-gray-600 space-y-2 mb-4">
-                <li>• 票券使用率統計</li>
-                <li>• 驗證成功率分析</li>
-                <li>• 過期票券損失統計</li>
-                <li>• 使用時間分佈分析</li>
-            </ul>
-            <a href="{% url 'merchant_account:export_tickets' subdomain=merchant.subdomain %}?days={{ days }}"
-               class="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200 inline-block text-center">
-                <i class="fas fa-download mr-2"></i>下載 Excel 
-            </a>
-        </div>
-    </div>
-
-    <!-- 商品表現報表 -->
-    <div class="bg-white rounded-lg shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-        <div class="p-6 border-b border-gray-200">
-            <div class="flex items-center">
-                <div>
-                    <h3 class="text-lg font-medium text-gray-900">商品表現報表</h3>
-                    <p class="text-sm text-gray-600">銷量排行、收入貢獻、庫存分析</p>
-                </div>
-            </div>
-        </div>
-        <div class="p-6">
-            <ul class="text-sm text-gray-600 space-y-2 mb-4">
-                <li>• 商品銷售排行榜</li>
-                <li>• 營收貢獻度分析</li>
-                <li>• 庫存狀況統計</li>
-                <li>• 商品定價效率分析</li>
-            </ul>
-            <a href="{% url 'merchant_account:export_products' subdomain=merchant.subdomain %}?days={{ days }}"
-               class="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200 inline-block text-center">
-                <i class="fas fa-download mr-2"></i>下載商品表現 Excel 報表
-            </a>
         </div>
     </div>
 </div>
