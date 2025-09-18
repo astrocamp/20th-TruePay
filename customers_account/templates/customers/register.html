@@ -1,4 +1,5 @@
 {% extends "layouts/default.html" %}
+{% load socialaccount %}
 {% block content %}
 <div class="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
     <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">消費者註冊</h1>
@@ -16,7 +17,7 @@
         
         <div>
             <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                {{ form.email.label }}
+                電子郵件 <span class="text-red-500">*</span>
             </label>
             {{ form.email }}
             {% if form.email.errors %}
@@ -28,7 +29,7 @@
         
         <div>
             <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                {{ form.name.label }}
+                姓名 <span class="text-red-500">*</span>
             </label>
             {{ form.name }}
             {% if form.name.errors %}
@@ -76,7 +77,7 @@
         
         <div>
             <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                {{ form.password.label }}
+                密碼 <span class="text-red-500">*</span>
             </label>
             {{ form.password }}
             {% if form.password.errors %}
@@ -88,7 +89,7 @@
         
         <div>
             <label for="{{ form.password_confirm.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                {{ form.password_confirm.label }}
+                確認密碼 <span class="text-red-500">*</span>
             </label>
             {{ form.password_confirm }}
             {% if form.password_confirm.errors %}
@@ -102,6 +103,20 @@
             註冊
         </button>
     </form>
+
+    <!-- Google 註冊按鈕 -->
+    <div class="mb-6 mt-6">
+        {% get_providers as socialaccount_providers %}
+        {% for provider in socialaccount_providers %}
+        {% if provider.id == "google" %}
+        <a href="{% provider_login_url 'google' process='login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}"
+            class="w-full flex justify-center items-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#0056B3] focus:ring-offset-2 transition duration-200">
+            {% include 'components/icons.html' with icon='google' class='w-5 h-5 mr-3' %}
+            使用 Google 帳號註冊
+        </a>
+        {% endif %}
+        {% endfor %}
+    </div>
     
     <div class="mt-6 text-center">
         <p class="text-gray-600">

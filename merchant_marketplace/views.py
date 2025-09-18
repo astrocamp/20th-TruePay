@@ -1,13 +1,13 @@
 from django.utils.dateparse import parse_datetime
 from django.utils import timezone
-from django.utils.dateparse import parse_datetime
+from datetime import timedelta
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.conf import settings
 import os
 from .models import Product
 from merchant_account.models import Merchant
-from truepay.decorators import no_cache_required
+from truepay.decorators import no_cache_required, merchant_verified_required
 from payments.models import OrderItem
 
 
@@ -24,6 +24,7 @@ def index(request, subdomain):
 
 
 @no_cache_required
+@merchant_verified_required
 def detail(request, subdomain, id):
     product = get_object_or_404(Product, id=id, merchant=request.merchant)
     
@@ -39,7 +40,7 @@ def detail(request, subdomain, id):
         elif action == "deactivate":
             product.is_active = False
             product.save()
-            messages.success(request, "商品已下架")
+            messages.success(request, "商品未上架")
             return redirect("merchant_marketplace:detail", request.merchant.subdomain, product.id)
             
         elif action == "delete":
@@ -56,9 +57,16 @@ def detail(request, subdomain, id):
 
 
 @no_cache_required
+@merchant_verified_required
 def new(request, subdomain):
     if request.method == "GET":
-        context = {"merchant_phone": request.merchant.Cellphone}
+        # 設定最小時間為當前時間的下一分鐘
+        now = timezone.now()
+        min_datetime = now.replace(second=0, microsecond=0) + timedelta(minutes=1)
+        context = {
+            "merchant_phone": request.merchant.Cellphone,
+            "current_datetime": min_datetime.strftime('%Y-%m-%dT%H:%M')
+        }
         return render(request, "merchant_marketplace/new.html", context)
 
     elif request.method == "POST":
@@ -68,7 +76,6 @@ def new(request, subdomain):
                 raise ValueError("庫存數量必須至少為 1 件")
                 
             # 處理票券期限
-            
             ticket_expiry = None
             if request.POST.get("ticket_expiry"):
                 ticket_expiry = parse_datetime(request.POST.get("ticket_expiry"))
@@ -91,12 +98,19 @@ def new(request, subdomain):
 
         except Exception as e:
             messages.error(request, f"新增失敗：{str(e)}")
-            context = {"merchant_phone": request.merchant.Cellphone}
+            # 設定最小時間為當前時間的下一分鐘
+            now = timezone.now()
+            min_datetime = now.replace(second=0, microsecond=0) + timedelta(minutes=1)
+            context = {
+                "merchant_phone": request.merchant.Cellphone,
+                "current_datetime": min_datetime.strftime('%Y-%m-%dT%H:%M')
+            }
             return render(request, "merchant_marketplace/new.html", context)
     return render(request, "merchant_marketplace/new.html")
 
 
 @no_cache_required
+@merchant_verified_required
 def edit(request, subdomain, id):
     product = get_object_or_404(Product, id=id)
     if product.merchant_id != request.merchant.id:
@@ -107,10 +121,14 @@ def edit(request, subdomain, id):
     has_tickets = OrderItem.objects.filter(product=product).exists()
 
     if request.method == "GET":
+        # 設定最小時間為當前時間的下一分鐘
+        now = timezone.now()
+        min_datetime = now.replace(second=0, microsecond=0) + timedelta(minutes=1)
         context = {
-            "product": product, 
+            "product": product,
             "merchant_phone": product.merchant.Cellphone,
-            "has_tickets": has_tickets
+            "has_tickets": has_tickets,
+            "current_datetime": min_datetime.strftime('%Y-%m-%dT%H:%M')
         }
         return render(request, "merchant_marketplace/edit.html", context)
 
@@ -138,16 +156,21 @@ def edit(request, subdomain, id):
             
             # 更新票券期限
             if request.POST.get("ticket_expiry"):
-                product.ticket_expiry = parse_datetime(request.POST.get("ticket_expiry"))
+                ticket_expiry = parse_datetime(request.POST.get("ticket_expiry"))
+                product.ticket_expiry = ticket_expiry
             
             product.save()
             messages.success(request, "商品更新成功！")
             return redirect("merchant_marketplace:index", request.merchant.subdomain)
         except Exception as e:
             messages.error(request, f"更新失敗：{str(e)}")
+            # 設定最小時間為當前時間的下一分鐘
+            now = timezone.now()
+            min_datetime = now.replace(second=0, microsecond=0) + timedelta(minutes=1)
             context = {
-                "product": product, 
+                "product": product,
                 "merchant_phone": product.merchant.Cellphone,
-                "has_tickets": has_tickets
+                "has_tickets": has_tickets,
+                "current_datetime": min_datetime.strftime('%Y-%m-%dT%H:%M')
             }
             return render(request, "merchant_marketplace/edit.html", context)

@@ -1,5 +1,6 @@
 from django.db import models
 from merchant_account.models import Merchant
+from .validators import validate_image_file
 
 
 class Product(models.Model):
@@ -13,7 +14,14 @@ class Product(models.Model):
     description = models.TextField(verbose_name="商品介紹")
     price = models.PositiveIntegerField(verbose_name="商品價格")
     stock = models.PositiveIntegerField(default=1, verbose_name="庫存數量")
-    image = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name="商品圖片")
+    image = models.ImageField(
+        upload_to='products/',
+        blank=True,
+        null=True,
+        validators=[validate_image_file],
+        verbose_name="商品圖片",
+        help_text="支援 JPG、PNG、GIF、WebP 格式，檔案大小不超過 5MB"
+    )
     phone_number = models.CharField(max_length=20, verbose_name="電話號碼")
     merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE, verbose_name="商家")
     verification_timing = models.CharField(

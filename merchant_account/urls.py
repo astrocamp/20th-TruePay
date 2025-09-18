@@ -49,22 +49,6 @@ urlpatterns = [
         views.sold_tickets_list,
         name="sold_tickets",
     ),
-    # 自有域名管理相關路由
-    path(
-        "own-domains/<slug:subdomain>/",
-        views.own_domain_list,
-        name="own_domain_list",
-    ),
-    path(
-        "own-domains/add/<slug:subdomain>/",
-        views.own_domain_add,
-        name="own_domain_add",
-    ),
-    path(
-        "own-domains/detail/<slug:subdomain>/<int:pk>/",
-        views.own_domain_detail,
-        name="own_domain_detail",
-    ),
     # 報表分析相關路由
     path(
         "reports/<slug:subdomain>/",

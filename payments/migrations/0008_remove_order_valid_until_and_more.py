@@ -3,6 +3,33 @@
 from django.db import migrations, models
 
 
+def remove_valid_until_if_exists(apps, schema_editor):
+    """安全地刪除 valid_until 欄位，如果它存在的話"""
+    from django.db import connection
+    cursor = connection.cursor()
+
+    # 檢查欄位是否存在
+    cursor.execute("""
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_name = 'orders' AND column_name = 'valid_until'
+    """)
+
+    if cursor.fetchone():
+        # 如果欄位存在，則刪除它
+        cursor.execute("ALTER TABLE orders DROP COLUMN valid_until")
+
+
+def reverse_remove_valid_until(apps, schema_editor):
+    """反向操作：重新加入 valid_until 欄位"""
+    from django.db import connection
+    cursor = connection.cursor()
+    cursor.execute("""
+        ALTER TABLE orders
+        ADD COLUMN valid_until TIMESTAMP WITH TIME ZONE NULL
+    """)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -10,9 +37,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name="order",
-            name="valid_until",
+        migrations.RunPython(
+            remove_valid_until_if_exists,
+            reverse_remove_valid_until,
         ),
         migrations.AddField(
             model_name="orderitem",

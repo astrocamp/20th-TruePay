@@ -23,7 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # 票券設定
 TICKET_VALIDITY_DAYS = 180  # 票券有效期（天數）
-TICKET_HMAC_KEY = os.getenv("TICKET_HMAC_KEY", "default-hmac-key-change-in-production")  # HMAC 簽名密鑰
+TICKET_HMAC_KEY = os.getenv(
+    "TICKET_HMAC_KEY", "default-hmac-key-change-in-production"
+)  # HMAC 簽名密鑰
 
 
 # Quick-start development settings - unsuitable for production
@@ -33,7 +35,7 @@ TICKET_HMAC_KEY = os.getenv("TICKET_HMAC_KEY", "default-hmac-key-change-in-produ
 SECRET_KEY = "django-insecure-iip1xgbl_eh&cl1p81i9*nuvl)qlb$#gj1e+f1it-a!xu1qjio"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # 從環境變數讀取 ngrok URL (必須在 .env 中設定)
 NGROK_URL = os.getenv("NGROK_URL")
@@ -42,18 +44,20 @@ if not NGROK_URL:
 
 
 ALLOWED_HOSTS = [
+    "truepay.tw",
+    "*.truepay.tw",
+    ".truepay.tw",  # 加上這行，支援所有子域名
     "127.0.0.1",
     "localhost",
-    NGROK_URL,
-    "truepay.tw",
-    "*.ushionagisa.work",  # 支援所有子域名
-    ".ushionagisa.work",  # 包含根域名
+    "54.95.179.51",  # EC2 IP
+    NGROK_URL,  # ngrok 域名
 ]
-BASE_DOMAIN = "ushionagisa.work"
+BASE_DOMAIN = "truepay.tw"
 
 # Application definition
 
 INSTALLED_APPS = [
+    "dynamic_host",  # 動態 Host 驗證套件
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -79,9 +83,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "dynamic_host.middleware.AllowedHostMiddleWare",  # 動態 Host 驗證 - 必須放最前面
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # 上線後靜態檔案讀取
     "truepay.security_middleware.SecurityHeadersMiddleware",
-    # "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 本地開發時禁用
     "django.middleware.cache.UpdateCacheMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "allauth.account.middleware.AccountMiddleware",
@@ -89,6 +94,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 子網域必需
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.cache.FetchFromCacheMiddleware",
@@ -181,7 +187,6 @@ STATICFILES_DIRS = [
     BASE_DIR / "src" / "styles",
     BASE_DIR / "src" / "scripts",
 ]
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -204,6 +209,10 @@ AWS_S3_OBJECT_PARAMETERS = {
 }
 
 # Media files (uploads)
+# 檔案上傳限制設定
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
+FILE_UPLOAD_PERMISSIONS = 0o644  # 檔案權限
 
 # Media files (uploads)
 STORAGES = {
@@ -241,7 +250,9 @@ elif EMAIL_PROVIDER == "mailtrap":
     EMAIL_HOST_PASSWORD = os.getenv("MAILTRAP_PASSWORD")
     DEFAULT_FROM_EMAIL = "TruePay <noreply@truepay.tw>"
 else:
-    raise ValueError(f"不支援的郵件服務提供商: {EMAIL_PROVIDER}。請使用 'resend' 或 'mailtrap'")
+    raise ValueError(
+        f"不支援的郵件服務提供商: {EMAIL_PROVIDER}。請使用 'resend' 或 'mailtrap'"
+    )
 
 # 藍新金流設定
 NEWEBPAY_MERCHANT_ID = os.getenv("NEWEBPAY_MERCHANT_ID")
@@ -275,11 +286,15 @@ LINEPAY_CANCEL_URL = f"https://{NGROK_URL}/payments/linepay/cancel/"
 CSRF_TRUSTED_ORIGINS = [
     # 正式網域
     "https://truepay.tw",
+    "https://*.truepay.tw",  # 支援所有 truepay.tw 子域名
+    "http://truepay.tw",
+    "http://*.truepay.tw",  # HTTP 版本的子域名支援
     # 本地開發
     "http://127.0.0.1:8000",
     "http://localhost:8000",
     # ngrok 測試環境
     f"https://{NGROK_URL}",
+    f"http://{NGROK_URL}",  # HTTP 版本
     # 金流回調需要
     "https://ccore.newebpay.com",
 ]
@@ -293,9 +308,10 @@ SESSION_COOKIE_HTTPONLY = True  # 防止 XSS 攻擊
 SESSION_COOKIE_SAMESITE = "Lax"  # CSRF 保護
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 瀏覽器關閉時清除 Session
 SESSION_COOKIE_AGE = 3600  # Session 1小時後過期
-# SESSION_COOKIE_DOMAIN = (
-#     ".ushionagisa.work"  # 讓子網域共享 session - 暫時註解以便本地開發
-# )
+
+# SESSION_COOKIE_DOMAIN = f".{BASE_DOMAIN}"
+# CSRF_COOKIE_DOMAIN = f".{BASE_DOMAIN}"
+
 
 # 快取設定（防止敏感頁面被快取）
 CACHE_MIDDLEWARE_SECONDS = 0  # 不快取頁面
@@ -357,59 +373,62 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # Celery Broker URL (RabbitMQ)
 # 支援 Docker 環境變數或預設本地設定
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'amqp://guest:guest@localhost:5672//')
+CELERY_BROKER_URL = os.getenv(
+    "CELERY_BROKER_URL", "amqp://guest:guest@localhost:5672//"
+)
 
 # Celery Result Backend (可選，用於儲存任務結果)
-CELERY_RESULT_BACKEND = 'rpc://'
+CELERY_RESULT_BACKEND = "rpc://"
 
 # 任務結果過期時間（秒）
 CELERY_RESULT_EXPIRES = 3600
 
 # 接受的內容類型
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
 
 # 時區設定
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_ENABLE_UTC = True
 
 # Celery Beat 排程器設定
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 # 定期任務排程設定
 from celery.schedules import crontab
+
 CELERY_BEAT_SCHEDULE = {
     # 每分鐘檢查票券到期狀況
-    'check-ticket-expiry-every-minute': {
-        'task': 'payments.check_ticket_expiry',
-        'schedule': crontab(),  # 每分鐘執行
-        'options': {
-            'expires': 55,  # 任務55秒後過期，避免堆積
-        }
+    "check-ticket-expiry-every-minute": {
+        "task": "payments.check_ticket_expiry",
+        "schedule": crontab(),  # 每分鐘執行
+        "options": {
+            "expires": 55,  # 任務55秒後過期，避免堆積
+        },
     },
     # 每小時清理過期票券狀態
-    'cleanup-expired-tickets-hourly': {
-        'task': 'payments.cleanup_expired_tickets',
-        'schedule': crontab(minute=0),  # 每小時整點執行
-        'options': {
-            'expires': 3300,  # 55分鐘後過期
-        }
+    "cleanup-expired-tickets-hourly": {
+        "task": "payments.cleanup_expired_tickets",
+        "schedule": crontab(minute=0),  # 每小時整點執行
+        "options": {
+            "expires": 3300,  # 55分鐘後過期
+        },
     },
     # 每日 23:00 發送統計報表
-    'daily-ticket-report': {
-        'task': 'payments.send_daily_ticket_report',
-        'schedule': crontab(hour=23, minute=0),  # 每日 23:00
-        'options': {
-            'expires': 3300,  # 55分鐘後過期
-        }
+    "daily-ticket-report": {
+        "task": "payments.send_daily_ticket_report",
+        "schedule": crontab(hour=23, minute=0),  # 每日 23:00
+        "options": {
+            "expires": 3300,  # 55分鐘後過期
+        },
     },
 }
 
 # 任務路由（可選）
 CELERY_TASK_ROUTES = {
-    'payments.*': {'queue': 'payments'},
-    'payments.check_ticket_expiry': {'queue': 'high_priority'},
+    "payments.*": {"queue": "payments"},
+    "payments.check_ticket_expiry": {"queue": "high_priority"},
 }
 
 # Worker 設定
@@ -418,35 +437,35 @@ CELERY_TASK_ACKS_LATE = True
 
 # 日誌設定
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
         },
     },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
         },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': 'celery.log',
-            'formatter': 'verbose',
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": "celery.log",
+            "formatter": "verbose",
         },
     },
-    'loggers': {
-        'payments.tasks': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
+    "loggers": {
+        "payments.tasks": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'celery': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
+        "celery": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
         },
     },
 }

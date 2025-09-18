@@ -34,13 +34,13 @@ def process_newebpay(order, request):
         # 檢測是否為重新付款（使用秒級比較，避免微秒差異）
         time_diff = abs((order.updated_at - order.created_at).total_seconds())
         is_retry = time_diff > 1  # 如果時間差超過1秒，視為重新付款
-        
+
         # 重新付款時使用當前時間，首次付款使用訂單建立時間
         if is_retry:
             timestamp = str(int(timezone.now().timestamp()))
         else:
             timestamp = str(int(order.created_at.timestamp()))
-        
+
         # 準備付款資料
         trade_info_data = {
             "MerchantID": merchant_id,
@@ -56,8 +56,9 @@ def process_newebpay(order, request):
         }
 
         # 生成 TradeInfo 和 TradeSha
-        trade_info_str = "&".join([f"{k}={v}" for k, v in trade_info_data.items()])
-        
+        # trade_info_str = "&".join([f"{k}={v}" for k, v in trade_info_data.items()])
+        trade_info_str = urlencode(trade_info_data)
+
         trade_info = aes_encrypt(trade_info_str, hash_key, hash_iv)
         trade_sha = generate_sha256(f"HashKey={hash_key}&{trade_info}&HashIV={hash_iv}")
 
@@ -79,17 +80,21 @@ def process_newebpay(order, request):
 
     except Exception as e:
         logger.error(f"藍新金流處理失敗: {e}")
-        
+
         # 檢查是否為庫存不足錯誤
         error_msg = str(e)
         if "庫存不足" in error_msg or "庫存扣減失敗" in error_msg:
             # 嘗試從訂單中獲取必要資訊
             try:
-                params = urlencode({
-                    'product_id': order.product.id,
-                    'requested_quantity': order.quantity
-                })
-                return redirect(f"{reverse('payments:stock_insufficient_error')}?{params}")
+                params = urlencode(
+                    {
+                        "product_id": order.product.id,
+                        "requested_quantity": order.quantity,
+                    }
+                )
+                return redirect(
+                    f"{reverse('payments:stock_insufficient_error')}?{params}"
+                )
             except:
                 pass
 
@@ -111,21 +116,29 @@ def newebpay_return(request):
             # 嘗試尋找最近的已付款訂單作為後備方案
             try:
                 # 查找最近5分鐘內狀態變為paid的藍新金流訂單
-                recent_paid_order = Order.objects.filter(
-                    provider="newebpay",
-                    status="paid",
-                    paid_at__gte=timezone.now() - timedelta(minutes=5)
-                ).order_by('-paid_at').first()
-                
+                recent_paid_order = (
+                    Order.objects.filter(
+                        provider="newebpay",
+                        status="paid",
+                        paid_at__gte=timezone.now() - timedelta(minutes=5),
+                    )
+                    .order_by("-paid_at")
+                    .first()
+                )
+
                 if recent_paid_order:
                     return render(
                         request,
                         "payments/newebpay/payment_success.html",
-                        {"success": True, "order": recent_paid_order, "message": "付款成功"},
+                        {
+                            "success": True,
+                            "order": recent_paid_order,
+                            "message": "付款成功",
+                        },
                     )
             except Exception:
                 pass
-            
+
             return render(
                 request,
                 "payments/newebpay/payment_result.html",
@@ -164,7 +177,11 @@ def newebpay_return(request):
                     # 直接使用已存在的 Member 記錄（不要創建新的）
                     member = order.customer.member
                     # 建立用戶認證 session
-                    django_login(request, member, backend='django.contrib.auth.backends.ModelBackend')
+                    django_login(
+                        request,
+                        member,
+                        backend="django.contrib.auth.backends.ModelBackend",
+                    )
                     logger.info(
                         f"藍新金流付款成功，已為用戶 {order.customer.member.email} 恢復登入狀態"
                     )
@@ -200,6 +217,13 @@ def newebpay_notify(request):
         trade_info = request.POST.get("TradeInfo")
         trade_sha = request.POST.get("TradeSha")
 
+        # 詳細 log 記錄原始資料
+        logger.info(
+            f"藍新通知原始資料 - TradeInfo 長度: {len(trade_info) if trade_info else 0}"
+        )
+        logger.info(f"藍新通知原始資料 - TradeSha: {trade_sha}")
+        logger.info(f"藍新通知原始資料 - POST 完整內容: {dict(request.POST)}")
+
         if not trade_info:
             logger.error("藍新金流通知缺少 TradeInfo")
             return HttpResponse("0|Missing TradeInfo")
@@ -210,6 +234,9 @@ def newebpay_notify(request):
         # 如果解密失敗
         if not result_data:
             logger.error("無法解密通知資料")
+            logger.info(
+                f"解密失敗的 TradeInfo 內容: {trade_info[:100]}..."
+            )  # 只記錄前100字元
             return HttpResponse("0|Decrypt Error")
 
         # 處理付款結果
@@ -285,6 +312,33 @@ def decrypt_newebpay_callback(trade_info, trade_sha=None):
 
         # 解密資料
         decrypted_data = aes_decrypt(trade_info, hash_key, hash_iv)
+
+        # 清理解密後的資料，移除多餘的字符
+        if decrypted_data:
+            # 移除可能的 null 字節和額外空白
+            decrypted_data = decrypted_data.strip("\x00").strip()
+
+            # 找到第一個完整的JSON結構（更健全的方法）
+            brace_count = 0
+            first_json_end = 0
+            json_started = False
+
+            for i, char in enumerate(decrypted_data):
+                if char == "{":
+                    json_started = True
+                    brace_count += 1
+                elif char == "}" and json_started:
+                    brace_count -= 1
+                    if brace_count == 0:
+                        first_json_end = i + 1
+                        break
+
+            if first_json_end > 0:
+                decrypted_data = decrypted_data[:first_json_end]
+                logger.error(f"[DEBUG] 截取JSON後長度: {len(decrypted_data)}")
+
+            # 再次清理可能的尾部字符
+            decrypted_data = decrypted_data.rstrip("\x00").rstrip()
         result_data = json.loads(decrypted_data)
 
         logger.info("成功解密藍新金流回調資料")
@@ -328,36 +382,20 @@ def aes_encrypt(data, key, iv):
 
 
 def aes_decrypt(encrypted_data, key, iv):
-    """AES 解密 - 自動檢測編碼格式"""
-    cipher = AES.new(key.encode("utf-8"), AES.MODE_CBC, iv.encode("utf-8"))
-
-    # 先嘗試十六進制解碼（發送給藍新的格式）
+    """AES 解密 - 藍新金流專用 Zero Padding 方式"""
     try:
+        # 藍新金流使用 Zero Padding，不是 PKCS7
+        key_bytes = key.encode("utf-8")[:32].ljust(32, b"\0")
+        iv_bytes = iv.encode("utf-8")[:16].ljust(16, b"\0")
+
+        cipher = AES.new(key_bytes, AES.MODE_CBC, iv_bytes)
         decrypted_data = cipher.decrypt(bytes.fromhex(encrypted_data))
-        result = unpad(decrypted_data, AES.block_size).decode("utf-8")
+        result = decrypted_data.rstrip(b"\0").decode("utf-8")
+        logger.error(f"[DEBUG] 藍新金流解密成功：Zero Padding")
         return result
-    except (ValueError, Exception):
-        pass
-
-    # 如果失敗，嘗試 Base64 解碼（回調可能使用的格式）
-    try:
-        decrypted_data = cipher.decrypt(base64.b64decode(encrypted_data))
-        result = unpad(decrypted_data, AES.block_size).decode("utf-8")
-        return result
-    except (ValueError, Exception):
-        pass
-
-    # 如果兩種方式都失敗，嘗試直接解碼（以防是其他格式）
-    try:
-        decrypted_data = cipher.decrypt(encrypted_data.encode("utf-8"))
-        result = unpad(decrypted_data, AES.block_size).decode("utf-8")
-        return result
-    except Exception:
-        pass
-
-    # 所有方法都失敗，記錄一次錯誤日誌
-    logger.error("AES 解密失敗 - 所有解密方法都無法解密資料")
-    raise ValueError("所有解密方法都失敗了 - 可能是加密格式、Key 或 IV 不正確")
+    except Exception as e:
+        logger.error(f"[DEBUG] 藍新金流解密失敗：{e}")
+        raise ValueError(f"藍新金流解密失敗 - {e}")
 
 
 def generate_sha256(data):

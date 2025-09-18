@@ -8,7 +8,7 @@ from django.forms import (
     EmailField,
 )
 from django import forms
-from .models import Merchant, MerchantOwnDomain
+from .models import Merchant
 from .utils import generate_unique_subdomain
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
@@ -26,18 +26,21 @@ class RegisterForm(ModelForm):
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
                 "placeholder": "請輸入電子郵件",
+                "required": True,
             }
         ),
-        label="電子郵件",
+        label="電子郵件 *",
     )
     password = CharField(
         widget=PasswordInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "請輸入密碼",
+                "placeholder": "請輸入密碼（至少8個字元）",
+                "required": True,
             }
         ),
-        label="密碼",
+        label="密碼 *",
+        help_text="密碼長度至少需要8個字元",
     )
 
     class Meta:
@@ -51,55 +54,81 @@ class RegisterForm(ModelForm):
             "Cellphone",
         ]
         labels = {
-            "ShopName": "商店名稱",
-            "UnifiedNumber": "統一編號",
-            "NationalNumber": "身分證號",
-            "Name": "負責人姓名",
-            "Address": "地址",
-            "Cellphone": "手機號碼",
+            "ShopName": "商店名稱 *",
+            "UnifiedNumber": "統一編號 *",
+            "NationalNumber": "身分證號 *",
+            "Name": "負責人姓名 *",
+            "Address": "地址 *",
+            "Cellphone": "手機號碼 *",
         }
         widgets = {
             "ShopName": TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
                     "maxlength": "50",
-                    "placeholder": "請輸入商店名稱",
+                    "placeholder": "請輸入商店名稱（至少2個字元）",
+                    "required": True,
                 }
             ),
             "UnifiedNumber": TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "maxlength": "30",
-                    "placeholder": "請輸入統一編號",
+                    "maxlength": "8",
+                    "placeholder": "請輸入8位數統一編號（例如：12345678）",
+                    "pattern": "[0-9]{8}",
+                    "required": True,
                 }
             ),
             "NationalNumber": TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入身分證字號",
+                    "placeholder": "請輸入身分證字號（格式：A123456789）",
+                    "pattern": "[A-Z][12][0-9]{8}",
+                    "maxlength": "10",
+                    "required": True,
                 }
             ),
             "Name": TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
                     "placeholder": "請輸入負責人姓名",
+                    "required": True,
                 }
             ),
             "Address": TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
                     "maxlength": "50",
-                    "placeholder": "請輸入地址",
+                    "placeholder": "請輸入完整地址（至少5個字元）",
+                    "required": True,
                 }
             ),
             "Cellphone": TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
                     "maxlength": "15",
-                    "placeholder": "請輸入手機號碼",
+                    "placeholder": "請輸入手機號碼（格式：09xxxxxxxx）",
+                    "pattern": "09[0-9]{8}",
+                    "required": True,
                 }
             ),
         }
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+
+        if not email:
+            return email
+
+        # 檢查是否已有商家使用此email
+        existing_merchant_members = Member.objects.filter(
+            email=email,
+            member_type="merchant"
+        )
+        if existing_merchant_members.exists():
+            raise ValidationError("此電子郵件已被商家註冊使用")
+
+        return email
 
     def save(self, commit=True):
         email = self.cleaned_data["email"]
@@ -119,6 +148,13 @@ class RegisterForm(ModelForm):
 
         if commit:
             merchant.save()
+            # 註冊完成後立即嘗試自動審核
+            auto_approved, message = merchant.attempt_auto_approval()
+            if auto_approved:
+                print(f"🎉 商家 {merchant.ShopName} 註冊後自動通過審核")
+            else:
+                print(f"⏳ 商家 {merchant.ShopName} 註冊後待人工審核：{message}")
+
         return merchant
 
 
@@ -355,6 +391,9 @@ class MerchantProfileUpdateForm(ModelForm):
     def save(self, commit=True):
         merchant = super().save(commit=False)
         if commit:
+            # 記錄更新前的審核狀態
+            old_status = merchant.verification_status
+
             merchant.save()
             # 更新 Member 的 email
             if self.user:
@@ -362,35 +401,32 @@ class MerchantProfileUpdateForm(ModelForm):
                 # 更新 username (格式: ID_email)
                 self.user.username = f"{self.user.pk}_{self.cleaned_data['email']}"
                 self.user.save(update_fields=["email", "username"])
+
+            # 檢查資料更新後是否仍符合自動審核條件
+            is_eligible, check_results = merchant.check_auto_approval_eligibility()
+
+            if old_status == 'approved' and not is_eligible:
+                # 如果之前已通過認證，但修改後不符合條件，撤銷認證
+                merchant.verification_status = 'pending'
+                merchant.rejection_reason = "資料修改後不符合自動審核條件，需重新審核"
+                merchant.save(update_fields=['verification_status', 'rejection_reason'])
+                print(f"⚠️ 商家 {merchant.ShopName} 因資料修改不符合標準，認證狀態已重置為待審核")
+
+                # 顯示具體不符合的項目
+                failed_checks = [check for check in check_results if check['status'] == 'failed']
+                for check in failed_checks:
+                    print(f"   - {check['field']}: {check['message']}")
+
+            elif old_status in ['rejected', 'pending']:
+                # 如果商家之前被拒絕或待審核，嘗試自動重審
+                auto_approved, message = merchant.attempt_auto_approval()
+                if auto_approved:
+                    print(f"🎉 商家 {merchant.ShopName} 資料更新後自動通過審核")
+                else:
+                    print(f"⏳ 商家 {merchant.ShopName} 資料更新後仍需人工審核：{message}")
+            elif old_status == 'approved' and is_eligible:
+                print(f"✅ 商家 {merchant.ShopName} 資料更新後仍符合認證標準")
+
         return merchant
 
 
-class MerchantOwnDomainForm(forms.ModelForm):
-
-    class Meta:
-        model = MerchantOwnDomain
-        fields = ["domain_name"]
-        widgets = {
-            "domain_name": forms.TextInput(
-                attrs={
-                    "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "例如: www.myshop.com 或 myshop.com",
-                    "required": True,
-                }
-            )
-        }
-        labels = {"domain_name": "自訂網域名稱"}
-
-    def clean_domain_name(self):
-        domain_name = self.cleaned_data.get("domain_name", "").strip().lower()
-        if not domain_name:
-            raise forms.ValidationError("請輸入網域名稱")
-
-        domain_pattern = r"^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$"
-        if not re.match(domain_pattern, domain_name):
-            raise forms.ValidationError("網域格式不正確")
-        if domain_name.endswith(f".{settings.BASE_DOMAIN}"):
-            raise forms.ValidationError(f"不能使用 {settings.BASE_DOMAIN} 的子網域")
-        if MerchantOwnDomain.objects.filter(domain_name=domain_name).exists():
-            raise forms.ValidationError("此網域已被使用")
-        return domain_name

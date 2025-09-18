@@ -49,6 +49,28 @@ npm-debug.log*
 .env.production
 .env.*.local
 
+# Node.js 開發相關（但保留生產構建結果）
+node_modules
+npm-debug.log
+.npm
+
+# 前端開發檔案（但保留已建置的 static/）
+src/
+.prettierignore
+.editorconfig
+tailwind.config.js
+vite.config.js
+
+# 大型檔案和映像檔案（重要優化）
+*.tar.gz
+*.tar
+*.zip
+*.rar
+*.7z
+
+# 新增的動態 ALLOWED_HOSTS 日誌
+*.log
+
 # 作業系統
 .DS_Store
 .DS_Store?
@@ -59,14 +81,14 @@ ehthumbs.db
 Thumbs.db
 
 # Docker 相關
-Dockerfile
+Dockerfile*
 .dockerignore
 docker-compose.yml
 docker-compose*.yml
 
-# 前端編譯輸出（會在容器內重新編譯）
-static/scripts/
-static/styles/
+# 前端編譯輸出（使用本地已編譯的版本）
+# static/scripts/
+# static/styles/
 
 # 日誌檔案
 logs/
@@ -77,6 +99,37 @@ celery.log
 tmp/
 temp/
 
-# 其他
+# Python 緩存和臨時檔案
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+.cache/
+
+# 虛擬環境（如果意外包含）
+.venv/
+venv/
+env/
+
+# 測試和文檔
 README.md
 *.md
+tests/
+coverage/
+docs/
+
+# IDE 和編輯器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 其他開發檔案
+.claude/
+ngrok.exe
+config.yml
+truepay-key-new.pem
+makefile
+Makefile

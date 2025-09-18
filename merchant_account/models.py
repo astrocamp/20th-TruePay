@@ -8,6 +8,13 @@ import secrets
 
 # Create your models here.
 class Merchant(models.Model):
+    VERIFICATION_STATUS_CHOICES = [
+        ("pending", "待審核"),
+        ("approved", "已通過"),
+        ("rejected", "已拒絕"),
+        ("suspended", "已暫停"),
+    ]
+
     member = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -22,6 +29,27 @@ class Merchant(models.Model):
     Address = models.CharField(max_length=50, null=False)
     Cellphone = models.CharField(max_length=15, null=False)
     subdomain = models.SlugField(max_length=50, unique=True, null=False, blank=False)
+
+    # 商家審核相關欄位
+    verification_status = models.CharField(
+        max_length=20,
+        choices=VERIFICATION_STATUS_CHOICES,
+        default="pending",
+        verbose_name="審核狀態",
+        help_text="商家身份驗證狀態",
+    )
+    verified_at = models.DateTimeField(
+        null=True, blank=True, verbose_name="通過審核時間"
+    )
+    rejection_reason = models.TextField(
+        blank=True, verbose_name="拒絕原因", help_text="審核不通過時的原因說明"
+    )
+    verification_documents = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name="驗證文件",
+        help_text="儲存審核相關文件的元資料",
+    )
     subdomain_change_count = models.PositiveIntegerField(
         default=0,
         verbose_name="修改次數",
@@ -110,6 +138,248 @@ class Merchant(models.Model):
         self.subdomain_change_count = 0
         self.save(update_fields=["subdomain_change_count"])
 
+    # 商家審核相關方法
+    def is_verified(self):
+        """檢查商家是否已通過審核"""
+        return self.verification_status == "approved"
+
+    def can_operate(self):
+        """檢查商家是否可以進行營業活動"""
+        return self.verification_status == "approved" and self.member.is_active
+
+    def approve_verification(self, admin_user=None):
+        """通過商家審核"""
+        self.verification_status = "approved"
+        self.verified_at = timezone.now()
+        self.rejection_reason = ""
+        self.save(
+            update_fields=["verification_status", "verified_at", "rejection_reason"]
+        )
+        # 可以在這裡加入發送通知郵件的邏輯
+        print(f"✅ 商家 {self.ShopName} 已通過審核")
+
+    def reject_verification(self, reason="", admin_user=None):
+        """拒絕商家審核"""
+        self.verification_status = "rejected"
+        self.rejection_reason = reason
+        self.verified_at = None
+        self.save(
+            update_fields=["verification_status", "rejection_reason", "verified_at"]
+        )
+        # 可以在這裡加入發送通知郵件的邏輯
+        print(f"❌ 商家 {self.ShopName} 審核被拒絕：{reason}")
+
+    def suspend_merchant(self, reason=""):
+        """暫停商家營業"""
+        self.verification_status = "suspended"
+        self.rejection_reason = reason
+        self.save(update_fields=["verification_status", "rejection_reason"])
+
+        print(f"⚠️ 商家 {self.ShopName} 已被暫停營業：{reason}")
+
+    def get_verification_status_display_with_icon(self):
+        """取得帶圖標的審核狀態顯示"""
+        status_icons = {
+            "pending": "⏳",
+            "approved": "✅",
+            "rejected": "❌",
+            "suspended": "⚠️",
+        }
+        icon = status_icons.get(self.verification_status, "❓")
+        return f"{icon} {self.get_verification_status_display()}"
+
+    def check_auto_approval_eligibility(self):
+        """檢查是否符合自動審核條件，返回 (是否符合, 具體檢查結果)"""
+        checks = []
+
+        # 如果關閉自動審核功能
+        if not getattr(settings, "ENABLE_AUTO_MERCHANT_APPROVAL", True):
+            return False, [
+                {"field": "系統", "status": "disabled", "message": "自動審核功能已關閉"}
+            ]
+
+        # 條件1：統一編號格式檢查（8位數字）
+        if (
+            not self.UnifiedNumber
+            or len(self.UnifiedNumber) != 8
+            or not self.UnifiedNumber.isdigit()
+        ):
+            checks.append(
+                {
+                    "field": "UnifiedNumber",
+                    "status": "failed",
+                    "message": "統一編號格式不正確，需要8位數字",
+                }
+            )
+        else:
+            checks.append(
+                {
+                    "field": "UnifiedNumber",
+                    "status": "passed",
+                    "message": "統一編號格式正確",
+                }
+            )
+
+        # 條件2：身分證字號格式檢查
+        if not re.match(r"^[A-Z][12][0-9]{8}$", self.NationalNumber):
+            checks.append(
+                {
+                    "field": "NationalNumber",
+                    "status": "failed",
+                    "message": "身分證字號格式不正確（格式：A123456789）",
+                }
+            )
+        else:
+            checks.append(
+                {
+                    "field": "NationalNumber",
+                    "status": "passed",
+                    "message": "身分證字號格式正確",
+                }
+            )
+
+        # 條件3：手機號碼格式檢查
+        if not re.match(r"^09[0-9]{8}$", self.Cellphone):
+            checks.append(
+                {
+                    "field": "Cellphone",
+                    "status": "failed",
+                    "message": "手機號碼格式不正確（格式：09xxxxxxxx）",
+                }
+            )
+        else:
+            checks.append(
+                {
+                    "field": "Cellphone",
+                    "status": "passed",
+                    "message": "手機號碼格式正確",
+                }
+            )
+
+        # 條件4：檢查是否有重複的統一編號
+        duplicate_unified = (
+            Merchant.objects.exclude(pk=self.pk)
+            .filter(UnifiedNumber=self.UnifiedNumber)
+            .exists()
+        )
+        if duplicate_unified:
+            checks.append(
+                {
+                    "field": "UnifiedNumber",
+                    "status": "failed",
+                    "message": "統一編號已被其他商家使用",
+                }
+            )
+
+        # 條件5：檢查商店名稱長度
+        if len(self.ShopName) < 2:
+            checks.append(
+                {
+                    "field": "ShopName",
+                    "status": "failed",
+                    "message": "商店名稱過短，至少需要2個字元",
+                }
+            )
+        else:
+            checks.append(
+                {
+                    "field": "ShopName",
+                    "status": "passed",
+                    "message": "商店名稱長度符合要求",
+                }
+            )
+
+        # 條件6：檢查地址是否完整
+        if not self.Address or len(self.Address) < 5:
+            checks.append(
+                {
+                    "field": "Address",
+                    "status": "failed",
+                    "message": "地址資訊不完整，至少需要5個字元",
+                }
+            )
+        else:
+            checks.append(
+                {"field": "Address", "status": "passed", "message": "地址資訊完整"}
+            )
+
+        # 條件7：檢查email域名是否在白名單中（如果有設定）
+        if (
+            hasattr(settings, "AUTO_APPROVE_EMAIL_DOMAINS")
+            and settings.AUTO_APPROVE_EMAIL_DOMAINS
+        ):
+            email_domain = self.member.email.split("@")[1].lower()
+            if email_domain not in [
+                domain.lower() for domain in settings.AUTO_APPROVE_EMAIL_DOMAINS
+            ]:
+                checks.append(
+                    {
+                        "field": "email",
+                        "status": "failed",
+                        "message": f"Email域名 {email_domain} 不在自動審核白名單中",
+                    }
+                )
+            else:
+                checks.append(
+                    {
+                        "field": "email",
+                        "status": "passed",
+                        "message": "Email域名在允許列表中",
+                    }
+                )
+
+        # 判斷是否全部通過
+        all_passed = all(
+            check["status"] == "passed"
+            for check in checks
+            if check["status"] != "disabled"
+        )
+        return all_passed, checks
+
+    def attempt_auto_approval(self):
+        """嘗試自動審核"""
+        if self.verification_status not in ["pending", "rejected"]:
+            return False, "商家狀態不允許自動審核"
+
+        eligible, checks = self.check_auto_approval_eligibility()
+
+        if eligible:
+            old_status = self.verification_status
+            self.verification_status = "approved"
+            self.verified_at = timezone.now()
+            self.rejection_reason = ""
+            self.save(
+                update_fields=["verification_status", "verified_at", "rejection_reason"]
+            )
+
+            print(
+                f"✅ 商家 {self.ShopName} 已自動通過審核（從 {old_status} 變更為 approved）"
+            )
+            return True, "自動審核通過"
+        else:
+            failed_checks = [check for check in checks if check["status"] == "failed"]
+            reasons = [check["message"] for check in failed_checks]
+            rejection_reason = "自動審核未通過：" + "；".join(reasons)
+
+            if self.verification_status == "pending":
+                self.verification_status = "rejected"
+                self.rejection_reason = rejection_reason
+                self.save(update_fields=["verification_status", "rejection_reason"])
+
+            print(
+                f"⏳ 商家 {self.ShopName} 自動審核未通過，共 {len(failed_checks)} 項不符合"
+            )
+            return False, rejection_reason
+
+    def get_verification_issues(self):
+        """取得詳細的審核問題列表（用於前端顯示）"""
+        eligible, checks = self.check_auto_approval_eligibility()
+        return {
+            "is_approved": self.verification_status == "approved",
+            "can_auto_approve": eligible,
+            "checks": checks,
+        }
+
 
 class SubdomainRedirect(models.Model):
     old_subdomain = models.CharField(max_length=50, verbose_name="舊子網域")
@@ -158,48 +428,3 @@ class SubdomainRedirect(models.Model):
         self.redirect_count += 1
         self.last_used = timezone.now()
         self.save(update_fields=["redirect_count", "last_used"])
-
-
-class MerchantOwnDomain(models.Model):
-    merchant = models.ForeignKey(
-        Merchant,
-        on_delete=models.CASCADE,
-        related_name="own_domains",
-        verbose_name="商家",
-    )
-    domain_name = models.CharField(
-        max_length=253,
-        unique=True,
-        verbose_name="網域名稱",
-        help_text="例如: www.shop.com 或 shop.com",
-    )
-    is_verified = models.BooleanField(default=False, verbose_name="已驗證")
-    verification_token = models.CharField(
-        max_length=64, blank=True, verbose_name="驗證Token"
-    )
-    verification_method = models.CharField(
-        max_length=10,
-        choices=[("DNS", "DNS記錄驗證"), ("FILE", "檔案驗證")],
-        default="DNS",
-        verbose_name="驗證方式",
-    )
-    ssl_enabled = models.BooleanField(default=False, verbose_name="SSL已啟用")
-    ssl_certificate_expires = models.DateTimeField(
-        null=True, blank=True, verbose_name="SSL證書到期時間"
-    )
-    is_active = models.BooleanField(default=True, verbose_name="啟用中")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="建立時間")
-    verified_at = models.DateTimeField(null=True, blank=True, verbose_name="驗證時間")
-
-    class Meta:
-        verbose_name = "商家自有網域"
-        verbose_name_plural = "商家自有網域"
-        ordering = ["-created_at"]
-
-    def __str__(self):
-        return f"{self.merchant.ShopName} - {self.domain_name}"
-
-    def save(self, *args, **kwargs):
-        if not self.verification_token:
-            self.verification_token = secrets.token_hex(32)
-        super().save(*args, **kwargs)

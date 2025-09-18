@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
     gcc \
     curl \
     locales \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs \
     && locale-gen zh_CN.UTF-8 \
     && rm -rf /var/lib/apt/lists/*
@@ -34,20 +34,11 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 ENV PATH="/app/.venv/bin:$PATH"
 
-# 複製前端依賴檔案
-COPY package.json package-lock.json ./
-
-# 安裝前端依賴
-RUN npm install
-
 # 複製應用程式代碼
 COPY . .
 
 # 建立必要目錄
-RUN mkdir -p /app/logs /app/static
-
-# 建置前端資源
-RUN npm run build
+RUN mkdir -p /app/logs
 
 # 開放 8000 port
 EXPOSE 8000
