@@ -902,7 +902,7 @@ def export_ticket_report(request, subdomain):
 
     # 票券驗證統計
     validations = TicketValidation.objects.filter(
-        ticket__order__product__merchant=merchant, validated_at__gte=start_date
+        ticket__order__product__merchant=merchant, validation_time__gte=start_date
     )
 
     ws[f"A{row + 1}"] = "票券驗證統計"
