@@ -23,9 +23,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # 票券設定
 TICKET_VALIDITY_DAYS = 180  # 票券有效期（天數）
-TICKET_HMAC_KEY = os.getenv(
-    "TICKET_HMAC_KEY", "default-hmac-key-change-in-production"
-)  # HMAC 簽名密鑰
 
 
 # Quick-start development settings - unsuitable for production
@@ -54,7 +51,6 @@ BASE_DOMAIN = "highland-activities-editing-nitrogen.trycloudflare.com"
 # Application definition
 
 INSTALLED_APPS = [
-    "dynamic_host",  # 動態 Host 驗證套件
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
