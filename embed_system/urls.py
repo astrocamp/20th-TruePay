@@ -21,7 +21,7 @@ urlpatterns = [
     ])),
 
     # 嵌入頁面
-    path('embed/product/<int:product_id>/', views.EmbedProductView.as_view(), name='embed-product'),
+    path('product/<int:product_id>/', views.EmbedProductView.as_view(), name='embed-product'),
 
     # 嵌入 JavaScript
     path('embed.js', views.EmbedJavaScriptView.as_view(), name='embed-js'),

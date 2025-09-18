@@ -7,7 +7,6 @@
     <title>TruePay 商品卡片</title>
     <link rel="stylesheet" href="{% static 'styles/app.css' %}">
     <script src="{% static 'scripts/app.js' %}" defer></script>
-    <script src="{% static 'scripts/embed-product.js' %}" defer></script>
 </head>
 <body class="m-0 p-2 bg-transparent">
     {% if error %}
@@ -18,14 +17,103 @@
         </div>
     {% else %}
         <div class="bg-white rounded-lg shadow-lg overflow-hidden max-w-sm mx-auto"
-             x-data="productCard({{ product.id }}, {{ can_manage|yesno:'true,false' }}, '{{ manage_token|default:'' }}')"
+             x-data="{
+                 productId: {{ product.id }},
+                 canManage: {{ can_manage|yesno:'true,false' }},
+                 manageToken: '{{ manage_token|default:'' }}',
+                 editMode: false,
+                 saving: false,
+                 message: '',
+                 messageType: 'success',
+                 productData: {},
+                 editData: {},
+
+                 init() {
+                     this.updateHeight();
+                     this.resetEditData();
+                 },
+
+                 updateHeight() {
+                     const height = document.body.scrollHeight;
+                     if (window.parent) {
+                         window.parent.postMessage({ type: 'truepay-resize', height }, '*');
+                     }
+                 },
+
+                 resetEditData() {
+                     this.editData = { ...this.productData };
+                 },
+
+                 toggleEditMode() {
+                     this.editMode = !this.editMode;
+                     this.message = '';
+                     if (this.editMode) this.resetEditData();
+                     this.$nextTick(() => this.updateHeight());
+                 },
+
+                 cancelEdit() {
+                     this.editMode = false;
+                     this.message = '';
+                     this.resetEditData();
+                     this.$nextTick(() => this.updateHeight());
+                 },
+
+                 async saveProduct() {
+                     this.saving = true;
+                     this.message = '';
+
+                     try {
+                         const response = await fetch(`/embed/api/products/${this.productId}/update/`, {
+                             method: 'PATCH',
+                             headers: {
+                                 'Content-Type': 'application/json',
+                                 'Authorization': `Bearer ${this.manageToken}`,
+                                 'X-CSRFToken': this.getCsrfToken()
+                             },
+                             body: JSON.stringify(this.editData)
+                         });
+
+                         const data = await response.json();
+
+                         if (response.ok) {
+                             this.productData = { ...this.productData, ...data.product };
+                             this.message = '商品資訊已成功更新！';
+                             this.messageType = 'success';
+
+                             setTimeout(() => {
+                                 this.editMode = false;
+                                 this.message = '';
+                                 this.$nextTick(() => this.updateHeight());
+                             }, 2000);
+                         } else {
+                             this.message = data.error || '更新失敗';
+                             this.messageType = 'error';
+                         }
+                     } catch (error) {
+                         this.message = '網路錯誤，請稍後再試';
+                         this.messageType = 'error';
+                     }
+
+                     this.saving = false;
+                     this.$nextTick(() => this.updateHeight());
+                 },
+
+                 getCsrfToken() {
+                     const cookies = document.cookie.split(';');
+                     for (let cookie of cookies) {
+                         const [name, value] = cookie.trim().split('=');
+                         if (name === 'csrftoken') return value;
+                     }
+                     return '';
+                 }
+             }"
              x-init="productData = {
                  name: '{{ product.name|escapejs }}',
                  description: '{{ product.description|escapejs }}',
                  price: {{ product.price }},
                  stock: {{ product.stock }},
                  is_active: {{ product.is_active|yesno:'true,false' }},
-                 purchase_url: '/shop/{{ product.merchant.subdomain }}/product/{{ product.id }}/'
+                 purchase_url: '/shop/{{ product.merchant.subdomain }}/pay/{{ product.id }}/'
              }; init()">
 
             <!-- 管理工具列 -->

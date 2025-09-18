@@ -86,8 +86,8 @@
                 target="_blank">
                 開啟收款頁面
               </a> {% endcomment %}
-              <!-- 正式部署使用（需啟用 SubdomainRedirectMiddleware）-->
-              <a href="https://{{ request.merchant.subdomain }}.{{ base_domain }}/pay/{{ product.id }}/"
+              <!-- 收款頁面連結 -->
+              <a href="https://{{ base_domain }}/shop/{{ request.merchant.subdomain }}/pay/{{ product.id }}/"
                 class="block w-full bg-green-500 text-white text-center py-3 px-4 rounded-lg text-sm hover:bg-green-600 transition duration-200"
                 target="_blank">
                 開啟收款頁面
