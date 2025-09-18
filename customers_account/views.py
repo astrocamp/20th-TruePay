@@ -799,4 +799,13 @@ def authenticator_guide(request):
         messages.info(request, "您已經啟用二階段驗證")
         return redirect("customers_account:totp_manage")
 
-    return render(request, "customers/authenticator_guide.html")
+    # 檢查是否有 next 參數，決定是否顯示「稍後再做設定」按鈕
+    next_url = request.GET.get("next")
+    is_required = bool(next_url)  # 如果有 next 參數，表示是必須設定的
+
+    context = {
+        "is_required": is_required,
+        "next_url": next_url,
+    }
+
+    return render(request, "customers/authenticator_guide.html", context)

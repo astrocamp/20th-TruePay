@@ -2,8 +2,12 @@
 {% block content %}
 <div class="max-w-4xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md" x-data="authenticatorGuide()">
     <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-4">🔐 歡迎使用 TruePay！</h1>
-        <p class="text-lg text-gray-600">為了保護您的帳戶安全，我們建議您設定二階段驗證</p>
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">🔐 {% if is_required %}安全驗證設定{% else %}歡迎使用 TruePay！{% endif %}</h1>
+        {% if is_required %}
+            <p class="text-lg text-orange-600 font-medium">此操作需要二階段驗證，請完成安全設定後繼續</p>
+        {% else %}
+            <p class="text-lg text-gray-600">為了保護您的帳戶安全，我們建議您設定二階段驗證</p>
+        {% endif %}
     </div>
 
     <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
@@ -61,21 +65,29 @@
     </div>
 
     <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-        <a href="{% url 'customers_account:totp_setup' %}"
+        <a href="{% url 'customers_account:totp_setup' %}{% if next_url %}?next={{ next_url }}{% endif %}"
            class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-200 font-medium text-center">
             ✅ 開始設定二階段驗證
         </a>
 
+        {% if not is_required %}
         <a href="{% url 'customers_account:dashboard' %}"
            class="bg-gray-400 text-white px-8 py-3 rounded-lg hover:bg-gray-500 transition duration-200 font-medium text-center">
             ⏭️ 稍後再做設定
         </a>
+        {% endif %}
     </div>
 
     <div class="mt-8 p-4 bg-gray-100 rounded-lg">
-        <p class="text-sm text-gray-600 text-center">
-            💡 <strong>小提示：</strong>您隨時可以在「個人設定」頁面中設定或管理二階段驗證
-        </p>
+        {% if is_required %}
+            <p class="text-sm text-orange-600 text-center">
+                🔒 <strong>注意：</strong>設定完成後將自動返回原頁面繼續操作
+            </p>
+        {% else %}
+            <p class="text-sm text-gray-600 text-center">
+                💡 <strong>小提示：</strong>您隨時可以在「個人設定」頁面中設定或管理二階段驗證
+            </p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
