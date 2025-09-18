@@ -114,7 +114,7 @@
                 </ul>
                 <div class="flex space-x-2">
                     <button @click="openModal('sales')"
-                        class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center">
+                        class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center cursor-pointer">
                         <i class="fas fa-chart-pie mr-2"></i> 預覽
                     </button>
                     <a href="{% url 'merchant_account:export_sales' subdomain=merchant.subdomain %}?days={{ days }}"
@@ -144,7 +144,7 @@
                 </ul>
                 <div class="flex space-x-2">
                     <button @click="openModal('tickets')"
-                        class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center">
+                        class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center cursor-pointer">
                         <i class="fas fa-chart-pie mr-2"></i> 預覽
                     </button>
                     <a href="{% url 'merchant_account:export_tickets' subdomain=merchant.subdomain %}?days={{ days }}"
@@ -174,7 +174,7 @@
                 </ul>
                 <div class="flex space-x-2">
                     <button @click="openModal('products')"
-                        class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center">
+                        class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center cursor-pointer">
                         <i class="fas fa-chart-pie mr-2"></i> 預覽
                     </button>
                     <a href="{% url 'merchant_account:export_products' subdomain=merchant.subdomain %}?days={{ days }}"
