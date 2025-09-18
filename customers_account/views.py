@@ -40,8 +40,11 @@ def register(request):
         if form.is_valid():
             try:
                 customer = form.save()
-                messages.success(request, "註冊成功！請登入您的帳號。")
-                return redirect("customers_account:login")
+                # 自動登入新註冊的用戶
+                django_login(request, customer.member, backend="django.contrib.auth.backends.ModelBackend")
+                messages.success(request, "註冊成功！歡迎加入 TruePay！")
+                # 跳轉到 Google Authenticator 下載引導頁面
+                return redirect("customers_account:authenticator_guide")
             except Exception as e:
                 messages.error(request, "註冊失敗，請重試。")
         else:
@@ -772,3 +775,28 @@ def totp_verify_for_redemption(request):
         "next_url": next_url,
     }
     return render(request, "customers/totp_verify_for_redemption.html", context)
+
+
+def authenticator_guide(request):
+    """Google Authenticator 下載引導頁面"""
+    # 檢查用戶是否已登入且是客戶
+    if not request.user.is_authenticated:
+        messages.error(request, "請先登入")
+        return redirect("customers_account:login")
+
+    if not hasattr(request.user, "member_type") or request.user.member_type != "customer":
+        messages.error(request, "權限不足")
+        return redirect("pages:home")
+
+    try:
+        customer = Customer.objects.get(member=request.user)
+    except Customer.DoesNotExist:
+        messages.error(request, "客戶資料不存在")
+        return redirect("pages:home")
+
+    # 如果用戶已經啟用了2FA，直接跳轉到管理頁面
+    if customer.totp_enabled:
+        messages.info(request, "您已經啟用二階段驗證")
+        return redirect("customers_account:totp_manage")
+
+    return render(request, "customers/authenticator_guide.html")

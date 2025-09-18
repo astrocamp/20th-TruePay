@@ -8,6 +8,20 @@ function showGlobalInfo(message) {
   console.log('Global:', message);
 }
 
+// Google Authenticator 下載引導頁面的 Alpine.js 組件
+function authenticatorGuide() {
+  return {
+    trackDownload(platform, url) {
+      console.log(`用戶點擊下載 ${platform}：`, url);
+      // 這裡可以加入更多追蹤邏輯，例如發送分析事件
+      // 例如：gtag('event', 'download_authenticator', { platform: platform });
+    }
+  };
+}
+
+// 暴露到全域
+window.authenticatorGuide = authenticatorGuide;
+
 // 獲取 CSRF Token 的通用函數
 function getCsrfToken() {
   // 優先從 cookie 獲取
