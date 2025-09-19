@@ -150,7 +150,10 @@
             <h2 class="text-xl font-semibold text-gray-900 mb-6">商店模板風格設定</h2>
             <p class="text-gray-600 mb-8">選擇適合您品牌的視覺風格，為顧客提供更好的購物體驗</p>
 
-            <form method="post" x-data="{ selectedTemplate: '{{ template_form.store_template_id.value|default:"modern" }}' }">
+            <form method="post" 
+                  x-data="{ selectedTemplate: '{{ template_form.store_template_id.value|default:'modern' }}' }" 
+                  data-preview-base-url="{% url 'public_store:shop_overview' merchant.subdomain %}"
+            >
                 {% csrf_token %}
                 <input type="hidden" name="form_type" value="template">
 
@@ -171,12 +174,6 @@
                             <!-- 模板預覽圖 -->
                             <div class="h-32 rounded-lg mb-4 flex items-center justify-center text-4xl"
                                  style="background: linear-gradient(135deg, {{ template_info|get_item:choice_value|get_item:'color' }}22, {{ template_info|get_item:choice_value|get_item:'color' }}44);">
-                                {% if choice_value == 'modern_light' %}
-                                {% elif choice_value == 'modern' %}
-                                {% elif choice_value == 'tech' %}
-                                {% elif choice_value == 'handcraft' %}
-                                {% elif choice_value == 'vintage' %}
-                                {% endif %}
                             </div>
 
                             <!-- 模板信息 -->
@@ -202,10 +199,10 @@
                 <div class="flex justify-between items-center">
                     <div class="text-sm text-gray-500">
                         <span class="font-medium">目前使用：</span>
-                        <span x-text="getTemplateName(selectedTemplate)" class="text-gray-700"></span>
+                        <span x-text="getTemplateDisplayName(selectedTemplate)" class="text-gray-700"></span>
                     </div>
                     <div class="flex space-x-4">
-                        <a :href="getPreviewUrl(selectedTemplate)"
+                        <a :href="buildPreviewUrl($el, selectedTemplate)"
                            target="_blank"
                            class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition duration-200">
                             預覽效果
@@ -220,20 +217,4 @@
     </div>
 </div>
 
-<script>
-function getTemplateName(value) {
-    const names = {
-        'luxury': '奢華精品風',
-        'modern': '現代簡約風',
-        'tech': '科技數位風',
-        'handcraft': '手工藝術風',
-        'vintage': '復古經典風'
-    };
-    return names[value] || '現代簡約風';
-}
-
-function getPreviewUrl(template) {
-    return `{% url 'public_store:shop_overview' merchant.subdomain %}?preview=${template}`;
-}
-</script>
 {% endblock %}

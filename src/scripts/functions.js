@@ -250,7 +250,7 @@ function handleUseMerchantPhone(element) {
   }
 }
 
-// Alpine.js 選單管理組件
+// Alpine.js選單管理組件
 function createMobileMenu() {
   return {
     isOpen: false,
@@ -828,9 +828,11 @@ function createBackupCodes(backupTokens) {
                 const successful = document.execCommand('copy');
                 if (successful) {
                     this.showCopySuccess();
+                } else {
+                    this.showError('舊版複製方法失敗');
                 }
             } catch (err) {
-                console.error('複製失敗:', err.message);
+                this.showError('複製失敗: ' + err.message);
             }
             
             document.body.removeChild(textArea);
@@ -1078,6 +1080,30 @@ function createTotpVerifyPayment() {
 
 // 將付款 TOTP 驗證函數掛載到全域供 Alpine.js 使用
 window.createTotpVerifyPayment = createTotpVerifyPayment;
+
+
+function getTemplateDisplayName(templateId) {
+    const names = {
+        'modern_light': '淡色 簡約風',
+        'modern': '現代簡約風',
+        'tech': '科技數位風',
+        'handcraft': '手工藝術風',
+        'vintage': '復古經典風'
+    };
+    return names[templateId] || '現代簡約風';
+}
+
+function buildPreviewUrl(formElement, templateId) {
+    const baseUrl = formElement.closest('form').dataset.previewBaseUrl;
+    if (!baseUrl) {
+        console.error('Preview base URL not found on form element!');
+        return '#';
+    }
+    return `${baseUrl}?preview=${templateId}`;
+}
+
+window.getTemplateDisplayName = getTemplateDisplayName;
+window.buildPreviewUrl = buildPreviewUrl;
 
 // 導出 Alpine.js 組件創建函數和 NavigationManager
 export { 
