@@ -9,6 +9,9 @@ from io import BytesIO
 import base64
 from django.contrib.staticfiles import finders
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def generate_qr_code_with_logo(data, logo_path=None, logo_size_ratio=0.25, error_correction=qrcode.constants.ERROR_CORRECT_M):
@@ -89,7 +92,7 @@ def generate_qr_code_with_logo(data, logo_path=None, logo_size_ratio=0.25, error
 
     except Exception as e:
         # 如果添加 logo 失敗，就使用原始的 QR Code
-        print(f"Warning: Could not add logo to QR code: {e}")
+        logger.warning(f"Warning: Could not add logo to QR code: {e}")
 
     # 轉換為 base64
     buffer = BytesIO()
