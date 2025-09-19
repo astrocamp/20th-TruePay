@@ -1,25 +1,26 @@
 {% extends 'layouts/default.html' %}
 {% block main_container_classes %}marketplace-bg{% endblock %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}商品總覽 - TruePay{% endblock %}
+{% block title %}{% trans "商品總覽" %} - TruePay{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 py-8">
     <!-- 頁面標題 -->
-    <div class="mb-8 text-center">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">商品總覽</h1>
-        <p class="text-gray-600">探索各大商家的精選商品</p>
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">{% trans "商品總覽" %}</h1>
+        <p class="text-gray-600">{% trans "探索各大商家的精選商品" %}</p>
     </div>
 
     <!-- 商品篩選 -->
     <div class="mb-8">
         <div class="flex items-center justify-between">
             <p class="text-sm text-gray-500">
-                共找到 {{ products.paginator.count }} 個商品
+                {% blocktrans with count=products.paginator.count %}共找到 {{ count }} 個商品{% endblocktrans %}
             </p>
             <p class="text-sm text-gray-500">
-                第 {{ products.number }} 頁，共 {{ products.paginator.num_pages }} 頁
+                {% blocktrans with current=products.number total=products.paginator.num_pages %}第 {{ current }} 頁，共 {{ total }} 頁{% endblocktrans %}
             </p>
         </div>
     </div>
@@ -57,11 +58,11 @@
                     <!-- 庫存狀態 -->
                     {% if product.stock > 0 %}
                         <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                            庫存 {{ product.stock }}
+                            {% blocktrans with stock=product.stock %}庫存 {{ stock }}{% endblocktrans %}
                         </span>
                     {% else %}
                         <span class="text-xs text-red-600 bg-red-50 px-2 py-1 rounded-full">
-                            已售完
+                            {% trans "已售完" %}
                         </span>
                     {% endif %}
                 </div>
@@ -77,16 +78,16 @@
                         {% if product.merchant.subdomain %}
                             <a href="{% url 'public_store:shop_overview' product.merchant.subdomain %}" 
                                class="block w-full bg-cis-primary text-white text-center py-2 px-4 rounded-xl hover:bg-cis-primaryHover transition-all font-medium">
-                                前往商家
+                                {% trans "前往商家" %}
                             </a>
                         {% else %}
                             <button class="block w-full bg-gray-400 text-gray-600 text-center py-2 px-4 rounded-xl cursor-not-allowed font-medium">
-                                商家未設定
+                                {% trans "商家未設定" %}
                             </button>
                         {% endif %}
                     {% else %}
                         <button class="block w-full bg-gray-300 text-gray-500 text-center py-2 px-4 rounded-xl cursor-not-allowed font-medium">
-                            已售完
+                            {% trans "已售完" %}
                         </button>
                     {% endif %}
                 </div>
@@ -100,8 +101,8 @@
         <div class="mb-4">
             {% include 'components/icons.html' with icon='warning' class='w-16 h-16 text-gray-300 mx-auto' %}
         </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">目前沒有商品</h3>
-        <p class="text-gray-500">請稍後再來查看，或許會有新商品上架！</p>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">{% trans "目前沒有商品" %}</h3>
+        <p class="text-gray-500">{% trans "請稍後再來查看，或許會有新商品上架！" %}</p>
     </div>
     {% endif %}
 
@@ -111,10 +112,10 @@
         <nav class="flex space-x-2">
             {% if products.has_previous %}
                 <a href="?page=1" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                    首頁
+                    {% trans "首頁" %}
                 </a>
                 <a href="?page={{ products.previous_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                    上一頁
+                    {% trans "上一頁" %}
                 </a>
             {% endif %}
 
@@ -132,10 +133,10 @@
 
             {% if products.has_next %}
                 <a href="?page={{ products.next_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                    下一頁
+                    {% trans "下一頁" %}
                 </a>
                 <a href="?page={{ products.paginator.num_pages }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                    最後頁
+                    {% trans "最後頁" %}
                 </a>
             {% endif %}
         </nav>

@@ -1,8 +1,9 @@
 {% extends "layouts/default.html" %}
-{% block main_container_classes %}w-full flex-grow flex items-center justify-center py-16 merchant-auth-bg{% endblock %}
+{% load i18n %}
+{% block main_container_classes %}w-full flex-grow flex items-center justify-center py-16{% endblock %}
 {% block content %}
 <div class="w-full max-w-md mx-auto p-8 bg-white rounded-2xl shadow-2xl border border-gray-100" style="width: 40%; min-width: 400px;">
-  <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">商家註冊</h1>
+  <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">{% trans "商家註冊" %}</h1>
 
   {% if messages %} {% for message in messages %}
   <div
@@ -24,7 +25,7 @@
         for="{{ form.ShopName.id_for_label }}"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
-        商店名稱 <span class="text-red-500">*</span>
+        {% trans "商店名稱" %} <span class="text-red-500">*</span>
       </label>
       {{ form.ShopName }}
       {% if form.ShopName.errors %}
@@ -39,7 +40,7 @@
         for="{{ form.UnifiedNumber.id_for_label }}"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
-        統一編號 <span class="text-red-500">*</span>
+        {% trans "統一編號" %} <span class="text-red-500">*</span>
       </label>
       {{ form.UnifiedNumber }}
       {% if form.UnifiedNumber.errors %}
@@ -54,7 +55,7 @@
         for="{{ form.NationalNumber.id_for_label }}"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
-        身分證號 <span class="text-red-500">*</span>
+        {% trans "身分證號" %} <span class="text-red-500">*</span>
       </label>
       {{ form.NationalNumber }}
       {% if form.NationalNumber.errors %}
@@ -69,7 +70,7 @@
         for="{{ form.email.id_for_label }}"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
-        電子郵件 <span class="text-red-500">*</span>
+        {% trans "電子郵件" %} <span class="text-red-500">*</span>
       </label>
       {{ form.email }}
       {% if form.email.errors %}
@@ -84,7 +85,7 @@
         for="{{ form.Name.id_for_label }}"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
-        負責人姓名 <span class="text-red-500">*</span>
+        {% trans "負責人姓名" %} <span class="text-red-500">*</span>
       </label>
       {{ form.Name }}
       {% if form.Name.errors %}
@@ -99,7 +100,7 @@
         for="{{ form.Address.id_for_label }}"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
-        地址 <span class="text-red-500">*</span>
+        {% trans "地址" %} <span class="text-red-500">*</span>
       </label>
       {{ form.Address }}
       {% if form.Address.errors %}
@@ -114,7 +115,7 @@
         for="{{ form.Cellphone.id_for_label }}"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
-        手機號碼 <span class="text-red-500">*</span>
+        {% trans "手機號碼" %} <span class="text-red-500">*</span>
       </label>
       {{ form.Cellphone }}
       {% if form.Cellphone.errors %}
@@ -129,7 +130,7 @@
         for="{{ form.password.id_for_label }}"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
-        密碼 <span class="text-red-500">*</span>
+        {% trans "密碼" %} <span class="text-red-500">*</span>
       </label>
       {{ form.password }}
       {% if form.password.errors %}
@@ -143,18 +144,18 @@
       type="submit"
       class="w-full bg-[#0056B3] text-white py-3 px-4 rounded-lg hover:bg-[#00408A] focus:outline-none focus:ring-2 focus:ring-[#0056B3] focus:ring-offset-2 transition duration-200"
     >
-      註冊
+      {% trans "註冊" %}
     </button>
   </form>
 
   <div class="mt-6 text-center">
     <p class="text-gray-600">
-      已有帳號？
+      {% trans "已有帳號？" %}
       <a
         href="{% url 'merchant_account:login' %}"
         class="text-blue-600 hover:text-blue-800 font-medium"
       >
-        點此登入
+        {% trans "點此登入" %}
       </a>
     </p>
   </div>

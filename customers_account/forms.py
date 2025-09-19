@@ -1,11 +1,10 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
+from django.utils.translation import gettext_lazy as _
 from .models import Customer
 import re
 from django.utils import timezone
-
-Member = get_user_model()
 
 Member = get_user_model()
 
@@ -15,7 +14,7 @@ class CustomerRegistrationForm(forms.ModelForm):
         widget=forms.PasswordInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "請輸入密碼（至少8個字元）",
+                "placeholder": _("請輸入密碼（至少8個字元）"),
             }
         ),
         label="密碼 *",
@@ -27,7 +26,7 @@ class CustomerRegistrationForm(forms.ModelForm):
         widget=forms.PasswordInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "確認密碼",
+                "placeholder": _("確認密碼"),
             }
         ),
         label="確認密碼 *",
@@ -37,7 +36,7 @@ class CustomerRegistrationForm(forms.ModelForm):
         widget=forms.EmailInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "請輸入電子郵件",
+                "placeholder": _("請輸入電子郵件"),
                 "required": True,
             }
         ),
@@ -51,14 +50,14 @@ class CustomerRegistrationForm(forms.ModelForm):
             "name": forms.TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入姓名",
+                    "placeholder": _("請輸入姓名"),
                     "required": True,
                 }
             ),
             "id_number": forms.TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入身分證字號（格式：A123456789）",
+                    "placeholder": _("請輸入身分證字號（格式：A123456789）"),
                 }
             ),
             "birth_date": forms.DateInput(
@@ -71,7 +70,7 @@ class CustomerRegistrationForm(forms.ModelForm):
             "phone": forms.TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入電話號碼（格式：09xxxxxxxx）",
+                    "placeholder": _("請輸入電話號碼（格式：09xxxxxxxx）"),
                 }
             ),
         }
@@ -144,7 +143,7 @@ class CustomerLoginForm(forms.Form):
         widget=forms.EmailInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "請輸入電子郵件",
+                "placeholder": _("請輸入電子郵件"),
             }
         ),
         label="電子郵件",
@@ -153,7 +152,7 @@ class CustomerLoginForm(forms.Form):
         widget=forms.PasswordInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "請輸入密碼",
+                "placeholder": _("請輸入密碼"),
             }
         ),
         label="密碼",
@@ -206,7 +205,7 @@ class CustomerProfileUpdateForm(forms.ModelForm):
         widget=forms.EmailInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "請輸入電子郵件",
+                "placeholder": _("請輸入電子郵件"),
             }
         ),
         label="電子郵件",
@@ -219,13 +218,13 @@ class CustomerProfileUpdateForm(forms.ModelForm):
             "name": forms.TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入姓名",
+                    "placeholder": _("請輸入姓名"),
                 }
             ),
             "id_number": forms.TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入身分證字號",
+                    "placeholder": _("請輸入身分證字號"),
                 }
             ),
             "birth_date": forms.DateInput(
@@ -237,7 +236,7 @@ class CustomerProfileUpdateForm(forms.ModelForm):
             "phone": forms.TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入電話號碼",
+                    "placeholder": _("請輸入電話號碼"),
                 }
             ),
         }
@@ -295,7 +294,7 @@ class PasswordChangeForm(forms.Form):
         widget=forms.PasswordInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "請輸入目前密碼",
+                "placeholder": _("請輸入目前密碼"),
             }
         ),
         label="目前密碼",
@@ -304,7 +303,7 @@ class PasswordChangeForm(forms.Form):
         widget=forms.PasswordInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "請輸入新密碼",
+                "placeholder": _("請輸入新密碼"),
             }
         ),
         label="新密碼",
@@ -315,7 +314,7 @@ class PasswordChangeForm(forms.Form):
         widget=forms.PasswordInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "確認新密碼",
+                "placeholder": _("確認新密碼"),
             }
         ),
         label="確認新密碼",
@@ -357,7 +356,7 @@ class ForgotPasswordForm(forms.Form):
         widget=forms.EmailInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "請輸入您的電子郵件",
+                "placeholder": _("請輸入您的電子郵件"),
             }
         ),
         label="電子郵件",
@@ -396,7 +395,7 @@ class PasswordResetForm(forms.Form):
         widget=forms.PasswordInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "請輸入新密碼",
+                "placeholder": _("請輸入新密碼"),
             }
         ),
         label="新密碼",
@@ -407,7 +406,7 @@ class PasswordResetForm(forms.Form):
         widget=forms.PasswordInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "確認新密碼",
+                "placeholder": _("確認新密碼"),
             }
         ),
         label="確認新密碼",
