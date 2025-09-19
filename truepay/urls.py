@@ -11,6 +11,7 @@ urlpatterns = [
     path("payments/", include("payments.urls")),
     path("accounts/", include("allauth.urls")),  # Django Allauth URLs
     path("embed/", include("embed_system.urls")),  # 嵌入系統 URLs
+    path("i18n/", include("django.conf.urls.i18n")),  # 語言切換
     path("", include("pages.urls")),
 ]
 

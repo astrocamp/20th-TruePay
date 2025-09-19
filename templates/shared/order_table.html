@@ -1,5 +1,5 @@
 {% load static %}
-
+{% load i18n %}
 <!-- 公版訂單記錄表格 -->
 <div class="w-full -mx-3 sm:-mx-0">
     <div class="overflow-x-auto rounded-lg border border-gray-200">
@@ -7,42 +7,42 @@
         <thead class="bg-gray-50">
             <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    訂單編號
+                    {% trans "訂單編號" %}
                 </th>
                 {% if role == 'merchant' %}
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    交易序號
+                    {% trans "交易序號" %}
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    消費者
+                    {% trans "消費者" %}
                 </th>
                 {% endif %}
                 {% if role == 'customer' %}
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    商家
+                    {% trans "商家" %}
                 </th>
                 {% endif %}
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    商品名稱
+                    {% trans "商品名稱" %}
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    數量
+                    {% trans "數量" %}
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    總金額
+                    {% trans "總金額" %}
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    訂單狀態
+                    {% trans "訂單狀態" %}
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    付款方式
+                    {% trans "付款方式" %}
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    建立時間
+                    {% trans "建立時間" %}
                 </th>
                 {% if role == 'customer' %}
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    操作
+                    {% trans "操作" %}
                 </th>
                 {% endif %}
             </tr>
@@ -107,28 +107,28 @@
                     {% if item.status == 'pending' %}
                         <div class="flex space-x-2">
                             <form method="POST" action="{% url 'payments:retry_payment' item.id %}" class="inline-block" 
-                                  onsubmit="return confirm('確認要重新付款此訂單嗎？');">
+                                  onsubmit="return confirm('{% trans '確認要重新付款此訂單嗎？' %}');">
                                 {% csrf_token %}
                                 <button type="submit" 
                                         class="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition duration-200">
-                                    重新付款
+                                    {% trans "重新付款" %}
                                 </button>
                             </form>
                             <form method="POST" action="{% url 'customers_account:cancel_order' item.id %}" class="inline-block" 
-                                  onsubmit="return confirm('確認要取消此訂單嗎？取消後將無法恢復。');">
+                                  onsubmit="return confirm('{% trans '確認要取消此訂單嗎？取消後將無法恢復。' %}');">
                                 {% csrf_token %}
                                 <button type="submit" 
                                         class="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700 transition duration-200">
-                                    取消訂單
+                                    {% trans "取消訂單" %}
                                 </button>
                             </form>
                         </div>
                     {% elif item.status == 'paid' %}
-                        <span class="text-green-600 text-xs">已完成</span>
+                        <span class="text-green-600 text-xs">{% trans "已完成" %}</span>
                     {% elif item.status == 'cancelled' %}
-                        <span class="text-gray-600 text-xs">已取消</span>
+                        <span class="text-gray-600 text-xs">{% trans "已取消" %}</span>
                     {% elif item.status == 'failed' %}
-                        <span class="text-red-600 text-xs">付款失敗</span>
+                        <span class="text-red-600 text-xs">{% trans "付款失敗" %}</span>
                     {% else %}
                         <span class="text-gray-500 text-xs">-</span>
                     {% endif %}
@@ -139,9 +139,9 @@
             <tr>
                 <td colspan="{% if role == 'merchant' %}9{% else %}7{% endif %}" class="px-6 py-8 text-center text-gray-500">
                     {% if role == 'merchant' %}
-                        目前沒有交易記錄
+                        {% trans "目前沒有交易記錄" %}
                     {% else %}
-                        目前沒有購買記錄
+                        {% trans "目前沒有購買記錄" %}
                     {% endif %}
                 </td>
             </tr>
@@ -158,18 +158,18 @@
             {% if page_obj.has_previous %}
                 <a href="?page={{ page_obj.previous_page_number }}" 
                    class="px-3 py-2 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                    上一頁
+                    {% trans "上一頁" %}
                 </a>
             {% endif %}
             
             <span class="px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-md">
-                第 {{ page_obj.number }} 頁，共 {{ page_obj.paginator.num_pages }} 頁
+                {% blocktrans with current=page_obj.number total=page_obj.paginator.num_pages %}第 {{ current }} 頁，共 {{ total }} 頁{% endblocktrans %}
             </span>
             
             {% if page_obj.has_next %}
                 <a href="?page={{ page_obj.next_page_number }}" 
                    class="px-3 py-2 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                    下一頁
+                    {% trans "下一頁" %}
                 </a>
             {% endif %}
         </nav>

@@ -83,6 +83,7 @@ MIDDLEWARE = [
     "truepay.security_middleware.SecurityHeadersMiddleware",
     "django.middleware.cache.UpdateCacheMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",  # i18n 語言中間件
     "allauth.account.middleware.AccountMiddleware",
     "truepay.security_middleware.SessionSecurityMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -162,7 +163,16 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "zh-hant"
+
+LANGUAGES = [
+    ("zh-hant", "繁體中文"),
+    ("en", "English"),
+]
+
+LOCALE_PATHS = [
+    BASE_DIR / "locale",
+]
 
 TIME_ZONE = "Asia/Taipei"
 

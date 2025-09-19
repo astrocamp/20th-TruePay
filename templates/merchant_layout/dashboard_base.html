@@ -1,9 +1,10 @@
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}TruePay 廠商儀表板{% endblock %}</title>
+  <title>{% block title %}{% trans "TruePay 廠商儀表板" %}{% endblock %}</title>
   <!-- 使用專案編譯的 Tailwind CSS -->
   {% load static %}
   <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
@@ -25,7 +26,7 @@
         <!-- Logo -->
         <div class="logo-section px-6 h-16 flex items-center">
           <a href="{% url 'merchant_account:dashboard' request.merchant.subdomain %}">TruePay</a>
-          <button @click="close()" class="ml-auto md:hidden cursor-pointer p-2 rounded-lg hover:bg-gray-700 touch-manipulation text-gray-300" aria-label="關閉選單">✕</button>
+          <button @click="close()" class="ml-auto md:hidden cursor-pointer p-2 rounded-lg hover:bg-gray-700 touch-manipulation text-gray-300" aria-label="{% trans '關閉選單' %}">✕</button>
         </div>
         <!-- 導覽選單 -->
         <nav class="dashboard-nav flex-1 overflow-y-auto" x-data="NavigationManager.createAlpineData()" @click="$parent.handleLinkClick($event)">
@@ -33,79 +34,95 @@
             <li>
               <a href="{% url 'merchant_account:dashboard' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)" @click="$root.close()">
                 {% include 'components/icons.html' with icon='home' %}
-                廠商總覽
+                {% trans "廠商總覽" %}
               </a>
             </li>
             <li>
               <a href="{% url 'merchant_marketplace:index' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)" @click="$root.close()">
                 {% include 'components/icons.html' with icon='menu' %}
-                商品列表 
+                {% trans "商品列表" %} 
               </a>
             </li>
             <li>
               <a href="{% url 'merchant_marketplace:new' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)" @click="$root.close()">
                 {% include 'components/icons.html' with icon='plus' %}
-                新增商品 
+                {% trans "新增商品" %} 
               </a>
             </li>
             <li>
               <a href="{% url 'merchant_account:transaction_history' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)" @click="$root.close()">
                 {% include 'components/icons.html' with icon='document' %}
-                交易紀錄
+                {% trans "交易紀錄" %}
               </a>
             </li>
             <li>
               <a href="{% url 'merchant_account:sold_tickets' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)">
                 {% include 'components/icons.html' with icon='ticket' %}
-                售出票券
+                {% trans "售出票券" %}
               </a>
             </li>
             
             <li>
               <a href="{% url 'merchant_account:subdomain_management' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)" @click="$root.close()">
                 {% include 'components/icons.html' with icon='check-circle' %}
-                子網域設定 
+                {% trans "子網域設定" %} 
               </a>
             </li>
             <li>
               <a href="{% url 'public_store:shop_overview' request.merchant.subdomain %}" 
                 target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
                 {% include 'components/icons.html' with icon='cube' %}
-                商品總覽
+                {% trans "商品總覽" %}
               </a>
             </li>
             <li>
               <a href="{% url 'merchant_account:ticket_validation' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)" @click="$root.close()">
                 {% include 'components/icons.html' with icon='scan-frame' %}
-                票券驗證 
+                {% trans "票券驗證" %} 
               </a>
             </li>
             <li>
               <a href="{% url 'merchant_account:verification_records' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)" @click="$root.close()">
                 {% include 'components/icons.html' with icon='ticket' %}
-                票券使用紀錄
+                {% trans "票券使用紀錄" %}
               </a>
             </li>
             <li>
               <a href="{% url 'merchant_account:reports' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)" @click="$root.close()">
                 {% include 'components/icons.html' with icon='chart-bar' %}
-                報表分析
+                {% trans "報表分析" %}
               </a>
             </li>
 
             <li>
               <a href="{% url 'merchant_account:profile_settings' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)" @click="$root.close()">
                 {% include 'components/icons.html' with icon='settings' %}
-                設定
+                {% trans "設定" %}
               </a>
             </li>
           </ul>
         </nav>
+        <!-- 語言切換器 -->
+        <div class="p-4 border-t border-[#D2D2D7]">
+          <form action="{% url 'set_language' %}" method="post">
+            {% csrf_token %}
+            <select name="language" onchange="this.form.submit()"
+                    class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              {% get_current_language as LANGUAGE_CODE %}
+              {% get_available_languages as LANGUAGES %}
+              {% for lang_code, lang_name in LANGUAGES %}
+                <option value="{{ lang_code }}" {% if lang_code == LANGUAGE_CODE %}selected{% endif %}>
+                  {{ lang_name }}
+                </option>
+              {% endfor %}
+            </select>
+          </form>
+        </div>
         <!-- 登出 -->
         <div class="dashboard-logout">
           <a href="{%url 'merchant_account:logout'%}" @click="$root.close()">
             {% include 'components/icons.html' with icon='logout' %}
-            登出
+            {% trans "登出" %} 
           </a>
         </div>
       </div>
@@ -133,8 +150,8 @@
         <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4 text-xs text-gray-500 flex items-center justify-between">
           <p>© 2025 TruePay</p>
           <nav class="flex items-center gap-4">
-            <a href="#" class="hover:text-blue-600">使用條款</a>
-            <a href="#" class="hover:text-blue-600">隱私權政策</a>
+            <a href="#" class="hover:text-blue-600">{% trans '使用條款' %}</a>
+            <a href="#" class="hover:text-blue-600">{% trans '隱私權政策' %}</a>
           </nav>
         </div>
       </footer>

@@ -8,12 +8,12 @@ from django.forms import (
     EmailField,
 )
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from .models import Merchant
 from .utils import generate_unique_subdomain
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.conf import settings
-import re
 
 
 Member = get_user_model()
@@ -25,7 +25,7 @@ class RegisterForm(ModelForm):
         widget=EmailInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "請輸入電子郵件",
+                "placeholder": _("請輸入電子郵件"),
                 "required": True,
             }
         ),
@@ -35,7 +35,7 @@ class RegisterForm(ModelForm):
         widget=PasswordInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "請輸入密碼（至少8個字元）",
+                "placeholder": _("請輸入密碼（至少8個字元）"),
                 "required": True,
             }
         ),
@@ -66,7 +66,7 @@ class RegisterForm(ModelForm):
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
                     "maxlength": "50",
-                    "placeholder": "請輸入商店名稱（至少2個字元）",
+                    "placeholder": _("請輸入商店名稱（至少2個字元）"),
                     "required": True,
                 }
             ),
@@ -74,7 +74,7 @@ class RegisterForm(ModelForm):
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
                     "maxlength": "8",
-                    "placeholder": "請輸入8位數統一編號（例如：12345678）",
+                    "placeholder": _("請輸入8位數統一編號（例如：12345678）"),
                     "pattern": "[0-9]{8}",
                     "required": True,
                 }
@@ -82,7 +82,7 @@ class RegisterForm(ModelForm):
             "NationalNumber": TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入身分證字號（格式：A123456789）",
+                    "placeholder": _("請輸入身分證字號（格式：A123456789）"),
                     "pattern": "[A-Z][12][0-9]{8}",
                     "maxlength": "10",
                     "required": True,
@@ -91,7 +91,7 @@ class RegisterForm(ModelForm):
             "Name": TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入負責人姓名",
+                    "placeholder": _("請輸入負責人姓名"),
                     "required": True,
                 }
             ),
@@ -99,7 +99,7 @@ class RegisterForm(ModelForm):
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
                     "maxlength": "50",
-                    "placeholder": "請輸入完整地址（至少5個字元）",
+                    "placeholder": _("請輸入完整地址（至少5個字元）"),
                     "required": True,
                 }
             ),
@@ -107,7 +107,7 @@ class RegisterForm(ModelForm):
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
                     "maxlength": "15",
-                    "placeholder": "請輸入手機號碼（格式：09xxxxxxxx）",
+                    "placeholder": _("請輸入手機號碼（格式：09xxxxxxxx）"),
                     "pattern": "09[0-9]{8}",
                     "required": True,
                 }
@@ -162,7 +162,7 @@ class LoginForm(Form):
         widget=EmailInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "請輸入電子郵件",
+                "placeholder": _("請輸入電子郵件"),
             }
         ),
         label="電子郵件",
@@ -171,7 +171,7 @@ class LoginForm(Form):
         widget=PasswordInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "請輸入密碼",
+                "placeholder": _("請輸入密碼"),
             }
         ),
         label="密碼",
@@ -225,7 +225,7 @@ class SubdomainChangeForm(forms.Form):
             attrs={
                 "class": "form-control",
                 "rows": 3,
-                "placeholder": "請說明修改原因...",
+                "placeholder": _("請說明修改原因..."),
             }
         ),
         label="修改原因",
@@ -270,7 +270,7 @@ class MerchantProfileUpdateForm(ModelForm):
         widget=EmailInput(
             attrs={
                 "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "placeholder": "請輸入電子郵件",
+                "placeholder": _("請輸入電子郵件"),
             }
         ),
         label="電子郵件",
@@ -298,37 +298,37 @@ class MerchantProfileUpdateForm(ModelForm):
             "ShopName": TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入商店名稱",
+                    "placeholder": _("請輸入商店名稱"),
                 }
             ),
             "UnifiedNumber": TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入統一編號",
+                    "placeholder": _("請輸入統一編號"),
                 }
             ),
             "NationalNumber": TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入身分證字號",
+                    "placeholder": _("請輸入身分證字號"),
                 }
             ),
             "Name": TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入負責人姓名",
+                    "placeholder": _("請輸入負責人姓名"),
                 }
             ),
             "Address": TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入地址",
+                    "placeholder": _("請輸入地址"),
                 }
             ),
             "Cellphone": TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "請輸入手機號碼",
+                    "placeholder": _("請輸入手機號碼"),
                 }
             ),
         }

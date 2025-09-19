@@ -1,0 +1,428 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-19 10:33+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: merchant_account/templates/merchant_account/login.html:5
+msgid "商家登入"
+msgstr ""
+
+#: merchant_account/templates/merchant_account/login.html:43
+msgid "登入"
+msgstr ""
+
+#: merchant_account/templates/merchant_account/login.html:49
+msgid "還沒有帳號？"
+msgstr ""
+
+#: merchant_account/templates/merchant_account/login.html:51
+msgid "點此註冊"
+msgstr ""
+
+#: templates/customers_layout/dashboard_base.html:7
+msgid "TruePay 消費者儀表板"
+msgstr ""
+
+#: templates/customers_layout/dashboard_base.html:16
+#: templates/customers_layout/dashboard_base.html:27
+#: templates/merchant_layout/dashboard_base.html:18
+#: templates/merchant_layout/dashboard_base.html:29
+msgid "關閉選單"
+msgstr ""
+
+#: templates/customers_layout/dashboard_base.html:35
+msgid "消費者總覽"
+msgstr ""
+
+#: templates/customers_layout/dashboard_base.html:41
+#: templates/payments/payment_status.html:175
+msgid "購買記錄"
+msgstr ""
+
+#: templates/customers_layout/dashboard_base.html:47
+msgid "票券錢包"
+msgstr ""
+
+#: templates/customers_layout/dashboard_base.html:54
+#: templates/merchant_layout/dashboard_base.html:100
+msgid "設定"
+msgstr ""
+
+#: templates/customers_layout/dashboard_base.html:63
+#: templates/merchant_layout/dashboard_base.html:109
+msgid "登出"
+msgstr ""
+
+#: templates/customers_layout/dashboard_base.html:73
+#: templates/merchant_layout/dashboard_base.html:119
+msgid "開啟選單"
+msgstr ""
+
+#: templates/customers_layout/dashboard_base.html:81
+#: templates/merchant_layout/dashboard_base.html:127
+msgid "子頁面會注入這裡"
+msgstr ""
+
+#: templates/customers_layout/dashboard_base.html:90
+#: templates/merchant_layout/dashboard_base.html:138
+msgid "使用條款"
+msgstr ""
+
+#: templates/customers_layout/dashboard_base.html:91
+#: templates/merchant_layout/dashboard_base.html:139
+msgid "隱私權政策"
+msgstr ""
+
+#: templates/layouts/default.html:19
+msgid "TruePay 首頁"
+msgstr ""
+
+#: templates/merchant_layout/dashboard_base.html:7
+msgid "TruePay 廠商儀表板"
+msgstr ""
+
+#: templates/merchant_layout/dashboard_base.html:37
+msgid "廠商總覽"
+msgstr ""
+
+#: templates/merchant_layout/dashboard_base.html:43
+msgid "商品列表"
+msgstr ""
+
+#: templates/merchant_layout/dashboard_base.html:49
+msgid "新增商品"
+msgstr ""
+
+#: templates/merchant_layout/dashboard_base.html:55
+msgid "交易紀錄"
+msgstr ""
+
+#: templates/merchant_layout/dashboard_base.html:61
+msgid "售出票券"
+msgstr ""
+
+#: templates/merchant_layout/dashboard_base.html:68
+msgid "子網域設定"
+msgstr ""
+
+#: templates/merchant_layout/dashboard_base.html:75
+msgid "商品總覽"
+msgstr ""
+
+#: templates/merchant_layout/dashboard_base.html:81
+msgid "票券驗證"
+msgstr ""
+
+#: templates/merchant_layout/dashboard_base.html:87
+msgid "票券使用紀錄"
+msgstr ""
+
+#: templates/merchant_layout/dashboard_base.html:93
+msgid "報表分析"
+msgstr ""
+
+#: templates/payments/confirm.html:12
+msgid "登入成功！"
+msgstr ""
+
+#: templates/payments/confirm.html:18
+msgid "付款資訊"
+msgstr ""
+
+#: templates/payments/confirm.html:22 templates/payments/payment_status.html:52
+msgid "商品名稱："
+msgstr ""
+
+#: templates/payments/confirm.html:27 templates/payments/payment_status.html:32
+msgid "付款金額："
+msgstr ""
+
+#: templates/payments/confirm.html:32 templates/payments/payment_status.html:16
+msgid "付款方式："
+msgstr ""
+
+#: templates/payments/confirm.html:35
+msgid "藍新金流"
+msgstr ""
+
+#: templates/payments/confirm.html:55
+msgid "確認付款"
+msgstr ""
+
+#: templates/payments/confirm.html:62
+#: templates/payments/order_limit_error.html:34
+#: templates/payments/payment_status.html:172
+msgid "返回首頁"
+msgstr ""
+
+#: templates/payments/order_limit_error.html:11
+msgid "訂單數量超過限制"
+msgstr ""
+
+#: templates/payments/order_limit_error.html:16
+#, python-format
+msgid ""
+"您在過去 %(time_window)s 分鐘內已有 <span class=\"font-semibold text-"
+"orange-600\">%(pending_count)s 筆</span>待付款訂單，"
+msgstr ""
+
+#: templates/payments/order_limit_error.html:19
+#, python-format
+msgid ""
+"目前共有 <span class=\"font-semibold text-orange-600\">%(total_pending)s 筆</"
+"span>待付款訂單。"
+msgstr ""
+
+#: templates/payments/order_limit_error.html:23
+msgid "請前往購買記錄重新付款現有訂單，或等待後再試。"
+msgstr ""
+
+#: templates/payments/order_limit_error.html:30
+msgid "前往購買記錄"
+msgstr ""
+
+#: templates/payments/order_limit_error.html:39
+msgid "如有疑問，請聯繫客服人員"
+msgstr ""
+
+#: templates/payments/payment_status.html:7
+msgid "付款狀態查詢"
+msgstr ""
+
+#: templates/payments/payment_status.html:12
+msgid "訂單編號："
+msgstr ""
+
+#: templates/payments/payment_status.html:20
+msgid "付款狀態："
+msgstr ""
+
+#: templates/payments/payment_status.html:36
+msgid "建立時間："
+msgstr ""
+
+#: templates/payments/payment_status.html:41
+msgid "付款時間："
+msgstr ""
+
+#: templates/payments/payment_status.html:49
+msgid "商品資訊"
+msgstr ""
+
+#: templates/payments/payment_status.html:56
+msgid "商家："
+msgstr ""
+
+#: templates/payments/payment_status.html:60
+msgid "商品描述："
+msgstr ""
+
+#: templates/payments/payment_status.html:70
+msgid "藍新金流詳情"
+msgstr ""
+
+#: templates/payments/payment_status.html:74
+msgid "交易序號："
+msgstr ""
+
+#: templates/payments/payment_status.html:80
+msgid "付款類型："
+msgstr ""
+
+#: templates/payments/payment_status.html:86
+msgid "信用卡號："
+msgstr ""
+
+#: templates/payments/payment_status.html:97
+msgid "LINE Pay 詳情"
+msgstr ""
+
+#: templates/payments/payment_status.html:100
+msgid "LINE Pay 交易ID："
+msgstr ""
+
+#: templates/payments/payment_status.html:115
+#, python-format
+msgid "您的票券代碼 (%(counter)s 張)"
+msgstr ""
+
+#: templates/payments/payment_status.html:125
+msgid "票券"
+msgstr ""
+
+#: templates/payments/payment_status.html:131
+msgid "票券狀態："
+msgstr ""
+
+#: templates/payments/payment_status.html:134
+msgid "已使用"
+msgstr ""
+
+#: templates/payments/payment_status.html:136
+msgid "可使用"
+msgstr ""
+
+#: templates/payments/payment_status.html:142
+msgid "有效期限："
+msgstr ""
+
+#: templates/payments/payment_status.html:148
+msgid "使用時間："
+msgstr ""
+
+#: templates/payments/payment_status.html:165
+msgid "請將各票券代碼分別提供給商家進行驗證"
+msgstr ""
+
+#: templates/payments/stock_insufficient_error.html:11
+msgid "庫存不足"
+msgstr ""
+
+#: templates/payments/stock_insufficient_error.html:17
+#, python-format
+msgid ""
+"目前庫存：<span class=\"font-semibold text-orange-600\">%(stock)s 件</span>"
+msgstr ""
+
+#: templates/payments/stock_insufficient_error.html:20
+#, python-format
+msgid "您想購買：<span class=\"font-semibold text-red-600\">%(qty)s 件</span>"
+msgstr ""
+
+#: templates/payments/stock_insufficient_error.html:27
+msgid "建議選項："
+msgstr ""
+
+#: templates/payments/stock_insufficient_error.html:30
+#, python-format
+msgid "• 調整購買數量為 %(stock)s 件或更少"
+msgstr ""
+
+#: templates/payments/stock_insufficient_error.html:31
+msgid "• 商品可能被其他用戶購買，請重新整理頁面查看最新庫存"
+msgstr ""
+
+#: templates/payments/stock_insufficient_error.html:37
+msgid "很抱歉，此商品目前已售完"
+msgstr ""
+
+#: templates/payments/stock_insufficient_error.html:40
+msgid "您可以瀏覽其他商品或聯繫商家了解補貨時間"
+msgstr ""
+
+#: templates/payments/stock_insufficient_error.html:50
+msgid "重新整理商品頁面"
+msgstr ""
+
+#: templates/payments/stock_insufficient_error.html:56
+#, python-format
+msgid "如有疑問，請聯繫商家客服：%(phone)s"
+msgstr ""
+
+#: templates/shared/order_table.html:10
+msgid "訂單編號"
+msgstr ""
+
+#: templates/shared/order_table.html:14
+msgid "交易序號"
+msgstr ""
+
+#: templates/shared/order_table.html:17
+msgid "消費者"
+msgstr ""
+
+#: templates/shared/order_table.html:22
+msgid "商家"
+msgstr ""
+
+#: templates/shared/order_table.html:26
+msgid "商品名稱"
+msgstr ""
+
+#: templates/shared/order_table.html:29
+msgid "數量"
+msgstr ""
+
+#: templates/shared/order_table.html:32
+msgid "總金額"
+msgstr ""
+
+#: templates/shared/order_table.html:35
+msgid "訂單狀態"
+msgstr ""
+
+#: templates/shared/order_table.html:38
+msgid "付款方式"
+msgstr ""
+
+#: templates/shared/order_table.html:41
+msgid "建立時間"
+msgstr ""
+
+#: templates/shared/order_table.html:45
+msgid "操作"
+msgstr ""
+
+#: templates/shared/order_table.html:110
+msgid "確認要重新付款此訂單嗎？"
+msgstr ""
+
+#: templates/shared/order_table.html:114
+msgid "重新付款"
+msgstr ""
+
+#: templates/shared/order_table.html:118
+msgid "確認要取消此訂單嗎？取消後將無法恢復。"
+msgstr ""
+
+#: templates/shared/order_table.html:122
+msgid "取消訂單"
+msgstr ""
+
+#: templates/shared/order_table.html:127
+msgid "已完成"
+msgstr ""
+
+#: templates/shared/order_table.html:129
+msgid "已取消"
+msgstr ""
+
+#: templates/shared/order_table.html:131
+msgid "付款失敗"
+msgstr ""
+
+#: templates/shared/order_table.html:142
+msgid "目前沒有交易記錄"
+msgstr ""
+
+#: templates/shared/order_table.html:144
+msgid "目前沒有購買記錄"
+msgstr ""
+
+#: templates/shared/order_table.html:161
+msgid "上一頁"
+msgstr ""
+
+#: templates/shared/order_table.html:166
+#, python-format
+msgid "第 %(current)s 頁，共 %(total)s 頁"
+msgstr ""
+
+#: templates/shared/order_table.html:172
+msgid "下一頁"
+msgstr ""

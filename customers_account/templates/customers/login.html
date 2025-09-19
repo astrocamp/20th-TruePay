@@ -1,6 +1,7 @@
 {% extends "layouts/default.html" %}
 {% load socialaccount %}
-{% block main_container_classes %}w-full flex-grow flex justify-center py-16 customer-auth-bg{% endblock %}
+{% load i18n %}
+{% block main_container_classes %}w-full flex-grow flex justify-center py-16{% endblock %}
 {% block content %}
 <div class="w-full max-w-md mx-auto p-8 bg-white rounded-2xl shadow-2xl border border-gray-100 mt-8" style="width: 40%; min-width: 400px;">
     <h1 class="text-2xl font-bold text-center text-brand-black mb-6">消費者登入</h1>
@@ -21,7 +22,7 @@
         
         <div>
             <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-brand-black mb-1">
-                {{ form.email.label }}
+                {% trans "電子郵件" %}
             </label>
             {{ form.email }}
             {% if form.email.errors %}
@@ -33,7 +34,7 @@
         
         <div>
             <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-brand-black mb-1">
-                {{ form.password.label }}
+                {% trans "密碼" %}
             </label>
             {{ form.password }}
             {% if form.password.errors %}
@@ -44,12 +45,12 @@
         </div>
         
         <button type="submit" class="w-full bg-[#0056B3] text-white py-3 px-4 rounded-lg hover:bg-[#00408A] focus:outline-none focus:ring-2 focus:ring-[#0056B3] focus:ring-offset-2 transition duration-200">
-            登入
+            {% trans "登入" %}
         </button>
         
         <div class="text-center mt-3">
             <a href="{% url 'customers_account:forgot_password' %}" class="text-sm text-[#0056B3] hover:text-[#00408A]">
-                忘記密碼？
+                {% trans "忘記密碼？" %}
             </a>
         </div>
     </form>
@@ -61,7 +62,7 @@
                 <div class="w-full border-t border-gray-300"></div>
             </div>
             <div class="relative flex justify-center text-sm">
-                <span class="px-2 bg-brand-white text-brand-black">或</span>
+                <span class="px-2 bg-brand-white text-brand-black">{% trans "或" %}</span>
             </div>
         </div>
     </div>
@@ -74,7 +75,7 @@
                 <a href="{% provider_login_url 'google' process='login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" 
                    class="w-full flex justify-center items-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#0056B3] focus:ring-offset-2 transition duration-200">
                     {% include 'components/icons.html' with icon='google' class='w-5 h-5 mr-3' %}
-                    使用 Google 帳號登入
+                    {% trans "使用 Google 帳號登入" %}
                 </a>
             {% endif %}
         {% endfor %}
@@ -82,9 +83,9 @@
     
     <div class="mt-6 text-center">
         <p class="text-brand-black">
-            還沒有帳號？
+            {% trans "還沒有帳號？" %}
             <a href="{% url 'customers_account:register' %}" class="text-[#0056B3] hover:text-[#00408A] font-medium">
-                點此註冊
+                {% trans "點此註冊" %}
             </a>
         </p>
     </div>

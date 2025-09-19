@@ -1,12 +1,12 @@
 {% extends "layouts/default.html" %}
 {% block main_container_classes %}w-full selectrole-bg{% endblock %}
-
+{% load i18n %}
 {% block content %}
 <div class="min-h-[calc(100vh-200px)] flex flex-col px-16 py-8">
   <!-- 頁面標題 -->
   <div class="text-center pt-8 mb-16">
-    <h1 class="text-4xl font-bold text-gray-900 mb-6">選擇您的身份</h1>
-    <p class="text-lg text-gray-600">請選擇適合您的登入方式</p>
+    <h1 class="text-4xl font-bold text-gray-900 mb-6">{% trans "選擇您的身份" %}</h1>
+    <p class="text-lg text-gray-600">{% trans "請選擇適合您的登入方式" %}</p>
   </div>
 
   <!-- 身份選擇卡片 -->
@@ -17,16 +17,16 @@
         <div class="text-black mb-8 flex-shrink-0">
           {% include 'components/icons.html' with icon='user' class='w-16 h-16 stroke-2 stroke-[#0056B3]' %}
         </div>
-        <h2 class="text-3xl font-semibold text-black mb-6 flex-shrink-0">我是消費者</h2>
-        <p class="text-gray-600 mb-8 text-lg leading-relaxed flex-grow flex items-center">查詢交易、管理付款方式、查看商品。</p>
+        <h2 class="text-3xl font-semibold text-black mb-6 flex-shrink-0">{% trans "我是消費者" %}</h2>
+        <p class="text-gray-600 mb-8 text-lg leading-relaxed flex-grow flex items-center">{% trans "查詢交易、管理付款方式、查看回饋。" %}</p>
         <div class="flex flex-col sm:flex-row gap-4 w-full flex-shrink-0">
           <a href="{% url 'customers_account:login' %}"
              class="flex-1 px-8 py-3 rounded-lg bg-[#0056B3] text-white text-base font-medium hover:bg-[#00408A] hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 text-center">
-            消費者登入
+            {% trans "消費者登入" %}
           </a>
           <a href="{% url 'customers_account:register' %}"
              class="flex-1 px-8 py-3 rounded-lg border-2 border-[#0056B3] text-[#0056B3] text-base font-medium hover:bg-[#0056B3] hover:text-white transition-all duration-200 transform hover:-translate-y-0.5 text-center">
-            消費者註冊
+            {% trans "消費者註冊" %}
           </a>
         </div>
       </div>
@@ -36,16 +36,16 @@
         <div class="text-black mb-8 flex-shrink-0">
           {% include 'components/icons.html' with icon='shop' class='w-16 h-16 stroke-2 stroke-[#0056B3]' %}
         </div>
-        <h2 class="text-3xl font-semibold text-black mb-6 flex-shrink-0">我是商家</h2>
-        <p class="text-gray-600 mb-8 text-lg leading-relaxed flex-grow flex items-center">查看訂單、對帳、各式功能管理。</p>
+        <h2 class="text-3xl font-semibold text-black mb-6 flex-shrink-0">{% trans "我是商家" %}</h2>
+        <p class="text-gray-600 mb-8 text-lg leading-relaxed flex-grow flex items-center">{% trans "查看訂單、對帳、管理金流與退款。" %}</p>
         <div class="flex flex-col sm:flex-row gap-4 w-full flex-shrink-0">
           <a href="{% url 'merchant_account:login' %}"
              class="flex-1 px-8 py-3 rounded-lg bg-[#0056B3] text-white text-base font-medium hover:bg-[#00408A] hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 text-center">
-            商家登入
+            {% trans "商家登入" %}
           </a>
           <a href="{% url 'merchant_account:register' %}"
              class="flex-1 px-8 py-3 rounded-lg border-2 border-[#0056B3] text-[#0056B3] text-base font-medium hover:bg-[#0056B3] hover:text-white transition-all duration-200 transform hover:-translate-y-0.5 text-center">
-            商家註冊
+            {% trans "商家註冊" %}
           </a>
         </div>
       </div>

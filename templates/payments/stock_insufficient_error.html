@@ -1,4 +1,5 @@
 {% extends "layouts/default.html" %}
+{% load i18n %}
 {% block content %}
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-md mx-auto">
@@ -7,36 +8,36 @@
                 {% include 'components/icons.html' with icon='warning' class='w-16 h-16 mx-auto' %}
             </div>
             
-            <h1 class="text-2xl font-bold text-gray-800 mb-2">庫存不足</h1>
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">{% trans "庫存不足" %}</h1>
             
             <div class="text-gray-600 mb-6 text-left bg-gray-50 p-4 rounded-lg">
                 <div class="mb-3">
                     <p class="font-medium text-gray-800 mb-1">{{ product.name }}</p>
                     <p class="text-sm text-gray-600">
-                        目前庫存：<span class="font-semibold text-orange-600">{{ product.stock }} 件</span>
+                        {% blocktrans with stock=product.stock %}目前庫存：<span class="font-semibold text-orange-600">{{ stock }} 件</span>{% endblocktrans %}
                     </p>
                     <p class="text-sm text-gray-600">
-                        您想購買：<span class="font-semibold text-red-600">{{ requested_quantity }} 件</span>
+                        {% blocktrans with qty=requested_quantity %}您想購買：<span class="font-semibold text-red-600">{{ qty }} 件</span>{% endblocktrans %}
                     </p>
                 </div>
                 
                 {% if product.stock > 0 %}
                 <div class="border-t pt-3 mt-3">
                     <p class="text-sm text-gray-700 mb-2">
-                        <strong>建議選項：</strong>
+                        <strong>{% trans "建議選項：" %}</strong>
                     </p>
                     <ul class="text-sm text-gray-600 space-y-1">
-                        <li>• 調整購買數量為 {{ product.stock }} 件或更少</li>
-                        <li>• 商品可能被其他用戶購買，請重新整理頁面查看最新庫存</li>
+                        <li>{% blocktrans with stock=product.stock %}• 調整購買數量為 {{ stock }} 件或更少{% endblocktrans %}</li>
+                        <li>{% trans "• 商品可能被其他用戶購買，請重新整理頁面查看最新庫存" %}</li>
                     </ul>
                 </div>
                 {% else %}
                 <div class="border-t pt-3 mt-3">
                     <p class="text-sm text-red-600 font-medium">
-                        很抱歉，此商品目前已售完
+                        {% trans "很抱歉，此商品目前已售完" %}
                     </p>
                     <p class="text-sm text-gray-600 mt-1">
-                        您可以瀏覽其他商品或聯繫商家了解補貨時間
+                        {% trans "您可以瀏覽其他商品或聯繫商家了解補貨時間" %}
                     </p>
                 </div>
                 {% endif %}
@@ -46,13 +47,13 @@
                 {% if product.stock > 0 %}
                 <a href="{{ product_url }}?refresh=1" 
                    class="block w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium">
-                    重新整理商品頁面
+                    {% trans "重新整理商品頁面" %}
                 </a>
                 {% endif %}
             </div>
             
             <div class="mt-6 text-sm text-gray-500">
-                如有疑問，請聯繫商家客服：{{ product.phone_number }}
+                {% blocktrans with phone=product.phone_number %}如有疑問，請聯繫商家客服：{{ phone }}{% endblocktrans %}
             </div>
         </div>
     </div>

@@ -1,4 +1,4 @@
-{% load static %} {% load merchant_tags %}
+{% load static %} {% load merchant_tags %} {% load i18n %}
 <!DOCTYPE html>
 <html lang="zh-Hant">
   <head>
@@ -30,18 +30,18 @@
                 <span class="font-bold text-xl">TRUEPAY</span>
             </div>
             <ul class="nav-links">
-                <li><a href="{% url 'pages:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">首頁</a></li>
-                <li><a href="{% url 'pages:home' %}#features">特色</a></li>
-                <li><a href="{% url 'pages:marketplace' %}">商品總覽</a></li>
+                <li><a href="{% url 'pages:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">{% trans "首頁" %}</a></li>
+                <li><a href="{% url 'pages:home' %}#features">{% trans "特色" %}</a></li>
+                <li><a href="{% url 'pages:marketplace' %}">{% trans "商品總覽" %}</a></li>
                 {% if user.is_authenticated %}
                     {% if user.member_type == "merchant" %}
-                        <li><a href="{% get_current_merchant %}">商家後台</a></li>
+                        <li><a href="{% get_current_merchant %}">{% trans "商家後台" %}</a></li>
                     {% else %}
-                        <li><a href="{% url 'customers_account:dashboard' %}">我的帳戶</a></li>
+                        <li><a href="{% url 'customers_account:dashboard' %}">{% trans "我的帳戶" %}</a></li>
                     {% endif %}
-                    <li><a href="{% if user.member_type == 'merchant' %}{% url 'merchant_account:logout' %}{% else %}{% url 'customers_account:logout' %}{% endif %}">登出</a></li>
+                    <li><a href="{% if user.member_type == 'merchant' %}{% url 'merchant_account:logout' %}{% else %}{% url 'customers_account:logout' %}{% endif %}">{% trans "登出" %}</a></li>
                 {% else %}
-                    <li><a href="{% url 'pages:selectrole' %}">登入/註冊</a></li>
+                    <li><a href="{% url 'pages:selectrole' %}">{% trans "登入/註冊" %}</a></li>
                 {% endif %}
             </ul>
 
@@ -55,18 +55,18 @@
             <!-- 手機版選單 -->
             <div class="mobile-menu" :class="{ 'show': mobileMenuOpen }">
                 <ul>
-                    <li><a href="{% url 'pages:home' %}" @click="mobileMenuOpen = false">首頁</a></li>
-                    <li><a href="{% url 'pages:home' %}#features" @click="mobileMenuOpen = false">特色</a></li>
-                    <li><a href="{% url 'pages:marketplace' %}" @click="mobileMenuOpen = false">商品總覽</a></li>
+                    <li><a href="{% url 'pages:home' %}" @click="mobileMenuOpen = false">{% trans "首頁" %}</a></li>
+                    <li><a href="{% url 'pages:home' %}#features" @click="mobileMenuOpen = false">{% trans "特色" %}</a></li>
+                    <li><a href="{% url 'pages:marketplace' %}" @click="mobileMenuOpen = false">{% trans "商品總覽" %}</a></li>
                     {% if user.is_authenticated %}
                         {% if user.member_type == "merchant" %}
-                            <li><a href="{% get_current_merchant %}" @click="mobileMenuOpen = false">商家後台</a></li>
+                            <li><a href="{% get_current_merchant %}" @click="mobileMenuOpen = false">{% trans "商家後台" %}</a></li>
                         {% else %}
-                            <li><a href="{% url 'customers_account:dashboard' %}" @click="mobileMenuOpen = false">我的帳戶</a></li>
+                            <li><a href="{% url 'customers_account:dashboard' %}" @click="mobileMenuOpen = false">{% trans "我的帳戶" %}</a></li>
                         {% endif %}
-                        <li><a href="{% if user.member_type == 'merchant' %}{% url 'merchant_account:logout' %}{% else %}{% url 'customers_account:logout' %}{% endif %}" @click="mobileMenuOpen = false">登出</a></li>
+                        <li><a href="{% if user.member_type == 'merchant' %}{% url 'merchant_account:logout' %}{% else %}{% url 'customers_account:logout' %}{% endif %}" @click="mobileMenuOpen = false">{% trans "登出" %}</a></li>
                     {% else %}
-                        <li><a href="{% url 'pages:selectrole' %}" @click="mobileMenuOpen = false">登入/註冊</a></li>
+                        <li><a href="{% url 'pages:selectrole' %}" @click="mobileMenuOpen = false">{% trans "登入/註冊" %}</a></li>
                     {% endif %}
                 </ul>
             </div>

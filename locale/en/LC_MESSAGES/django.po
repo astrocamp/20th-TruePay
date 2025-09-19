@@ -1,0 +1,1010 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-19 15:30+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: customers_account/forms.py:17 merchant_account/forms.py:38
+msgid "請輸入密碼（至少8個字元）"
+msgstr "Enter password (at least 8 characters)"
+
+#: customers_account/forms.py:29
+#: customers_account/templates/customers/register.html:93
+msgid "確認密碼"
+msgstr "Confirm Password"
+
+#: customers_account/forms.py:39 customers_account/forms.py:146
+#: customers_account/forms.py:208 merchant_account/forms.py:28
+#: merchant_account/forms.py:166 merchant_account/forms.py:274
+msgid "請輸入電子郵件"
+msgstr "Enter email"
+
+#: customers_account/forms.py:53 customers_account/forms.py:221
+msgid "請輸入姓名"
+msgstr "Enter your name"
+
+#: customers_account/forms.py:60 merchant_account/forms.py:85
+msgid "請輸入身分證字號（格式：A123456789）"
+msgstr "Enter ID number (format: A123456789)"
+
+#: customers_account/forms.py:73
+msgid "請輸入電話號碼（格式：09xxxxxxxx）"
+msgstr "Enter phone number (format: 09xxxxxxxx)"
+
+#: customers_account/forms.py:155 merchant_account/forms.py:175
+msgid "請輸入密碼"
+msgstr "Enter password"
+
+#: customers_account/forms.py:227 merchant_account/forms.py:314
+msgid "請輸入身分證字號"
+msgstr "Enter ID number"
+
+#: customers_account/forms.py:239
+msgid "請輸入電話號碼"
+msgstr "Enter phone number"
+
+#: customers_account/forms.py:297
+msgid "請輸入目前密碼"
+msgstr "Enter current password"
+
+#: customers_account/forms.py:306 customers_account/forms.py:398
+msgid "請輸入新密碼"
+msgstr "Enter new password"
+
+#: customers_account/forms.py:317 customers_account/forms.py:409
+#: customers_account/templates/customers/profile_settings.html:127
+msgid "確認新密碼"
+msgstr "Confirm new password"
+
+#: customers_account/forms.py:359
+msgid "請輸入您的電子郵件"
+msgstr "Email"
+
+#: customers_account/templates/customers/dashboard.html:3
+msgid "消費者儀表板"
+msgstr "TruePay Customer Dashboard"
+
+#: customers_account/templates/customers/dashboard.html:7
+#, python-format
+msgid "歡迎回來，%(name)s！"
+msgstr "Welcome back, %(name)s!"
+
+#: customers_account/templates/customers/dashboard.html:20
+msgid "總購買次數"
+msgstr "Total Purchases"
+
+#: customers_account/templates/customers/dashboard.html:25
+msgid "總消費金額"
+msgstr "Total Amount Spent"
+
+#: customers_account/templates/customers/dashboard.html:30
+msgid "待付款訂單"
+msgstr "Pending Orders"
+
+#: customers_account/templates/customers/dashboard.html:38
+msgid "最近購買記錄"
+msgstr "Purchase History"
+
+#: customers_account/templates/customers/dashboard.html:40
+msgid "查看全部"
+msgstr "View All"
+
+#: customers_account/templates/customers/dashboard.html:49
+#: templates/shared/order_table.html:10
+msgid "訂單編號"
+msgstr "Order Number"
+
+#: customers_account/templates/customers/dashboard.html:50
+#: templates/shared/order_table.html:26
+msgid "商品名稱"
+msgstr "Product Name"
+
+#: customers_account/templates/customers/dashboard.html:51
+#: customers_account/templates/customers/ticket_wallet.html:110
+#: templates/shared/order_table.html:22
+msgid "商家"
+msgstr "Merchant"
+
+#: customers_account/templates/customers/dashboard.html:52
+msgid "金額"
+msgstr "Total Amount"
+
+#: customers_account/templates/customers/dashboard.html:53
+msgid "狀態"
+msgstr "Order Status"
+
+#: customers_account/templates/customers/dashboard.html:54
+#: customers_account/templates/customers/ticket_wallet.html:113
+msgid "購買時間"
+msgstr "Purchase Time"
+
+#: customers_account/templates/customers/dashboard.html:91
+msgid "還沒有購買記錄"
+msgstr "No purchase records currently"
+
+#: customers_account/templates/customers/dashboard.html:93
+msgid "開始購物"
+msgstr "Start Shopping"
+
+#: customers_account/templates/customers/login.html:6
+#: pages/templates/pages/selectrole.html:17
+msgid "消費者登入"
+msgstr "Customer Login"
+
+#: customers_account/templates/customers/login.html:24
+#: customers_account/templates/customers/profile_settings.html:62
+#: customers_account/templates/customers/register.html:21
+#: merchant_account/templates/merchant_account/Register.html:72
+msgid "電子郵件"
+msgstr "Email"
+
+#: customers_account/templates/customers/login.html:36
+#: customers_account/templates/customers/register.html:81
+#: merchant_account/templates/merchant_account/Register.html:132
+msgid "密碼"
+msgstr "Password"
+
+#: customers_account/templates/customers/login.html:47
+#: merchant_account/templates/merchant_account/login.html:43
+msgid "登入"
+msgstr "Login"
+
+#: customers_account/templates/customers/login.html:52
+msgid "忘記密碼？"
+msgstr "Forgot Password?"
+
+#: customers_account/templates/customers/login.html:64
+msgid "或"
+msgstr "Or"
+
+#: customers_account/templates/customers/login.html:77
+msgid "使用 Google 帳號登入"
+msgstr "Sign in with Google"
+
+#: customers_account/templates/customers/login.html:85
+#: merchant_account/templates/merchant_account/login.html:49
+msgid "還沒有帳號？"
+msgstr "Don't have an account?"
+
+#: customers_account/templates/customers/login.html:87
+#: merchant_account/templates/merchant_account/login.html:51
+msgid "點此註冊"
+msgstr "Register here"
+
+#: customers_account/templates/customers/profile_settings.html:7
+msgid "會員資料設定"
+msgstr "Profile Settings"
+
+#: customers_account/templates/customers/profile_settings.html:25
+#: customers_account/templates/customers/profile_settings.html:46
+msgid "個人資料"
+msgstr "Personal Information"
+
+#: customers_account/templates/customers/profile_settings.html:31
+#: customers_account/templates/customers/profile_settings.html:101
+#: customers_account/templates/customers/profile_settings.html:135
+#: customers_account/templates/customers/profile_settings.html:237
+msgid "修改密碼"
+msgstr "Change Password"
+
+#: customers_account/templates/customers/profile_settings.html:37
+#: customers_account/templates/customers/profile_settings.html:145
+msgid "安全設定"
+msgstr "Security Settings"
+
+#: customers_account/templates/customers/profile_settings.html:55
+#: customers_account/templates/customers/register.html:33
+msgid "姓名"
+msgstr "Name"
+
+#: customers_account/templates/customers/profile_settings.html:69
+#: customers_account/templates/customers/register.html:45
+#: merchant_account/templates/merchant_account/Register.html:57
+msgid "身分證號"
+msgstr "ID Number"
+
+#: customers_account/templates/customers/profile_settings.html:76
+#: customers_account/templates/customers/register.html:69
+msgid "電話"
+msgstr "Phone"
+
+#: customers_account/templates/customers/profile_settings.html:83
+#: customers_account/templates/customers/register.html:57
+msgid "生日"
+msgstr "Birth Date"
+
+#: customers_account/templates/customers/profile_settings.html:91
+msgid "更新個人資料"
+msgstr "Update Profile"
+
+#: customers_account/templates/customers/profile_settings.html:110
+msgid "目前密碼"
+msgstr "Current Password"
+
+#: customers_account/templates/customers/profile_settings.html:117
+msgid "新密碼"
+msgstr "New Password"
+
+#: customers_account/templates/customers/profile_settings.html:121
+msgid "密碼長度至少需要8個字元"
+msgstr "Password must be at least 8 characters long"
+
+#: customers_account/templates/customers/profile_settings.html:152
+#: customers_account/templates/customers/profile_settings.html:181
+msgid "二階段驗證"
+msgstr "Two-Factor Authentication"
+
+#: customers_account/templates/customers/profile_settings.html:154
+#: customers_account/templates/customers/profile_settings.html:183
+msgid "為您的帳戶提供額外的安全保護，交易時需要輸入手機應用程式的驗證代碼"
+msgstr ""
+"Provides additional security protection for your account, requiring "
+"verification codes from mobile apps during transactions"
+
+#: customers_account/templates/customers/profile_settings.html:160
+#: customers_account/templates/customers/profile_settings.html:189
+msgid "已啟用"
+msgstr "Enabled"
+
+#: customers_account/templates/customers/profile_settings.html:164
+#: customers_account/templates/customers/profile_settings.html:193
+msgid "管理設定"
+msgstr "Manage Settings"
+
+#: customers_account/templates/customers/profile_settings.html:168
+#: customers_account/templates/customers/profile_settings.html:197
+msgid "未啟用"
+msgstr "Disabled"
+
+#: customers_account/templates/customers/profile_settings.html:172
+#: customers_account/templates/customers/profile_settings.html:201
+msgid "立即啟用"
+msgstr "Enable Now"
+
+#: customers_account/templates/customers/profile_settings.html:210
+msgid "您的帳戶已受到二階段驗證保護"
+msgstr "Your account is protected by two-factor authentication"
+
+#: customers_account/templates/customers/profile_settings.html:212
+msgid "最後驗證時間"
+msgstr "Last Verification Time"
+
+#: customers_account/templates/customers/profile_settings.html:219
+msgid "建議啟用二階段驗證以提升帳戶安全性，避免未經授權的高額交易"
+msgstr ""
+"We recommend enabling two-factor authentication to enhance account security "
+"and prevent unauthorized high-value transactions"
+
+#: customers_account/templates/customers/profile_settings.html:227
+msgid "登入安全"
+msgstr "Login Security"
+
+#: customers_account/templates/customers/profile_settings.html:232
+msgid "密碼強度"
+msgstr "Password Strength"
+
+#: customers_account/templates/customers/profile_settings.html:233
+msgid "定期更換密碼以保持帳戶安全"
+msgstr "Regularly change your password to maintain account security"
+
+#: customers_account/templates/customers/profile_settings.html:243
+msgid "登入記錄"
+msgstr "Login History"
+
+#: customers_account/templates/customers/profile_settings.html:244
+msgid "檢視最近的登入活動"
+msgstr "View recent login activity"
+
+#: customers_account/templates/customers/purchase_history.html:5
+#: templates/customers_layout/dashboard_base.html:41
+#: templates/payments/payment_status.html:175
+msgid "購買記錄"
+msgstr "Purchase History"
+
+#: customers_account/templates/customers/purchase_history.html:20
+#: templates/shared/order_table.html:144
+msgid "目前沒有購買記錄"
+msgstr "No purchase records currently"
+
+#: customers_account/templates/customers/purchase_history.html:22
+msgid "回到首頁購物"
+msgstr "Back to Home Shopping"
+
+#: customers_account/templates/customers/register.html:6
+#: pages/templates/pages/selectrole.html:21
+msgid "消費者註冊"
+msgstr "Customer Registration"
+
+#: customers_account/templates/customers/register.html:104
+#: merchant_account/templates/merchant_account/Register.html:146
+msgid "註冊"
+msgstr "Register"
+
+#: customers_account/templates/customers/register.html:116
+msgid "使用 Google 帳號註冊"
+msgstr "Sign up with Google"
+
+#: customers_account/templates/customers/register.html:124
+#: merchant_account/templates/merchant_account/Register.html:152
+msgid "已有帳號？"
+msgstr "Already have an account?"
+
+#: customers_account/templates/customers/register.html:126
+#: merchant_account/templates/merchant_account/Register.html:157
+msgid "點此登入"
+msgstr "Sign in here"
+
+#: customers_account/templates/customers/ticket_wallet.html:10
+#: templates/customers_layout/dashboard_base.html:47
+msgid "票券錢包"
+msgstr "Ticket Wallet"
+
+#: customers_account/templates/customers/ticket_wallet.html:11
+msgid "管理您的所有票券，查看使用狀態和有效期限"
+msgstr "Manage all your tickets, check usage status and expiration dates"
+
+#: customers_account/templates/customers/ticket_wallet.html:20
+msgid "總票券數"
+msgstr "Total Tickets"
+
+#: customers_account/templates/customers/ticket_wallet.html:24
+#: customers_account/templates/customers/ticket_wallet.html:44
+#: customers_account/templates/customers/ticket_wallet.html:100
+msgid "未使用"
+msgstr "Unused"
+
+#: customers_account/templates/customers/ticket_wallet.html:28
+#: customers_account/templates/customers/ticket_wallet.html:45
+#: customers_account/templates/customers/ticket_wallet.html:104
+#: templates/payments/payment_status.html:134
+msgid "已使用"
+msgstr "Used"
+
+#: customers_account/templates/customers/ticket_wallet.html:32
+#: customers_account/templates/customers/ticket_wallet.html:102
+msgid "已過期"
+msgstr "Expired"
+
+#: customers_account/templates/customers/ticket_wallet.html:41
+msgid "狀態篩選"
+msgstr "Status Filter"
+
+#: customers_account/templates/customers/ticket_wallet.html:43
+msgid "全部狀態"
+msgstr "All Status"
+
+#: customers_account/templates/customers/ticket_wallet.html:49
+msgid "商家篩選"
+msgstr "Merchant Filter"
+
+#: customers_account/templates/customers/ticket_wallet.html:51
+msgid "全部商家"
+msgstr "All Merchants"
+
+#: customers_account/templates/customers/ticket_wallet.html:60
+msgid "訂單編號篩選"
+msgstr "Order Number"
+
+#: customers_account/templates/customers/ticket_wallet.html:68
+msgid "篩選"
+msgstr "Filter"
+
+#: customers_account/templates/customers/ticket_wallet.html:71
+msgid "清除"
+msgstr "Clear"
+
+#: customers_account/templates/customers/ticket_wallet.html:117
+msgid "使用時間"
+msgstr "Used At:"
+
+#: customers_account/templates/customers/ticket_wallet.html:122
+msgid "有效期限"
+msgstr "Valid Until:"
+
+#: customers_account/templates/customers/ticket_wallet.html:144
+msgid "顯示"
+msgstr "Show"
+
+#: customers_account/templates/customers/ticket_wallet.html:301
+msgid "前往購物"
+msgstr "Go Shopping"
+
+#: merchant_account/forms.py:69
+msgid "請輸入商店名稱（至少2個字元）"
+msgstr "Enter shop name (at least 2 characters)"
+
+#: merchant_account/forms.py:77
+msgid "請輸入8位數統一編號（例如：12345678）"
+msgstr "Enter 8-digit unified business number (e.g. 12345678)"
+
+#: merchant_account/forms.py:94 merchant_account/forms.py:320
+msgid "請輸入負責人姓名"
+msgstr "Enter representative name"
+
+#: merchant_account/forms.py:102
+msgid "請輸入完整地址（至少5個字元）"
+msgstr "Enter complete address (at least 5 characters)"
+
+#: merchant_account/forms.py:110
+msgid "請輸入手機號碼（格式：09xxxxxxxx）"
+msgstr "Enter mobile number (format: 09xxxxxxxx)"
+
+#: merchant_account/forms.py:229
+msgid "請說明修改原因..."
+msgstr "Please explain the reason for modification..."
+
+#: merchant_account/forms.py:302
+msgid "請輸入商店名稱"
+msgstr "Enter shop name"
+
+#: merchant_account/forms.py:308
+msgid "請輸入統一編號"
+msgstr "Enter unified business number"
+
+#: merchant_account/forms.py:326
+msgid "請輸入地址"
+msgstr "Enter address"
+
+#: merchant_account/forms.py:332
+msgid "請輸入手機號碼"
+msgstr "Enter mobile number"
+
+#: merchant_account/templates/merchant_account/Register.html:5
+#: pages/templates/pages/selectrole.html:40
+msgid "商家註冊"
+msgstr "Merchant Registration"
+
+#: merchant_account/templates/merchant_account/Register.html:27
+msgid "商店名稱"
+msgstr "Shop Name"
+
+#: merchant_account/templates/merchant_account/Register.html:42
+msgid "統一編號"
+msgstr "Unified Business Number"
+
+#: merchant_account/templates/merchant_account/Register.html:87
+msgid "負責人姓名"
+msgstr "Representative Name"
+
+#: merchant_account/templates/merchant_account/Register.html:102
+msgid "地址"
+msgstr "Address"
+
+#: merchant_account/templates/merchant_account/Register.html:117
+msgid "手機號碼"
+msgstr "Mobile Phone"
+
+#: merchant_account/templates/merchant_account/login.html:5
+#: pages/templates/pages/selectrole.html:36
+msgid "商家登入"
+msgstr "Merchant Login"
+
+#: pages/templates/pages/marketplace.html:5
+#: pages/templates/pages/marketplace.html:11 templates/layouts/default.html:57
+#: templates/layouts/default.html:129
+#: templates/merchant_layout/dashboard_base.html:75
+msgid "商品總覽"
+msgstr "Product Overview"
+
+#: pages/templates/pages/marketplace.html:12
+msgid "探索各大商家的精選商品"
+msgstr "Explore selected products from various merchants"
+
+#: pages/templates/pages/marketplace.html:19
+#, python-format
+msgid "共找到 %(count)s 個商品"
+msgstr "Found %(count)s products"
+
+#: pages/templates/pages/marketplace.html:22
+#: templates/shared/order_table.html:166
+#, python-format
+msgid "第 %(current)s 頁，共 %(total)s 頁"
+msgstr "Page %(current)s of %(total)s"
+
+#: pages/templates/pages/marketplace.html:60
+#, python-format
+msgid "庫存 %(stock)s"
+msgstr "Stock %(stock)s"
+
+#: pages/templates/pages/marketplace.html:64
+#: pages/templates/pages/marketplace.html:89
+msgid "已售完"
+msgstr "Sold Out"
+
+#: pages/templates/pages/marketplace.html:80
+msgid "前往商家"
+msgstr "Visit Merchant"
+
+#: pages/templates/pages/marketplace.html:84
+msgid "商家未設定"
+msgstr "Merchant Not Set"
+
+#: pages/templates/pages/marketplace.html:103
+msgid "目前沒有商品"
+msgstr "No products currently"
+
+#: pages/templates/pages/marketplace.html:104
+msgid "請稍後再來查看，或許會有新商品上架！"
+msgstr "Please check back later, there might be new products available!"
+
+#: pages/templates/pages/marketplace.html:114 templates/layouts/default.html:50
+#: templates/layouts/default.html:121
+msgid "首頁"
+msgstr "Home"
+
+#: pages/templates/pages/marketplace.html:117
+#: templates/shared/order_table.html:161
+msgid "上一頁"
+msgstr "Previous"
+
+#: pages/templates/pages/marketplace.html:135
+#: templates/shared/order_table.html:172
+msgid "下一頁"
+msgstr "Next"
+
+#: pages/templates/pages/marketplace.html:138
+msgid "最後頁"
+msgstr "Last"
+
+#: pages/templates/pages/selectrole.html:12
+msgid "我是消費者"
+msgstr "I'm a Customer"
+
+#: pages/templates/pages/selectrole.html:13
+msgid "查詢交易、管理付款方式、查看回饋。"
+msgstr "View transactions, manage payment methods, and check rewards."
+
+#: pages/templates/pages/selectrole.html:31
+msgid "我是商家"
+msgstr "I'm a Merchant"
+
+#: pages/templates/pages/selectrole.html:32
+msgid "查看訂單、對帳、管理金流與退款。"
+msgstr "View orders, reconciliation, manage payments and refunds."
+
+#: templates/customers_layout/dashboard_base.html:7
+msgid "TruePay 消費者儀表板"
+msgstr "TruePay Customer Dashboard"
+
+#: templates/customers_layout/dashboard_base.html:16
+#: templates/customers_layout/dashboard_base.html:27
+#: templates/merchant_layout/dashboard_base.html:18
+#: templates/merchant_layout/dashboard_base.html:29
+msgid "關閉選單"
+msgstr "Close Menu"
+
+#: templates/customers_layout/dashboard_base.html:35
+msgid "消費者總覽"
+msgstr "Customer Overview"
+
+#: templates/customers_layout/dashboard_base.html:54
+#: templates/merchant_layout/dashboard_base.html:100
+msgid "設定"
+msgstr "Settings"
+
+#: templates/customers_layout/dashboard_base.html:79
+#: templates/layouts/default.html:71 templates/layouts/default.html:147
+#: templates/layouts/default.html:164 templates/layouts/default.html:181
+#: templates/merchant_layout/dashboard_base.html:125
+msgid "登出"
+msgstr "Logout"
+
+#: templates/customers_layout/dashboard_base.html:89
+#: templates/merchant_layout/dashboard_base.html:135
+msgid "開啟選單"
+msgstr "Open Menu"
+
+#: templates/customers_layout/dashboard_base.html:97
+#: templates/merchant_layout/dashboard_base.html:143
+msgid "子頁面會注入這裡"
+msgstr "Child pages will be injected here"
+
+#: templates/customers_layout/dashboard_base.html:106
+#: templates/merchant_layout/dashboard_base.html:154
+msgid "使用條款"
+msgstr "Terms of Service"
+
+#: templates/customers_layout/dashboard_base.html:107
+#: templates/merchant_layout/dashboard_base.html:155
+msgid "隱私權政策"
+msgstr "Privacy Policy"
+
+#: templates/layouts/default.html:19
+msgid "TruePay 首頁"
+msgstr "TruePay Home"
+
+#: templates/layouts/default.html:62 templates/layouts/default.html:139
+msgid "商家後台"
+msgstr "Merchant Dashboard"
+
+#: templates/layouts/default.html:66 templates/layouts/default.html:156
+#: templates/layouts/default.html:173
+msgid "我的帳戶"
+msgstr "My Account"
+
+#: templates/layouts/default.html:78 templates/layouts/default.html:191
+msgid "登入/註冊"
+msgstr "Login/Register"
+
+#: templates/merchant_layout/dashboard_base.html:7
+msgid "TruePay 廠商儀表板"
+msgstr "TruePay Merchant Dashboard"
+
+#: templates/merchant_layout/dashboard_base.html:37
+msgid "廠商總覽"
+msgstr "Merchant Overview"
+
+#: templates/merchant_layout/dashboard_base.html:43
+msgid "商品列表"
+msgstr "Product List"
+
+#: templates/merchant_layout/dashboard_base.html:49
+msgid "新增商品"
+msgstr "Add Product"
+
+#: templates/merchant_layout/dashboard_base.html:55
+msgid "交易紀錄"
+msgstr "Transaction History"
+
+#: templates/merchant_layout/dashboard_base.html:61
+msgid "售出票券"
+msgstr "Sold Tickets"
+
+#: templates/merchant_layout/dashboard_base.html:68
+msgid "子網域設定"
+msgstr "Subdomain Settings"
+
+#: templates/merchant_layout/dashboard_base.html:81
+msgid "票券驗證"
+msgstr "Ticket Validation"
+
+#: templates/merchant_layout/dashboard_base.html:87
+msgid "票券使用紀錄"
+msgstr "Ticket Usage Records"
+
+#: templates/merchant_layout/dashboard_base.html:93
+msgid "報表分析"
+msgstr "Reports & Analytics"
+
+#: templates/payments/confirm.html:12
+msgid "登入成功！"
+msgstr "Login Successful!"
+
+#: templates/payments/confirm.html:18
+msgid "付款資訊"
+msgstr "Payment Information"
+
+#: templates/payments/confirm.html:22 templates/payments/payment_status.html:52
+msgid "商品名稱："
+msgstr "Product Name:"
+
+#: templates/payments/confirm.html:27 templates/payments/payment_status.html:32
+msgid "付款金額："
+msgstr "Amount:"
+
+#: templates/payments/confirm.html:32 templates/payments/payment_status.html:16
+msgid "付款方式："
+msgstr "Payment Method:"
+
+#: templates/payments/confirm.html:35
+msgid "藍新金流"
+msgstr "NewebPay"
+
+#: templates/payments/confirm.html:55
+msgid "確認付款"
+msgstr "Confirm Payment"
+
+#: templates/payments/confirm.html:62
+#: templates/payments/order_limit_error.html:34
+#: templates/payments/payment_status.html:172
+msgid "返回首頁"
+msgstr "Return to Home"
+
+#: templates/payments/order_limit_error.html:11
+msgid "訂單數量超過限制"
+msgstr "Order Limit Exceeded"
+
+#: templates/payments/order_limit_error.html:16
+#, python-format
+msgid ""
+"您在過去 %(time_window)s 分鐘內已有 <span class=\"font-semibold text-"
+"orange-600\">%(pending_count)s 筆</span>待付款訂單，"
+msgstr ""
+"You have <span class=\"font-semibold text-orange-600\">%(pending_count)s</"
+"span> pending orders in the past %(time_window)s minutes,"
+
+#: templates/payments/order_limit_error.html:19
+#, python-format
+msgid ""
+"目前共有 <span class=\"font-semibold text-orange-600\">%(total_pending)s 筆</"
+"span>待付款訂單。"
+msgstr ""
+"Currently there are <span class=\"font-semibold text-"
+"orange-600\">%(total_pending)s</span> pending orders in total."
+
+#: templates/payments/order_limit_error.html:23
+msgid "請前往購買記錄重新付款現有訂單，或等待後再試。"
+msgstr ""
+"Please go to purchase history to retry payment for existing orders, or try "
+"again later."
+
+#: templates/payments/order_limit_error.html:30
+msgid "前往購買記錄"
+msgstr "Go to Purchase History"
+
+#: templates/payments/order_limit_error.html:39
+msgid "如有疑問，請聯繫客服人員"
+msgstr "If you have any questions, please contact customer service"
+
+#: templates/payments/payment_status.html:7
+msgid "付款狀態查詢"
+msgstr "Payment Status Inquiry"
+
+#: templates/payments/payment_status.html:12
+msgid "訂單編號："
+msgstr "Order Number:"
+
+#: templates/payments/payment_status.html:20
+msgid "付款狀態："
+msgstr "Payment Status:"
+
+#: templates/payments/payment_status.html:36
+msgid "建立時間："
+msgstr "Created At:"
+
+#: templates/payments/payment_status.html:41
+msgid "付款時間："
+msgstr "Paid At:"
+
+#: templates/payments/payment_status.html:49
+msgid "商品資訊"
+msgstr "Product Information"
+
+#: templates/payments/payment_status.html:56
+msgid "商家："
+msgstr "Merchant:"
+
+#: templates/payments/payment_status.html:60
+msgid "商品描述："
+msgstr "Product Description:"
+
+#: templates/payments/payment_status.html:70
+msgid "藍新金流詳情"
+msgstr "NewebPay Details"
+
+#: templates/payments/payment_status.html:74
+msgid "交易序號："
+msgstr "Transaction Number:"
+
+#: templates/payments/payment_status.html:80
+msgid "付款類型："
+msgstr "Payment Type:"
+
+#: templates/payments/payment_status.html:86
+msgid "信用卡號："
+msgstr "Credit Card Number:"
+
+#: templates/payments/payment_status.html:97
+msgid "LINE Pay 詳情"
+msgstr "LINE Pay Details"
+
+#: templates/payments/payment_status.html:100
+msgid "LINE Pay 交易ID："
+msgstr "LINE Pay Transaction ID:"
+
+#: templates/payments/payment_status.html:115
+#, python-format
+msgid "您的票券代碼 (%(counter)s 張)"
+msgstr "Your Ticket Codes (%(counter)s tickets)"
+
+#: templates/payments/payment_status.html:125
+msgid "票券"
+msgstr "Ticket"
+
+#: templates/payments/payment_status.html:131
+msgid "票券狀態："
+msgstr "Ticket Status:"
+
+#: templates/payments/payment_status.html:136
+msgid "可使用"
+msgstr "Available"
+
+#: templates/payments/payment_status.html:142
+msgid "有效期限："
+msgstr "Valid Until:"
+
+#: templates/payments/payment_status.html:148
+msgid "使用時間："
+msgstr "Used At:"
+
+#: templates/payments/payment_status.html:165
+msgid "請將各票券代碼分別提供給商家進行驗證"
+msgstr "Please provide each ticket code to the merchant for verification"
+
+#: templates/payments/stock_insufficient_error.html:11
+msgid "庫存不足"
+msgstr "Insufficient Stock"
+
+#: templates/payments/stock_insufficient_error.html:17
+#, python-format
+msgid ""
+"目前庫存：<span class=\"font-semibold text-orange-600\">%(stock)s 件</span>"
+msgstr ""
+"Current Stock: <span class=\"font-semibold text-orange-600\">%(stock)s "
+"items</span>"
+
+#: templates/payments/stock_insufficient_error.html:20
+#, python-format
+msgid "您想購買：<span class=\"font-semibold text-red-600\">%(qty)s 件</span>"
+msgstr ""
+"You want to buy: <span class=\"font-semibold text-red-600\">%(qty)s items</"
+"span>"
+
+#: templates/payments/stock_insufficient_error.html:27
+msgid "建議選項："
+msgstr "Suggested Options:"
+
+#: templates/payments/stock_insufficient_error.html:30
+#, python-format
+msgid "• 調整購買數量為 %(stock)s 件或更少"
+msgstr "• Adjust quantity to %(stock)s items or fewer"
+
+#: templates/payments/stock_insufficient_error.html:31
+msgid "• 商品可能被其他用戶購買，請重新整理頁面查看最新庫存"
+msgstr ""
+"• Product may have been purchased by others, please refresh page for latest "
+"stock"
+
+#: templates/payments/stock_insufficient_error.html:37
+msgid "很抱歉，此商品目前已售完"
+msgstr "Sorry, this product is currently sold out"
+
+#: templates/payments/stock_insufficient_error.html:40
+msgid "您可以瀏覽其他商品或聯繫商家了解補貨時間"
+msgstr ""
+"You can browse other products or contact the merchant for restock information"
+
+#: templates/payments/stock_insufficient_error.html:50
+msgid "重新整理商品頁面"
+msgstr "Refresh Product Page"
+
+#: templates/payments/stock_insufficient_error.html:56
+#, python-format
+msgid "如有疑問，請聯繫商家客服：%(phone)s"
+msgstr "For questions, please contact merchant customer service: %(phone)s"
+
+#: templates/shared/order_table.html:14
+msgid "交易序號"
+msgstr "Transaction Number"
+
+#: templates/shared/order_table.html:17
+msgid "消費者"
+msgstr "Customer"
+
+#: templates/shared/order_table.html:29
+msgid "數量"
+msgstr "Quantity"
+
+#: templates/shared/order_table.html:32
+msgid "總金額"
+msgstr "Total Amount"
+
+#: templates/shared/order_table.html:35
+msgid "訂單狀態"
+msgstr "Order Status"
+
+#: templates/shared/order_table.html:38
+msgid "付款方式"
+msgstr "Payment Method"
+
+#: templates/shared/order_table.html:41
+msgid "建立時間"
+msgstr "Created At"
+
+#: templates/shared/order_table.html:45
+msgid "操作"
+msgstr "Actions"
+
+#: templates/shared/order_table.html:110
+msgid "確認要重新付款此訂單嗎？"
+msgstr "Are you sure you want to retry payment for this order?"
+
+#: templates/shared/order_table.html:114
+msgid "重新付款"
+msgstr "Retry Payment"
+
+#: templates/shared/order_table.html:118
+msgid "確認要取消此訂單嗎？取消後將無法恢復。"
+msgstr ""
+"Are you sure you want to cancel this order? This action cannot be undone."
+
+#: templates/shared/order_table.html:122
+msgid "取消訂單"
+msgstr "Cancel Order"
+
+#: templates/shared/order_table.html:127
+msgid "已完成"
+msgstr "Completed"
+
+#: templates/shared/order_table.html:129
+msgid "已取消"
+msgstr "Cancelled"
+
+#: templates/shared/order_table.html:131
+msgid "付款失敗"
+msgstr "Payment Failed"
+
+#: templates/shared/order_table.html:142
+msgid "目前沒有交易記錄"
+msgstr "No transaction records currently"
+
+#~| msgid "訂單編號"
+#~ msgid "輸入訂單編號"
+#~ msgstr "Order Number"
+
+#~ msgid "收起"
+#~ msgstr "Hide"
+
+#~ msgid "此票券需要更新才能顯示QR Code"
+#~ msgstr "This ticket needs to be updated to show QR Code"
+
+#~ msgid "票券已過期，無法顯示 QR Code"
+#~ msgstr "Ticket has expired, cannot show QR Code"
+
+#~ msgid "核銷前安全驗證"
+#~ msgstr "Security Verification Before Redemption"
+
+#~ msgid "此票券需要二階段驗證才能查看 QR Code，請先完成安全設定"
+#~ msgstr ""
+#~ "This ticket requires two-factor authentication to view QR Code, please "
+#~ "complete security setup first"
+
+#~ msgid "我已閱讀並同意相關使用條款，了解票券兌換方式及相關規範"
+#~ msgstr ""
+#~ "I have read and agree to the relevant terms of use, understand the ticket "
+#~ "redemption method and related regulations"
+
+#~ msgid "您已完成二階段驗證設定，點擊下方按鈕進行驗證"
+#~ msgstr ""
+#~ "You have completed two-factor authentication setup. Click the button "
+#~ "below to verify"
+
+#~ msgid "需要設定二階段驗證"
+#~ msgstr "Two-Factor Authentication Setup Required"
+
+#~ msgid "立即設定二階段驗證"
+#~ msgstr "Set Up Two-Factor Authentication Now"
+
+#~ msgid "設定完成後將自動返回此頁面"
+#~ msgstr "You will be automatically redirected back to this page after setup"
+
+#~ msgid "確認條款，進行二階段驗證"
+#~ msgstr "Confirm Terms and Proceed with Two-Factor Authentication"
+
+#~ msgid "票券 QR Code"
+#~ msgstr "Ticket QR Code"
+
+#~ msgid "票券代碼"
+#~ msgstr "Ticket Code"
+
+#~ msgid "票券代碼未生成"
+#~ msgstr "Ticket code not generated"
+
+#~ msgid "還沒有票券"
+#~ msgstr "No tickets yet"
+
+#~ msgid "您目前沒有任何票券，快去購買商品吧！"
+#~ msgstr "You currently have no tickets. Go buy some products!"

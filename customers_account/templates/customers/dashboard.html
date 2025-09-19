@@ -1,9 +1,10 @@
 {% extends "customers_layout/dashboard_base.html" %}
-{% block title %}消費者儀表板 - TruePay{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "消費者儀表板" %} - TruePay{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto">
-    <h1 class="text-3xl font-bold text-gray-900 mb-8">歡迎回來，{{ customer.name }}！</h1>
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">{% blocktrans with name=customer.name %}歡迎回來，{{ name }}！{% endblocktrans %}</h1>
     
     {% if messages %}
         {% for message in messages %}
@@ -16,17 +17,17 @@
     <!-- 快速統計 -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white p-6 rounded-xl border border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900 mb-2">總購買次數</h3>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">{% trans "總購買次數" %}</h3>
             <p class="text-3xl font-bold text-blue-600">{{ total_orders }}</p>
         </div>
         
         <div class="bg-white p-6 rounded-xl border border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900 mb-2">總消費金額</h3>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">{% trans "總消費金額" %}</h3>
             <p class="text-3xl font-bold text-green-600">NT$ {{ total_amount|floatformat:0 }}</p>
         </div>
         
         <div class="bg-white p-6 rounded-xl border border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900 mb-2">待付款訂單</h3>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">{% trans "待付款訂單" %}</h3>
             <p class="text-3xl font-bold text-yellow-600">{{ pending_orders }}</p>
         </div>
     </div>
@@ -34,9 +35,9 @@
     <!-- 最近購買記錄 -->
     <div class="bg-white rounded-xl border border-gray-200 p-6">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-semibold text-gray-900">最近購買記錄</h2>
+            <h2 class="text-xl font-semibold text-gray-900">{% trans "最近購買記錄" %}</h2>
             <a href="{% url 'customers_account:purchase_history' %}" class="text-blue-600 hover:text-blue-700 font-medium">
-                查看全部 →
+                {% trans "查看全部" %} →
             </a>
         </div>
         
@@ -45,12 +46,12 @@
                 <table class="min-w-full">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">訂單編號</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">商品名稱</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">商家</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">金額</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">狀態</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">購買時間</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "訂單編號" %}</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "商品名稱" %}</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "商家" %}</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "金額" %}</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "狀態" %}</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "購買時間" %}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
@@ -87,9 +88,9 @@
             </div>
         {% else %}
             <div class="text-center py-8">
-                <p class="text-gray-500">還沒有購買記錄</p>
+                <p class="text-gray-500">{% trans "還沒有購買記錄" %}</p>
                 <a href="{% url 'pages:home' %}" class="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
-                    開始購物
+                    {% trans "開始購物" %}
                 </a>
             </div>
         {% endif %}
