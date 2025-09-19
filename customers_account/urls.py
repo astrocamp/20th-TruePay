@@ -13,6 +13,7 @@ urlpatterns = [
     path("profile-settings/", views.profile_settings, name="profile_settings"),
     
     # TOTP 二階段驗證相關路由
+    path("authenticator_guide/", views.authenticator_guide, name="authenticator_guide"),
     path("totp/setup/", views.totp_setup, name="totp_setup"),
     path("totp/enable/", views.totp_enable, name="totp_enable"),
     path("totp/manage/", views.totp_manage, name="totp_manage"),

@@ -160,7 +160,27 @@
                                                 <span class="text-orange-800 font-medium">⚠️ 需要設定二階段驗證</span>
                                             </div>
                                             <p class="text-orange-700 text-sm mb-3">此商品需要二階段驗證才能購買，請先完成安全設定：</p>
-                                            <a href="{% url 'customers_account:totp_setup' %}?next={{ request.get_full_path }}" 
+
+                                            <!-- Google Authenticator 下載提醒 -->
+                                            <div class="bg-blue-50 border border-blue-200 rounded-md p-3 mb-3">
+                                                <p class="text-blue-800 text-sm font-medium mb-2"> 首次設定需要下載應用程式：</p>
+                                                <div class="flex flex-wrap gap-2">
+                                                    <a href="https://apps.apple.com/tw/app/google-authenticator/id388497605"
+                                                       target="_blank"
+                                                       rel="noopener noreferrer"
+                                                       class="inline-flex items-center text-xs bg-black text-white px-2 py-1 rounded hover:bg-gray-800">
+                                                         iOS 下載
+                                                    </a>
+                                                    <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2"
+                                                       target="_blank"
+                                                       rel="noopener noreferrer"
+                                                       class="inline-flex items-center text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700">
+                                                         Android 下載
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                            <a href="{% url 'customers_account:authenticator_guide' %}?next={{ request.get_full_path }}"
                                                class="inline-block bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition duration-200 text-sm font-medium">
                                                 🔧 立即設定二階段驗證
                                             </a>

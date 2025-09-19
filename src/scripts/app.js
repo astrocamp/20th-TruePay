@@ -12,4 +12,8 @@ window.htmx = htmx
 window.jsQR = jsQR
 window.Html5Qrcode = Html5Qrcode
 window.Chart = Chart
+
+// 暴露 Alpine 組件到全域
+// authenticatorGuide 函數在 functions.js 中定義，會自動暴露到全域
+
 Alpine.start()

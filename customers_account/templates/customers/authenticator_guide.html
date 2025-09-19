@@ -1,0 +1,95 @@
+{% extends "layouts/default.html" %}
+{% block content %}
+<div class="max-w-4xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md" x-data="authenticatorGuide()">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">🔐 {% if is_required %}安全驗證設定{% else %}歡迎使用 TruePay！{% endif %}</h1>
+        {% if is_required %}
+            <p class="text-lg text-orange-600 font-medium">此操作需要二階段驗證，請完成安全設定後繼續</p>
+        {% else %}
+            <p class="text-lg text-gray-600">為了保護您的帳戶安全，我們建議您設定二階段驗證</p>
+        {% endif %}
+    </div>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+        <h2 class="text-xl font-bold text-blue-800 mb-4">✨ 什麼是二階段驗證？</h2>
+        <p class="text-blue-700 mb-4">
+            二階段驗證（2FA）為您的帳戶增加額外的安全防護，即使密碼被盜用，駭客也無法輕易存取您的帳戶。
+        </p>
+        <ul class="list-disc list-inside text-blue-700 space-y-2">
+            <li>保護您的個人資料和購買記錄</li>
+            <li>防止未經授權的交易</li>
+            <li>提升整體帳戶安全性</li>
+        </ul>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <!-- iOS 下載 -->
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+            <div class="mb-4">
+                <span class="text-4xl">📱</span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">iOS 用戶</h3>
+            <p class="text-gray-600 mb-4">從 App Store 下載 Google Authenticator</p>
+            <a href="https://apps.apple.com/tw/app/google-authenticator/id388497605"
+               target="_blank"
+               rel="noopener noreferrer"
+               @click="trackDownload('iOS', $event.target.href)"
+               class="inline-block bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition duration-200 font-medium">
+                前往 App Store
+            </a>
+        </div>
+
+        <!-- Android 下載 -->
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+            <div class="mb-4">
+                <span class="text-4xl">🤖</span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Android 用戶</h3>
+            <p class="text-gray-600 mb-4">從 Google Play 商店下載 Google Authenticator</p>
+            <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2"
+               target="_blank"
+               rel="noopener noreferrer"
+               @click="trackDownload('Android', $event.target.href)"
+               class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-200 font-medium">
+                前往 Google Play
+            </a>
+        </div>
+    </div>
+
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-8">
+        <h3 class="text-lg font-bold text-yellow-800 mb-3">📋 設定步驟預覽</h3>
+        <ol class="list-decimal list-inside text-yellow-700 space-y-2">
+            <li>下載並安裝 Google Authenticator 應用程式</li>
+            <li>點擊下方「開始設定二階段驗證」按鈕</li>
+            <li>使用應用程式掃描 QR Code</li>
+            <li>輸入驗證代碼完成設定</li>
+        </ol>
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <a href="{% url 'customers_account:totp_setup' %}{% if next_url %}?next={{ next_url }}{% endif %}"
+           class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-200 font-medium text-center">
+            ✅ 開始設定二階段驗證
+        </a>
+
+        {% if not is_required %}
+        <a href="{% url 'customers_account:dashboard' %}"
+           class="bg-gray-400 text-white px-8 py-3 rounded-lg hover:bg-gray-500 transition duration-200 font-medium text-center">
+            ⏭️ 稍後再做設定
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="mt-8 p-4 bg-gray-100 rounded-lg">
+        {% if is_required %}
+            <p class="text-sm text-orange-600 text-center">
+                🔒 <strong>注意：</strong>設定完成後將自動返回原頁面繼續操作
+            </p>
+        {% else %}
+            <p class="text-sm text-gray-600 text-center">
+                💡 <strong>小提示：</strong>您隨時可以在「個人設定」頁面中設定或管理二階段驗證
+            </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
