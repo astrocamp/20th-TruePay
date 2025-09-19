@@ -7,7 +7,7 @@ import qrcode
 from PIL import Image, ImageDraw
 from io import BytesIO
 import base64
-from django.conf import settings
+from django.contrib.staticfiles import finders
 import os
 
 
@@ -27,7 +27,7 @@ def generate_qr_code_with_logo(data, logo_path=None, logo_size_ratio=0.25, error
 
     # 如果沒有指定 logo 路徑，使用預設的 favicon
     if logo_path is None:
-        logo_path = os.path.join(settings.BASE_DIR, 'src', 'favicon.ico')
+        logo_path = finders.find('favicon.ico')
 
     # 創建 QR Code
     qr = qrcode.QRCode(
