@@ -9,9 +9,9 @@ import qrcode
 from io import BytesIO
 import base64
 import json
-import hmac
-import hashlib
-import time
+
+# Local imports
+from truepay.qr_utils import generate_qr_code_with_logo
 
 
 def default_provider_raw_data():
@@ -455,112 +455,38 @@ TruePay 客服團隊
         }
     
     def generate_qr_code_data(self):
-        """生成QR code資料內容（含HMAC簽名防偽）"""
-        # 生成時間戳
-        timestamp = int(time.time())
-
-        # 基本資料
+        """生成QR code資料內容"""
         qr_data = {
             "ticket_code": self.ticket_code,
             "type": "ticket_voucher",
             "version": "1.0",
             "product_id": self.product.id,
-            "merchant_id": self.product.merchant.id,
-            "timestamp": timestamp
+            "merchant_id": self.product.merchant.id
         }
-
-        # 生成HMAC簽名
-        signature = self._generate_hmac_signature(qr_data)
-        qr_data["signature"] = signature
-
         return json.dumps(qr_data)
     
     def generate_qr_code_image(self):
-        """生成QR code圖片的base64編碼"""
+        """生成帶有 TruePay logo 的票券 QR code"""
+
         # 獲取QR code資料
         qr_data = self.generate_qr_code_data()
-        
-        # 創建QR code
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_M,
-            box_size=10,
-            border=4,
+
+        # 使用帶 logo 的 QR Code 生成器
+        return generate_qr_code_with_logo(
+            data=qr_data,
+            error_correction=qrcode.constants.ERROR_CORRECT_M,  # 票券需要中等錯誤修正
+            logo_size_ratio=0.2  # logo 稍微小一點，確保掃描穩定性
         )
-        qr.add_data(qr_data)
-        qr.make(fit=True)
-        
-        # 生成圖片
-        img = qr.make_image(fill_color="black", back_color="white")
-        
-        # 轉換為base64
-        buffer = BytesIO()
-        img.save(buffer, format='PNG')
-        buffer.seek(0)
-        
-        return base64.b64encode(buffer.getvalue()).decode()
     
-    def _generate_hmac_signature(self, data):
-        """生成HMAC簽名"""
-        # 建立簽名字串（排除signature本身）
-        sign_data = f"{data['ticket_code']}:{data['product_id']}:{data['merchant_id']}:{data['timestamp']}"
 
-        # 計算HMAC-SHA256簽名
-        signature = hmac.new(
-            settings.TICKET_HMAC_KEY.encode(),
-            sign_data.encode(),
-            hashlib.sha256
-        ).hexdigest()
-
-        return signature
-
-    @classmethod
-    def verify_qr_signature(cls, qr_data_dict):
-        """驗證QR code簽名"""
-        # 檢查是否有簽名（向下相容舊版本）
-        if "signature" not in qr_data_dict or "timestamp" not in qr_data_dict:
-            return True, "舊版本票券，跳過簽名驗證"
-
-        # 提取簽名
-        provided_signature = qr_data_dict.get("signature")
-        if not provided_signature:
-            return False, "缺少簽名資訊"
-
-        # 重新計算預期簽名
-        sign_data = f"{qr_data_dict['ticket_code']}:{qr_data_dict['product_id']}:{qr_data_dict['merchant_id']}:{qr_data_dict['timestamp']}"
-
-        expected_signature = hmac.new(
-            settings.TICKET_HMAC_KEY.encode(),
-            sign_data.encode(),
-            hashlib.sha256
-        ).hexdigest()
-
-        # 比對簽名
-        if not hmac.compare_digest(provided_signature, expected_signature):
-            return False, "票券簽名驗證失敗，可能被偽造"
-
-        # 檢查時間戳（防止過舊的票券）
-        current_time = int(time.time())
-        ticket_time = qr_data_dict.get("timestamp", 0)
-
-        # 允許10分鐘內的時間差（600秒）
-        if current_time - ticket_time > 600:
-            return False, "票券驗證時間過期"
-
-        return True, "簽名驗證通過"
 
     @classmethod
     def get_ticket_from_qr_data(cls, qr_data):
-        """從QR code資料中取得票券（含簽名驗證）"""
+        """從QR code資料中取得票券"""
         try:
             data = json.loads(qr_data)
             if data.get("type") != "ticket_voucher":
                 return None, "無效的QR code類型"
-
-            # 驗證HMAC簽名
-            is_valid, error_message = cls.verify_qr_signature(data)
-            if not is_valid:
-                return None, error_message
 
             ticket_code = data.get("ticket_code")
             if not ticket_code:

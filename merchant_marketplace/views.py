@@ -1,4 +1,3 @@
-from django.utils.dateparse import parse_datetime
 from django.utils import timezone
 from datetime import timedelta
 from django.shortcuts import render, get_object_or_404, redirect
@@ -6,6 +5,7 @@ from django.contrib import messages
 from django.conf import settings
 import os
 from .models import Product
+from .forms import ProductForm, ProductEditForm
 from merchant_account.models import Merchant
 from truepay.decorators import no_cache_required, merchant_verified_required
 from payments.models import OrderItem
@@ -59,54 +59,39 @@ def detail(request, subdomain, id):
 @no_cache_required
 @merchant_verified_required
 def new(request, subdomain):
-    if request.method == "GET":
-        # 設定最小時間為當前時間的下一分鐘
-        now = timezone.now()
-        min_datetime = now.replace(second=0, microsecond=0) + timedelta(minutes=1)
-        context = {
-            "merchant_phone": request.merchant.Cellphone,
-            "current_datetime": min_datetime.strftime('%Y-%m-%dT%H:%M')
-        }
-        return render(request, "merchant_marketplace/new.html", context)
+    # 設定最小時間為當前時間的下一分鐘
+    now = timezone.now()
+    min_datetime = now.replace(second=0, microsecond=0) + timedelta(minutes=1)
 
-    elif request.method == "POST":
-        try:
-            stock = int(request.POST.get("stock", 1))
-            if stock < 1:
-                raise ValueError("庫存數量必須至少為 1 件")
-                
-            # 處理票券期限
-            ticket_expiry = None
-            if request.POST.get("ticket_expiry"):
-                ticket_expiry = parse_datetime(request.POST.get("ticket_expiry"))
-            
-            product = Product.objects.create(
-                name=request.POST.get("name"),
-                description=request.POST.get("description"),
-                price=request.POST.get("price"),
-                stock=stock,
-                image=request.FILES.get("image"),
-                phone_number=request.POST.get("phone_number"),
-                verification_timing=request.POST.get("verification_timing", "before_redeem"),
-                ticket_expiry=ticket_expiry,
-                merchant=request.merchant,
-                is_active=False,  # 預設為下架
-            )
+    if request.method == "POST":
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                product = form.save(commit=False)
+                product.merchant = request.merchant
+                product.is_active = False  # 預設為下架
+                product.save()
 
-            messages.success(request, "商品新增成功！")
-            return redirect("merchant_marketplace:index", request.merchant.subdomain)
+                messages.success(request, "商品新增成功！")
+                return redirect("merchant_marketplace:index", request.merchant.subdomain)
 
-        except Exception as e:
-            messages.error(request, f"新增失敗：{str(e)}")
-            # 設定最小時間為當前時間的下一分鐘
-            now = timezone.now()
-            min_datetime = now.replace(second=0, microsecond=0) + timedelta(minutes=1)
-            context = {
-                "merchant_phone": request.merchant.Cellphone,
-                "current_datetime": min_datetime.strftime('%Y-%m-%dT%H:%M')
-            }
-            return render(request, "merchant_marketplace/new.html", context)
-    return render(request, "merchant_marketplace/new.html")
+            except Exception as e:
+                messages.error(request, f"新增失敗：{str(e)}")
+        else:
+            # 表單驗證失敗時顯示錯誤
+            for field, errors in form.errors.items():
+                for error in errors:
+                    field_label = form.fields[field].label if field in form.fields else field
+                    messages.error(request, f"{field_label}: {error}")
+    else:
+        form = ProductForm()
+
+    context = {
+        "form": form,
+        "merchant_phone": request.merchant.Cellphone,
+        "current_datetime": min_datetime.strftime('%Y-%m-%dT%H:%M')
+    }
+    return render(request, "merchant_marketplace/new.html", context)
 
 
 @no_cache_required
@@ -120,57 +105,37 @@ def edit(request, subdomain, id):
     # 檢查是否有票券，決定是否可以修改驗證方式（GET/POST 共用）
     has_tickets = OrderItem.objects.filter(product=product).exists()
 
-    if request.method == "GET":
-        # 設定最小時間為當前時間的下一分鐘
-        now = timezone.now()
-        min_datetime = now.replace(second=0, microsecond=0) + timedelta(minutes=1)
-        context = {
-            "product": product,
-            "merchant_phone": product.merchant.Cellphone,
-            "has_tickets": has_tickets,
-            "current_datetime": min_datetime.strftime('%Y-%m-%dT%H:%M')
-        }
-        return render(request, "merchant_marketplace/edit.html", context)
+    # 設定最小時間為當前時間的下一分鐘
+    now = timezone.now()
+    min_datetime = now.replace(second=0, microsecond=0) + timedelta(minutes=1)
 
-    elif request.method == "POST":
-        try:
-            # 如果已有票券，完全禁止修改
-            if has_tickets:
-                raise ValueError("此商品已有售出票券，為確保票券真實性和消費者權益，所有商品資訊已鎖定無法修改")
-            product.name = request.POST.get("name", product.name)
-            product.description = request.POST.get("description", product.description)
-            product.price = request.POST.get("price", product.price)
-            # 更新庫存，允許設為 0（賣完狀態）
-            stock = int(request.POST.get("stock", product.stock))
-            if stock < 0:
-                raise ValueError("庫存數量不能為負數")
-            product.stock = stock
-            # 只有在有新圖片時才更新
-            if request.FILES.get("image"):
-                product.image = request.FILES.get("image")
-            product.phone_number = request.POST.get(
-                "phone_number", product.phone_number
-            )
-            # 更新驗證方式
-            product.verification_timing = request.POST.get("verification_timing") or product.verification_timing
-            
-            # 更新票券期限
-            if request.POST.get("ticket_expiry"):
-                ticket_expiry = parse_datetime(request.POST.get("ticket_expiry"))
-                product.ticket_expiry = ticket_expiry
-            
-            product.save()
-            messages.success(request, "商品更新成功！")
-            return redirect("merchant_marketplace:index", request.merchant.subdomain)
-        except Exception as e:
-            messages.error(request, f"更新失敗：{str(e)}")
-            # 設定最小時間為當前時間的下一分鐘
-            now = timezone.now()
-            min_datetime = now.replace(second=0, microsecond=0) + timedelta(minutes=1)
-            context = {
-                "product": product,
-                "merchant_phone": product.merchant.Cellphone,
-                "has_tickets": has_tickets,
-                "current_datetime": min_datetime.strftime('%Y-%m-%dT%H:%M')
-            }
-            return render(request, "merchant_marketplace/edit.html", context)
+    if request.method == "POST":
+        # 如果已有票券，完全禁止修改
+        if has_tickets:
+            messages.error(request, "此商品已有售出票券，為確保票券真實性和消費者權益，所有商品資訊已鎖定無法修改")
+        else:
+            form = ProductEditForm(request.POST, request.FILES, instance=product)
+            if form.is_valid():
+                try:
+                    form.save()
+                    messages.success(request, "商品更新成功！")
+                    return redirect("merchant_marketplace:index", request.merchant.subdomain)
+                except Exception as e:
+                    messages.error(request, f"更新失敗：{str(e)}")
+            else:
+                # 表單驗證失敗時顯示錯誤
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        field_label = form.fields[field].label if field in form.fields else field
+                        messages.error(request, f"{field_label}: {error}")
+    else:
+        form = ProductEditForm(instance=product)
+
+    context = {
+        "form": form,
+        "product": product,
+        "merchant_phone": product.merchant.Cellphone,
+        "has_tickets": has_tickets,
+        "current_datetime": min_datetime.strftime('%Y-%m-%dT%H:%M')
+    }
+    return render(request, "merchant_marketplace/edit.html", context)

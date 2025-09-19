@@ -13,17 +13,17 @@ export default defineConfig({
             }
         }
     ],
-    build:{
+    build: {
         outDir: 'static',
         emptyOutDir: false,
-        rollupOptions:{
+        rollupOptions: {
             input: {
-                app: resolve(__dirname,'src/scripts/app.js')
+                app: resolve(__dirname, 'src/scripts/app.js')
             },
             output: {
-                entryFileNames:"scripts/[name].js",
-                chunkFileNames:"scripts/[name].js",
-                assetFileNames:"styles/[name].[ext]"
+                entryFileNames: "scripts/[name].js",
+                chunkFileNames: "scripts/[name].js",
+                assetFileNames: "styles/[name].[ext]"
             }
         }
     }

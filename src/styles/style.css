@@ -35,4 +35,36 @@
   .no-double-tap-zoom {
     touch-action: manipulation;
   }
+
+  /* TOTP 驗證 Loading 動畫 */
+  .totp-loading-spinner {
+    @apply inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full;
+    animation: spin 1s linear infinite;
+  }
+
+  .totp-loading-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* 按鈕 loading 狀態優化 */
+  .totp-button-loading {
+    @apply relative;
+  }
+
+  .totp-button-loading .totp-button-text {
+    @apply opacity-75;
+  }
+
+  .totp-input-loading {
+    @apply pointer-events-none opacity-60;
+  }
 }

@@ -23,9 +23,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # 票券設定
 TICKET_VALIDITY_DAYS = 180  # 票券有效期（天數）
-TICKET_HMAC_KEY = os.getenv(
-    "TICKET_HMAC_KEY", "default-hmac-key-change-in-production"
-)  # HMAC 簽名密鑰
 
 
 # Quick-start development settings - unsuitable for production
@@ -35,7 +32,7 @@ TICKET_HMAC_KEY = os.getenv(
 SECRET_KEY = "django-insecure-iip1xgbl_eh&cl1p81i9*nuvl)qlb$#gj1e+f1it-a!xu1qjio"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # 從環境變數讀取 ngrok URL (必須在 .env 中設定)
 NGROK_URL = os.getenv("NGROK_URL")
@@ -80,7 +77,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    # "dynamic_host.middleware.AllowedHostMiddleWare",  # 動態 Host 驗證 - 暫時註解，缺少套件
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",  # 上線後靜態檔案讀取
     "truepay.security_middleware.SecurityHeadersMiddleware",
