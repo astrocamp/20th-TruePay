@@ -58,33 +58,27 @@ def generate_qr_code_with_logo(data, logo_path=None, logo_size_ratio=0.25, error
             # 調整 logo 大小
             logo = logo.resize((logo_size, logo_size), Image.Resampling.LANCZOS)
 
-            # 創建白色背景的圓形遮罩
-            mask = Image.new('L', (logo_size, logo_size), 0)
+            # 創建圓形白色背景
+            background_size = logo_size
+            background = Image.new('RGBA', (background_size, background_size), (255, 255, 255, 255))
+
+            # 創建圓形遮罩
+            mask = Image.new('L', (background_size, background_size), 0)
             draw = ImageDraw.Draw(mask)
+            draw.ellipse([0, 0, background_size, background_size], fill=255)
 
-            # 畫圓形遮罩（稍微縮小一點，留白邊）
-            margin = 4
-            draw.ellipse([margin, margin, logo_size-margin, logo_size-margin], fill=255)
-
-            # 創建帶有白色圓形背景的 logo
-            background = Image.new('RGBA', (logo_size, logo_size), (255, 255, 255, 255))
-
-            # 應用圓形遮罩到背景
+            # 應用圓形遮罩到白色背景
             background.putalpha(mask)
 
-            # 將 logo 粘貼到圓形背景上
-            final_logo = Image.new('RGBA', (logo_size, logo_size), (255, 255, 255, 0))
-            final_logo.paste(background, (0, 0), mask)
+            # 調整 logo 大小（留一些邊距）
+            logo_margin = logo_size // 4
+            inner_size = logo_size - logo_margin * 2
+            logo_resized = logo.resize((inner_size, inner_size), Image.Resampling.LANCZOS)
 
-            # 調整 logo 大小並居中
-            logo_margin = logo_size // 6
-            logo_resized = logo.resize((logo_size - logo_margin*2, logo_size - logo_margin*2), Image.Resampling.LANCZOS)
-
-            # 計算 logo 在圓形背景中的位置（居中）
-            logo_pos_x = (logo_size - logo_resized.size[0]) // 2
-            logo_pos_y = (logo_size - logo_resized.size[1]) // 2
-
-            final_logo.paste(logo_resized, (logo_pos_x, logo_pos_y), logo_resized)
+            # 創建最終的 logo（白色圓形背景 + logo）
+            final_logo = background.copy()
+            logo_pos = ((background_size - inner_size) // 2, (background_size - inner_size) // 2)
+            final_logo.paste(logo_resized, logo_pos, logo_resized)
 
             # 計算 logo 在 QR Code 中的位置（居中）
             logo_x = (qr_width - logo_size) // 2
