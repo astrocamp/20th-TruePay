@@ -5,6 +5,9 @@ import pyotp
 import qrcode
 import secrets
 
+# Local imports
+from truepay.qr_utils import generate_qr_code_with_logo
+
 
 class Customer(models.Model):
     member = models.OneToOneField(
@@ -84,8 +87,6 @@ class Customer(models.Model):
     
     def generate_qr_code(self):
         """生成帶有 TruePay logo 的 TOTP QR Code"""
-        from truepay.qr_utils import generate_qr_code_with_logo
-
         uri = self.get_totp_provisioning_uri()
 
         # 使用帶 logo 的 QR Code 生成器

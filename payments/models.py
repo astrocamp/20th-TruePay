@@ -10,6 +10,9 @@ from io import BytesIO
 import base64
 import json
 
+# Local imports
+from truepay.qr_utils import generate_qr_code_with_logo
+
 
 def default_provider_raw_data():
     """避免可變物件陷阱的預設值函數"""
@@ -464,7 +467,6 @@ TruePay 客服團隊
     
     def generate_qr_code_image(self):
         """生成帶有 TruePay logo 的票券 QR code"""
-        from truepay.qr_utils import generate_qr_code_with_logo
 
         # 獲取QR code資料
         qr_data = self.generate_qr_code_data()
