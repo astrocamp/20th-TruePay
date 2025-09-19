@@ -10,6 +10,7 @@ urlpatterns = [
     path("shop/", include("public_store.urls")),
     path("payments/", include("payments.urls")),
     path("accounts/", include("allauth.urls")),  # Django Allauth URLs
+    path("embed/", include("embed_system.urls")),  # 嵌入系統 URLs
     path("", include("pages.urls")),
 ]
 

@@ -49,9 +49,25 @@ def detail(request, subdomain, id):
             messages.success(request, "商品已刪除")
             return redirect("merchant_marketplace:index", request.merchant.subdomain)
 
+    # 生成嵌入代碼（使用與 embed_system 相同的邏輯）
+    ENV = os.getenv('ENV', 'development')
+    if ENV == 'production':
+        base_url = "https://truepay.tw"
+    else:
+        base_url = f"https://{os.getenv('NGROK_URL')}" if os.getenv('NGROK_URL') else "http://localhost:8000"
+
+    # iframe 嵌入代碼（與 embed_system/views.py:357 相同格式）
+    iframe_code = f'<iframe src="{base_url}/embed/product/{product.id}/" width="400" height="600" frameborder="0" style="border: 1px solid #ddd; border-radius: 8px;"></iframe>'
+
+    # JavaScript 嵌入代碼（與 embed_system/views.py:359-360 相同格式）
+    script_code = f'''<div class="truepay-widget" data-id="{product.id}"></div>
+<script src="{base_url}/embed/embed.js"></script>'''
+
     context = {
         "product": product,
-        "base_domain": os.getenv("NGROK_URL", settings.BASE_DOMAIN)
+        "base_domain": os.getenv("NGROK_URL", settings.BASE_DOMAIN),
+        "iframe_code": iframe_code,
+        "script_code": script_code
     }
     return render(request, "merchant_marketplace/detail.html", context)
 
