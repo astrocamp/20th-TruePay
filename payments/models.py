@@ -463,29 +463,18 @@ TruePay 客服團隊
         return json.dumps(qr_data)
     
     def generate_qr_code_image(self):
-        """生成QR code圖片的base64編碼"""
+        """生成帶有 TruePay logo 的票券 QR code"""
+        from truepay.qr_utils import generate_qr_code_with_logo
+
         # 獲取QR code資料
         qr_data = self.generate_qr_code_data()
-        
-        # 創建QR code
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_M,
-            box_size=10,
-            border=4,
+
+        # 使用帶 logo 的 QR Code 生成器
+        return generate_qr_code_with_logo(
+            data=qr_data,
+            error_correction=qrcode.constants.ERROR_CORRECT_M,  # 票券需要中等錯誤修正
+            logo_size_ratio=0.2  # logo 稍微小一點，確保掃描穩定性
         )
-        qr.add_data(qr_data)
-        qr.make(fit=True)
-        
-        # 生成圖片
-        img = qr.make_image(fill_color="black", back_color="white")
-        
-        # 轉換為base64
-        buffer = BytesIO()
-        img.save(buffer, format='PNG')
-        buffer.seek(0)
-        
-        return base64.b64encode(buffer.getvalue()).decode()
     
 
 
