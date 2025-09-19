@@ -21,5 +21,7 @@ def marketplace(req):
 
     context = {"products": products, "page_title": "商品總覽"}
     return render(req, "pages/marketplace.html", context)
+
+
 def selectrole(req):
     return render(req, "pages/selectrole.html")

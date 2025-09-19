@@ -1,0 +1,93 @@
+{% extends "layouts/default.html" %}
+{% block title %}{{ merchant.ShopName }} - 現代簡約{% endblock %}
+
+{% block main_container_classes %}{% endblock %}
+
+{% block content %}
+<style>
+    /* 優化進場動畫，使其更快速細微 */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modern-container { 
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    /* 移除 pulse 動畫，改用 transition 實現更自然的 hover 效果 */
+    .modern-card {
+        transition: all 0.3s ease-in-out;
+    }
+    .modern-card:hover {
+        transform: translateY(-5px) scale(1.03);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .modern-gradient {
+        background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+    }
+</style>
+
+<div class="min-h-screen bg-gray-50">
+  <div class="container mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto">
+
+      <!-- 商店標頭 -->
+      <div class="modern-container bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
+        <div class="p-8 modern-gradient text-white">
+          <div class="flex items-center space-x-6">
+            <div class="w-16 h-16 rounded-2xl flex items-center justify-center font-bold text-2xl" style="background: white; color: #4f46e5;">
+              {{ merchant.ShopName|first }}
+            </div>
+            <div>
+              <h1 class="text-3xl font-bold mb-2 text-white">{{ merchant.ShopName }}</h1>
+              <p class="text-indigo-100">{{ merchant.Address }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 商品區 -->
+      <div class="mb-6">
+        <h2 class="text-3xl font-bold text-center mb-12 text-gray-700">精選商品</h2>
+
+        {% if products %}
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for product in products %}
+            <div class="modern-container modern-card bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div class="h-60 bg-gray-50 relative">
+                {% if product.image %}
+                  <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+                {% else %}
+                  <div class="w-full h-full flex items-center justify-center text-gray-400">
+                    <span class="text-6xl">📦</span>
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">{{ product.name }}</h3>
+                <p class="text-2xl font-bold text-indigo-500 mb-4">NT$ {{ product.price }}</p>
+
+                <a href="{% url 'public_store:payment_page' id=product.id %}"
+                   class="w-full font-medium py-3 px-6 rounded-xl transition-all duration-200 ease-in-out flex items-center justify-center shadow-md hover:shadow-lg hover:-translate-y-0.5" style="background: #818cf8; color: white;" onmouseover="this.style.background='#6366f1'" onmouseout="this.style.background='#818cf8'">
+                   立即購買
+                </a>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-16">
+            <div class="modern-container bg-white rounded-2xl shadow-lg p-12">
+              <h3 class="text-xl font-bold text-gray-600 mb-4">暫無商品</h3>
+              <p class="text-gray-500">商品準備中，敬請期待</p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

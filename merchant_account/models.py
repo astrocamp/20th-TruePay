@@ -61,6 +61,20 @@ class Merchant(models.Model):
     subdomain_history = models.JSONField(
         default=list, verbose_name="修改歷史", help_text="所有 subdomain 修改紀錄"
     )
+    STORE_TEMPLATE_CHOICES = [
+        ("modern_light", "modern_light"),
+        ("modern", "modern"),
+        ("tech", "tech"),
+        ("handcraft", "handcraft"),
+        ("vintage", "vintage"),
+    ]
+    store_template_id = models.CharField(
+        max_length=20,
+        choices=STORE_TEMPLATE_CHOICES,
+        default="modern",
+        verbose_name="商店模板風格",
+        help_text="選擇商店頁面的視覺風格樣式",
+    )
 
     def __str__(self):
         return self.ShopName

@@ -1,0 +1,23 @@
+/* Additional custom styles */
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Smooth scrolling for the whole page */
+html {
+    scroll-behavior: smooth;
+}
+
+/* General utility classes that can't be easily replaced with Tailwind */
+.backdrop-blur {
+    backdrop-filter: blur(10px);
+}
+
+/* Brand colors that match the existing design */
+:root {
+    --brand-blue: #3b82f6;
+    --brand-blue-dark: #1e3a8a;
+    --brand-blue-light: #60a5fa;
+    --brand-gray: #64748b;
+    --brand-gray-light: #f8fafc;
+}

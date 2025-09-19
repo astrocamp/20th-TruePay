@@ -1,0 +1,94 @@
+{% extends "layouts/default.html" %}
+{% block title %}{{ merchant.ShopName }} - 現代淡色系{% endblock %}
+
+{% block content %}
+<style>
+    .modern-light-font { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+
+    /* 改為更柔和的淡入動畫 */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .modern-light-container {
+        animation: fadeIn 1s ease-out;
+    }
+
+    /* 移除無限循環的 glow 動畫，改用 transition */
+    .modern-light-accent {
+        transition: all 0.3s ease-in-out;
+    }
+    .modern-light-accent:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 216, 3, 0.2);
+    }
+
+    .modern-light-pattern {
+        background: #fffffe;
+        min-height: 100vh;
+    }
+</style>
+
+<div class="modern-light-pattern">
+  <div class="container mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto">
+
+      <!-- 商店標頭 -->
+      <div class="modern-light-container bg-gradient-to-br from-slate-50 to-white rounded-xl shadow-lg overflow-hidden mb-8 border border-slate-200">
+        <div class="p-8" style="background: linear-gradient(135deg, #e3f6f5 0%, #bae8e8 100%);">
+          <div class="flex items-center space-x-6">
+            <div class="w-20 h-20 rounded-full flex items-center justify-center font-bold text-3xl modern-light-font" style="background: #ffd803; color: #272343;">
+              {{ merchant.ShopName|first }}
+            </div>
+            <div>
+              <h1 class="text-4xl font-bold modern-light-font mb-2" style="color: #272343;">{{ merchant.ShopName }}</h1>
+              <p class="modern-light-font text-lg" style="color: #2d334a;">{{ merchant.Address }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 商品區 -->
+      <div class="mb-6">
+        <h2 class="text-4xl font-bold modern-light-font text-center mb-12 tracking-wider" style="color: #272343;">精選商品</h2>
+
+        {% if products %}
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for product in products %}
+            <div class="modern-light-container bg-white rounded-xl shadow-md overflow-hidden border border-slate-200 modern-light-accent">
+              <div class="h-64 relative overflow-hidden" style="background: linear-gradient(135deg, #e3f6f5 0%, #bae8e8 50%);">
+                {% if product.image %}
+                  <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+                {% else %}
+                  <div class="w-full h-full flex items-center justify-center" style="color: #2d334a;">
+                    <span class="text-6xl">📦</span>
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="p-6">
+                <h3 class="text-xl font-bold mb-3 modern-light-font" style="color: #272343;">{{ product.name }}</h3>
+                <p class="text-3xl font-bold modern-light-font mb-4" style="color: #2d334a;">NT$ {{ product.price }}</p>
+
+                <a href="{% url 'public_store:payment_page' id=product.id %}"
+                   class="w-full font-bold py-3 px-6 rounded-lg transition-all duration-200 ease-in-out hover:-translate-y-0.5 flex items-center justify-center modern-light-font text-base shadow-md" style="background: #ffd803; color: #272343; border: 2px solid #272343;">
+                   <span>立即購買</span>
+                </a>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-16">
+            <div class="modern-light-container bg-white rounded-xl shadow-md p-12 border border-slate-200">
+              <h3 class="text-2xl font-bold mb-4 modern-light-font" style="color: #272343;">暫無商品</h3>
+              <p class="modern-light-font" style="color: #2d334a;">商品準備中，敬請期待</p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

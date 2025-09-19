@@ -1,0 +1,298 @@
+{% extends "layouts/default.html" %}
+{% block title %}{{ product.name }} - 手工藝術{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+    .handcraft-font { font-family: 'Caveat', cursive; }
+
+    .paper-texture {
+        background-image:
+            radial-gradient(circle at 1px 1px, rgba(139,69,19,0.1) 1px, transparent 0),
+            radial-gradient(circle at 15px 15px, rgba(217,119,6,0.05) 1px, transparent 0);
+        background-size: 20px 20px, 30px 30px;
+    }
+
+    /* 縮短進場動畫時間 */
+    @keyframes rotateIn {
+        from { opacity: 0; transform: rotate(-10deg) scale(0.8); }
+        to { opacity: 1; transform: rotate(0deg) scale(1); }
+    }
+
+    /* 縮短搖擺動畫時間 */
+    @keyframes wiggle {
+        0%, 7% { transform: rotateZ(0); }
+        15% { transform: rotateZ(-15deg); }
+        20% { transform: rotateZ(10deg); }
+        25% { transform: rotateZ(-10deg); }
+        30% { transform: rotateZ(6deg); }
+        35% { transform: rotateZ(-4deg); }
+        40%, 100% { transform: rotateZ(0); }
+    }
+
+    .handcraft-container { animation: rotateIn 1s ease-out; }
+    .wiggle:hover { animation: wiggle 0.8s ease-in-out; }
+
+    /* 強制覆蓋全域文字顏色 */
+    .handcraft-page * {
+        color: inherit !important;
+    }
+
+    /* 文字顏色 */
+    .handcraft-orange-600 { color: #ea580c !important; }
+    .handcraft-orange-700 { color: #c2410c !important; }
+    .handcraft-orange-800 { color: #9a3412 !important; }
+    .handcraft-blue-600 { color: #2563eb !important; }
+    .handcraft-blue-700 { color: #1d4ed8 !important; }
+    .handcraft-blue-800 { color: #1e40af !important; }
+    .handcraft-green-600 { color: #16a34a !important; }
+    .handcraft-green-700 { color: #15803d !important; }
+    .handcraft-green-800 { color: #166534 !important; }
+    .handcraft-white { color: #ffffff !important; }
+
+    /* 背景顏色 */
+    .handcraft-bg-blue-600 { background-color: #2563eb !important; }
+    .handcraft-bg-blue-700 { background-color: #1d4ed8 !important; }
+    .handcraft-bg-green-600 { background-color: #16a34a !important; }
+    .handcraft-bg-green-700 { background-color: #15803d !important; }
+    .handcraft-bg-orange-500 { background-color: #f97316 !important; }
+    .handcraft-bg-orange-600 { background-color: #ea580c !important; }
+
+    /* Hover效果 */
+    .handcraft-hover-blue-700:hover { background-color: #1d4ed8 !important; }
+    .handcraft-hover-green-700:hover { background-color: #15803d !important; }
+    .handcraft-hover-orange-600:hover { background-color: #ea580c !important; }
+</style>
+
+<div class="min-h-screen bg-orange-25 paper-texture handcraft-page">
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto">
+
+        <!-- 導覽列: 加深文字顏色 -->
+        <nav class="flex items-center space-x-2 text-sm handcraft-orange-600 mb-6 handcraft-font" aria-label="Breadcrumb">
+            <a href="{% url 'public_store:shop_overview' product.merchant.subdomain %}"
+               class="handcraft-orange-800 transition duration-200 flex items-center">
+                {% include 'components/icons.html' with icon='home' class='w-4 h-4 mr-1' %}
+                {{ product.merchant.ShopName }}
+            </a>
+            {% include 'components/icons.html' with icon='arrow-right' class='w-4 h-4 text-orange-400' %}
+            <span class="handcraft-orange-700 font-medium">{{ product.name }}</span>
+        </nav>
+
+        <div class="handcraft-container bg-white rounded-3xl shadow-lg overflow-hidden border-4 border-orange-200 transform rotate-1">
+            <div class="flex flex-col md:flex-row">
+                <!-- 商品圖片 -->
+                <div class="w-full md:w-1/2 p-4 md:p-8">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-96 object-cover rounded-2xl transform -rotate-1">
+                    {% else %}
+                        <div class="w-full h-96 bg-orange-100 flex items-center justify-center rounded-2xl transform rotate-2">
+                            <span class="text-orange-400 text-6xl">🎨</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- 商品資訊: 加深文字顏色 -->
+                <div class="w-full md:w-1/2 p-4 md:p-8" x-data="createQuantityManager()"
+                     data-unit-price="{{ product.price }}" data-max-stock="{{ product.stock }}"
+                     data-product-id="{{ product.id }}"
+                     x-init="
+                         needsVerification = '{{ product.verification_timing }}' === 'before_payment';
+                         isVerified = false;
+                         termsAgreed = false;
+                         verificationData = { terms: false, identity: '', phone: '' };
+                     ">
+                    <div class="mb-6">
+                        <h1 class="text-3xl font-bold handcraft-orange-800 mb-4 handcraft-font transform -rotate-1">{{ product.name }}</h1>
+                        <p class="text-4xl font-bold handcraft-orange-700 mb-6 handcraft-font">NT$ {{ product.price }}</p>
+                    </div>
+
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-center">
+                            <span class="handcraft-orange-700 font-medium w-20 handcraft-font">店家</span>
+                            <span class="handcraft-orange-800 handcraft-font">{{ product.merchant.ShopName }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="handcraft-orange-700 font-medium w-20 handcraft-font">電話</span>
+                            <span class="handcraft-orange-800">{{ product.phone_number }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-orange-700 font-medium w-20 handcraft-font">庫存</span>
+                            <span class="text-orange-800">
+                                <span data-stock-display>{{ product.stock }} 件</span>
+                                <span data-stock-status>
+                                    {% if product.stock == 0 %}
+                                        <span class="text-red-600 font-medium">已售完</span>
+                                    {% elif product.stock <= 5 %}
+                                        <span class="text-orange-600 font-medium">庫存緊張</span>
+                                    {% endif %}
+                                </span>
+                            </span>
+                            <button @click="refreshStock()" :disabled="stockCheckLoading" class="ml-2 text-orange-600 hover:text-orange-800 text-sm transition" :class="{ 'opacity-50 cursor-not-allowed': stockCheckLoading }">
+                                <span x-show="!stockCheckLoading">刷新</span>
+                                <span x-show="stockCheckLoading" class="animate-spin">◌</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {% if product.stock > 0 %}
+                        <div class="mb-6 p-4 bg-orange-100 rounded-3xl border-2 border-orange-200 transform -rotate-1">
+                            <label for="quantity" class="block text-sm font-medium text-orange-800 mb-2 handcraft-font">購買數量</label>
+                            <div class="flex items-center space-x-3">
+                                <button type="button" @click="decrease()" :disabled="!canDecrease" :class="canDecrease ? 'bg-orange-300 text-orange-800 hover:bg-orange-400' : 'bg-orange-200 text-orange-500 cursor-not-allowed'" class="w-8 h-8 flex items-center justify-center rounded-full transition duration-200 handcraft-font font-bold transform rotate-12
+                                hover:scale-110">-</button>
+                                <input type="number" x-ref="quantityInput" x-model="quantity" min="1" max="{{ product.stock }}" class="w-20 text-center border-2 border-orange-300 rounded-2xl py-1 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent handcraft-font">
+                                <button type="button" @click="increase()" :disabled="!canIncrease" :class="canIncrease ? 'bg-orange-300 text-orange-800 hover:bg-orange-400' : 'bg-orange-200 text-orange-500 cursor-not-allowed'" class="w-8 h-8 flex items-center justify-center rounded-full transition duration-200 handcraft-font font-bold transform -rotate-12 hover:scale-110">+</button>
+                                <span class="text-sm text-orange-700 handcraft-font">/ <span data-stock-display>{{ product.stock }}</span> 件</span>
+                            </div>
+                            <div x-show="stockWarningMessage" x-text="stockWarningMessage" class="mt-3 p-3 bg-red-100 border-2 border-red-300 rounded-2xl text-red-700 text-sm handcraft-font"></div>
+                            <div class="mt-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-orange-800 handcraft-font">單價</span>
+                                    <span class="font-medium handcraft-font">NT$ {{ product.price }}</span>
+                                </div>
+                                <div class="flex justify-between items-center mt-1">
+                                    <span class="text-orange-800 handcraft-font">總價</span>
+                                    <span class="text-xl font-bold text-orange-700 handcraft-font" x-text="formattedTotalPrice">NT$ {{ product.price }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if is_customer %}
+                        {% if product.stock > 0 %}
+                            <div x-show="needsVerification && !isVerified" class="mb-6">
+                                <div class="bg-orange-100 border-4 border-orange-300 rounded-3xl p-6 transform rotate-1">
+                                    <div class="flex items-center mb-4">
+                                        <svg class="w-6 h-6 text-orange-700 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.818-4.954A9.959 9.959 0 0121 12c0 5.523-4.477 10-10 10S1 17.523 1 12 5.477 2 11 2a9.959 9.959 0 014.954 1.818"/></svg>
+                                        <h3 class="text-lg font-bold text-orange-800 handcraft-font">需要身份驗證</h3>
+                                    </div>
+                                    <p class="text-orange-700 mb-6 handcraft-font">此商品需要身份驗證，請先完成設置。</p>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="flex items-start">
+                                                <input type="checkbox" x-model="verificationData.terms" class="mt-1 mr-3 focus:ring-orange-600 text-orange-600">
+                                                <span class="text-sm text-orange-800 handcraft-font">我已閱讀並同意購買條款及使用政策。</span>
+                                            </label>
+                                        </div>
+                                        {% if is_customer and customer.totp_enabled and product.verification_timing == 'before_payment' %}
+                                        <div class="bg-green-100 border border-green-300 rounded-2xl p-4 transform -rotate-1">
+                                            <div class="flex items-center mb-2">
+                                                <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.818-4.954A9.959 9.959 0 0121 12c0 5.523-4.477 10-10 10S1 17.523 1 12 5.477 2 11 2a9.959 9.959 0 014.954 1.818"/></svg>
+                                                <span class="text-green-800 font-medium handcraft-font">身份驗證已啟用</span>
+                                            </div>
+                                            <p class="text-green-700 text-sm handcraft-font">您的帳戶已啟用兩步驟驗證，點擊下方按鈕即可繼續。</p>
+                                        </div>
+                                        {% elif is_customer and product.verification_timing == 'before_payment' %}
+                                        <div class="bg-orange-200 border border-orange-300 rounded-2xl p-4 transform rotate-1">
+                                            <div class="flex items-center mb-2">
+                                                <svg class="w-5 h-5 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.728-.833-2.498 0L4.316 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                                                <span class="text-orange-800 font-medium handcraft-font">請先設定兩步驟驗證</span>
+                                            </div>
+                                            <p class="text-orange-700 text-sm mb-3 handcraft-font">此商品需要身份驗證，請先完成設置。</p>
+                                            <a href="{% url 'customers_account:totp_setup' %}?next={{ request.get_full_path }}" class="inline-block handcraft-bg-orange-500 handcraft-hover-orange-600 handcraft-white px-4 py-2 rounded-2xl transition-all duration-200 text-sm font-medium handcraft-font transform -rotate-1 hover:scale-105">前往設定</a>
+                                            <p class="text-xs text-orange-600 mt-2 handcraft-font">完成後將自動跳轉回來</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% if is_customer and customer.totp_enabled and product.verification_timing == 'before_payment' %}
+                                    <button type="button" @click="if(verificationData.terms) { isVerified = true }" :disabled="!verificationData.terms" :class="verificationData.terms ? 'handcraft-bg-orange-500 handcraft-hover-orange-600' : 'bg-gray-400 cursor-not-allowed'" class="w-full handcraft-white py-3 px-6 rounded-3xl transition-all duration-300 ease-in-out hover:-translate-y-0.5 font-medium text-lg mt-6 handcraft-font transform -rotate-1">我同意並繼續</button>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div x-show="!needsVerification || isVerified">
+                            <div class="bg-blue-100 border-4 border-blue-300 rounded-3xl p-6 mb-4 transform rotate-1 transition-transform duration-300 wiggle">
+                                <h3 class="text-lg font-bold text-blue-800 mb-4 handcraft-font">使用藍新金流</h3>
+                                <form method="post" action="{% url 'payments:create_payment' %}" id="newebpay-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="provider" value="newebpay">
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <input type="hidden" name="quantity" :value="quantity">
+                                    <button type="submit" class="w-full handcraft-bg-blue-600 handcraft-hover-blue-700 handcraft-white py-4 px-6 rounded-3xl transition-all duration-300 ease-in-out hover:-translate-y-1 font-bold text-lg cursor-pointer handcraft-font transform hover:scale-105">立即購買 <span x-text="formattedTotalPrice">NT$ {{ product.price }}</span></button>
+                                </form>
+                                <p class="text-sm text-blue-700 text-center mt-3 handcraft-font">安全交易 | 24小時客服</p>
+                            </div>
+
+                            <div class="bg-green-100 border-4 border-green-300 rounded-3xl p-6 mb-4 transform -rotate-1 transition-transform duration-300 wiggle">
+                                <h3 class="text-lg font-bold text-green-800 mb-4 handcraft-font">使用 LINE PAY</h3>
+                                <form method="post" action="{% url 'payments:create_payment' %}" id="linepay-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="provider" value="linepay">
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <input type="hidden" name="quantity" :value="quantity">
+                                    <button type="submit" class="w-full handcraft-bg-green-600 handcraft-hover-green-700 handcraft-white py-4 px-6 rounded-3xl transition-all duration-300 ease-in-out hover:-translate-y-1 font-bold text-lg cursor-pointer handcraft-font transform hover:scale-105">使用 LINE PAY <span x-text="formattedTotalPrice">NT$ {{ product.price }}</span></button>
+                                </form>
+                                <p class="text-sm text-green-700 text-center mt-3 handcraft-font">安全支付 | 24小時支援</p>
+                            </div>
+                            </div>
+                        {% else %}
+                            <div class="bg-red-100 border-4 border-red-300 rounded-3xl p-6 mb-4 transform rotate-2">
+                                <h3 class="text-lg font-bold text-red-800 mb-4 handcraft-font">已售完</h3>
+                                <p class="text-red-700 mb-4 handcraft-font">抱歉，此商品庫存不足，暫時無法購買。</p>
+                                <div class="w-full bg-gray-400 text-white py-3 px-6 rounded-3xl text-center font-medium text-lg cursor-not-allowed handcraft-font">無法購買</div>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="bg-yellow-100 border-4 border-yellow-300 rounded-3xl p-6 mb-4 transform -rotate-1">
+                            <h3 class="text-lg font-bold text-yellow-800 mb-4 handcraft-font">請先登入</h3>
+                            <p class="text-yellow-700 mb-4 handcraft-font">請登入以完成購買。</p>
+                            <a href="{% url 'customers_account:login' %}?next={{ request.get_full_path }}" class="w-full inline-block text-center handcraft-bg-orange-500 handcraft-hover-orange-600 handcraft-white py-3 px-6 rounded-3xl transition-all duration-300 ease-in-out hover:-translate-y-0.5 font-medium text-lg handcraft-font">前往登入</a>
+                        </div>
+                    {% endif %}
+
+                    <div class="mt-6 bg-green-100 border-4 border-green-300 rounded-3xl p-4 transform rotate-1">
+                        <p class="text-green-800 font-medium mb-2 handcraft-font">聯絡賣家</p>
+                        <p class="text-green-700 handcraft-font">店家電話：{{ product.phone_number }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-8 border-t-4 border-orange-200 bg-orange-50">
+                <h3 class="text-xl font-bold text-orange-800 mb-4 handcraft-font">商品描述</h3>
+                <div class="text-stone-800 leading-relaxed whitespace-pre-line handcraft-font">{{ product.description }}</div>
+            </div>
+
+            <div class="p-8 border-t-4 border-orange-200 bg-orange-100">
+                <h3 class="text-xl font-bold text-orange-800 mb-6 handcraft-font">賣家資訊</h3>
+                <div class="flex items-start space-x-4">
+                    <div class="bg-orange-300 text-orange-800 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0 handcraft-font transform rotate-12">
+                        {{ product.merchant.ShopName|first }}
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-medium text-orange-800 text-lg mb-2 handcraft-font">{{ product.merchant.ShopName }}</p>
+                        <p class="text-orange-700 mb-1 handcraft-font">店家電話：{{ product.phone_number }}</p>
+                        <p class="text-sm text-orange-600 handcraft-font">上架時間：{{ product.created_at|date:"Y年m月d日" }}</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 p-6 bg-white border-4 border-orange-200 rounded-3xl transform -rotate-1">
+                    <h4 class="text-lg font-bold text-orange-800 mb-4 handcraft-font">安全保障</h4>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div class="flex items-center">
+                            {% include 'components/icons.html' with icon='security' class='w-5 h-5 mr-3 text-green-600' %}
+                            <span class="text-orange-800 font-medium handcraft-font">SSL 加密連線</span>
+                        </div>
+                        <div class="flex items-center">
+                            {% include 'components/icons.html' with icon='verified' class='w-5 h-5 mr-3 text-blue-600' %}
+                            <span class="text-orange-800 font-medium handcraft-font">TruePay 認證</span>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-3 text-purple-600" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+                            <span class="text-orange-800 font-medium handcraft-font">24小時客服</span>
+                        </div>
+                        {% if is_customer and customer.totp_enabled and product.verification_timing == 'before_payment' %}
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.818-4.954A9.959 9.959 0 0121 12c0 5.523-4.477 10-10 10S1 17.523 1 12 5.477 2 11 2a9.959 9.959 0 014.954 1.818"/></svg>
+                            <span class="text-orange-800 font-medium handcraft-font">兩步驟驗證</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock %}
