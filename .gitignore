@@ -56,6 +56,9 @@ static/
 CLAUDE.local.md
 COMPONENT_SYSTEM.md
 
+# pip install log/暫存檔
+=*
+
 # Config files
 config.yml
 docker-compose.prod.yml
