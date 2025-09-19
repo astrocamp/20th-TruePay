@@ -1,10 +1,11 @@
 {% extends "merchant_layout/dashboard_base.html" %}
+{% load i18n %}
 {% block content %}
 <div class="max-w-7xl mx-auto mt-8 p-6 bg-brand-white rounded-lg shadow-md">
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-brand-black">售出票券管理</h1>
+        <h1 class="text-2xl font-bold text-brand-black">{% trans "售出票券管理" %}</h1>
         <div class="text-sm text-gray-600">
-            總計：{{ stats.total_tickets }} 張票券
+            {% trans "總計" %}:{{ stats.total_tickets }} {% trans "張票券" %}
         </div>
     </div>
     
@@ -20,27 +21,27 @@
     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
             <div class="text-2xl font-bold text-blue-600">{{ stats.total_tickets }}</div>
-            <div class="text-sm text-blue-800">總售出</div>
+            <div class="text-sm text-blue-800">{% trans "總售出" %}</div>
         </div>
         <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
             <div class="text-2xl font-bold text-green-600">{{ stats.unused_tickets }}</div>
-            <div class="text-sm text-green-800">未使用</div>
+            <div class="text-sm text-green-800">{% trans "未使用" %}</div>
         </div>
         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
             <div class="text-2xl font-bold text-gray-600">{{ stats.used_tickets }}</div>
-            <div class="text-sm text-gray-800">已使用</div>
+            <div class="text-sm text-gray-800">{% trans "已使用" %}</div>
         </div>
         <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
             <div class="text-2xl font-bold text-red-600">{{ stats.expired_tickets }}</div>
-            <div class="text-sm text-red-800">已過期</div>
+            <div class="text-sm text-red-800">{% trans "已過期" %}</div>
         </div>
         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
             <div class="text-2xl font-bold text-yellow-600">{{ stats.expiring_soon }}</div>
-            <div class="text-sm text-yellow-800">將到期</div>
+            <div class="text-sm text-yellow-800">{% trans "將到期" %}</div>
         </div>
         <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center">
             <div class="text-2xl font-bold text-purple-600">NT$ {{ stats.total_revenue|floatformat:0 }}</div>
-            <div class="text-sm text-purple-800">總收入</div>
+            <div class="text-sm text-purple-800">{% trans "總收入" %}</div>
         </div>
     </div>
     
@@ -48,32 +49,32 @@
     <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
         <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-                <label for="status" class="block text-sm font-medium text-gray-700 mb-1">票券狀態</label>
+                <label for="status" class="block text-sm font-medium text-gray-700 mb-1">{% trans "票券狀態" %}</label>
                 <select name="status" id="status" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-                    <option value="all" {% if current_filters.status == 'all' %}selected{% endif %}>全部狀態</option>
+                    <option value="all" {% if current_filters.status == 'all' %}selected{% endif %}>{% trans "全部狀態" %}</option>
                     {% for value, label in status_choices %}
                         <option value="{{ value }}" {% if current_filters.status == value %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div>
-                <label for="product" class="block text-sm font-medium text-gray-700 mb-1">商品篩選</label>
+                <label for="product" class="block text-sm font-medium text-gray-700 mb-1">{% trans "商品篩選" %}</label>
                 <select name="product" id="product" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-                    <option value="all" {% if current_filters.product == 'all' %}selected{% endif %}>全部商品</option>
+                    <option value="all" {% if current_filters.product == 'all' %}selected{% endif %}>{% trans "全部商品" %}</option>
                     {% for product in merchant_products %}
                         <option value="{{ product.id }}" {% if current_filters.product == product.id|stringformat:"s" %}selected{% endif %}>{{ product.name }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div>
-                <label for="search" class="block text-sm font-medium text-gray-700 mb-1">搜尋</label>
+                <label for="search" class="block text-sm font-medium text-gray-700 mb-1">{% trans "搜尋" %}</label>
                 <input type="text" name="search" id="search" value="{{ current_filters.search }}" 
-                       placeholder="客戶姓名、Email、訂單編號"
+                       placeholder="{% trans '客戶姓名、Email、訂單編號' %}"
                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
             </div>
             <div class="flex items-end">
                 <button type="submit" class="w-full bg-[#0056B3] text-white py-2 px-4 rounded-md hover:bg-[#00408A] transition duration-200">
-                    篩選
+                    {% trans "篩選" %}
                 </button>
             </div>
         </form>
@@ -85,13 +86,13 @@
             <table class="min-w-full bg-white border border-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">票券代碼</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">商品</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">客戶</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">狀態</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">金額</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">購買時間</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">到期時間</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">{% trans "票券代碼" %}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">{% trans "商品" %}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">{% trans "客戶" %}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">{% trans "狀態" %}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">{% trans "金額" %}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">{% trans "購買時間" %}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">{% trans "到期時間" %}</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -110,15 +111,15 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 {% if ticket.status == 'unused' %}
                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                        未使用
+                                        {% trans "未使用" %}
                                     </span>
                                 {% elif ticket.status == 'used' %}
                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                                        已使用
+                                        {% trans "已使用" %}
                                     </span>
                                 {% else %}
                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-                                        已過期
+                                        {% trans "已過期" %}
                                     </span>
                                 {% endif %}
                             </td>
@@ -132,7 +133,7 @@
                                 {% if ticket.valid_until %}
                                     <div class="text-sm text-gray-900">{{ ticket.valid_until|date:"Y/m/d H:i" }}</div>
                                 {% else %}
-                                    <div class="text-sm text-gray-500">無期限</div>
+                                    <div class="text-sm text-gray-500">{% trans "無期限" %}</div>
                                 {% endif %}
                             </td>
                         </tr>
@@ -145,14 +146,14 @@
         {% if tickets.has_other_pages %}
             <div class="flex justify-between items-center mt-6">
                 <div class="text-sm text-gray-600">
-                    第 {{ tickets.number }} 頁，共 {{ tickets.paginator.num_pages }} 頁
-                    （總計 {{ tickets.paginator.count }} 筆記錄）
+                    {% trans "第" %} {{ tickets.number }} {% trans "頁，共" %} {{ tickets.paginator.num_pages }} {% trans "頁" %}
+                    ({% trans "總計" %} {{ tickets.paginator.count }} {% trans "筆記錄" %})
                 </div>
                 <div class="flex space-x-2">
                     {% if tickets.has_previous %}
                         <a href="?page={{ tickets.previous_page_number }}{% if current_filters.status != 'all' %}&status={{ current_filters.status }}{% endif %}{% if current_filters.product != 'all' %}&product={{ current_filters.product }}{% endif %}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}" 
                            class="px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition duration-200">
-                            上一頁
+                            {% trans "上一頁" %}
                         </a>
                     {% endif %}
                     
@@ -170,7 +171,7 @@
                     {% if tickets.has_next %}
                         <a href="?page={{ tickets.next_page_number }}{% if current_filters.status != 'all' %}&status={{ current_filters.status }}{% endif %}{% if current_filters.product != 'all' %}&product={{ current_filters.product }}{% endif %}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}" 
                            class="px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition duration-200">
-                            下一頁
+                            {% trans "下一頁" %}
                         </a>
                     {% endif %}
                 </div>
@@ -180,18 +181,18 @@
     {% else %}
         <div class="text-center py-8">
             <div class="text-gray-400 text-6xl mb-4">🎫</div>
-            <p class="text-gray-500 text-lg mb-2">目前沒有符合條件的票券</p>
+            <p class="text-gray-500 text-lg mb-2">{% trans "目前沒有符合條件的票券" %}</p>
             {% if current_filters.status != 'all' or current_filters.product != 'all' or current_filters.search %}
-                <p class="text-gray-400 mb-4">請嘗試調整篩選條件</p>
+                <p class="text-gray-400 mb-4">{% trans "請嘗試調整篩選條件" %}</p>
                 <a href="{% url 'merchant_account:sold_tickets' subdomain=merchant.subdomain %}" 
                    class="inline-block bg-[#0056B3] text-white px-6 py-2 rounded-lg hover:bg-[#00408A] transition duration-200">
-                    清除篩選
+                    {% trans "清除篩選" %}
                 </a>
             {% else %}
-                <p class="text-gray-400 mb-4">還沒有售出任何票券</p>
+                <p class="text-gray-400 mb-4">{% trans "還沒有售出任何票券" %}</p>
                 <a href="{% url 'merchant_marketplace:index' merchant.subdomain %}" 
                    class="inline-block bg-[#0056B3] text-white px-6 py-2 rounded-lg hover:bg-[#00408A] transition duration-200">
-                    管理商品
+                    {% trans "管理商品" %}
                 </a>
             {% endif %}
         </div>
