@@ -1,13 +1,12 @@
 from django.db import models
-from django.contrib.auth.hashers import make_password, check_password
 from django.utils import timezone
 from django.conf import settings
 import pyotp
 import qrcode
-from io import BytesIO
-import base64
-import json
 import secrets
+
+# Local imports
+from truepay.qr_utils import generate_qr_code_with_logo
 
 
 class Customer(models.Model):
@@ -87,23 +86,15 @@ class Customer(models.Model):
         )
     
     def generate_qr_code(self):
-        """生成 QR Code 圖片的 base64 編碼"""
+        """生成帶有 TruePay logo 的 TOTP QR Code"""
         uri = self.get_totp_provisioning_uri()
-        
-        # 生成 QR Code
-        qr = qrcode.QRCode(version=1, box_size=10, border=5)
-        qr.add_data(uri)
-        qr.make(fit=True)
-        
-        # 創建圖片
-        img = qr.make_image(fill_color="black", back_color="white")
-        
-        # 轉換為 base64
-        buffer = BytesIO()
-        img.save(buffer, format='PNG')
-        buffer.seek(0)
-        
-        return base64.b64encode(buffer.getvalue()).decode()
+
+        # 使用帶 logo 的 QR Code 生成器
+        return generate_qr_code_with_logo(
+            data=uri,
+            error_correction=qrcode.constants.ERROR_CORRECT_M,  # TOTP 需要較高的錯誤修正
+            logo_size_ratio=0.25  # logo 佔 QR Code 25% 的大小
+        )
     
     def verify_totp(self, token):
         """驗證 TOTP 代碼或備用恢復代碼"""
