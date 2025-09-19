@@ -122,8 +122,7 @@ class RegisterForm(ModelForm):
 
         # 檢查是否已有商家使用此email
         existing_merchant_members = Member.objects.filter(
-            email=email,
-            member_type="merchant"
+            email=email, member_type="merchant"
         )
         if existing_merchant_members.exists():
             raise ValidationError("此電子郵件已被商家註冊使用")
@@ -405,28 +404,60 @@ class MerchantProfileUpdateForm(ModelForm):
             # 檢查資料更新後是否仍符合自動審核條件
             is_eligible, check_results = merchant.check_auto_approval_eligibility()
 
-            if old_status == 'approved' and not is_eligible:
+            if old_status == "approved" and not is_eligible:
                 # 如果之前已通過認證，但修改後不符合條件，撤銷認證
-                merchant.verification_status = 'pending'
+                merchant.verification_status = "pending"
                 merchant.rejection_reason = "資料修改後不符合自動審核條件，需重新審核"
-                merchant.save(update_fields=['verification_status', 'rejection_reason'])
-                print(f"⚠️ 商家 {merchant.ShopName} 因資料修改不符合標準，認證狀態已重置為待審核")
+                merchant.save(update_fields=["verification_status", "rejection_reason"])
+                print(
+                    f"⚠️ 商家 {merchant.ShopName} 因資料修改不符合標準，認證狀態已重置為待審核"
+                )
 
                 # 顯示具體不符合的項目
-                failed_checks = [check for check in check_results if check['status'] == 'failed']
+                failed_checks = [
+                    check for check in check_results if check["status"] == "failed"
+                ]
                 for check in failed_checks:
                     print(f"   - {check['field']}: {check['message']}")
 
-            elif old_status in ['rejected', 'pending']:
+            elif old_status in ["rejected", "pending"]:
                 # 如果商家之前被拒絕或待審核，嘗試自動重審
                 auto_approved, message = merchant.attempt_auto_approval()
                 if auto_approved:
                     print(f"🎉 商家 {merchant.ShopName} 資料更新後自動通過審核")
                 else:
-                    print(f"⏳ 商家 {merchant.ShopName} 資料更新後仍需人工審核：{message}")
-            elif old_status == 'approved' and is_eligible:
+                    print(
+                        f"⏳ 商家 {merchant.ShopName} 資料更新後仍需人工審核：{message}"
+                    )
+            elif old_status == "approved" and is_eligible:
                 print(f"✅ 商家 {merchant.ShopName} 資料更新後仍符合認證標準")
 
         return merchant
 
 
+class TemplateSelectionForm(ModelForm):
+    """商店模板選擇表單"""
+
+    class Meta:
+        model = Merchant
+        fields = ["store_template_id"]
+        labels = {
+            "store_template_id": "商店模板風格",
+        }
+        widgets = {
+            "store_template_id": forms.RadioSelect(
+                attrs={
+                    "class": "template-radio",
+                }
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["store_template_id"].choices = [
+            ("modern_light", "modern_light"),
+            ("modern", "modern"),
+            ("tech", "tech"),
+            ("handcraft", "handcraft"),
+            ("vintage", "vintage"),
+        ]

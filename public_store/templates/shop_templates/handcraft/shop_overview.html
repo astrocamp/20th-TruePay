@@ -1,0 +1,105 @@
+{% extends "layouts/default.html" %}
+{% block title %}{{ merchant.ShopName }} - 手工藝術{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+    .handcraft-font { font-family: 'Caveat', cursive; }
+
+    .paper-texture {
+        background-image:
+            radial-gradient(circle at 1px 1px, rgba(139,69,19,0.1) 1px, transparent 0),
+            radial-gradient(circle at 15px 15px, rgba(217,119,6,0.05) 1px, transparent 0);
+        background-size: 20px 20px, 30px 30px;
+    }
+
+    /* 縮短進場動畫時間，使其更流暢 */
+    @keyframes rotateIn {
+        from { opacity: 0; transform: rotate(-10deg) scale(0.8); }
+        to { opacity: 1; transform: rotate(0deg) scale(1); }
+    }
+
+    /* 縮短搖擺動畫時間，使其更輕快 */
+    @keyframes wiggle {
+        0%, 7% { transform: rotateZ(0); }
+        15% { transform: rotateZ(-15deg); }
+        20% { transform: rotateZ(10deg); }
+        25% { transform: rotateZ(-10deg); }
+        30% { transform: rotateZ(6deg); }
+        35% { transform: rotateZ(-4deg); }
+        40%, 100% { transform: rotateZ(0); }
+    }
+
+    .handcraft-container { animation: rotateIn 1s ease-out; } 
+    .wiggle:hover { animation: wiggle 0.8s ease-in-out; } 
+</style>
+
+<div class="min-h-screen bg-orange-25 paper-texture">
+  <div class="container mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto">
+
+      <!-- 商店標頭 -->
+      <div class="handcraft-container bg-white rounded-3xl shadow-md overflow-hidden mb-8 border-2 border-orange-200 transform rotate-1">
+        <div class="p-8 bg-gradient-to-r from-orange-50 to-orange-100">
+          <div class="flex items-center space-x-6">
+            <div class="bg-orange-200 text-orange-700 w-20 h-20 rounded-full flex items-center justify-center font-bold text-3xl handcraft-font transform rotate-12">
+              {{ merchant.ShopName|first }}
+            </div>
+            <div>
+              <h1 class="text-4xl font-bold handcraft-font mb-2 text-orange-700 transform -rotate-2">{{ merchant.ShopName }}</h1>
+              <!-- 加深文字顏色 -->
+              <p class="text-orange-700 handcraft-font text-xl">位於 {{ merchant.Address }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 商品區 -->
+      <div class="mb-6">
+        <!-- 加深標題顏色 -->
+        <h2 class="text-4xl font-bold text-center mb-12 text-orange-600 handcraft-font transform -rotate-3">手工創作</h2>
+
+        {% if products %}
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for product in products %}
+            <div class="handcraft-container wiggle bg-white rounded-3xl shadow-md overflow-hidden border-2 border-orange-200 hover:border-orange-300 transition-all duration-300 transform {% cycle '-rotate-2' 'rotate-1' '-rotate-1' %}">
+              <div class="h-60 bg-orange-50 relative">
+                {% if product.image %}
+                  <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+                {% else %}
+                  <div class="w-full h-full flex items-center justify-center text-orange-300">
+                    <span class="text-6xl">🎨</span>
+                  </div>
+                {% endif %}
+                <div class="absolute top-4 left-4 bg-orange-200 text-orange-700 px-3 py-1 rounded-full handcraft-font font-bold transform rotate-12">
+                  手工
+                </div>
+              </div>
+
+              <div class="p-6">
+                <h3 class="text-xl font-bold text-orange-700 mb-3 handcraft-font">{{ product.name }}</h3>
+                <!-- 加深價格顏色 -->
+                <p class="text-3xl font-bold text-orange-600 mb-4 handcraft-font">NT$ {{ product.price }}</p>
+
+                <!-- 增加 hover 浮動效果 -->
+                <a href="{% url 'public_store:payment_page' id=product.id %}"
+                   class="w-full bg-orange-300 hover:bg-orange-400 text-orange-800 font-bold py-3 px-6 rounded-2xl transition-all duration-200 ease-in-out hover:-translate-y-0.5 flex items-center justify-center handcraft-font text-lg shadow-md hover:shadow-lg">
+                   立即購買
+                </a>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-16">
+            <div class="bg-white rounded-3xl shadow-md p-12 border-2 border-orange-200 transform rotate-2">
+              <h3 class="text-2xl font-bold text-orange-700 mb-4 handcraft-font">暫無作品</h3>
+              <p class="text-orange-600 handcraft-font text-lg">手工創作準備中，敬請期待</p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

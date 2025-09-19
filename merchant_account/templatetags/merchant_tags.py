@@ -15,3 +15,8 @@ def get_current_merchant(context):
         except Merchant.DoesNotExist:
             pass
     return "/merchant/login/"
+
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)

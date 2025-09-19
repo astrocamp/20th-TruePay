@@ -6,6 +6,13 @@ from django.http import HttpResponsePermanentRedirect
 import os
 
 
+def get_store_template(merchant, template_name):
+    template_id = getattr(merchant, "store_template_id", "modern")
+    if not template_id:
+        template_id = "modern"
+    return f"shop_templates/{template_id}/{template_name}"
+
+
 def shop_overview(request, subdomain=None):
     """商店總覽頁面 - 客戶查看商家的所有商品"""
 
@@ -22,8 +29,23 @@ def shop_overview(request, subdomain=None):
     products = Product.objects.filter(merchant=merchant, is_active=True).order_by(
         "-created_at"
     )
+
+    preview_template = request.GET.get("preview")
+    if preview_template and preview_template in [
+        "modern_light",
+        "modern",
+        "tech",
+        "handcraft",
+        "vintage",
+    ]:
+        # 使用預覽模板
+        template_path = f"shop_templates/{preview_template}/shop_overview.html"
+    else:
+        # 使用商家設定的模板
+        template_path = get_store_template(merchant, "shop_overview.html")
+
     context = {"merchant": merchant, "products": products}
-    return render(request, "public_store/shop_overview.html", context)
+    return render(request, template_path, context)
 
 
 def payment_page(request, subdomain=None, id=None):
@@ -50,4 +72,5 @@ def payment_page(request, subdomain=None, id=None):
             pass
 
     context = {"product": product, "is_customer": is_customer, "customer": customer}
-    return render(request, "public_store/payment_page.html", context)
+    template_path = get_store_template(merchant, "payment_page.html")
+    return render(request, template_path, context)

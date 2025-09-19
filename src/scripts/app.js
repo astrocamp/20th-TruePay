@@ -4,6 +4,8 @@ import { Html5Qrcode } from 'html5-qrcode';
 import '../styles/app.css'
 import './functions.js'
 import './chart.js'
+import './custom.js'
+import './navigation.js'
 import jsQR from 'jsqr'
 import Chart from 'chart.js/auto' 
 

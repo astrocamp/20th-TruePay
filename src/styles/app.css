@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@import "./navigation.css";
+@import "./home.css";
+@import "./custom.css";
+@import "./style.css";
 
 :root {
   --color-brand-blue: #0056B3;
@@ -41,5 +45,4 @@
 .text-cis-primary { color: var(--color-cis-primary) !important; }
 .text-brand-blue { color: var(--color-brand-blue) !important; }
 
-/* 引入自訂樣式 */
-@import "./style.css";
+

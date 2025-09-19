@@ -21,6 +21,7 @@ from .forms import (
     LoginForm,
     SubdomainChangeForm,
     MerchantProfileUpdateForm,
+    TemplateSelectionForm,
 )
 from customers_account.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
@@ -514,17 +515,69 @@ def profile_settings(request, subdomain):
                             f"{password_form.fields[field].label if field in password_form.fields else field}: {error}",
                         )
 
+        elif form_type == "template":
+            # 處理模板選擇
+            template_form = TemplateSelectionForm(request.POST, instance=merchant)
+            if template_form.is_valid():
+                template_form.save()
+                messages.success(request, "商店模板風格已成功更新")
+                return redirect("merchant_account:profile_settings", subdomain)
+            else:
+                for field, errors in template_form.errors.items():
+                    for error in errors:
+                        messages.error(
+                            request,
+                            f"{template_form.fields[field].label if field in template_form.fields else field}: {error}",
+                        )
+
     # GET 請求或表單驗證失敗時顯示表單
     profile_form = MerchantProfileUpdateForm(instance=merchant, user=request.user)
     password_form = PasswordChangeForm(request.user)
+    template_form = TemplateSelectionForm(instance=merchant)
 
     # 取得詳細的審核狀態資訊
     verification_info = merchant.get_verification_issues()
+
+    # 模板預覽
+    template_info = {
+        "modern_light": {
+            "name": "現代簡約淡色系",
+            "description": "簡潔明亮的設計，採用淡色系的配置去呈現",
+            "features": ["簡約設計", "淡色不刺眼", "配置清爽"],
+            "color": "#ffffff",
+        },
+        "modern": {
+            "name": "現代簡約風",
+            "description": "簡潔明亮的設計，符合現代審美",
+            "features": ["簡約設計", "流暢動畫", "清爽界面"],
+            "color": "#3b82f6",
+        },
+        "tech": {
+            "name": "科技數位風",
+            "description": "科技感十足，適合數位產品或服務",
+            "features": ["終端機風格", "螢光特效", "數位化體驗"],
+            "color": "#06b6d4",
+        },
+        "handcraft": {
+            "name": "手工藝術風",
+            "description": "溫馨手工感，適合藝術創作或手工商品",
+            "features": ["手寫字體", "溫暖色調", "創作氛圍"],
+            "color": "#ea580c",
+        },
+        "vintage": {
+            "name": "復古經典風",
+            "description": "經典復古設計，傳達傳統品牌價值",
+            "features": ["復古濾鏡", "經典字體", "懷舊氛圍"],
+            "color": "#d97706",
+        },
+    }
 
     context = {
         "merchant": merchant,
         "profile_form": profile_form,
         "password_form": password_form,
+        "template_form": template_form,
+        "template_info": template_info,
         "verification_info": verification_info,
     }
 
