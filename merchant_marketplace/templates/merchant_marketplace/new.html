@@ -1,4 +1,5 @@
 {% extends "merchant_layout/dashboard_base.html" %}
+{% load i18n %}
 
 {% block content %}
 <div class="max-w-2xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
@@ -7,11 +8,11 @@
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
             </svg>
-            返回商品列表
+            {% trans "返回商品列表" %}
         </a>
     </div>
     
-    <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">新增商品</h1>
+    <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">{% trans "新增商品" %}</h1>
     
     {% if messages %}
         {% for message in messages %}
@@ -26,47 +27,47 @@
         
         <div>
             <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                商品名稱 <span class="text-red-500">*</span>
+                {% trans "商品名稱" %} <span class="text-red-500">*</span>
             </label>
             <input type="text" id="name" name="name" required
                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0056B3] focus:border-transparent"
-                   placeholder="請輸入商品名稱">
+                   placeholder="{% trans '請輸入商品名稱' %}">
         </div>
         
         <div>
             <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
-                商品描述 <span class="text-red-500">*</span>
+                {% trans "商品描述" %} <span class="text-red-500">*</span>
             </label>
             <textarea id="description" name="description" rows="5" required
                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0056B3] focus:border-transparent"
-                      placeholder="請詳細描述您的商品..."></textarea>
+                      placeholder="{% trans '請詳細描述您的商品...' %}"></textarea>
         </div>
         
         <div>
             <label for="price" class="block text-sm font-medium text-gray-700 mb-2">
-                商品價格 <span class="text-red-500">*</span>
+                {% trans "商品價格" %} <span class="text-red-500">*</span>
             </label>
             <div class="relative">
                 <span class="absolute left-3 top-2 text-gray-500">$</span>
                 <input type="number" id="price" name="price" step="1" min="1" required
                        class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0056B3] focus:border-transparent"
-                       placeholder="請輸入商品價格（元）">
+                       placeholder="{% trans '請輸入商品價格（元）' %}">
             </div>
         </div>
         
         <div>
             <label for="stock" class="block text-sm font-medium text-gray-700 mb-2">
-                庫存數量 <span class="text-red-500">*</span>
+                {% trans "庫存數量" %} <span class="text-red-500">*</span>
             </label>
             <input type="number" id="stock" name="stock" min="1" value="1" required
                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0056B3] focus:border-transparent"
-                   placeholder="請輸入庫存數量">
-            <p class="text-sm text-gray-500 mt-1">商品上架時至少需要 1 件庫存</p>
+                   placeholder="{% trans '請輸入庫存數量' %}">
+            <p class="text-sm text-gray-500 mt-1">{% trans "商品上架時至少需要 1 件庫存" %}</p>
         </div>
         
         <div x-data="createImagePreview()">
             <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
-                商品圖片 <span class="text-red-500">*</span>
+                {% trans "商品圖片" %} <span class="text-red-500">*</span>
             </label>
             <input type="file" id="image" name="image"
                    accept=".jpg,.jpeg,.png,.gif,.webp"
@@ -75,48 +76,48 @@
                    @change="handleFileChange($event)"
                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
             <p class="text-sm text-gray-500 mt-1">
-                <span class="text-red-600 font-medium">必填：</span>
-                支援 JPG、PNG、GIF、WebP 格式，檔案大小不超過 5MB
+                <span class="text-red-600 font-medium">{% trans "必填：" %}</span>
+                {% trans "支援 JPG、PNG、GIF、WebP 格式，檔案大小不超過 5MB" %}
             </p>
             
             <!-- Alpine.js 圖片預覽 -->
             <div x-show="previewSrc" x-transition class="mt-2">
                 <p class="text-sm text-gray-600 mb-2" x-text="previewText"></p>
-                <img :src="previewSrc" :class="imageClasses" alt="圖片預覽">
+                <img :src="previewSrc" :class="imageClasses" alt="{% trans '圖片預覽' %}">
             </div>
         </div>
         
         <div>
             <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-2">
-                聯絡電話 <span class="text-red-500">*</span>
+                {% trans "聯絡電話" %} <span class="text-red-500">*</span>
             </label>
             <input type="tel" id="phone_number" name="phone_number" value="{{ merchant_phone|default:'' }}" required
                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0056B3] focus:border-transparent"
-                   placeholder="請輸入聯絡電話">
+                   placeholder="{% trans '請輸入聯絡電話' %}">
         </div>
 
         <!-- 商品票券有效期限 -->
         <div>
             <label for="ticket_expiry" class="block text-sm font-medium text-gray-700 mb-2">
-                商品票券有效期限 <span class="text-red-500">*</span>
+                {% trans "商品票券有效期限" %} <span class="text-red-500">*</span>
             </label>
             <input type="datetime-local" id="ticket_expiry" name="ticket_expiry" required
                    min="{{ current_datetime }}"
                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0056B3] focus:border-transparent">
-            <p class="text-sm text-gray-500 mt-1">請選擇票券到期日與時間（最小單位：分鐘）。票券將於此時間自動失效。<strong>請注意：不能設定過去的時間。</strong></p>
+            <p class="text-sm text-gray-500 mt-1">{% trans "請選擇票券到期日與時間（最小單位：分鐘）。票券將於此時間自動失效。" %}<strong>{% trans "請注意：不能設定過去的時間。" %}</strong></p>
         </div>
         
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-4">
-                交易驗證時間點 <span class="text-red-500">*</span>
+                {% trans "交易驗證時間點" %} <span class="text-red-500">*</span>
             </label>
             <div class="space-y-3">
                 <div class="flex items-center">
                     <input type="radio" id="verify_before_payment" name="verification_timing" value="before_payment" required
                            class="w-4 h-4 text-[#0056B3] bg-gray-100 border-gray-300 focus:ring-[#0056B3] focus:ring-2">
                     <label for="verify_before_payment" class="ml-3 text-sm text-gray-700">
-                        <span class="font-medium">付款前驗證</span>
-                        <span class="block text-xs text-gray-500 mt-1">消費者需先完成驗證才能付款</span>
+                        <span class="font-medium">{% trans "付款前驗證" %}</span>
+                        <span class="block text-xs text-gray-500 mt-1">{% trans "消費者需先完成驗證才能付款" %}</span>
                     </label>
                 </div>
                 
@@ -124,32 +125,32 @@
                     <input type="radio" id="verify_before_redeem" name="verification_timing" value="before_redeem" required
                            class="w-4 h-4 text-[#0056B3] bg-gray-100 border-gray-300 focus:ring-[#0056B3] focus:ring-2">
                     <label for="verify_before_redeem" class="ml-3 text-sm text-gray-700">
-                        <span class="font-medium">核銷前驗證</span>
-                        <span class="block text-xs text-gray-500 mt-1">消費者可先付款，但核銷時需驗證</span>
+                        <span class="font-medium">{% trans "核銷前驗證" %}</span>
+                        <span class="block text-xs text-gray-500 mt-1">{% trans "消費者可先付款，但核銷時需驗證" %}</span>
                     </label>
                 </div>
                 
             </div>
-            <p class="text-sm text-gray-500 mt-2">選擇交易驗證的時機點，影響消費者的購買和使用流程</p>
+            <p class="text-sm text-gray-500 mt-2">{% trans "選擇交易驗證的時機點，影響消費者的購買和使用流程" %}</p>
         </div>
         
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h3 class="text-sm font-medium text-blue-800 mb-2">注意事項：</h3>
+            <h3 class="text-sm font-medium text-blue-800 mb-2">{% trans "注意事項：" %}</h3>
             <ul class="text-sm text-blue-700 space-y-1">
-                <li>• 請確保商品資訊真實準確</li>
-                <li>• <strong>商品圖片為必填項目</strong>，會自動上傳至 AWS S3，建議使用高品質照片</li>
-                <li>• 圖片檔案限制：JPG/PNG/GIF/WebP 格式，最大 5MB</li>
-                <li>• 聯絡電話請確保可以正常接聽</li>
-                <li>• 商品價格請合理定價</li>
+                <li>• {% trans "請確保商品資訊真實準確" %}</li>
+                <li>• <strong>{% trans "商品圖片為必填項目" %}</strong>{% trans "，會自動上傳至 AWS S3，建議使用高品質照片" %}</li>
+                <li>• {% trans "圖片檔案限制：JPG/PNG/GIF/WebP 格式，最大 5MB" %}</li>
+                <li>• {% trans "聯絡電話請確保可以正常接聽" %}</li>
+                <li>• {% trans "商品價格請合理定價" %}</li>
             </ul>
         </div>
         
         <div class="flex space-x-4">
             <button type="submit" class="flex-1 bg-[#0056B3] text-white py-3 px-4 rounded-lg hover:bg-[#00408A] focus:outline-none focus:ring-2 focus:ring-[#0056B3] focus:ring-offset-2 transition duration-200">
-                新增商品
+                {% trans "新增商品" %}
             </button>
             <a href="{% url 'merchant_marketplace:index' request.merchant.subdomain %}" class="flex-1 text-center bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition duration-200">
-                取消
+                {% trans "取消" %}
             </a>
         </div>
     </form>
