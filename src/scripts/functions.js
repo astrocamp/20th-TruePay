@@ -184,8 +184,40 @@ function createPaymentTimer(config = {}) {
   };
 }
 
+// TOTP 管理頁面函數
+function createTotpManage() {
+  return {
+    showRegenerateModal: false,
+    showDisableModal: false,
+    regenerateCode: '',
+    disableCode: ''
+  };
+}
+
+// TOTP 設定頁面函數
+function createTotpSetup() {
+  return {
+    totpCode: '',
+
+    handleTotpInput() {
+      // 只允許數字
+      this.totpCode = this.totpCode.replace(/\D/g, '');
+
+      // 自動提交表單當輸入滿 6 位數
+      if (this.totpCode.length === 6) {
+        // 延遲 500ms 提交，讓用戶看到完整輸入
+        setTimeout(() => {
+          this.$refs.totpForm.submit();
+        }, 500);
+      }
+    }
+  };
+}
+
 // 將函數掛載到全域供 Alpine.js 使用
 window.createPaymentTimer = createPaymentTimer;
+window.createTotpManage = createTotpManage;
+window.createTotpSetup = createTotpSetup;
 
 // 統一的事件處理器
 function handleConfirmDelete(element) {
