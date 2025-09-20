@@ -2,6 +2,7 @@ from django.db import models, transaction
 from django.contrib.auth.hashers import make_password, check_password
 from django.conf import settings
 from django.utils import timezone
+from django.utils.translation import gettext as _
 import re
 import secrets
 
@@ -84,13 +85,13 @@ class Merchant(models.Model):
 
     def can_change_subdomain(self):
         if self.subdomain_change_count >= self.max_subdomains_change_per_year:
-            return False, f"已達年度修改上限({self.max_subdomains_change_per_year}次)"
+            return False, _("已達年度修改上限(%(count)s次)") % {'count': self.max_subdomains_change_per_year}
         if self.last_subdomain_change:
             days_since_last = (timezone.now() - self.last_subdomain_change).days
             if days_since_last < self.subdomain_change_cooldown_days:
                 remaining_days = self.subdomain_change_cooldown_days - days_since_last
-                return False, f"請等待{remaining_days}天後再行修改"
-        return True, "可以修改"
+                return False, _("請等待%(days)s天後再行修改") % {'days': remaining_days}
+        return True, _("可以修改")
 
     @classmethod
     def validate_subdomain_format(cls, subdomain):

@@ -61,7 +61,7 @@
         <!-- QR Code 掃描區域 -->
         <div x-show="currentTab === 'qr'" x-transition class="space-y-6">
             <div id="qr-reader" class="w-full max-w-md mx-auto bg-gray-100 rounded-xl overflow-hidden border border-gray-200"></div>
-            <p x-text="qrScanner.status" class="text-center text-gray-500"></p>
+            <p x-text="qrScanner.status" class="text-center text-gray-500">{% trans "點擊下方按鈕以啟動相機進行掃描" %}</p>
             <div id="scanner-controls">
                 <button @click="qrScanner.isScanning ? qrScanner.stopScanner() : qrScanner.startScanner()"
                         type="button"

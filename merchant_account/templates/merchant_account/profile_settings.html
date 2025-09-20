@@ -1,10 +1,11 @@
 {% extends "merchant_layout/dashboard_base.html" %}
 {% load merchant_tags %}
-{% block title %}商家資料設定 - TruePay{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "商家資料設定" %} - TruePay{% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto" x-data="{ activeTab: 'profile' }">
-    <h1 class="text-3xl font-bold text-gray-900 mb-8">商家資料設定</h1>
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">{% trans "商家資料設定" %}</h1>
     
     {% if messages %}
         {% for message in messages %}
@@ -19,13 +20,13 @@
         <div class="border-b border-gray-200">
             <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                 <button @click="activeTab = 'profile'" :class="activeTab === 'profile' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'" class="hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
-                    商家資料
+                    {% trans "商家資料" %}
                 </button>
                 <button @click="activeTab = 'password'" :class="activeTab === 'password' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'" class="hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
-                    修改密碼
+                    {% trans "修改密碼" %}
                 </button>
                 <button @click="activeTab = 'template'" :class="activeTab === 'template' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'" class="hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
-                    模板設定
+                    {% trans "模板設定" %}
                 </button>
             </nav>
         </div>
@@ -34,7 +35,7 @@
     <!-- 商家資料表單 -->
     <div x-show="activeTab === 'profile'" class="mb-8">
         <div class="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-6">商家資料</h2>
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">{% trans "商家資料" %}</h2>
             
             <form method="post" class="space-y-6">
                 {% csrf_token %}
@@ -43,49 +44,49 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="{{ profile_form.ShopName.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ profile_form.ShopName.label }}
+                            {% trans "商店名稱" %}
                         </label>
                         {{ profile_form.ShopName }}
                     </div>
                     
                     <div>
                         <label for="{{ profile_form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ profile_form.email.label }}
+                            {% trans "電子郵件" %}
                         </label>
                         {{ profile_form.email }}
                     </div>
                     
                     <div>
                         <label for="{{ profile_form.Name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ profile_form.Name.label }}
+                            {% trans "負責人姓名" %}
                         </label>
                         {{ profile_form.Name }}
                     </div>
                     
                     <div>
                         <label for="{{ profile_form.Cellphone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ profile_form.Cellphone.label }}
+                            {% trans "電話" %}
                         </label>
                         {{ profile_form.Cellphone }}
                     </div>
                     
                     <div>
                         <label for="{{ profile_form.UnifiedNumber.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ profile_form.UnifiedNumber.label }}
+                            {% trans "統一編號" %}
                         </label>
                         {{ profile_form.UnifiedNumber }}
                     </div>
                     
                     <div>
                         <label for="{{ profile_form.NationalNumber.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ profile_form.NationalNumber.label }}
+                            {% trans "身分證號" %}
                         </label>
                         {{ profile_form.NationalNumber }}
                     </div>
                     
                     <div class="md:col-span-2">
                         <label for="{{ profile_form.Address.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ profile_form.Address.label }}
+                            {% trans "地址" %}
                         </label>
                         {{ profile_form.Address }}
                     </div>
@@ -93,7 +94,7 @@
                 
                 <div class="flex justify-end">
                     <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200">
-                        更新商家資料
+                        {% trans "更新商家資料" %}
                     </button>
                 </div>
             </form>
@@ -103,7 +104,7 @@
     <!-- 密碼修改表單 -->
     <div x-show="activeTab === 'password'">
         <div class="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-6">修改密碼</h2>
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">{% trans "修改密碼" %}</h2>
             
             <form method="post" class="space-y-6">
                 {% csrf_token %}
@@ -112,24 +113,24 @@
                 <div class="space-y-4">
                     <div>
                         <label for="{{ password_form.old_password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ password_form.old_password.label }}
+                            {% trans "目前密碼" %}
                         </label>
                         {{ password_form.old_password }}
                     </div>
                     
                     <div>
                         <label for="{{ password_form.new_password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ password_form.new_password.label }}
+                            {% trans "新密碼" %}
                         </label>
                         {{ password_form.new_password }}
                         {% if password_form.new_password.help_text %}
-                            <p class="mt-2 text-sm text-gray-500">{{ password_form.new_password.help_text }}</p>
+                            <p class="mt-2 text-sm text-gray-500">{% trans "密碼長度至少需要8個字元" %}</p>
                         {% endif %}
                     </div>
                     
                     <div>
                         <label for="{{ password_form.confirm_password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ password_form.confirm_password.label }}
+                            {% trans "確認新密碼" %}
                         </label>
                         {{ password_form.confirm_password }}
                     </div>
@@ -137,7 +138,7 @@
                 
                 <div class="flex justify-end">
                     <button type="submit" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition duration-200">
-                        修改密碼
+                        {% trans "修改密碼" %}
                     </button>
                 </div>
             </form>
@@ -147,8 +148,8 @@
     <!-- 模板設定表單 -->
     <div x-show="activeTab === 'template'">
         <div class="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-6">商店模板風格設定</h2>
-            <p class="text-gray-600 mb-8">選擇適合您品牌的視覺風格，為顧客提供更好的購物體驗</p>
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">{% trans "商店模板風格設定" %}</h2>
+            <p class="text-gray-600 mb-8">{% trans "選擇適合您品牌的視覺風格，為顧客提供更好的購物體驗" %}</p>
 
             <form method="post" 
                   x-data="{ selectedTemplate: '{{ template_form.store_template_id.value|default:'modern' }}' }" 
@@ -198,17 +199,17 @@
 
                 <div class="flex justify-between items-center">
                     <div class="text-sm text-gray-500">
-                        <span class="font-medium">目前使用：</span>
+                        <span class="font-medium">{% trans "目前使用：" %}</span>
                         <span x-text="getTemplateDisplayName(selectedTemplate)" class="text-gray-700"></span>
                     </div>
                     <div class="flex space-x-4">
                         <a :href="buildPreviewUrl($el, selectedTemplate)"
                            target="_blank"
                            class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition duration-200">
-                            預覽效果
+                            {% trans "預覽效果" %}
                         </a>
                         <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200">
-                            更新模板風格
+                            {% trans "更新模板風格" %}
                         </button>
                     </div>
                 </div>
