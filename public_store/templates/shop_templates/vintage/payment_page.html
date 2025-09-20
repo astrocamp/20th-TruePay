@@ -1,51 +1,11 @@
 {% extends "layouts/default.html" %}
 {% block title %}{{ product.name }} - 復古{% endblock %}
 
+{% block main_container_classes %}vintage-pattern{% endblock %}
+
 {% block content %}
-<style>
-    .vintage-font { font-family: 'Times New Roman', serif; }
 
-    .vintage-pattern {
-        background: #96632E;
-        background-image:
-            /* 垂直格線 */
-            linear-gradient(90deg, transparent 0px, rgba(252,250,242,0.3) 1px, transparent 2px),
-            /* 水平格線 */
-            linear-gradient(0deg, transparent 0px, rgba(252,250,242,0.3) 1px, transparent 2px),
-            /* 粗垂直格線 */
-            linear-gradient(90deg, transparent 0px, rgba(252,250,242,0.4) 2px, transparent 4px),
-            /* 粗水平格線 */
-            linear-gradient(0deg, transparent 0px, rgba(252,250,242,0.4) 2px, transparent 4px),
-            /* 格紋交織效果 */
-            linear-gradient(45deg, rgba(252,250,242,0.1) 25%, transparent 25%, transparent 75%, rgba(252,250,242,0.1) 75%),
-            linear-gradient(-45deg, rgba(252,250,242,0.1) 25%, transparent 25%, transparent 75%, rgba(252,250,242,0.1) 75%);
-        background-size: 30px 30px, 30px 30px, 120px 120px, 120px 120px, 60px 60px, 60px 60px;
-    }
-
-    /* 改為更柔和的淡入動畫 */
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    .vintage-container {
-        animation: fadeIn 1.2s ease-in-out;
-        filter: sepia(0.2);
-    }
-
-    /* 將hover特效從animation改為更流暢的transition */
-    .vintage-card {
-        transition: all 0.4s ease-in-out;
-    }
-
-    .vintage-card:hover {
-        transform: scale(1.02);
-        filter: sepia(0.3);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-    }
-</style>
-
-<div class="min-h-screen vintage-pattern">
+<div class="min-h-screen">
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-6xl mx-auto">
 
@@ -273,10 +233,6 @@
                         <div class="flex items-center">
                             {% include 'components/icons.html' with icon='verified' class='w-5 h-5 mr-3 text-blue-600' %}
                             <span class="font-medium vintage-font" style="color: #96632E;">TruePay 認證</span>
-                        </div>
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 mr-3 text-purple-600" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
-                            <span class="font-medium vintage-font" style="color: #96632E;">24小時客服</span>
                         </div>
                         {% if is_customer and customer.totp_enabled and product.verification_timing == 'before_payment' %}
                         <div class="flex items-center">

@@ -1,35 +1,11 @@
 {% extends "layouts/default.html" %}
 {% block title %}{{ merchant.ShopName }} - 現代簡約{% endblock %}
 
-{% block main_container_classes %}{% endblock %}
+{% block main_container_classes %}bg-gray-50{% endblock %}
 
 {% block content %}
-<style>
-    /* 優化進場動畫，使其更快速細微 */
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
 
-    .modern-container { 
-        animation: fadeInUp 0.8s ease-out;
-    }
-
-    /* 移除 pulse 動畫，改用 transition 實現更自然的 hover 效果 */
-    .modern-card {
-        transition: all 0.3s ease-in-out;
-    }
-    .modern-card:hover {
-        transform: translateY(-5px) scale(1.03);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-    }
-
-    .modern-gradient {
-        background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
-    }
-</style>
-
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen">
   <div class="container mx-auto px-4 py-8">
     <div class="max-w-6xl mx-auto">
 
@@ -37,12 +13,12 @@
       <div class="modern-container bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
         <div class="p-8 modern-gradient text-white">
           <div class="flex items-center space-x-6">
-            <div class="w-16 h-16 rounded-2xl flex items-center justify-center font-bold text-2xl" style="background: white; color: #4f46e5;">
+            <div class="w-16 h-16 rounded-2xl flex items-center justify-center font-bold text-2xl" style="background: white; color: #6A4C9C;">
               {{ merchant.ShopName|first }}
             </div>
             <div>
               <h1 class="text-3xl font-bold mb-2 text-white">{{ merchant.ShopName }}</h1>
-              <p class="text-indigo-100">{{ merchant.Address }}</p>
+              <p class="text-white opacity-90">{{ merchant.Address }}</p>
             </div>
           </div>
         </div>
@@ -68,10 +44,10 @@
 
               <div class="p-6">
                 <h3 class="text-lg font-bold text-gray-800 mb-2">{{ product.name }}</h3>
-                <p class="text-2xl font-bold text-indigo-500 mb-4">NT$ {{ product.price }}</p>
+                <p class="text-2xl font-bold mb-4" style="color: #6A4C9C;">NT$ {{ product.price }}</p>
 
                 <a href="{% url 'public_store:payment_page' id=product.id %}"
-                   class="w-full font-medium py-3 px-6 rounded-xl transition-all duration-200 ease-in-out flex items-center justify-center shadow-md hover:shadow-lg hover:-translate-y-0.5" style="background: #818cf8; color: white;" onmouseover="this.style.background='#6366f1'" onmouseout="this.style.background='#818cf8'">
+                   class="w-full font-medium py-3 px-6 rounded-xl transition-all duration-200 ease-in-out flex items-center justify-center shadow-md hover:shadow-lg hover:-translate-y-0.5" style="background: #B28FCE; color: white;" onmouseover="this.style.background='#6A4C9C'" onmouseout="this.style.background='#B28FCE'">
                    立即購買
                 </a>
               </div>

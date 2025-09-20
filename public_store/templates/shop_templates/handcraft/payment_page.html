@@ -1,70 +1,12 @@
 {% extends "layouts/default.html" %}
 {% block title %}{{ product.name }} - 手工藝術{% endblock %}
 
+{% block main_container_classes %}paper-texture{% endblock %}
+
 {% block content %}
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-    .handcraft-font { font-family: 'Caveat', cursive; }
 
-    .paper-texture {
-        background-image:
-            radial-gradient(circle at 1px 1px, rgba(139,69,19,0.1) 1px, transparent 0),
-            radial-gradient(circle at 15px 15px, rgba(217,119,6,0.05) 1px, transparent 0);
-        background-size: 20px 20px, 30px 30px;
-    }
-
-    /* 縮短進場動畫時間 */
-    @keyframes rotateIn {
-        from { opacity: 0; transform: rotate(-10deg) scale(0.8); }
-        to { opacity: 1; transform: rotate(0deg) scale(1); }
-    }
-
-    /* 縮短搖擺動畫時間 */
-    @keyframes wiggle {
-        0%, 7% { transform: rotateZ(0); }
-        15% { transform: rotateZ(-15deg); }
-        20% { transform: rotateZ(10deg); }
-        25% { transform: rotateZ(-10deg); }
-        30% { transform: rotateZ(6deg); }
-        35% { transform: rotateZ(-4deg); }
-        40%, 100% { transform: rotateZ(0); }
-    }
-
-    .handcraft-container { animation: rotateIn 1s ease-out; }
-    .wiggle:hover { animation: wiggle 0.8s ease-in-out; }
-
-    /* 強制覆蓋全域文字顏色 */
-    .handcraft-page * {
-        color: inherit !important;
-    }
-
-    /* 文字顏色 */
-    .handcraft-orange-600 { color: #ea580c !important; }
-    .handcraft-orange-700 { color: #c2410c !important; }
-    .handcraft-orange-800 { color: #9a3412 !important; }
-    .handcraft-blue-600 { color: #2563eb !important; }
-    .handcraft-blue-700 { color: #1d4ed8 !important; }
-    .handcraft-blue-800 { color: #1e40af !important; }
-    .handcraft-green-600 { color: #16a34a !important; }
-    .handcraft-green-700 { color: #15803d !important; }
-    .handcraft-green-800 { color: #166534 !important; }
-    .handcraft-white { color: #ffffff !important; }
-
-    /* 背景顏色 */
-    .handcraft-bg-blue-600 { background-color: #2563eb !important; }
-    .handcraft-bg-blue-700 { background-color: #1d4ed8 !important; }
-    .handcraft-bg-green-600 { background-color: #16a34a !important; }
-    .handcraft-bg-green-700 { background-color: #15803d !important; }
-    .handcraft-bg-orange-500 { background-color: #f97316 !important; }
-    .handcraft-bg-orange-600 { background-color: #ea580c !important; }
-
-    /* Hover效果 */
-    .handcraft-hover-blue-700:hover { background-color: #1d4ed8 !important; }
-    .handcraft-hover-green-700:hover { background-color: #15803d !important; }
-    .handcraft-hover-orange-600:hover { background-color: #ea580c !important; }
-</style>
-
-<div class="min-h-screen bg-orange-25 paper-texture handcraft-page">
+<div class="min-h-screen">
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-6xl mx-auto">
 
@@ -276,10 +218,6 @@
                         <div class="flex items-center">
                             {% include 'components/icons.html' with icon='verified' class='w-5 h-5 mr-3 text-blue-600' %}
                             <span class="text-orange-800 font-medium handcraft-font">TruePay 認證</span>
-                        </div>
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 mr-3 text-purple-600" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
-                            <span class="text-orange-800 font-medium handcraft-font">24小時客服</span>
                         </div>
                         {% if is_customer and customer.totp_enabled and product.verification_timing == 'before_payment' %}
                         <div class="flex items-center">

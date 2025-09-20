@@ -21,3 +21,52 @@ html {
     --brand-gray: #64748b;
     --brand-gray-light: #f8fafc;
 }
+
+/* ===============================================
+   Page Background Styles
+   =============================================== */
+
+/* Marketplace Page Background */
+.marketplace-bg {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.5)),
+                      url('https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=2000&q=80');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* SelectRole Page Background */
+.selectrole-bg {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.5)),
+                      url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2000&q=80');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* SelectRole Card Hover Effects */
+.merchant-card:hover {
+    border-color: #7a9ef5;
+}
+
+.customer-card:hover {
+    border-color: #00AA90;
+}
+
+/* Merchant Authentication Pages Background */
+.merchant-auth-bg {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.5)),
+                      url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2000&q=80');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* Customer Authentication Pages Background */
+.customer-auth-bg {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.5)),
+                      url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=2000&q=80');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}

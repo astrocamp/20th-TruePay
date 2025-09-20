@@ -1,40 +1,18 @@
 {% extends "layouts/default.html" %}
 {% block title %}{{ product.name }} - 現代簡約{% endblock %}
 
+{% block main_container_classes %}bg-gray-50{% endblock %}
+
 {% block content %}
-<style>
-    /* 優化進場動畫 */
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
 
-    .modern-container { 
-        animation: fadeInUp 0.8s ease-out; 
-    }
-
-    /* 移除 pulse 動畫，改用 transition */
-    .modern-card {
-        transition: all 0.3s ease-in-out;
-    }
-    .modern-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.08);
-    }
-
-    .modern-gradient {
-        background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
-    }
-</style>
-
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen">
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-6xl mx-auto">
 
         <!-- 導覽列 -->
         <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-6" aria-label="Breadcrumb">
             <a href="{% url 'public_store:shop_overview' product.merchant.subdomain %}"
-               class="hover:text-indigo-600 transition duration-200 flex items-center">
+               class="transition duration-200 flex items-center" style="color: #6A4C9C;" onmouseover="this.style.color='#B28FCE'" onmouseout="this.style.color='#6A4C9C'"
                 {% include 'components/icons.html' with icon='home' class='w-4 h-4 mr-1' %}
                 {{ product.merchant.ShopName }}
             </a>
@@ -67,7 +45,7 @@
                      ">
                     <div class="mb-6">
                         <h1 class="text-2xl font-bold text-gray-800 mb-4">{{ product.name }}</h1>
-                        <p class="text-3xl font-bold text-indigo-500 mb-6">NT$ {{ product.price }}</p>
+                        <p class="text-3xl font-bold mb-6" style="color: #6A4C9C;">NT$ {{ product.price }}</p>
                     </div>
 
                     <div class="space-y-4 mb-8">
@@ -91,7 +69,7 @@
                                     {% endif %}
                                 </span>
                             </span>
-                            <button @click="refreshStock()" :disabled="stockCheckLoading" class="ml-2 text-indigo-500 hover:text-indigo-700 text-sm transition" :class="{ 'opacity-50 cursor-not-allowed': stockCheckLoading }">
+                            <button @click="refreshStock()" :disabled="stockCheckLoading" class="ml-2 text-sm transition" style="color: #B28FCE;" onmouseover="this.style.color='#6A4C9C'" onmouseout="this.style.color='#B28FCE'" :class="{ 'opacity-50 cursor-not-allowed': stockCheckLoading }">
                                 <span x-show="!stockCheckLoading">刷新</span>
                                 <span x-show="stockCheckLoading" class="animate-spin">◌</span>
                             </button>
@@ -103,7 +81,7 @@
                             <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">購買數量</label>
                             <div class="flex items-center space-x-3">
                                 <button type="button" @click="decrease()" :disabled="!canDecrease" :class="canDecrease ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : 'bg-gray-100 text-gray-400 cursor-not-allowed'" class="w-8 h-8 flex items-center justify-center rounded-md transition duration-200">-</button>
-                                <input type="number" x-ref="quantityInput" x-model="quantity" min="1" max="{{ product.stock }}" class="w-20 text-center border border-gray-300 rounded-md py-1 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent">
+                                <input type="number" x-ref="quantityInput" x-model="quantity" min="1" max="{{ product.stock }}" class="w-20 text-center border border-gray-300 rounded-md py-1 focus:outline-none focus:ring-2 focus:border-transparent" style="--tw-ring-color: #B28FCE;">
                                 <button type="button" @click="increase()" :disabled="!canIncrease" :class="canIncrease ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : 'bg-gray-100 text-gray-400 cursor-not-allowed'" class="w-8 h-8 flex items-center justify-center rounded-md transition duration-200">+</button>
                                 <span class="text-sm text-gray-600">/ <span data-stock-display>{{ product.stock }}</span> 件</span>
                             </div>
@@ -115,7 +93,7 @@
                                 </div>
                                 <div class="flex justify-between items-center mt-1">
                                     <span class="text-gray-600">總價</span>
-                                    <span class="text-xl font-bold text-indigo-500" x-text="formattedTotalPrice">NT$ {{ product.price }}</span>
+                                    <span class="text-xl font-bold" style="color: #6A4C9C;" x-text="formattedTotalPrice">NT$ {{ product.price }}</span>
                                 </div>
                             </div>
                         </div>
@@ -124,16 +102,16 @@
                     {% if is_customer %}
                         {% if product.stock > 0 %}
                             <div x-show="needsVerification && !isVerified" class="mb-6">
-                                <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+                                <div class="bg-white border-2 rounded-xl p-6" style="border-color: #B28FCE;">
                                     <div class="flex items-center mb-4">
-                                        <svg class="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.818-4.954A9.959 9.959 0 0121 12c0 5.523-4.477 10-10 10S1 17.523 1 12 5.477 2 11 2a9.959 9.959 0 014.954 1.818"/></svg>
-                                        <h3 class="text-lg font-bold text-blue-800">需要身份驗證</h3>
+                                        <svg class="w-6 h-6 mr-2" style="color: #6A4C9C;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.818-4.954A9.959 9.959 0 0121 12c0 5.523-4.477 10-10 10S1 17.523 1 12 5.477 2 11 2a9.959 9.959 0 014.954 1.818"/></svg>
+                                        <h3 class="text-lg font-bold" style="color: #6A4C9C;">需要身份驗證</h3>
                                     </div>
-                                    <p class="text-blue-700 mb-6">此商品需要身份驗證，請先完成設置。</p>
+                                    <p class="mb-6" style="color: #6A4C9C;">此商品需要身份驗證，請先完成設置。</p>
                                     <div class="space-y-4">
                                         <div>
                                             <label class="flex items-start">
-                                                <input type="checkbox" x-model="verificationData.terms" class="mt-1 mr-3 rounded text-blue-600 focus:ring-blue-500">
+                                                <input type="checkbox" x-model="verificationData.terms" class="mt-1 mr-3 rounded focus:ring-2" style="color: #6A4C9C; --tw-ring-color: #B28FCE;">
                                                 <span class="text-sm text-gray-700">我已閱讀並同意購買條款及使用政策。</span>
                                             </label>
                                         </div>
@@ -158,22 +136,22 @@
                                         {% endif %}
                                     </div>
                                     {% if is_customer and customer.totp_enabled and product.verification_timing == 'before_payment' %}
-                                    <button type="button" @click="if(verificationData.terms) { isVerified = true }" :disabled="!verificationData.terms" :class="verificationData.terms ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'" class="w-full text-white py-3 px-6 rounded-xl transition-all duration-300 ease-in-out hover:-translate-y-0.5 font-medium text-lg mt-6">我同意並繼續</button>
+                                    <button type="button" @click="if(verificationData.terms) { isVerified = true }" :disabled="!verificationData.terms" :class="verificationData.terms ? 'hover:-translate-y-0.5' : 'cursor-not-allowed'" class="w-full text-white py-3 px-6 rounded-xl transition-all duration-300 ease-in-out font-medium text-lg mt-6" :style="verificationData.terms ? 'background: #B28FCE;' : 'background: #9CA3AF;'" onmouseover="if(!this.disabled) this.style.background='#6A4C9C'" onmouseout="if(!this.disabled) this.style.background='#B28FCE'">我同意並繼續</button>
                                     {% endif %}
                                 </div>
                             </div>
 
                             <div x-show="!needsVerification || isVerified">
-                            <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-4 modern-card">
-                                <h3 class="text-lg font-bold text-blue-800 mb-4">使用藍新金流</h3>
+                            <div class="bg-white border rounded-xl p-6 mb-4 modern-card" style="border-color: #B28FCE;">
+                                <h3 class="text-lg font-bold mb-4" style="color: #6A4C9C;">使用藍新金流</h3>
                                 <form method="post" action="{% url 'payments:create_payment' %}" id="newebpay-form">
                                     {% csrf_token %}
                                     <input type="hidden" name="provider" value="newebpay">
                                     <input type="hidden" name="product_id" value="{{ product.id }}">
                                     <input type="hidden" name="quantity" :value="quantity">
-                                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl transition-all duration-300 ease-in-out hover:-translate-y-0.5 font-medium text-lg cursor-pointer shadow-md hover:shadow-lg">立即購買 <span x-text="formattedTotalPrice">NT$ {{ product.price }}</span></button>
+                                    <button type="submit" class="w-full text-white py-3 px-6 rounded-xl transition-all duration-300 ease-in-out hover:-translate-y-0.5 font-medium text-lg cursor-pointer shadow-md hover:shadow-lg" style="background: #B28FCE;" onmouseover="this.style.background='#6A4C9C'" onmouseout="this.style.background='#B28FCE'">立即購買 <span x-text="formattedTotalPrice">NT$ {{ product.price }}</span></button>
                                 </form>
-                                <p class="text-sm text-blue-700 text-center mt-3">安全交易 | 24小時客服</p>
+                                <p class="text-sm text-center mt-3" style="color: #6A4C9C;">安全交易 | 24小時客服</p>
                             </div>
 
                             <div class="bg-green-50 border border-green-200 rounded-xl p-6 mb-4 modern-card">
@@ -199,7 +177,7 @@
                         <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-4">
                             <h3 class="text-lg font-bold text-yellow-800 mb-4">請先登入</h3>
                             <p class="text-yellow-700 mb-4">請登入以完成購買。</p>
-                            <a href="{% url 'customers_account:login' %}?next={{ request.get_full_path }}" class="w-full inline-block text-center bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl transition-all duration-300 ease-in-out hover:-translate-y-0.5 font-medium text-lg">前往登入</a>
+                            <a href="{% url 'customers_account:login' %}?next={{ request.get_full_path }}" class="w-full inline-block text-center text-white py-3 px-6 rounded-xl transition-all duration-300 ease-in-out hover:-translate-y-0.5 font-medium text-lg" style="background: #B28FCE;" onmouseover="this.style.background='#6A4C9C'" onmouseout="this.style.background='#B28FCE'">前往登入</a>
                         </div>
                     {% endif %}
 
@@ -218,7 +196,7 @@
             <div class="p-8 border-t border-gray-200 bg-gray-50">
                 <h3 class="text-xl font-bold text-gray-800 mb-6">賣家資訊</h3>
                 <div class="flex items-start space-x-4">
-                    <div class="bg-blue-600 text-white w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg flex-shrink-0">
+                    <div class="text-white w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg flex-shrink-0" style="background: #6A4C9C;">
                         {{ product.merchant.ShopName|first }}
                     </div>
                     <div class="flex-1">
@@ -236,12 +214,8 @@
                             <span class="text-gray-700 font-medium">SSL 加密連線</span>
                         </div>
                         <div class="flex items-center">
-                            {% include 'components/icons.html' with icon='verified' class='w-5 h-5 mr-3 text-blue-600' %}
+                            <svg class="w-5 h-5 mr-3" style="color: #6A4C9C;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                             <span class="text-gray-700 font-medium">TruePay 認證</span>
-                        </div>
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 mr-3 text-purple-600" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
-                            <span class="text-gray-700 font-medium">24小時客服</span>
                         </div>
                         {% if is_customer and customer.totp_enabled and product.verification_timing == 'before_payment' %}
                         <div class="flex items-center">

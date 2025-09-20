@@ -1,34 +1,9 @@
 {% extends "layouts/default.html" %}
 {% block title %}{{ merchant.ShopName }} - 現代淡色系{% endblock %}
 
+{% block main_container_classes %}bg-gray-50{% endblock %}
+
 {% block content %}
-<style>
-    .modern-light-font { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
-
-    /* 改為更柔和的淡入動畫 */
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    .modern-light-container {
-        animation: fadeIn 1s ease-out;
-    }
-
-    /* 移除無限循環的 glow 動畫，改用 transition */
-    .modern-light-accent {
-        transition: all 0.3s ease-in-out;
-    }
-    .modern-light-accent:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(255, 216, 3, 0.2);
-    }
-
-    .modern-light-pattern {
-        background: #fffffe;
-        min-height: 100vh;
-    }
-</style>
 
 <div class="modern-light-pattern">
   <div class="container mx-auto px-4 py-8">
