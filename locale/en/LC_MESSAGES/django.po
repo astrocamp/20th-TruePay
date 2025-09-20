@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-20 00:29+0800\n"
+"POT-Creation-Date: 2025-09-20 20:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -387,6 +387,7 @@ msgstr "Unused"
 #: customers_account/templates/customers/ticket_wallet.html:28
 #: customers_account/templates/customers/ticket_wallet.html:45
 #: customers_account/templates/customers/ticket_wallet.html:104
+#: customers_account/templates/customers/ticket_wallet.html:159
 #: merchant_account/templates/merchant_account/dashboard.html:96
 #: merchant_account/templates/merchant_account/dashboard.html:212
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:32
@@ -425,6 +426,10 @@ msgstr "All Merchants"
 msgid "訂單編號篩選"
 msgstr "Order Number"
 
+#: customers_account/templates/customers/ticket_wallet.html:63
+msgid "輸入訂單編號"
+msgstr "Enter order number"
+
 #: customers_account/templates/customers/ticket_wallet.html:68
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:77
 msgid "篩選"
@@ -443,8 +448,114 @@ msgid "有效期限"
 msgstr "Valid Until:"
 
 #: customers_account/templates/customers/ticket_wallet.html:144
-msgid "顯示"
-msgstr "Show"
+msgid "收起"
+msgstr "Collapse"
+
+#: customers_account/templates/customers/ticket_wallet.html:144
+msgid "顯示 QR Code"
+msgstr "Show QR Code"
+
+#: customers_account/templates/customers/ticket_wallet.html:149
+msgid "此票券需要更新才能顯示QR Code"
+msgstr "This ticket needs to be updated to display QR Code"
+
+#: customers_account/templates/customers/ticket_wallet.html:152
+msgid "票券已過期，無法顯示 QR Code"
+msgstr "Ticket has expired, cannot display QR Code"
+
+#: customers_account/templates/customers/ticket_wallet.html:154
+msgid "顯示QR Code"
+msgstr "Show QR Code"
+
+#: customers_account/templates/customers/ticket_wallet.html:185
+msgid "此票券需要二階段驗證才能查看 QR Code，請先完成安全設定"
+msgstr "This ticket requires two-factor authentication to view QR Code, please complete security setup first"
+
+#: customers_account/templates/customers/ticket_wallet.html:192
+msgid "我已閱讀並同意相關使用條款，了解票券兌換方式及相關規範"
+msgstr "I have read and agree to the relevant terms of use, and understand the ticket redemption methods and related regulations"
+
+#: customers_account/templates/customers/ticket_wallet.html:206
+msgid "您已完成二階段驗證設定，點擊下方按鈕進行驗證"
+msgstr "You have completed two-factor authentication setup, click the button below to verify"
+
+#: customers_account/templates/customers/ticket_wallet.html:217
+msgid "此票券需要二階段驗證才能查看 QR Code，請先完成安全設定："
+msgstr "This ticket requires two-factor authentication to view QR Code, please complete security setup first:"
+
+#: customers_account/templates/customers/ticket_wallet.html:221
+msgid "📱 首次設定需要下載應用程式："
+msgstr "📱 First setup requires downloading the app:"
+
+#: customers_account/templates/customers/ticket_wallet.html:227
+msgid "iOS 下載"
+msgstr "iOS Download"
+
+#: customers_account/templates/customers/ticket_wallet.html:233
+msgid "Android 下載"
+msgstr "Android Download"
+
+#: customers_account/templates/customers/ticket_wallet.html:240
+msgid "🔧 立即設定二階段驗證"
+msgstr "🔧 Set up two-factor authentication now"
+
+#: customers_account/templates/customers/ticket_wallet.html:242
+msgid "💡 設定完成後將自動返回此頁面"
+msgstr "💡 You will automatically return to this page after setup"
+
+#: customers_account/templates/customers/ticket_wallet.html:251
+msgid "✓ 確認條款，進行二階段驗證"
+msgstr "✓ Confirm terms and proceed with two-factor authentication"
+
+#: customers_account/templates/customers/ticket_wallet.html:260
+msgid "票券 QR Code"
+msgstr "Ticket QR Code"
+
+#: customers_account/templates/customers/ticket_wallet.html:267
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:89
+msgid "票券代碼"
+msgstr "Ticket Code"
+
+#: customers_account/templates/customers/ticket_wallet.html:271
+msgid "票券代碼未生成"
+msgstr "Ticket code not generated"
+
+#: customers_account/templates/customers/ticket_wallet.html:297
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:156
+#: pages/templates/pages/marketplace.html:118
+#: templates/shared/order_table.html:161
+msgid "上一頁"
+msgstr "Previous"
+
+#: customers_account/templates/customers/ticket_wallet.html:301
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:149
+msgid "第"
+msgstr "Page"
+
+#: customers_account/templates/customers/ticket_wallet.html:301
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:149
+msgid "頁，共"
+msgstr "of"
+
+#: customers_account/templates/customers/ticket_wallet.html:301
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:149
+msgid "頁"
+msgstr "pages"
+
+#: customers_account/templates/customers/ticket_wallet.html:306
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:174
+#: pages/templates/pages/marketplace.html:136
+#: templates/shared/order_table.html:172
+msgid "下一頁"
+msgstr "Next"
+
+#: customers_account/templates/customers/ticket_wallet.html:317
+msgid "還沒有票券"
+msgstr "No tickets yet"
+
+#: customers_account/templates/customers/ticket_wallet.html:318
+msgid "您目前沒有任何票券，快去購買商品吧！"
+msgstr "You currently have no tickets, go buy some products!"
 
 #: customers_account/templates/customers/ticket_wallet.html:321
 msgid "前往購物"
@@ -725,6 +836,16 @@ msgstr "No active redirects"
 msgid "商家登入"
 msgstr "Merchant Login"
 
+#: merchant_account/templates/merchant_account/partials/scan_ready.html:7
+#, fuzzy
+#| msgid "驗證票券"
+msgid "準備驗證票券"
+msgstr "Validate Ticket"
+
+#: merchant_account/templates/merchant_account/partials/scan_ready.html:8
+msgid "請在上方輸入票券驗證碼，驗證結果將在此顯示"
+msgstr ""
+
 #: merchant_account/templates/merchant_account/profile_settings.html:4
 #: merchant_account/templates/merchant_account/profile_settings.html:8
 msgid "商家資料設定"
@@ -985,10 +1106,6 @@ msgstr "Search"
 msgid "客戶姓名、Email、訂單編號"
 msgstr "Customer Name, Email, Order Number"
 
-#: merchant_account/templates/merchant_account/sold_tickets_list.html:89
-msgid "票券代碼"
-msgstr "Ticket Code"
-
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:90
 msgid "商品"
 msgstr "Product"
@@ -1005,33 +1122,9 @@ msgstr "Expiration Time"
 msgid "無期限"
 msgstr "No Expiration"
 
-#: merchant_account/templates/merchant_account/sold_tickets_list.html:149
-msgid "第"
-msgstr "Page"
-
-#: merchant_account/templates/merchant_account/sold_tickets_list.html:149
-msgid "頁，共"
-msgstr "of"
-
-#: merchant_account/templates/merchant_account/sold_tickets_list.html:149
-msgid "頁"
-msgstr "pages"
-
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:150
 msgid "筆記錄"
 msgstr "records"
-
-#: merchant_account/templates/merchant_account/sold_tickets_list.html:156
-#: pages/templates/pages/marketplace.html:118
-#: templates/shared/order_table.html:161
-msgid "上一頁"
-msgstr "Previous"
-
-#: merchant_account/templates/merchant_account/sold_tickets_list.html:174
-#: pages/templates/pages/marketplace.html:136
-#: templates/shared/order_table.html:172
-msgid "下一頁"
-msgstr "Next"
 
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:184
 msgid "目前沒有符合條件的票券"
@@ -1077,6 +1170,10 @@ msgstr "Please enter the ticket validation code provided by the customer"
 #: merchant_account/templates/merchant_account/ticket_validation.html:56
 msgid "驗證票券"
 msgstr "Validate Ticket"
+
+#: merchant_account/templates/merchant_account/ticket_validation.html:64
+msgid "點擊下方按鈕以啟動相機進行掃描"
+msgstr ""
 
 #: merchant_account/templates/merchant_account/ticket_validation.html:78
 msgid "驗證結果"
@@ -1930,6 +2027,9 @@ msgstr "Cancelled"
 #: templates/shared/order_table.html:131
 msgid "付款失敗"
 msgstr "Payment Failed"
+
+#~ msgid "顯示"
+#~ msgstr "Show"
 
 #~ msgid "停止掃描"
 #~ msgstr "Stop Scanning"

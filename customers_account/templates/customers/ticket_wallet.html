@@ -60,7 +60,7 @@
         <label class="block text-sm font-medium text-gray-700 mb-1">{% trans "訂單編號篩選" %}</label>
         <input type="text" name="order" 
                value="{{ request.GET.order }}" 
-               placeholder="輸入訂單編號"
+               placeholder="{% trans '輸入訂單編號' %}"
                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
       </div>
       <div>
@@ -110,18 +110,18 @@
                   <span class="font-medium">{% trans "商家" %}：</span>{{ ticket.product.merchant.ShopName }}
                 </div>
                 <div>
-                  <span class="font-medium">{% trans "購買時間" %}：</span>{{ ticket.created_at|date:"Y年m月d日 H:i" }}
+                  <span class="font-medium">{% trans "購買時間" %}：</span>{{ ticket.created_at|date:"Y-m-d H:i" }}
                 </div>
                 {% if ticket.used_at %}
                 <div>
-                  <span class="font-medium">{% trans "使用時間" %}：</span>{{ ticket.used_at|date:"Y年m月d日 H:i" }}
+                  <span class="font-medium">{% trans "使用時間" %}：</span>{{ ticket.used_at|date:"Y-m-d H:i" }}
                 </div>
                 {% endif %}
                 {% if ticket.valid_until %}
                 <div>
                   <span class="font-medium">{% trans "有效期限" %}：</span>
                     <span class="{% if ticket.valid_until < now %}text-red-600{% endif %}">
-                      {{ ticket.valid_until|date:"Y年m月d日 H:i" }}
+                      {{ ticket.valid_until|date:"Y-m-d H:i" }}
                   </span>
                 </div>
                 {% endif %}
@@ -141,22 +141,22 @@
                         @click="showQR = !showQR"
                         :class="showQR ? 'bg-gray-600' : 'bg-blue-600 hover:bg-blue-700'">
                   {% include 'components/icons.html' with icon='qr-code' class='w-4 h-4 inline mr-2' %}
-                  <span x-text="showQR ? '收起' : '顯示QR Code'">{% trans "顯示" %} QR Code</span>
+                  <span x-text="showQR ? '{% trans "收起" %}' : '{% trans "顯示 QR Code" %}'"></span>
                 </button>
               {% elif ticket.status == 'unused' and not ticket.ticket_code %}
                 <!-- 沒有票券代碼的提示 -->
                 <div class="px-4 py-2 bg-gray-100 text-gray-600 rounded-md text-sm">
-                  <p>此票券需要更新才能顯示QR Code</p>
+                  <p>{% trans "此票券需要更新才能顯示QR Code" %}</p>
               {% elif ticket.status == 'expired' %}
                 <button type="button" class="px-4 py-2 bg-gray-300 text-gray-500 rounded-md cursor-not-allowed text-sm"
-                        @click="alert('票券已過期，無法顯示 QR Code')">
+                        @click="alert('{% trans '票券已過期，無法顯示 QR Code' %}')">
                   {% include 'components/icons.html' with icon='qr-code' class='w-4 h-4 inline mr-2' %}
-                  顯示QR Code
+                  {% trans "顯示QR Code" %}
                 </button>
               {% else %}
                 <div class="text-sm text-gray-500">
                   {% include 'components/icons.html' with icon='check-circle' class='w-4 h-4 inline mr-1 text-green-600' %}
-                  已使用
+                  {% trans "已使用" %}
                 </div>
               {% endif %}
             </div>
@@ -182,14 +182,14 @@
                   </svg>
                   <h3 class="text-lg font-bold text-blue-800">🔐 核銷前安全驗證</h3>
                 </div>
-                <p class="text-blue-700 mb-6">此票券需要二階段驗證才能查看 QR Code，請先完成安全設定</p>
+                <p class="text-blue-700 mb-6">{% trans "此票券需要二階段驗證才能查看 QR Code，請先完成安全設定" %}</p>
                 
                 <div class="space-y-4">
                   <div>
                     <label class="flex items-start">
                       <input type="checkbox" x-model="redemptionData.terms" class="mt-1 mr-3">
                       <span class="text-sm text-gray-700">
-                        我已閱讀並同意相關使用條款，了解票券兌換方式及相關規範
+                        {% trans "我已閱讀並同意相關使用條款，了解票券兌換方式及相關規範" %}
                       </span>
                     </label>
                   </div>
@@ -203,7 +203,7 @@
                       </svg>
                       <span class="text-green-800 font-medium">✅ 二階段驗證已啟用</span>
                     </div>
-                    <p class="text-green-700 text-sm">您已完成二階段驗證設定，點擊下方按鈕進行驗證</p>
+                    <p class="text-green-700 text-sm">{% trans "您已完成二階段驗證設定，點擊下方按鈕進行驗證" %}</p>
                   </div>
                   {% else %}
                   <!-- 商品需要核銷前驗證但用戶未啟用TOTP -->
@@ -214,32 +214,32 @@
                       </svg>
                       <span class="text-orange-800 font-medium">⚠️ 需要設定二階段驗證</span>
                     </div>
-                    <p class="text-orange-700 text-sm mb-3">此票券需要二階段驗證才能查看 QR Code，請先完成安全設定：</p>
+                    <p class="text-orange-700 text-sm mb-3">{% trans "此票券需要二階段驗證才能查看 QR Code，請先完成安全設定：" %}</p>
 
                     <!-- Google Authenticator 下載提醒 -->
                     <div class="bg-blue-50 border border-blue-200 rounded-md p-3 mb-3">
-                      <p class="text-blue-800 text-sm font-medium mb-2">📱 首次設定需要下載應用程式：</p>
+                      <p class="text-blue-800 text-sm font-medium mb-2">{% trans "📱 首次設定需要下載應用程式：" %}</p>
                       <div class="flex flex-wrap gap-2">
                         <a href="https://apps.apple.com/tw/app/google-authenticator/id388497605"
                            target="_blank"
                            rel="noopener noreferrer"
                            class="inline-flex items-center text-xs bg-black text-white px-2 py-1 rounded hover:bg-gray-800">
-                           iOS 下載
+                           {% trans "iOS 下載" %}
                         </a>
                         <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2"
                            target="_blank"
                            rel="noopener noreferrer"
                            class="inline-flex items-center text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700">
-                           Android 下載
+                           {% trans "Android 下載" %}
                         </a>
                       </div>
                     </div>
 
                     <a href="{% url 'customers_account:authenticator_guide' %}?next={{ request.get_full_path }}"
                        class="inline-block bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition duration-200 text-sm font-medium">
-                        🔧 立即設定二階段驗證
+                        {% trans "🔧 立即設定二階段驗證" %}
                     </a>
-                    <p class="text-xs text-orange-600 mt-2">💡 設定完成後將自動返回此頁面</p>
+                    <p class="text-xs text-orange-600 mt-2">{% trans "💡 設定完成後將自動返回此頁面" %}</p>
                   </div>
                   {% endif %}
                 </div>
@@ -248,7 +248,7 @@
                 <a href="{% url 'customers_account:totp_verify_for_redemption' %}?next={{ request.get_full_path }}&ticket_id={{ ticket.id }}"
                    :class="redemptionData.terms ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed pointer-events-none'"
                    class="block w-full text-white text-center py-3 px-6 rounded-lg transition duration-200 font-medium text-lg mt-6">
-                  ✓ 確認條款，進行二階段驗證
+                  {% trans "✓ 確認條款，進行二階段驗證" %}
                 </a>
                 {% endif %}
               </div>
@@ -257,18 +257,18 @@
             <!-- QR Code 顯示區域 -->
             <div x-show="!needsRedemptionVerification || isRedemptionVerified">
               <div class="bg-gray-50 rounded-lg p-6 text-center">
-                <h4 class="text-lg font-semibold text-gray-900 mb-4">票券 QR Code</h4>
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">{% trans "票券 QR Code" %}</h4>
                 <div class="flex justify-center mb-4">
                   <img src="data:image/png;base64,{{ ticket.generate_qr_code_image }}" 
                        alt="票券 QR Code" 
                        class="rounded-lg w-[200px] h-[200px]">
                 </div>
                 <div class="space-y-2">
-                  <p class="text-sm text-gray-600">票券代碼</p>
+                  <p class="text-sm text-gray-600">{% trans "票券代碼" %}</p>
                   {% if ticket.ticket_code %}
                     <p class="font-mono text-lg font-semibold bg-white px-3 py-2 rounded border">{{ ticket.ticket_code }}</p>
                   {% else %}
-                    <p class="text-sm text-gray-500 bg-gray-100 px-3 py-2 rounded border">票券代碼未生成</p>
+                    <p class="text-sm text-gray-500 bg-gray-100 px-3 py-2 rounded border">{% trans "票券代碼未生成" %}</p>
                   {% endif %}
                   <p class="text-sm text-gray-500">{{ ticket.product.name }}</p>
                 </div>
@@ -294,16 +294,16 @@
       <nav class="flex items-center space-x-2">
         {% if page_obj.has_previous %}
           <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.merchant %}&merchant={{ request.GET.merchant }}{% endif %}{% if request.GET.order %}&order={{ request.GET.order }}{% endif %}" 
-             class="px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50">上一頁</a>
+             class="px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50">{% trans "上一頁" %}</a>
         {% endif %}
         
         <span class="px-3 py-2 text-sm text-gray-600">
-          第 {{ page_obj.number }} 頁，共 {{ page_obj.paginator.num_pages }} 頁
+          {% trans "第" %} {{ page_obj.number }} {% trans "頁，共" %} {{ page_obj.paginator.num_pages }} {% trans "頁" %}
         </span>
         
         {% if page_obj.has_next %}
           <a href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.merchant %}&merchant={{ request.GET.merchant }}{% endif %}{% if request.GET.order %}&order={{ request.GET.order }}{% endif %}" 
-             class="px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50">下一頁</a>
+             class="px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50">{% trans "下一頁" %}</a>
         {% endif %}
       </nav>
     </div>
@@ -314,8 +314,8 @@
       <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
         {% include 'components/icons.html' with icon='ticket' class='w-8 h-8 text-gray-400' %}
       </div>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">還沒有票券</h3>
-      <p class="text-gray-600 mb-6">您目前沒有任何票券，快去購買商品吧！</p>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">{% trans "還沒有票券" %}</h3>
+      <p class="text-gray-600 mb-6">{% trans "您目前沒有任何票券，快去購買商品吧！" %}</p>
       <a href="{% url 'pages:home' %}" 
          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
         {% trans "前往購物" %}

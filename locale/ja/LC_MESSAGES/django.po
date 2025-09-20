@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TruePay 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-20 10:01+0800\n"
+"POT-Creation-Date: 2025-09-20 20:41+0800\n"
 "PO-Revision-Date: 2025-09-20 11:00+0800\n"
 "Last-Translator: Claude AI <claude@anthropic.com>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -16,6 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
 #: customers_account/forms.py:17 merchant_account/forms.py:38
 msgid "請輸入密碼（至少8個字元）"
 msgstr "パスワードを入力してください（8文字以上）"
@@ -263,7 +264,9 @@ msgstr "二段階認証"
 #: customers_account/templates/customers/profile_settings.html:154
 #: customers_account/templates/customers/profile_settings.html:183
 msgid "為您的帳戶提供額外的安全保護，交易時需要輸入手機應用程式的驗證代碼"
-msgstr "アカウントに追加のセキュリティ保護を提供し、取引時にモバイルアプリの認証コードの入力が必要です"
+msgstr ""
+"アカウントに追加のセキュリティ保護を提供し、取引時にモバイルアプリの認証コー"
+"ドの入力が必要です"
 
 #: customers_account/templates/customers/profile_settings.html:160
 #: customers_account/templates/customers/profile_settings.html:189
@@ -295,7 +298,9 @@ msgstr "最終認証時刻"
 
 #: customers_account/templates/customers/profile_settings.html:219
 msgid "建議啟用二階段驗證以提升帳戶安全性，避免未經授權的高額交易"
-msgstr "アカウントのセキュリティ向上のため二段階認証の有効化をお勧めします。未許可の高額取引を防ぐことができます"
+msgstr ""
+"アカウントのセキュリティ向上のため二段階認証の有効化をお勧めします。未許可の"
+"高額取引を防ぐことができます"
 
 #: customers_account/templates/customers/profile_settings.html:227
 msgid "登入安全"
@@ -382,6 +387,7 @@ msgstr "未使用"
 #: customers_account/templates/customers/ticket_wallet.html:28
 #: customers_account/templates/customers/ticket_wallet.html:45
 #: customers_account/templates/customers/ticket_wallet.html:104
+#: customers_account/templates/customers/ticket_wallet.html:159
 #: merchant_account/templates/merchant_account/dashboard.html:96
 #: merchant_account/templates/merchant_account/dashboard.html:212
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:32
@@ -420,6 +426,10 @@ msgstr "すべての店舗"
 msgid "訂單編號篩選"
 msgstr "注文番号で絞り込み"
 
+#: customers_account/templates/customers/ticket_wallet.html:63
+msgid "輸入訂單編號"
+msgstr "注文番号を入力"
+
 #: customers_account/templates/customers/ticket_wallet.html:68
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:77
 msgid "篩選"
@@ -438,8 +448,114 @@ msgid "有效期限"
 msgstr "有効期限"
 
 #: customers_account/templates/customers/ticket_wallet.html:144
-msgid "顯示"
-msgstr "表示"
+msgid "收起"
+msgstr "閉じる"
+
+#: customers_account/templates/customers/ticket_wallet.html:144
+msgid "顯示 QR Code"
+msgstr "QRコードを表示"
+
+#: customers_account/templates/customers/ticket_wallet.html:149
+msgid "此票券需要更新才能顯示QR Code"
+msgstr "このチケットはQRコードを表示するために更新が必要です"
+
+#: customers_account/templates/customers/ticket_wallet.html:152
+msgid "票券已過期，無法顯示 QR Code"
+msgstr "チケットは期限切れで、QRコードを表示できません"
+
+#: customers_account/templates/customers/ticket_wallet.html:154
+msgid "顯示QR Code"
+msgstr "QRコードを表示"
+
+#: customers_account/templates/customers/ticket_wallet.html:185
+msgid "此票券需要二階段驗證才能查看 QR Code，請先完成安全設定"
+msgstr "このチケットはQRコードを表示するために二段階認証が必要です。まずセキュリティ設定を完了してください"
+
+#: customers_account/templates/customers/ticket_wallet.html:192
+msgid "我已閱讀並同意相關使用條款，了解票券兌換方式及相關規範"
+msgstr "関連する利用規約を読み、同意し、チケットの利用方法および関連規定を理解しています"
+
+#: customers_account/templates/customers/ticket_wallet.html:206
+msgid "您已完成二階段驗證設定，點擊下方按鈕進行驗證"
+msgstr "二段階認証の設定が完了しました。下のボタンをクリックして認証を行ってください"
+
+#: customers_account/templates/customers/ticket_wallet.html:217
+msgid "此票券需要二階段驗證才能查看 QR Code，請先完成安全設定："
+msgstr "このチケットはQRコードを表示するために二段階認証が必要です。まずセキュリティ設定を完了してください："
+
+#: customers_account/templates/customers/ticket_wallet.html:221
+msgid "📱 首次設定需要下載應用程式："
+msgstr "📱 初回設定にはアプリのダウンロードが必要です："
+
+#: customers_account/templates/customers/ticket_wallet.html:227
+msgid "iOS 下載"
+msgstr "iOS ダウンロード"
+
+#: customers_account/templates/customers/ticket_wallet.html:233
+msgid "Android 下載"
+msgstr "Android ダウンロード"
+
+#: customers_account/templates/customers/ticket_wallet.html:240
+msgid "🔧 立即設定二階段驗證"
+msgstr "🔧 二段階認証を今すぐ設定"
+
+#: customers_account/templates/customers/ticket_wallet.html:242
+msgid "💡 設定完成後將自動返回此頁面"
+msgstr "💡 設定完了後、このページに自動的に戻ります"
+
+#: customers_account/templates/customers/ticket_wallet.html:251
+msgid "✓ 確認條款，進行二階段驗證"
+msgstr "✓ 規約を確認して二段階認証を進める"
+
+#: customers_account/templates/customers/ticket_wallet.html:260
+msgid "票券 QR Code"
+msgstr "チケット QR コード"
+
+#: customers_account/templates/customers/ticket_wallet.html:267
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:89
+msgid "票券代碼"
+msgstr "チケットコード"
+
+#: customers_account/templates/customers/ticket_wallet.html:271
+msgid "票券代碼未生成"
+msgstr "チケットコードが生成されていません"
+
+#: customers_account/templates/customers/ticket_wallet.html:297
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:156
+#: pages/templates/pages/marketplace.html:118
+#: templates/shared/order_table.html:161
+msgid "上一頁"
+msgstr "前のページ"
+
+#: customers_account/templates/customers/ticket_wallet.html:301
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:149
+msgid "第"
+msgstr "第"
+
+#: customers_account/templates/customers/ticket_wallet.html:301
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:149
+msgid "頁，共"
+msgstr "ページ、全"
+
+#: customers_account/templates/customers/ticket_wallet.html:301
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:149
+msgid "頁"
+msgstr "ページ"
+
+#: customers_account/templates/customers/ticket_wallet.html:306
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:174
+#: pages/templates/pages/marketplace.html:136
+#: templates/shared/order_table.html:172
+msgid "下一頁"
+msgstr "次のページ"
+
+#: customers_account/templates/customers/ticket_wallet.html:317
+msgid "還沒有票券"
+msgstr "まだチケットがありません"
+
+#: customers_account/templates/customers/ticket_wallet.html:318
+msgid "您目前沒有任何票券，快去購買商品吧！"
+msgstr "現在チケットをお持ちではありません。商品を購入しましょう！"
 
 #: customers_account/templates/customers/ticket_wallet.html:321
 msgid "前往購物"
@@ -752,7 +868,9 @@ msgstr "店舗テンプレートスタイル設定"
 
 #: merchant_account/templates/merchant_account/profile_settings.html:152
 msgid "選擇適合您品牌的視覺風格，為顧客提供更好的購物體驗"
-msgstr "ブランドに適したビジュアルスタイルを選択し、お客様により良いショッピング体験を提供します"
+msgstr ""
+"ブランドに適したビジュアルスタイルを選択し、お客様により良いショッピング体験"
+"を提供します"
 
 #: merchant_account/templates/merchant_account/profile_settings.html:202
 msgid "目前使用："
@@ -985,10 +1103,6 @@ msgstr "検索"
 msgid "客戶姓名、Email、訂單編號"
 msgstr "お客様氏名、メール、注文番号"
 
-#: merchant_account/templates/merchant_account/sold_tickets_list.html:89
-msgid "票券代碼"
-msgstr "チケットコード"
-
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:90
 msgid "商品"
 msgstr "商品"
@@ -1005,33 +1119,9 @@ msgstr "有効期限"
 msgid "無期限"
 msgstr "期限なし"
 
-#: merchant_account/templates/merchant_account/sold_tickets_list.html:149
-msgid "第"
-msgstr "第"
-
-#: merchant_account/templates/merchant_account/sold_tickets_list.html:149
-msgid "頁，共"
-msgstr "ページ、全"
-
-#: merchant_account/templates/merchant_account/sold_tickets_list.html:149
-msgid "頁"
-msgstr "ページ"
-
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:150
 msgid "筆記錄"
 msgstr "件の記録"
-
-#: merchant_account/templates/merchant_account/sold_tickets_list.html:156
-#: pages/templates/pages/marketplace.html:118
-#: templates/shared/order_table.html:161
-msgid "上一頁"
-msgstr "前のページ"
-
-#: merchant_account/templates/merchant_account/sold_tickets_list.html:174
-#: pages/templates/pages/marketplace.html:136
-#: templates/shared/order_table.html:172
-msgid "下一頁"
-msgstr "次のページ"
 
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:184
 msgid "目前沒有符合條件的票券"
@@ -1131,7 +1221,8 @@ msgstr "商品編集"
 
 #: merchant_marketplace/templates/merchant_marketplace/detail.html:77
 msgid "確定要刪除這個商品嗎？此操作無法復原。"
-msgstr "この商品を削除してもよろしいですか？この操作は元に戻すことができません。"
+msgstr ""
+"この商品を削除してもよろしいですか？この操作は元に戻すことができません。"
 
 #: merchant_marketplace/templates/merchant_marketplace/detail.html:80
 msgid "刪除商品"
@@ -1143,7 +1234,9 @@ msgstr "決済ページを開く"
 
 #: merchant_marketplace/templates/merchant_marketplace/detail.html:107
 msgid "確定要上架這個商品嗎？上架後顧客就能購買。"
-msgstr "この商品を公開してもよろしいですか？公開後、お客様が購入できるようになります。"
+msgstr ""
+"この商品を公開してもよろしいですか？公開後、お客様が購入できるようになりま"
+"す。"
 
 #: merchant_marketplace/templates/merchant_marketplace/detail.html:112
 msgid "商品上架"
@@ -1151,7 +1244,9 @@ msgstr "商品を公開"
 
 #: merchant_marketplace/templates/merchant_marketplace/detail.html:120
 msgid "確定要下架這個商品嗎？下架後顧客將無法購買。"
-msgstr "この商品を非公開にしてもよろしいですか？非公開後、お客様は購入できなくなります。"
+msgstr ""
+"この商品を非公開にしてもよろしいですか？非公開後、お客様は購入できなくなりま"
+"す。"
 
 #: merchant_marketplace/templates/merchant_marketplace/detail.html:125
 msgid "商品下架"
@@ -1176,7 +1271,9 @@ msgstr "埋め込みコード"
 msgid ""
 "將以下代碼複製到您的 Google Blogger、WordPress 或其他網站中，讓顧客可以直接購"
 "買商品。"
-msgstr "以下のコードをGoogle Blogger、WordPress、またはその他のウェブサイトにコピーして、お客様が直接商品を購入できるようにします。"
+msgstr ""
+"以下のコードをGoogle Blogger、WordPress、またはその他のウェブサイトにコピーし"
+"て、お客様が直接商品を購入できるようにします。"
 
 #: merchant_marketplace/templates/merchant_marketplace/detail.html:190
 msgid "iframe 嵌入代碼"
@@ -1196,11 +1293,14 @@ msgstr "使用方法："
 
 #: merchant_marketplace/templates/merchant_marketplace/detail.html:214
 msgid "• iframe 代碼：直接貼到網頁 HTML 中，支援大部分平台"
-msgstr "• iframeコード：ウェブページのHTMLに直接貼り付け、ほとんどのプラットフォームに対応"
+msgstr ""
+"• iframeコード：ウェブページのHTMLに直接貼り付け、ほとんどのプラットフォーム"
+"に対応"
 
 #: merchant_marketplace/templates/merchant_marketplace/detail.html:215
 msgid "• 顧客點擊購買後會導向到您的 TruePay 收款頁面"
-msgstr "• お客様が購入をクリックすると、TruePayの決済ページにリダイレクトされます"
+msgstr ""
+"• お客様が購入をクリックすると、TruePayの決済ページにリダイレクトされます"
 
 #: merchant_marketplace/templates/merchant_marketplace/edit.html:8
 msgid "返回商品詳情"
@@ -1218,11 +1318,15 @@ msgstr "商品情報がロックされています"
 msgid ""
 "此商品已有售出票券，為確保票券真實性和消費者權益，商品資訊已完全鎖定無法修"
 "改。"
-msgstr "この商品はすでにチケットが売れており、チケットの真正性と消費者の権益を保護するため、商品情報が完全にロックされており、変更できません。"
+msgstr ""
+"この商品はすでにチケットが売れており、チケットの真正性と消費者の権益を保護す"
+"るため、商品情報が完全にロックされており、変更できません。"
 
 #: merchant_marketplace/templates/merchant_marketplace/edit.html:38
 msgid "包含商品名稱、描述、價格、聯絡電話及驗證方式等所有資訊均無法變更。"
-msgstr "商品名、説明、価格、連絡先電話番号、認証方法など、すべての情報を変更することはできません。"
+msgstr ""
+"商品名、説明、価格、連絡先電話番号、認証方法など、すべての情報を変更すること"
+"はできません。"
 
 #: merchant_marketplace/templates/merchant_marketplace/edit.html:66
 #: merchant_marketplace/templates/merchant_marketplace/new.html:48
@@ -1269,7 +1373,9 @@ msgstr "商品はすでにチケットが売れており、画像を変更でき
 
 #: merchant_marketplace/templates/merchant_marketplace/edit.html:108
 msgid "選擇新圖片將覆蓋現有圖片，支援 JPG、PNG、GIF、WebP 格式，最大 5MB"
-msgstr "新しい画像を選択すると現在の画像が上書きされます。JPG、PNG、GIF、WebP形式に対応、最大5MBまで"
+msgstr ""
+"新しい画像を選択すると現在の画像が上書きされます。JPG、PNG、GIF、WebP形式に対"
+"応、最大5MBまで"
 
 #: merchant_marketplace/templates/merchant_marketplace/edit.html:114
 msgid "目前圖片："
@@ -1292,7 +1398,9 @@ msgstr "商品チケットの有効期限"
 #: merchant_marketplace/templates/merchant_marketplace/edit.html:153
 #: merchant_marketplace/templates/merchant_marketplace/new.html:107
 msgid "請選擇票券到期日與時間（最小單位：分鐘）。票券將於此時間自動失效。"
-msgstr "チケットの有効期限日時を選択してください（最小単位：分）。チケットはこの時刻に自動的に無効になります。"
+msgstr ""
+"チケットの有効期限日時を選択してください（最小単位：分）。チケットはこの時刻"
+"に自動的に無効になります。"
 
 #: merchant_marketplace/templates/merchant_marketplace/edit.html:153
 #: merchant_marketplace/templates/merchant_marketplace/new.html:107
@@ -1314,7 +1422,9 @@ msgstr "認証方法がロックされています"
 
 #: merchant_marketplace/templates/merchant_marketplace/edit.html:173
 msgid "此商品已有售出票券，無法修改驗證方式以保護消費者權益。"
-msgstr "この商品はすでにチケットが売れており、消費者の権益を保護するため認証方法を変更できません。"
+msgstr ""
+"この商品はすでにチケットが売れており、消費者の権益を保護するため認証方法を変"
+"更できません。"
 
 #: merchant_marketplace/templates/merchant_marketplace/edit.html:183
 #: merchant_marketplace/templates/merchant_marketplace/edit.html:211
@@ -1342,7 +1452,9 @@ msgstr "お客様は先に決済できますが、利用時に認証が必要で
 
 #: merchant_marketplace/templates/merchant_marketplace/edit.html:231
 msgid "此設定在商品首次售出後即無法修改，以確保票券使用條件的一致性"
-msgstr "この設定は商品が初めて売れた後は変更できません。チケットの使用条件の一貫性を保つためです。"
+msgstr ""
+"この設定は商品が初めて売れた後は変更できません。チケットの使用条件の一貫性を"
+"保つためです。"
 
 #: merchant_marketplace/templates/merchant_marketplace/edit.html:233
 #: merchant_marketplace/templates/merchant_marketplace/new.html:134
@@ -1368,7 +1480,9 @@ msgstr "画像ファイルの制限：JPG/PNG/GIF/WebP形式、最大5MB"
 
 #: merchant_marketplace/templates/merchant_marketplace/edit.html:245
 msgid "注意：此商品已售出票券，資訊已鎖定無法修改"
-msgstr "注意：この商品はすでにチケットが売れており、情報がロックされており変更できません"
+msgstr ""
+"注意：この商品はすでにチケットが売れており、情報がロックされており変更できま"
+"せん"
 
 #: merchant_marketplace/templates/merchant_marketplace/edit.html:254
 msgid "商品已鎖定"
@@ -1698,18 +1812,24 @@ msgstr "注文数が制限を超えています"
 msgid ""
 "您在過去 %(time_window)s 分鐘內已有 <span class=\"font-semibold text-"
 "orange-600\">%(pending_count)s 筆</span>待付款訂單，"
-msgstr "過去%(time_window)s分間で<span class=\"font-semibold text-orange-600\">%(pending_count)s件</span>の未決済注文があります。"
+msgstr ""
+"過去%(time_window)s分間で<span class=\"font-semibold text-"
+"orange-600\">%(pending_count)s件</span>の未決済注文があります。"
 
 #: templates/payments/order_limit_error.html:19
 #, python-format
 msgid ""
 "目前共有 <span class=\"font-semibold text-orange-600\">%(total_pending)s 筆</"
 "span>待付款訂單。"
-msgstr "現在合計<span class=\"font-semibold text-orange-600\">%(total_pending)s件</span>の未決済注文があります。"
+msgstr ""
+"現在合計<span class=\"font-semibold text-orange-600\">%(total_pending)s件</"
+"span>の未決済注文があります。"
 
 #: templates/payments/order_limit_error.html:23
 msgid "請前往購買記錄重新付款現有訂單，或等待後再試。"
-msgstr "購入履歴から既存の注文の決済を行うか、しばらくお待ちいただいてから再度お試しください。"
+msgstr ""
+"購入履歴から既存の注文の決済を行うか、しばらくお待ちいただいてから再度お試し"
+"ください。"
 
 #: templates/payments/order_limit_error.html:30
 msgid "前往購買記錄"
@@ -1796,12 +1916,14 @@ msgstr "各チケットコードを別々店舗に提供して認証を受けて
 #, python-format
 msgid ""
 "目前庫存：<span class=\"font-semibold text-orange-600\">%(stock)s 件</span>"
-msgstr "現在の在庫：<span class=\"font-semibold text-orange-600\">%(stock)s個</span>"
+msgstr ""
+"現在の在庫：<span class=\"font-semibold text-orange-600\">%(stock)s個</span>"
 
 #: templates/payments/stock_insufficient_error.html:20
 #, python-format
 msgid "您想購買：<span class=\"font-semibold text-red-600\">%(qty)s 件</span>"
-msgstr "ご購入希望数：<span class=\"font-semibold text-red-600\">%(qty)s個</span>"
+msgstr ""
+"ご購入希望数：<span class=\"font-semibold text-red-600\">%(qty)s個</span>"
 
 #: templates/payments/stock_insufficient_error.html:27
 msgid "建議選項："
@@ -1814,7 +1936,9 @@ msgstr "• 購入数量を%(stock)s個以下に調整してください"
 
 #: templates/payments/stock_insufficient_error.html:31
 msgid "• 商品可能被其他用戶購買，請重新整理頁面查看最新庫存"
-msgstr "• 商品が他のユーザーに購入された可能性があります。ページを更新して最新の在庫を確認してください"
+msgstr ""
+"• 商品が他のユーザーに購入された可能性があります。ページを更新して最新の在庫"
+"を確認してください"
 
 #: templates/payments/stock_insufficient_error.html:37
 msgid "很抱歉，此商品目前已售完"
@@ -1822,7 +1946,8 @@ msgstr "申し訳ございません、この商品は現在売り切れです"
 
 #: templates/payments/stock_insufficient_error.html:40
 msgid "您可以瀏覽其他商品或聯繫商家了解補貨時間"
-msgstr "他の商品をご覧いただくか、店舗にお問い合わせして再入荷時期をご確認ください"
+msgstr ""
+"他の商品をご覧いただくか、店舗にお問い合わせして再入荷時期をご確認ください"
 
 #: templates/payments/stock_insufficient_error.html:50
 msgid "重新整理商品頁面"
@@ -1831,7 +1956,9 @@ msgstr "商品ページを更新"
 #: templates/payments/stock_insufficient_error.html:56
 #, python-format
 msgid "如有疑問，請聯繫商家客服：%(phone)s"
-msgstr "ご不明な点がございましたら、店舗カスタマーサポートにお問い合わせください：%(phone)s"
+msgstr ""
+"ご不明な点がございましたら、店舗カスタマーサポートにお問い合わせください："
+"%(phone)s"
 
 #: templates/shared/order_table.html:14
 msgid "交易序號"
@@ -1875,7 +2002,8 @@ msgstr "再決済"
 
 #: templates/shared/order_table.html:118
 msgid "確認要取消此訂單嗎？取消後將無法恢復。"
-msgstr "この注文をキャンセルしてもよろしいですか？キャンセル後は復元できません。"
+msgstr ""
+"この注文をキャンセルしてもよろしいですか？キャンセル後は復元できません。"
 
 #: templates/shared/order_table.html:122
 msgid "取消訂單"
@@ -1892,3 +2020,6 @@ msgstr "キャンセル済み"
 #: templates/shared/order_table.html:131
 msgid "付款失敗"
 msgstr "決済失敗"
+
+#~ msgid "顯示"
+#~ msgstr "表示"
