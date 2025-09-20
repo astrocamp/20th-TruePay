@@ -10,23 +10,23 @@
   <link href="{% static 'styles/app.css' %}" rel="stylesheet" type="text/css" />
   <script src="{% static 'scripts/app.js' %}" defer></script>
 </head>
-<body class="bg-green-100 text-black font-sans scrollbar-apple" x-data="createMobileMenu()">
-  <!-- 背景遮罩層（手機版點擊關閉側邊選單） -->
-  <div x-show="isOpen" @click="close()" class="fixed inset-0 z-40 bg-black/50 md:hidden transition-opacity" x-transition:enter="transition-opacity ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" aria-label="關閉選單"></div>
+<body class="customer-dashboard font-sans scrollbar-apple" x-data="createMobileMenu()">
+  <!-- 背景遮罩層（手機版） -->
+  <div class="dashboard-overlay" :class="{ 'open': isOpen }" @click="close()"></div>
 
   <!-- 整體容器：側欄 + 內容區 -->
   <div class="min-h-screen grid grid-cols-1 md:grid-cols-[260px_1fr]">
 
-    <!-- 側欄（Desktop 固定，Mobile 抽屜） -->
-    <aside class="fixed md:static inset-y-0 left-0 z-50 w-72 md:w-auto transition-transform bg-white border-r border-brand-grayBorder md:translate-x-0" :class="{ 'translate-x-0': isOpen, '-translate-x-full': !isOpen }">
+    <!-- 側欄（Dashly 風格） -->
+    <aside class="dashboard-sidebar" :class="{ 'open': isOpen }">
       <div class="h-full flex flex-col">
         <!-- Logo -->
-        <div class="px-6 h-16 flex items-center border-b border-brand-grayBorder">
-          <a href="{% url 'pages:marketplace' %}" class="text-xl font-bold text-brand-blue">TruePay</a>
-          <button @click="close()" class="ml-auto md:hidden cursor-pointer p-2 rounded-lg hover:bg-brand-grayLight touch-manipulation" aria-label="關閉選單">✕</button>
+        <div class="logo-section px-6 h-16 flex items-center">
+          <a href="{% url 'pages:marketplace' %}">TruePay</a>
+          <button @click="close()" class="ml-auto md:hidden cursor-pointer p-2 rounded-lg hover:bg-gray-700 touch-manipulation text-gray-300" aria-label="關閉選單">✕</button>
         </div>
         <!-- 導覽選單 -->
-        <nav class="flex-1 overflow-y-auto py-4" x-data="NavigationManager.createAlpineData()" @click="$parent.handleLinkClick($event)">
+        <nav class="dashboard-nav flex-1 overflow-y-auto" x-data="NavigationManager.createAlpineData()" @click="$parent.handleLinkClick($event)">
           <ul class="px-2 space-y-1 text-base">
             <li>
               <a href="{% url 'customers_account:dashboard' %}" x-bind="navLinkBinding($el)" @click="$root.close()">
@@ -56,42 +56,43 @@
           </ul>
         </nav>
         <!-- 登出 -->
-        <div class="p-4 border-t border-[#D2D2D7]">
-          <a href="{% url 'customers_account:logout' %}" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-red-600" @click="$root.close()">
+        <div class="dashboard-logout">
+          <a href="{% url 'customers_account:logout' %}" @click="$root.close()">
             {% include 'components/icons.html' with icon='logout' %}
-            登出 
+            登出
           </a>
         </div>
       </div>
     </aside>
 
     <!-- 右側主要區域 -->
-    <main class="flex flex-col min-h-screen">
-      <!-- 手機版漢堡選單按鈕 -->
-      <div class="md:hidden bg-white border-b border-[#D2D2D7] px-4 py-3 flex items-center">
-        <button @click="toggle()" class="cursor-pointer p-2 rounded-lg hover:bg-[#F5F5F7] touch-manipulation" aria-label="開啟選單">
+    <main class="dashboard-main flex flex-col min-h-screen">
+      <!-- 手機版頂部導航 -->
+      <div class="dashboard-mobile-header md:hidden">
+        <button @click="toggle()" class="dashboard-mobile-toggle" aria-label="開啟選單">
           {% include 'components/icons.html' with icon='menu' class='w-6 h-6' %}
         </button>
-        <h1 class="ml-3 text-lg font-semibold text-[#0056B3]">TruePay</h1>
+        <h1>TruePay 消費者後台</h1>
       </div>
+
       <!-- 主內容 -->
-      <div class="flex-1 p-6">
+      <div class="dashboard-content flex-1">
         {% block content %}
         <!-- 子頁面會注入這裡 -->
         {% endblock %}
       </div>
 
       <!-- Footer -->
-      <footer class="mt-auto border-t border-[#D2D2D7] bg-white">
-        <div class="max-w-6xl mx-auto px-4 md:px-6 py-6 text-xs text-gray-500 flex items-center justify-between">
+      <footer class="mt-auto border-t border-gray-200 bg-white">
+        <div class="max-w-6xl mx-auto px-4 md:px-6 py-4 text-xs text-gray-500 flex items-center justify-between">
           <p>© 2025 TruePay</p>
           <nav class="flex items-center gap-4">
-            <a href="#" class="hover:text-[#0056B3]">使用條款</a>
-            <a href="#" class="hover:text-[#0056B3]">隱私權政策</a>
+            <a href="#" class="hover:text-green-600">使用條款</a>
+            <a href="#" class="hover:text-green-600">隱私權政策</a>
           </nav>
         </div>
       </footer>
-    </div>
+    </main>
   </div>
  </body>
 </html>

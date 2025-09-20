@@ -1,0 +1,515 @@
+/* ===============================================
+   後台儀表板樣式 (Dashly 風格)
+   =============================================== */
+
+/* ===============================================
+   全域變數定義
+   =============================================== */
+:root {
+    /* 商家主色調 */
+    --merchant-primary: #7a9ef5;
+    --merchant-primary-hover: #6b8ff4;
+    --merchant-primary-light: #d2deff;
+
+    /* 消費者主色調 */
+    --customer-primary: #00AA90;
+    --customer-primary-hover: #009980;
+    --customer-primary-light: #ffffff;
+
+    /* 通用側邊欄文字顏色 */
+    --sidebar-text-color: #ffffff;
+
+    /* 主內容區 */
+    --main-bg: #f8fafc;
+    --card-bg: #ffffff;
+    --card-border: #e2e8f0;
+    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --card-shadow-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+    /* 文字顏色 */
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+}
+
+/* ===============================================
+   側邊欄設計 (Dashly 風格)
+   =============================================== */
+.dashboard-sidebar {
+    transition: all 0.3s ease;
+}
+
+.dashboard-sidebar .logo-section {
+    color: var(--sidebar-text-color);
+}
+
+/* 商家版本 Logo 區域 */
+.merchant-dashboard .dashboard-sidebar .logo-section {
+    background: var(--merchant-primary-hover);
+    border-bottom-color: #ffffff;
+}
+
+/* 消費者版本 Logo 區域 */
+.customer-dashboard .dashboard-sidebar .logo-section {
+    background: var(--customer-primary-hover);
+    border-bottom-color: #ffffff;
+}
+
+.dashboard-sidebar .logo-section a {
+    color: var(--sidebar-text-color);
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+}
+
+/* 導航選單樣式 */
+.dashboard-nav {
+    padding: 1rem 0;
+}
+
+.dashboard-nav ul {
+    padding: 0 0.75rem;
+    margin: 0;
+    list-style: none;
+}
+
+.dashboard-nav li {
+    margin-bottom: 0.25rem;
+}
+
+.dashboard-nav a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: var(--sidebar-text-color);
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.dashboard-nav a:hover {
+    color: var(--sidebar-text-color);
+    transform: translateX(2px);
+}
+
+.dashboard-nav a.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--sidebar-text-color);
+    border-left: 3px solid #ffffff;
+}
+
+/* 商家版本側邊欄 */
+.merchant-dashboard .dashboard-sidebar {
+    background: var(--merchant-primary);
+    border-right-color: var(--merchant-primary-hover);
+}
+
+.merchant-dashboard .dashboard-nav a.active {
+    background: var(--merchant-primary-hover);
+    color: var(--sidebar-text-color);
+    border-left: 3px solid #ffffff;
+}
+
+.merchant-dashboard .dashboard-nav a:hover {
+    background: var(--merchant-primary-hover);
+    color: var(--sidebar-text-color);
+}
+
+/* 消費者版本側邊欄 */
+.customer-dashboard .dashboard-sidebar {
+    background: var(--customer-primary);
+    border-right-color: var(--customer-primary-hover);
+}
+
+.customer-dashboard .dashboard-nav a.active {
+    background: var(--customer-primary-hover);
+    color: var(--sidebar-text-color);
+    border-left: 3px solid #ffffff;
+}
+
+.customer-dashboard .dashboard-nav a:hover {
+    background: var(--customer-primary-hover);
+    color: var(--sidebar-text-color);
+}
+
+/* 登出區域 */
+.dashboard-logout {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem;
+}
+
+.dashboard-logout a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #ef4444;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.dashboard-logout a:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* 商家版本登出按鈕 */
+.merchant-dashboard .dashboard-logout {
+    border-top-color: var(--merchant-primary);
+}
+
+/* 消費者版本登出按鈕 */
+.customer-dashboard .dashboard-logout {
+    border-top-color: var(--customer-primary);
+}
+
+/* ===============================================
+   主內容區設計
+   =============================================== */
+.dashboard-main {
+    background: var(--main-bg);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.dashboard-content {
+    padding: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* 手機版頂部導航 */
+.dashboard-mobile-header {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--card-border);
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.dashboard-mobile-header h1 {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1.125rem;
+    margin: 0;
+}
+
+.dashboard-mobile-toggle {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dashboard-mobile-toggle:hover {
+    background: var(--main-bg);
+    color: var(--text-primary);
+}
+
+/* ===============================================
+   卡片組件設計 (Dashly 風格)
+   =============================================== */
+.dashboard-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 0.75rem;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+/* 確保 dashboard-card 在 flex 容器中正確工作 */
+.flex .dashboard-card {
+    flex: 1;
+    min-width: 0; /* 防止 flex 子元素溢出 */
+}
+
+.dashboard-card:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-1px);
+}
+
+.dashboard-card-header {
+    padding: 1.5rem 1.5rem 0 1.5rem;
+    border-bottom: none;
+}
+
+.dashboard-card-body {
+    padding: 1.5rem;
+}
+
+.dashboard-card-title {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1.125rem;
+    margin: 0 0 0.5rem 0;
+}
+
+.dashboard-card-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+/* ===============================================
+   統計卡片設計
+   =============================================== */
+.stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+}
+
+.stat-card-content {
+    position: relative;
+    z-index: 2;
+}
+
+.stat-card-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    opacity: 0.9;
+}
+
+.stat-card-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0.5rem 0;
+    line-height: 1;
+}
+
+.stat-card-label {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.stat-card-change {
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
+}
+
+.stat-card-change.positive {
+    color: #10b981;
+}
+
+.stat-card-change.negative {
+    color: #ef4444;
+}
+
+/* 商家版本統計卡片 */
+.merchant-dashboard .stat-card-primary .stat-card-icon {
+    background: var(--merchant-primary-light);
+    color: var(--merchant-primary);
+}
+
+.merchant-dashboard .stat-card-primary .stat-card-value {
+    color: var(--merchant-primary);
+}
+
+/* 消費者版本統計卡片 */
+.customer-dashboard .stat-card-primary .stat-card-icon {
+    background: var(--customer-primary-light);
+    color: var(--customer-primary);
+}
+
+.customer-dashboard .stat-card-primary .stat-card-value {
+    color: var(--customer-primary);
+}
+
+/* ===============================================
+   響應式設計 (重點處理殘留問題)
+   =============================================== */
+
+/* 桌機版 (768px 以上) */
+@media (min-width: 768px) {
+    /* 確保手機版樣式完全重置 */
+    .dashboard-mobile-header {
+        display: none !important;
+    }
+
+    .dashboard-sidebar {
+        position: static !important;
+        transform: none !important;
+        width: 16rem !important; /* 64 * 0.25rem = 16rem */
+        z-index: auto !important;
+    }
+
+    /* 移除手機版的遮罩層 */
+    .dashboard-overlay {
+        display: none !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    .dashboard-content {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .stat-card-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    /* 快速操作區塊 4 欄格線 */
+    .md\:grid-cols-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+/* 平板版 (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .dashboard-content {
+        padding: 1.5rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .stat-card-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+/* 手機版 (767px 以下) */
+@media (max-width: 767px) {
+    /* 側邊欄手機版設計 */
+    .dashboard-sidebar {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 280px !important;
+        z-index: 50 !important;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .dashboard-sidebar.open {
+        transform: translateX(0) !important;
+    }
+
+    /* 手機版顯示頂部導航 */
+    .dashboard-mobile-header {
+        display: flex !important;
+    }
+
+    /* 遮罩層 */
+    .dashboard-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 40;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .dashboard-overlay.open {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    .dashboard-content {
+        padding: 1rem;
+        margin-top: 0;
+        max-width: 100%;
+    }
+
+    .stat-card-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .stat-card {
+        padding: 1.25rem;
+    }
+
+    .stat-card-value {
+        font-size: 1.75rem;
+    }
+}
+
+/* 超小螢幕 (480px 以下) */
+@media (max-width: 480px) {
+    .dashboard-content {
+        padding: 0.75rem;
+        max-width: 100%;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-card-value {
+        font-size: 1.5rem;
+    }
+
+    .dashboard-card-body {
+        padding: 1rem;
+    }
+}
+
+/* ===============================================
+   動畫和過渡效果
+   =============================================== */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.dashboard-card {
+    animation: slideInRight 0.3s ease forwards;
+}
+
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+/* ===============================================
+   深色模式準備 (未來擴展)
+   =============================================== */
+@media (prefers-color-scheme: dark) {
+    /* 暫時保留，未來可擴展 */
+}
+

@@ -327,10 +327,10 @@ window.createMobileMenu = createMobileMenu;
 class NavigationManager {
   constructor() {
     this._currentPath = null; // 快取路徑
-    this.baseClasses = 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]';
-    this.activeClasses = 'text-[#0056B3] font-medium bg-blue-50';
-    this.inactiveClasses = 'text-gray-700';
-    this.logoutClasses = 'flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7] text-red-600';
+    this.baseClasses = ''; // 使用 dashboard CSS 樣式
+    this.activeClasses = 'active';
+    this.inactiveClasses = '';
+    this.logoutClasses = '';
   }
   
   get currentPath() {

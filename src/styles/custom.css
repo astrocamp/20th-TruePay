@@ -56,7 +56,7 @@ html {
 /* Merchant Authentication Pages Background */
 .merchant-auth-bg {
     background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.5)),
-                      url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2000&q=80');
+                      url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=2000&q=80');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;

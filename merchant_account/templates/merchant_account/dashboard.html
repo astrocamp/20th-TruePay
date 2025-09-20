@@ -3,72 +3,88 @@
 {% block title %}廠商總覽 - TruePay{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+<div class="space-y-8">
     <!-- 歡迎區塊 -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-        <div class="flex items-center justify-between mb-6">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">歡迎回來，{{ merchant.Name }}！</h1>
-                <p class="text-gray-600">這裡是您的商家經營概況</p>
+    <div class="dashboard-card">
+        <div class="dashboard-card-body">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 mb-2">歡迎回來，{{ merchant.Name }}！</h1>
+                    <p class="text-gray-600">這裡是您的商家經營概況</p>
+                </div>
+                <div class="hidden md:block">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                        <span class="text-white text-2xl font-bold">{{ merchant.Name|first }}</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- 統計卡片 -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="stat-card-grid grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- 商品總數 -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-600 text-sm font-medium">商品總數</p>
-                    <p class="text-3xl font-bold text-[#0056B3] mt-2">{{ total_products }}</p>
-                    <p class="text-green-600 text-sm mt-1">活躍商品</p>
-                </div>
-                <div class="p-3 bg-blue-50 rounded-full">
-                    {% include 'components/icons.html' with icon='box' class='w-8 h-8 text-[#0056B3]' %}
+        <div class="stat-card stat-card-primary">
+            <div class="stat-card-content">
+                <div class="flex items-center justify-between">
+                    <div class="">
+                        <p class="stat-card-label">商品總數</p>
+                        <p class="stat-card-value">{{ total_products }}</p>
+                        <p class="stat-card-change positive">+12% 本月</p>
+                    </div>
+                    <div class="stat-card-icon">
+                        {% include 'components/icons.html' with icon='box' class='w-6 h-6' %}
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- 交易訂單 -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-600 text-sm font-medium">交易訂單</p>
-                    <p class="text-3xl font-bold text-green-600 mt-2">{{ total_orders }}</p>
-                    <p class="text-gray-500 text-sm mt-1">總訂單數</p>
-                </div>
-                <div class="p-3 bg-green-50 rounded-full">
-                    {% include 'components/icons.html' with icon='document' class='w-8 h-8 text-green-600' %}
+        <div class="stat-card">
+            <div class="stat-card-content">
+                <div class="flex items-center justify-between">
+                    <div class="">
+                        <p class="stat-card-label">交易訂單</p>
+                        <p class="stat-card-value text-green-600">{{ total_orders }}</p>
+                        <p class="stat-card-change positive">+8% 本月</p>
+                    </div>
+                    <div class="stat-card-icon bg-green-100 text-green-600">
+                        {% include 'components/icons.html' with icon='document' class='w-6 h-6' %}
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- 總收入 -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-600 text-sm font-medium">總收入</p>
-                    <p class="text-3xl font-bold text-yellow-600 mt-2">${{ total_revenue|floatformat:0 }}</p>
-                    <p class="text-gray-500 text-sm mt-1">累計金額</p>
-                </div>
-                <div class="p-3 bg-yellow-50 rounded-full">
-                    {% include 'components/icons.html' with icon='money' class='w-8 h-8 text-yellow-600' %}
+        <div class="stat-card">
+            <div class="stat-card-content">
+                <div class="flex items-center justify-between">
+                    <div class="">
+                        <p class="stat-card-label">總收入</p>
+                        <p class="stat-card-value text-yellow-600">NT$ {{ total_revenue|floatformat:0 }}</p>
+                        <p class="stat-card-change positive">+15% 本月</p>
+                    </div>
+                    <div class="stat-card-icon bg-yellow-100 text-yellow-600">
+                        {% include 'components/icons.html' with icon='money' class='w-6 h-6' %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- 票券統計卡片 -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-gray-900">票券統計</h2>
-            <a href="{% url 'merchant_account:sold_tickets' request.merchant.subdomain %}" class="text-[#0056B3] hover:text-[#00408A] text-sm font-medium">
-                查看全部 →
-            </a>
+    <div class="dashboard-card">
+        <div class="dashboard-card-header">
+            <div class="flex items-center justify-between">
+                <h2 class="dashboard-card-title">票券統計</h2>
+                <a href="{% url 'merchant_account:sold_tickets' request.merchant.subdomain %}" class="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
+                    查看全部 →
+                </a>
+            </div>
         </div>
+        <div class="dashboard-card-body">
         
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             <!-- 總票券數 -->
             <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
                 <div class="p-2 bg-blue-100 rounded-full w-fit mx-auto mb-2">
@@ -114,17 +130,20 @@
                 <div class="text-sm text-orange-800">將到期</div>
             </div>
         </div>
+        </div>
     </div>
 
     <!-- 最新商品、訂單和票券 -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="flex flex-col md:flex-row gap-6">
         <!-- 最新商品 -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-bold text-gray-900">最新商品</h2>
-                <a href="{% url 'merchant_marketplace:index' request.merchant.subdomain %}" class="text-[#0056B3] hover:text-[#00408A] text-sm font-medium">
-                    查看全部 →
-                </a>
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <div class="flex items-center justify-between">
+                    <h2 class="dashboard-card-title">最新商品</h2>
+                    <a href="{% url 'merchant_marketplace:index' request.merchant.subdomain %}" class="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
+                        查看全部 →
+                    </a>
+                </div>
             </div>
             
             {% if recent_products %}
@@ -159,13 +178,16 @@
         </div>
 
         <!-- 最新訂單 -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-bold text-gray-900">最新訂單</h2>
-                <a href="{% url 'merchant_account:transaction_history' request.merchant.subdomain %}" class="text-[#0056B3] hover:text-[#00408A] text-sm font-medium">
-                    查看全部 →
-                </a>
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <div class="flex items-center justify-between">
+                    <h2 class="dashboard-card-title">最新訂單</h2>
+                    <a href="{% url 'merchant_account:transaction_history' request.merchant.subdomain %}" class="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
+                        查看全部 →
+                    </a>
+                </div>
             </div>
+            
             
             {% if recent_orders %}
                 <div class="space-y-4">
@@ -187,16 +209,19 @@
                     <p>尚無訂單</p>
                 </div>
             {% endif %}
-        </div>
+        </div> 
 
         <!-- 最新票券 -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-bold text-gray-900">最新票券</h2>
-                <a href="{% url 'merchant_account:sold_tickets' request.merchant.subdomain %}" class="text-[#0056B3] hover:text-[#00408A] text-sm font-medium">
-                    查看全部 →
-                </a>
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <div class="flex items-center justify-between">
+                    <h2 class="dashboard-card-title">最新票券</h2>
+                    <a href="{% url 'merchant_account:sold_tickets' request.merchant.subdomain %}" class="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
+                        查看全部 →
+                    </a>
+                </div>
             </div>
+            
             
             {% if recent_tickets %}
                 <div class="space-y-4">
@@ -228,31 +253,35 @@
                 </div>
             {% endif %}
         </div>
-    </div>
+    </div> 
 
     <!-- 快速操作 -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h2 class="text-xl font-bold text-gray-900 mb-6">快速操作</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <a href="{% url 'merchant_marketplace:new' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
-                {% include 'components/icons.html' with icon='plus' class='w-8 h-8 mb-2' %}
-                <span class="text-sm font-medium">新增商品</span>
-            </a>
-            
-            <a href="{% url 'merchant_marketplace:index' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
-                {% include 'components/icons.html' with icon='menu' class='w-8 h-8 mb-2' %}
-                <span class="text-sm font-medium">商品列表</span>
-            </a>
-            
-            <a href="{% url 'merchant_account:transaction_history' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
-                {% include 'components/icons.html' with icon='document' class='w-8 h-8 mb-2' %}
-                <span class="text-sm font-medium">交易記錄</span>
-            </a>
-            
-            <a href="{% url 'merchant_account:profile_settings' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
-                {% include 'components/icons.html' with icon='settings' class='w-8 h-8 mb-2' %}
-                <span class="text-sm font-medium">設定</span>
-            </a>
+    <div class="dashboard-card">
+        <div class="dashboard-card-header">
+            <h2 class="dashboard-card-title">快速操作</h2>
+        </div>
+        <div class="dashboard-card-body">
+            <div class="flex flex-wrap gap-4">
+                <a href="{% url 'merchant_marketplace:new' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors w-[calc(50%-0.5rem)] md:w-[calc(25%-0.75rem)]">
+                    {% include 'components/icons.html' with icon='plus' class='w-8 h-8 mb-2' %}
+                    <span class="text-sm font-medium">新增商品</span>
+                </a>
+
+                <a href="{% url 'merchant_marketplace:index' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors w-[calc(50%-0.5rem)] md:w-[calc(25%-0.75rem)]">
+                    {% include 'components/icons.html' with icon='menu' class='w-8 h-8 mb-2' %}
+                    <span class="text-sm font-medium">商品列表</span>
+                </a>
+
+                <a href="{% url 'merchant_account:transaction_history' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors w-[calc(50%-0.5rem)] md:w-[calc(25%-0.75rem)]">
+                    {% include 'components/icons.html' with icon='document' class='w-8 h-8 mb-2' %}
+                    <span class="text-sm font-medium">交易記錄</span>
+                </a>
+
+                <a href="{% url 'merchant_account:profile_settings' request.merchant.subdomain %}" class="flex flex-col items-center p-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors w-[calc(50%-0.5rem)] md:w-[calc(25%-0.75rem)]">
+                    {% include 'components/icons.html' with icon='settings' class='w-8 h-8 mb-2' %}
+                    <span class="text-sm font-medium">設定</span>
+                </a>
+            </div>
         </div>
     </div>
 </div>
