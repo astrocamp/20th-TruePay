@@ -1,0 +1,1894 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: TruePay 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-20 10:01+0800\n"
+"PO-Revision-Date: 2025-09-20 11:00+0800\n"
+"Last-Translator: Claude AI <claude@anthropic.com>\n"
+"Language-Team: Japanese <ja@li.org>\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+#: customers_account/forms.py:17 merchant_account/forms.py:38
+msgid "請輸入密碼（至少8個字元）"
+msgstr "パスワードを入力してください（8文字以上）"
+
+#: customers_account/forms.py:29
+#: customers_account/templates/customers/register.html:94
+msgid "確認密碼"
+msgstr "パスワードを確認"
+
+#: customers_account/forms.py:39 customers_account/forms.py:146
+#: customers_account/forms.py:208 merchant_account/forms.py:28
+#: merchant_account/forms.py:165 merchant_account/forms.py:273
+msgid "請輸入電子郵件"
+msgstr "メールアドレスを入力してください"
+
+#: customers_account/forms.py:53 customers_account/forms.py:221
+msgid "請輸入姓名"
+msgstr "お名前を入力してください"
+
+#: customers_account/forms.py:60 merchant_account/forms.py:85
+msgid "請輸入身分證字號（格式：A123456789）"
+msgstr "身分証番号を入力してください（形式：A123456789）"
+
+#: customers_account/forms.py:73
+msgid "請輸入電話號碼（格式：09xxxxxxxx）"
+msgstr "電話番号を入力してください（形式：09xxxxxxxx）"
+
+#: customers_account/forms.py:155 merchant_account/forms.py:174
+msgid "請輸入密碼"
+msgstr "パスワードを入力してください"
+
+#: customers_account/forms.py:227 merchant_account/forms.py:313
+msgid "請輸入身分證字號"
+msgstr "身分証番号を入力してください"
+
+#: customers_account/forms.py:239
+msgid "請輸入電話號碼"
+msgstr "電話番号を入力してください"
+
+#: customers_account/forms.py:297
+msgid "請輸入目前密碼"
+msgstr "現在のパスワードを入力してください"
+
+#: customers_account/forms.py:306 customers_account/forms.py:398
+msgid "請輸入新密碼"
+msgstr "新しいパスワードを入力してください"
+
+#: customers_account/forms.py:317 customers_account/forms.py:409
+#: customers_account/templates/customers/profile_settings.html:127
+#: merchant_account/templates/merchant_account/profile_settings.html:133
+msgid "確認新密碼"
+msgstr "新しいパスワードを確認"
+
+#: customers_account/forms.py:359
+msgid "請輸入您的電子郵件"
+msgstr "あなたのメールアドレスを入力してください"
+
+#: customers_account/templates/customers/dashboard.html:3
+msgid "消費者儀表板"
+msgstr "消費者ダッシュボード"
+
+#: customers_account/templates/customers/dashboard.html:7
+#, python-format
+msgid "歡迎回來，%(name)s！"
+msgstr "おかえりなさい、%(name)sさん！"
+
+#: customers_account/templates/customers/dashboard.html:20
+msgid "總購買次數"
+msgstr "総購入回数"
+
+#: customers_account/templates/customers/dashboard.html:25
+msgid "總消費金額"
+msgstr "総消費金額"
+
+#: customers_account/templates/customers/dashboard.html:30
+msgid "待付款訂單"
+msgstr "未決済注文"
+
+#: customers_account/templates/customers/dashboard.html:38
+msgid "最近購買記錄"
+msgstr "最近の購入履歴"
+
+#: customers_account/templates/customers/dashboard.html:40
+#: merchant_account/templates/merchant_account/dashboard.html:67
+#: merchant_account/templates/merchant_account/dashboard.html:126
+#: merchant_account/templates/merchant_account/dashboard.html:166
+#: merchant_account/templates/merchant_account/dashboard.html:197
+msgid "查看全部"
+msgstr "すべてを表示"
+
+#: customers_account/templates/customers/dashboard.html:49
+#: templates/shared/order_table.html:10
+msgid "訂單編號"
+msgstr "注文番号"
+
+#: customers_account/templates/customers/dashboard.html:50
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:48
+#: merchant_marketplace/templates/merchant_marketplace/new.html:30
+#: templates/shared/order_table.html:26
+msgid "商品名稱"
+msgstr "商品名"
+
+#: customers_account/templates/customers/dashboard.html:51
+#: customers_account/templates/customers/ticket_wallet.html:110
+#: templates/shared/order_table.html:22
+msgid "商家"
+msgstr "店舗"
+
+#: customers_account/templates/customers/dashboard.html:52
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:93
+msgid "金額"
+msgstr "金額"
+
+#: customers_account/templates/customers/dashboard.html:53
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:92
+msgid "狀態"
+msgstr "ステータス"
+
+#: customers_account/templates/customers/dashboard.html:54
+#: customers_account/templates/customers/ticket_wallet.html:113
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:94
+msgid "購買時間"
+msgstr "購入日時"
+
+#: customers_account/templates/customers/dashboard.html:91
+msgid "還沒有購買記錄"
+msgstr "まだ購入履歴がありません"
+
+#: customers_account/templates/customers/dashboard.html:93
+msgid "開始購物"
+msgstr "ショッピングを始める"
+
+#: customers_account/templates/customers/login.html:25
+#: customers_account/templates/customers/profile_settings.html:62
+#: customers_account/templates/customers/register.html:22
+#: merchant_account/templates/merchant_account/Register.html:73
+#: merchant_account/templates/merchant_account/profile_settings.html:54
+msgid "電子郵件"
+msgstr "メールアドレス"
+
+#: customers_account/templates/customers/login.html:37
+#: customers_account/templates/customers/register.html:82
+#: merchant_account/templates/merchant_account/Register.html:133
+msgid "密碼"
+msgstr "パスワード"
+
+#: customers_account/templates/customers/login.html:48
+#: merchant_account/templates/merchant_account/login.html:44
+msgid "登入"
+msgstr "ログイン"
+
+#: customers_account/templates/customers/login.html:53
+msgid "忘記密碼？"
+msgstr "パスワードをお忘れですか？"
+
+#: customers_account/templates/customers/login.html:65
+msgid "或"
+msgstr "または"
+
+#: customers_account/templates/customers/login.html:78
+msgid "使用 Google 帳號登入"
+msgstr "Googleアカウントでログイン"
+
+#: customers_account/templates/customers/login.html:86
+#: merchant_account/templates/merchant_account/login.html:50
+msgid "還沒有帳號？"
+msgstr "アカウントをお持ちでないですか？"
+
+#: customers_account/templates/customers/login.html:88
+#: merchant_account/templates/merchant_account/login.html:52
+msgid "點此註冊"
+msgstr "こちらから登録"
+
+#: customers_account/templates/customers/profile_settings.html:7
+msgid "會員資料設定"
+msgstr "会員情報設定"
+
+#: customers_account/templates/customers/profile_settings.html:25
+#: customers_account/templates/customers/profile_settings.html:46
+msgid "個人資料"
+msgstr "個人情報"
+
+#: customers_account/templates/customers/profile_settings.html:31
+#: customers_account/templates/customers/profile_settings.html:101
+#: customers_account/templates/customers/profile_settings.html:135
+#: customers_account/templates/customers/profile_settings.html:237
+#: merchant_account/templates/merchant_account/profile_settings.html:26
+#: merchant_account/templates/merchant_account/profile_settings.html:107
+#: merchant_account/templates/merchant_account/profile_settings.html:141
+msgid "修改密碼"
+msgstr "パスワード変更"
+
+#: customers_account/templates/customers/profile_settings.html:37
+#: customers_account/templates/customers/profile_settings.html:145
+msgid "安全設定"
+msgstr "セキュリティ設定"
+
+#: customers_account/templates/customers/profile_settings.html:55
+#: customers_account/templates/customers/register.html:34
+msgid "姓名"
+msgstr "お名前"
+
+#: customers_account/templates/customers/profile_settings.html:69
+#: customers_account/templates/customers/register.html:46
+#: merchant_account/templates/merchant_account/Register.html:58
+#: merchant_account/templates/merchant_account/profile_settings.html:82
+msgid "身分證號"
+msgstr "身分証番号"
+
+#: customers_account/templates/customers/profile_settings.html:76
+#: customers_account/templates/customers/register.html:70
+#: merchant_account/templates/merchant_account/profile_settings.html:68
+msgid "電話"
+msgstr "電話番号"
+
+#: customers_account/templates/customers/profile_settings.html:83
+#: customers_account/templates/customers/register.html:58
+msgid "生日"
+msgstr "生年月日"
+
+#: customers_account/templates/customers/profile_settings.html:91
+msgid "更新個人資料"
+msgstr "個人情報を更新"
+
+#: customers_account/templates/customers/profile_settings.html:110
+#: merchant_account/templates/merchant_account/profile_settings.html:116
+msgid "目前密碼"
+msgstr "現在のパスワード"
+
+#: customers_account/templates/customers/profile_settings.html:117
+#: merchant_account/templates/merchant_account/profile_settings.html:123
+msgid "新密碼"
+msgstr "新しいパスワード"
+
+#: customers_account/templates/customers/profile_settings.html:121
+#: merchant_account/templates/merchant_account/profile_settings.html:127
+msgid "密碼長度至少需要8個字元"
+msgstr "パスワードは8文字以上で入力してください"
+
+#: customers_account/templates/customers/profile_settings.html:152
+#: customers_account/templates/customers/profile_settings.html:181
+msgid "二階段驗證"
+msgstr "二段階認証"
+
+#: customers_account/templates/customers/profile_settings.html:154
+#: customers_account/templates/customers/profile_settings.html:183
+msgid "為您的帳戶提供額外的安全保護，交易時需要輸入手機應用程式的驗證代碼"
+msgstr "アカウントに追加のセキュリティ保護を提供し、取引時にモバイルアプリの認証コードの入力が必要です"
+
+#: customers_account/templates/customers/profile_settings.html:160
+#: customers_account/templates/customers/profile_settings.html:189
+msgid "已啟用"
+msgstr "有効"
+
+#: customers_account/templates/customers/profile_settings.html:164
+#: customers_account/templates/customers/profile_settings.html:193
+msgid "管理設定"
+msgstr "設定管理"
+
+#: customers_account/templates/customers/profile_settings.html:168
+#: customers_account/templates/customers/profile_settings.html:197
+msgid "未啟用"
+msgstr "無効"
+
+#: customers_account/templates/customers/profile_settings.html:172
+#: customers_account/templates/customers/profile_settings.html:201
+msgid "立即啟用"
+msgstr "今すぐ有効にする"
+
+#: customers_account/templates/customers/profile_settings.html:210
+msgid "您的帳戶已受到二階段驗證保護"
+msgstr "アカウントは二段階認証で保護されています"
+
+#: customers_account/templates/customers/profile_settings.html:212
+msgid "最後驗證時間"
+msgstr "最終認証時刻"
+
+#: customers_account/templates/customers/profile_settings.html:219
+msgid "建議啟用二階段驗證以提升帳戶安全性，避免未經授權的高額交易"
+msgstr "アカウントのセキュリティ向上のため二段階認証の有効化をお勧めします。未許可の高額取引を防ぐことができます"
+
+#: customers_account/templates/customers/profile_settings.html:227
+msgid "登入安全"
+msgstr "ログインセキュリティ"
+
+#: customers_account/templates/customers/profile_settings.html:232
+msgid "密碼強度"
+msgstr "パスワード強度"
+
+#: customers_account/templates/customers/profile_settings.html:233
+msgid "定期更換密碼以保持帳戶安全"
+msgstr "アカウントのセキュリティを保つため定期的にパスワードを変更してください"
+
+#: customers_account/templates/customers/profile_settings.html:243
+msgid "登入記錄"
+msgstr "ログイン履歴"
+
+#: customers_account/templates/customers/profile_settings.html:244
+msgid "檢視最近的登入活動"
+msgstr "最近のログインアクティビティを確認"
+
+#: customers_account/templates/customers/purchase_history.html:5
+#: templates/customers_layout/dashboard_base.html:41
+#: templates/payments/payment_status.html:175
+msgid "購買記錄"
+msgstr "購入履歴"
+
+#: customers_account/templates/customers/purchase_history.html:20
+#: templates/shared/order_table.html:144
+msgid "目前沒有購買記錄"
+msgstr "現在購入履歴がありません"
+
+#: customers_account/templates/customers/purchase_history.html:22
+msgid "回到首頁購物"
+msgstr "ホームページでショッピング"
+
+#: customers_account/templates/customers/register.html:7
+#: pages/templates/pages/selectrole.html:30
+msgid "消費者註冊"
+msgstr "消費者登録"
+
+#: customers_account/templates/customers/register.html:105
+#: merchant_account/templates/merchant_account/Register.html:147
+msgid "註冊"
+msgstr "登録"
+
+#: customers_account/templates/customers/register.html:117
+msgid "使用 Google 帳號註冊"
+msgstr "Googleアカウントで登録"
+
+#: customers_account/templates/customers/register.html:125
+#: merchant_account/templates/merchant_account/Register.html:153
+msgid "已有帳號？"
+msgstr "アカウントをお持ちですか？"
+
+#: customers_account/templates/customers/register.html:127
+#: merchant_account/templates/merchant_account/Register.html:158
+msgid "點此登入"
+msgstr "こちらからログイン"
+
+#: customers_account/templates/customers/ticket_wallet.html:10
+#: templates/customers_layout/dashboard_base.html:47
+msgid "票券錢包"
+msgstr "チケットウォレット"
+
+#: customers_account/templates/customers/ticket_wallet.html:11
+msgid "管理您的所有票券，查看使用狀態和有效期限"
+msgstr "すべてのチケットを管理し、使用状態と有効期限を確認できます"
+
+#: customers_account/templates/customers/ticket_wallet.html:20
+msgid "總票券數"
+msgstr "総チケット数"
+
+#: customers_account/templates/customers/ticket_wallet.html:24
+#: customers_account/templates/customers/ticket_wallet.html:44
+#: customers_account/templates/customers/ticket_wallet.html:100
+#: merchant_account/templates/merchant_account/dashboard.html:87
+#: merchant_account/templates/merchant_account/dashboard.html:210
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:28
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:114
+msgid "未使用"
+msgstr "未使用"
+
+#: customers_account/templates/customers/ticket_wallet.html:28
+#: customers_account/templates/customers/ticket_wallet.html:45
+#: customers_account/templates/customers/ticket_wallet.html:104
+#: merchant_account/templates/merchant_account/dashboard.html:96
+#: merchant_account/templates/merchant_account/dashboard.html:212
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:32
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:118
+#: templates/payments/payment_status.html:134
+msgid "已使用"
+msgstr "使用済み"
+
+#: customers_account/templates/customers/ticket_wallet.html:32
+#: customers_account/templates/customers/ticket_wallet.html:102
+#: merchant_account/templates/merchant_account/dashboard.html:105
+#: merchant_account/templates/merchant_account/dashboard.html:214
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:36
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:122
+msgid "已過期"
+msgstr "期限切れ"
+
+#: customers_account/templates/customers/ticket_wallet.html:41
+msgid "狀態篩選"
+msgstr "ステータスで絞り込み"
+
+#: customers_account/templates/customers/ticket_wallet.html:43
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:54
+msgid "全部狀態"
+msgstr "すべてのステータス"
+
+#: customers_account/templates/customers/ticket_wallet.html:49
+msgid "商家篩選"
+msgstr "店舗で絞り込み"
+
+#: customers_account/templates/customers/ticket_wallet.html:51
+msgid "全部商家"
+msgstr "すべての店舗"
+
+#: customers_account/templates/customers/ticket_wallet.html:60
+msgid "訂單編號篩選"
+msgstr "注文番号で絞り込み"
+
+#: customers_account/templates/customers/ticket_wallet.html:68
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:77
+msgid "篩選"
+msgstr "絞り込み"
+
+#: customers_account/templates/customers/ticket_wallet.html:71
+msgid "清除"
+msgstr "クリア"
+
+#: customers_account/templates/customers/ticket_wallet.html:117
+msgid "使用時間"
+msgstr "使用時刻"
+
+#: customers_account/templates/customers/ticket_wallet.html:122
+msgid "有效期限"
+msgstr "有効期限"
+
+#: customers_account/templates/customers/ticket_wallet.html:144
+msgid "顯示"
+msgstr "表示"
+
+#: customers_account/templates/customers/ticket_wallet.html:321
+msgid "前往購物"
+msgstr "ショッピングに行く"
+
+#: merchant_account/forms.py:69
+msgid "請輸入商店名稱（至少2個字元）"
+msgstr "店舗名を入力してください（2文字以上）"
+
+#: merchant_account/forms.py:77
+msgid "請輸入8位數統一編號（例如：12345678）"
+msgstr "8桁の統一番号を入力してください（例：12345678）"
+
+#: merchant_account/forms.py:94 merchant_account/forms.py:319
+msgid "請輸入負責人姓名"
+msgstr "責任者のお名前を入力してください"
+
+#: merchant_account/forms.py:102
+msgid "請輸入完整地址（至少5個字元）"
+msgstr "完全な住所を入力してください（5文字以上）"
+
+#: merchant_account/forms.py:110
+msgid "請輸入手機號碼（格式：09xxxxxxxx）"
+msgstr "携帯電話番号を入力してください（形式：09xxxxxxxx）"
+
+#: merchant_account/forms.py:214
+msgid "例如：mystore"
+msgstr "例：mystore"
+
+#: merchant_account/forms.py:216
+msgid "只能使用英文字母、數字和連字號"
+msgstr "英数字とハイフンのみ使用可能"
+
+#: merchant_account/forms.py:228
+msgid "請說明修改原因..."
+msgstr "変更理由を記入してください..."
+
+#: merchant_account/forms.py:301
+msgid "請輸入商店名稱"
+msgstr "店舗名を入力してください"
+
+#: merchant_account/forms.py:307
+msgid "請輸入統一編號"
+msgstr "統一番号を入力してください"
+
+#: merchant_account/forms.py:325
+msgid "請輸入地址"
+msgstr "住所を入力してください"
+
+#: merchant_account/forms.py:331
+msgid "請輸入手機號碼"
+msgstr "携帯電話番号を入力してください"
+
+#: merchant_account/models.py:88
+#, python-format
+msgid "已達年度修改上限(%(count)s次)"
+msgstr "年間変更上限に達しました(%(count)s回)"
+
+#: merchant_account/models.py:93
+#, python-format
+msgid "請等待%(days)s天後再行修改"
+msgstr "%(days)s日後に再度変更してください"
+
+#: merchant_account/models.py:94
+msgid "可以修改"
+msgstr "変更可能"
+
+#: merchant_account/templates/merchant_account/Register.html:6
+#: pages/templates/pages/selectrole.html:49
+msgid "商家註冊"
+msgstr "店舗登録"
+
+#: merchant_account/templates/merchant_account/Register.html:28
+#: merchant_account/templates/merchant_account/profile_settings.html:47
+msgid "商店名稱"
+msgstr "店舗名"
+
+#: merchant_account/templates/merchant_account/Register.html:43
+#: merchant_account/templates/merchant_account/profile_settings.html:75
+msgid "統一編號"
+msgstr "統一番号"
+
+#: merchant_account/templates/merchant_account/Register.html:88
+#: merchant_account/templates/merchant_account/profile_settings.html:61
+msgid "負責人姓名"
+msgstr "責任者氏名"
+
+#: merchant_account/templates/merchant_account/Register.html:103
+#: merchant_account/templates/merchant_account/profile_settings.html:89
+msgid "地址"
+msgstr "住所"
+
+#: merchant_account/templates/merchant_account/Register.html:118
+msgid "手機號碼"
+msgstr "携帯電話番号"
+
+#: merchant_account/templates/merchant_account/dashboard.html:11
+msgid "歡迎回來"
+msgstr "おかえりなさい"
+
+#: merchant_account/templates/merchant_account/dashboard.html:12
+msgid "這裡是您的商家經營概況"
+msgstr "こちらはあなたの店舗経営概況です"
+
+#: merchant_account/templates/merchant_account/dashboard.html:23
+#: merchant_account/templates/merchant_account/reports.html:84
+msgid "商品總數"
+msgstr "総商品数"
+
+#: merchant_account/templates/merchant_account/dashboard.html:25
+#: merchant_account/templates/merchant_account/reports.html:86
+msgid "活躍商品"
+msgstr "アクティブ商品"
+
+#: merchant_account/templates/merchant_account/dashboard.html:37
+#: merchant_account/templates/merchant_account/reports.html:58
+msgid "交易訂單"
+msgstr "取引注文"
+
+#: merchant_account/templates/merchant_account/dashboard.html:39
+#: merchant_account/templates/merchant_account/reports.html:56
+msgid "總訂單數"
+msgstr "総注文数"
+
+#: merchant_account/templates/merchant_account/dashboard.html:51
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:44
+msgid "總收入"
+msgstr "総売上"
+
+#: merchant_account/templates/merchant_account/dashboard.html:53
+#: merchant_account/templates/merchant_account/reports.html:44
+msgid "累計金額"
+msgstr "累計金額"
+
+#: merchant_account/templates/merchant_account/dashboard.html:65
+msgid "票券統計"
+msgstr "チケット統計"
+
+#: merchant_account/templates/merchant_account/dashboard.html:78
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:24
+msgid "總售出"
+msgstr "総販売数"
+
+#: merchant_account/templates/merchant_account/dashboard.html:114
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:40
+msgid "將到期"
+msgstr "期限近い"
+
+#: merchant_account/templates/merchant_account/dashboard.html:124
+msgid "最新商品"
+msgstr "最新商品"
+
+#: merchant_account/templates/merchant_account/dashboard.html:139
+msgid "無圖"
+msgstr "画像なし"
+
+#: merchant_account/templates/merchant_account/dashboard.html:153
+msgid "尚無商品"
+msgstr "まだ商品がありません"
+
+#: merchant_account/templates/merchant_account/dashboard.html:155
+msgid "立即新增"
+msgstr "今すぐ追加"
+
+#: merchant_account/templates/merchant_account/dashboard.html:164
+msgid "最新訂單"
+msgstr "最新注文"
+
+#: merchant_account/templates/merchant_account/dashboard.html:176
+#: merchant_account/templates/merchant_account/dashboard.html:207
+msgid "顧客"
+msgstr "お客様"
+
+#: merchant_account/templates/merchant_account/dashboard.html:187
+msgid "尚無訂單"
+msgstr "まだ注文がありません"
+
+#: merchant_account/templates/merchant_account/dashboard.html:195
+msgid "最新票券"
+msgstr "最新チケット"
+
+#: merchant_account/templates/merchant_account/dashboard.html:227
+msgid "尚無售出票券"
+msgstr "まだ販売したチケットがありません"
+
+#: merchant_account/templates/merchant_account/dashboard.html:235
+msgid "快速操作"
+msgstr "クイック操作"
+
+#: merchant_account/templates/merchant_account/dashboard.html:239
+#: merchant_marketplace/templates/merchant_marketplace/index.html:8
+#: merchant_marketplace/templates/merchant_marketplace/new.html:15
+#: merchant_marketplace/templates/merchant_marketplace/new.html:150
+#: templates/merchant_layout/dashboard_base.html:49
+msgid "新增商品"
+msgstr "商品追加"
+
+#: merchant_account/templates/merchant_account/dashboard.html:244
+#: merchant_marketplace/templates/merchant_marketplace/index.html:6
+#: templates/merchant_layout/dashboard_base.html:43
+msgid "商品列表"
+msgstr "商品一覧"
+
+#: merchant_account/templates/merchant_account/dashboard.html:249
+#: merchant_account/templates/merchant_account/transaction_history.html:5
+msgid "交易記錄"
+msgstr "取引履歴"
+
+#: merchant_account/templates/merchant_account/dashboard.html:254
+#: templates/customers_layout/dashboard_base.html:54
+#: templates/merchant_layout/dashboard_base.html:100
+msgid "設定"
+msgstr "設定"
+
+#: merchant_account/templates/merchant_account/domain_settings.html:11
+msgid "網域設定"
+msgstr "ドメイン設定"
+
+#: merchant_account/templates/merchant_account/domain_settings.html:12
+msgid "管理您的商店子網域設定"
+msgstr "店舗のサブドメイン設定を管理"
+
+#: merchant_account/templates/merchant_account/domain_settings.html:30
+msgid "修改子網域"
+msgstr "サブドメインを変更"
+
+#: merchant_account/templates/merchant_account/domain_settings.html:34
+msgid "目前商店網址"
+msgstr "現在の店舗URL"
+
+#: merchant_account/templates/merchant_account/domain_settings.html:50
+#, python-format
+msgid "本年度已修改 %(count)s / %(max)s 次"
+msgstr "今年度 %(count)s / %(max)s 回変更済み"
+
+#: merchant_account/templates/merchant_account/domain_settings.html:71
+msgid "新的子網域名稱"
+msgstr "新しいサブドメイン名"
+
+#: merchant_account/templates/merchant_account/domain_settings.html:95
+msgid "修改原因"
+msgstr "変更理由"
+
+#: merchant_account/templates/merchant_account/domain_settings.html:113
+msgid "申請變更"
+msgstr "変更申請"
+
+#: merchant_account/templates/merchant_account/domain_settings.html:124
+msgid "修改歷史"
+msgstr "変更履歴"
+
+#: merchant_account/templates/merchant_account/domain_settings.html:143
+msgid "原因："
+msgstr "理由："
+
+#: merchant_account/templates/merchant_account/domain_settings.html:143
+msgid "未提供"
+msgstr "未提供"
+
+#: merchant_account/templates/merchant_account/domain_settings.html:153
+msgid "沒有修改紀錄"
+msgstr "変更記録がありません"
+
+#: merchant_account/templates/merchant_account/domain_settings.html:161
+msgid "有效重導向"
+msgstr "有効なリダイレクト"
+
+#: merchant_account/templates/merchant_account/domain_settings.html:179
+msgid "到期日："
+msgstr "有効期限："
+
+#: merchant_account/templates/merchant_account/domain_settings.html:189
+msgid "沒有有效重導向"
+msgstr "有効なリダイレクトがありません"
+
+#: merchant_account/templates/merchant_account/login.html:6
+#: pages/templates/pages/selectrole.html:45
+msgid "商家登入"
+msgstr "店舗ログイン"
+
+#: merchant_account/templates/merchant_account/partials/scan_ready.html:7
+msgid "準備驗證票券"
+msgstr "チケット認証準備"
+
+#: merchant_account/templates/merchant_account/partials/scan_ready.html:8
+msgid "請在上方輸入票券驗證碼，驗證結果將在此顯示"
+msgstr "上にチケット認証コードを入力してください。認証結果はここに表示されます"
+
+#: merchant_account/templates/merchant_account/profile_settings.html:4
+#: merchant_account/templates/merchant_account/profile_settings.html:8
+msgid "商家資料設定"
+msgstr "店舗情報設定"
+
+#: merchant_account/templates/merchant_account/profile_settings.html:23
+#: merchant_account/templates/merchant_account/profile_settings.html:38
+msgid "商家資料"
+msgstr "店舗情報"
+
+#: merchant_account/templates/merchant_account/profile_settings.html:29
+msgid "模板設定"
+msgstr "テンプレート設定"
+
+#: merchant_account/templates/merchant_account/profile_settings.html:97
+msgid "更新商家資料"
+msgstr "店舗情報を更新"
+
+#: merchant_account/templates/merchant_account/profile_settings.html:151
+msgid "商店模板風格設定"
+msgstr "店舗テンプレートスタイル設定"
+
+#: merchant_account/templates/merchant_account/profile_settings.html:152
+msgid "選擇適合您品牌的視覺風格，為顧客提供更好的購物體驗"
+msgstr "ブランドに適したビジュアルスタイルを選択し、お客様により良いショッピング体験を提供します"
+
+#: merchant_account/templates/merchant_account/profile_settings.html:202
+msgid "目前使用："
+msgstr "現在使用中："
+
+#: merchant_account/templates/merchant_account/profile_settings.html:209
+msgid "預覽效果"
+msgstr "プレビュー効果"
+
+#: merchant_account/templates/merchant_account/profile_settings.html:212
+msgid "更新模板風格"
+msgstr "テンプレートスタイルを更新"
+
+#: merchant_account/templates/merchant_account/reports.html:5
+#: merchant_account/templates/merchant_account/reports.html:11
+#: templates/merchant_layout/dashboard_base.html:93
+msgid "報表分析"
+msgstr "レポート分析"
+
+#: merchant_account/templates/merchant_account/reports.html:12
+msgid "查看商店營運數據與趨勢分析"
+msgstr "店舗運営データとトレンド分析を確認"
+
+#: merchant_account/templates/merchant_account/reports.html:18
+msgid "統計期間"
+msgstr "統計期間"
+
+#: merchant_account/templates/merchant_account/reports.html:22
+msgid "最近 7 天"
+msgstr "直近7日"
+
+#: merchant_account/templates/merchant_account/reports.html:26
+msgid "最近 30 天"
+msgstr "直近30日"
+
+#: merchant_account/templates/merchant_account/reports.html:30
+msgid "最近 90 天"
+msgstr "直近90日"
+
+#: merchant_account/templates/merchant_account/reports.html:42
+msgid "總營收"
+msgstr "総売上"
+
+#: merchant_account/templates/merchant_account/reports.html:70
+msgid "發行票券"
+msgstr "発行チケット"
+
+#: merchant_account/templates/merchant_account/reports.html:72
+msgid "使用率"
+msgstr "使用率"
+
+#: merchant_account/templates/merchant_account/reports.html:104
+msgid "銷售分析報表"
+msgstr "売上分析レポート"
+
+#: merchant_account/templates/merchant_account/reports.html:105
+msgid "營收趨勢、訂單狀態、金流分析"
+msgstr "売上トレンド、注文状況、決済分析"
+
+#: merchant_account/templates/merchant_account/reports.html:111
+msgid "營收總覽與趨勢分析"
+msgstr "売上概要とトレンド分析"
+
+#: merchant_account/templates/merchant_account/reports.html:112
+msgid "訂單成功率統計"
+msgstr "注文成功率統計"
+
+#: merchant_account/templates/merchant_account/reports.html:113
+msgid "金流方式使用比例"
+msgstr "決済手段使用率"
+
+#: merchant_account/templates/merchant_account/reports.html:114
+msgid "平均訂單金額分析"
+msgstr "平均注文金額分析"
+
+#: merchant_account/templates/merchant_account/reports.html:119
+#: merchant_account/templates/merchant_account/reports.html:149
+#: merchant_account/templates/merchant_account/reports.html:179
+msgid "預覽"
+msgstr "プレビュー"
+
+#: merchant_account/templates/merchant_account/reports.html:123
+#: merchant_account/templates/merchant_account/reports.html:153
+#: merchant_account/templates/merchant_account/reports.html:183
+msgid "下載 Excel"
+msgstr "Excelダウンロード"
+
+#: merchant_account/templates/merchant_account/reports.html:134
+msgid "票券營運報表"
+msgstr "チケット運営レポート"
+
+#: merchant_account/templates/merchant_account/reports.html:135
+msgid "使用率、驗證記錄、過期分析"
+msgstr "使用率、認証記録、期限切れ分析"
+
+#: merchant_account/templates/merchant_account/reports.html:141
+msgid "票券使用率統計"
+msgstr "チケット使用率統計"
+
+#: merchant_account/templates/merchant_account/reports.html:142
+msgid "驗證成功率分析"
+msgstr "認証成功率分析"
+
+#: merchant_account/templates/merchant_account/reports.html:143
+msgid "過期票券損失統計"
+msgstr "期限切れチケット損失統計"
+
+#: merchant_account/templates/merchant_account/reports.html:144
+msgid "使用時間分佈分析"
+msgstr "使用時間分布分析"
+
+#: merchant_account/templates/merchant_account/reports.html:164
+msgid "商品表現報表"
+msgstr "商品パフォーマンスレポート"
+
+#: merchant_account/templates/merchant_account/reports.html:165
+msgid "銷量排行、收入貢獻、庫存分析"
+msgstr "売上ランキング、売上貢献、在庫分析"
+
+#: merchant_account/templates/merchant_account/reports.html:171
+msgid "商品銷售排行榜"
+msgstr "商品売上ランキング"
+
+#: merchant_account/templates/merchant_account/reports.html:172
+msgid "營收貢獻度分析"
+msgstr "売上貢献度分析"
+
+#: merchant_account/templates/merchant_account/reports.html:173
+msgid "庫存狀況統計"
+msgstr "在庫状況統計"
+
+#: merchant_account/templates/merchant_account/reports.html:174
+msgid "商品定價效率分析"
+msgstr "商品価格効率分析"
+
+#: merchant_account/templates/merchant_account/reports.html:209
+msgid "載入圖表中..."
+msgstr "グラフ読み込み中..."
+
+#: merchant_account/templates/merchant_account/reports.html:219
+msgid "主要分析"
+msgstr "主要分析"
+
+#: merchant_account/templates/merchant_account/reports.html:225
+msgid "詳細分佈"
+msgstr "詳細分布"
+
+#: merchant_account/templates/merchant_account/reports.html:243
+msgid "載入失敗"
+msgstr "読み込み失敗"
+
+#: merchant_account/templates/merchant_account/reports.html:245
+msgid "無法載入圖表數據，請稍後再試"
+msgstr "グラフデータを読み込めません。しばらくしてから再度お試しください"
+
+#: merchant_account/templates/merchant_account/reports.html:254
+msgid "報表使用說明"
+msgstr "レポート使用説明"
+
+#: merchant_account/templates/merchant_account/reports.html:257
+msgid "報表功能"
+msgstr "レポート機能"
+
+#: merchant_account/templates/merchant_account/reports.html:259
+msgid "支援多種時間範圍選擇（7天、30天、90天）"
+msgstr "複数の時間範囲選択に対応（7日、30日、90日）"
+
+#: merchant_account/templates/merchant_account/reports.html:260
+msgid "自動生成詳細統計圖表與視覺化分析"
+msgstr "詳細な統計グラフと視覚化分析を自動生成"
+
+#: merchant_account/templates/merchant_account/reports.html:261
+msgid "Excel 格式匯出，方便後續數據分析"
+msgstr "Excel形式でエクスポートし、後続のデータ分析に便利"
+
+#: merchant_account/templates/merchant_account/reports.html:262
+msgid "即時預覽功能，快速檢視報表內容"
+msgstr "リアルタイムプレビュー機能でレポート内容を素早く確認"
+
+#: merchant_account/templates/merchant_account/reports.html:266
+msgid "更新與建議"
+msgstr "更新と推奨事項"
+
+#: merchant_account/templates/merchant_account/reports.html:268
+msgid "數據即時更新，確保資訊準確性"
+msgstr "データのリアルタイム更新で情報の正確性を保証"
+
+#: merchant_account/templates/merchant_account/reports.html:269
+msgid "建議定期下載分析，追蹤營運趨勢"
+msgstr "定期的なダウンロード分析で運営トレンドを追跡することをお勧めします"
+
+#: merchant_account/templates/merchant_account/reports.html:270
+msgid "可用於制定營運決策與策略規劃"
+msgstr "運営意思決定と戦略立案に利用可能"
+
+#: merchant_account/templates/merchant_account/reports.html:271
+msgid "支援多種圖表格式，滿足不同需求"
+msgstr "複数のグラフ形式に対応し、異なるニーズに対応"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:6
+msgid "售出票券管理"
+msgstr "販売チケット管理"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:8
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:150
+msgid "總計"
+msgstr "合計"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:8
+msgid "張票券"
+msgstr "枚のチケット"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:52
+msgid "票券狀態"
+msgstr "チケット状態"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:61
+msgid "商品篩選"
+msgstr "商品で絞り込み"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:63
+msgid "全部商品"
+msgstr "すべての商品"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:70
+msgid "搜尋"
+msgstr "検索"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:72
+msgid "客戶姓名、Email、訂單編號"
+msgstr "お客様氏名、メール、注文番号"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:89
+msgid "票券代碼"
+msgstr "チケットコード"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:90
+msgid "商品"
+msgstr "商品"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:91
+msgid "客戶"
+msgstr "お客様"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:95
+msgid "到期時間"
+msgstr "有効期限"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:136
+msgid "無期限"
+msgstr "期限なし"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:149
+msgid "第"
+msgstr "第"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:149
+msgid "頁，共"
+msgstr "ページ、全"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:149
+msgid "頁"
+msgstr "ページ"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:150
+msgid "筆記錄"
+msgstr "件の記録"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:156
+#: pages/templates/pages/marketplace.html:118
+#: templates/shared/order_table.html:161
+msgid "上一頁"
+msgstr "前のページ"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:174
+#: pages/templates/pages/marketplace.html:136
+#: templates/shared/order_table.html:172
+msgid "下一頁"
+msgstr "次のページ"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:184
+msgid "目前沒有符合條件的票券"
+msgstr "条件に一致するチケットがありません"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:186
+msgid "請嘗試調整篩選條件"
+msgstr "絞り込み条件を調整してください"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:189
+msgid "清除篩選"
+msgstr "絞り込みをクリア"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:192
+msgid "還沒有售出任何票券"
+msgstr "まだチケットを販売していません"
+
+#: merchant_account/templates/merchant_account/sold_tickets_list.html:195
+#: merchant_account/templates/merchant_account/transaction_history.html:22
+msgid "管理商品"
+msgstr "商品管理"
+
+#: merchant_account/templates/merchant_account/ticket_validation.html:23
+msgid "手動輸入驗證碼"
+msgstr "手動で認証コード入力"
+
+#: merchant_account/templates/merchant_account/ticket_validation.html:29
+msgid "QR Code 掃描"
+msgstr "QRコードスキャン"
+
+#: merchant_account/templates/merchant_account/ticket_validation.html:42
+msgid "票券驗證碼"
+msgstr "チケット認証コード"
+
+#: merchant_account/templates/merchant_account/ticket_validation.html:48
+msgid "請輸入票券驗證碼（例如：TC12345678）"
+msgstr "チケット認証コードを入力してください（例：TC12345678）"
+
+#: merchant_account/templates/merchant_account/ticket_validation.html:50
+msgid "請輸入客戶提供的票券驗證碼"
+msgstr "お客様から提供されたチケット認証コードを入力してください"
+
+#: merchant_account/templates/merchant_account/ticket_validation.html:56
+msgid "驗證票券"
+msgstr "チケット認証"
+
+#: merchant_account/templates/merchant_account/ticket_validation.html:64
+msgid "點擊下方按鈕以啟動相機進行掃描"
+msgstr "下のボタンをクリックしてカメラを起動し、スキャンしてください"
+
+#: merchant_account/templates/merchant_account/ticket_validation.html:78
+msgid "驗證結果"
+msgstr "認証結果"
+
+#: merchant_account/templates/merchant_account/transaction_history.html:20
+#: templates/shared/order_table.html:142
+msgid "目前沒有交易記錄"
+msgstr "現在取引記録がありません"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:10
+#: merchant_marketplace/templates/merchant_marketplace/new.html:11
+msgid "返回商品列表"
+msgstr "商品一覧に戻る"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:33
+#: merchant_marketplace/templates/merchant_marketplace/index.html:41
+msgid "無圖片"
+msgstr "画像なし"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:51
+msgid "發布："
+msgstr "公開："
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:57
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:269
+msgid "狀態："
+msgstr "状態："
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:59
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:269
+#: merchant_marketplace/templates/merchant_marketplace/index.html:17
+#: merchant_marketplace/templates/merchant_marketplace/index.html:53
+msgid "上架中"
+msgstr "販売中"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:59
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:269
+#: merchant_marketplace/templates/merchant_marketplace/index.html:18
+#: merchant_marketplace/templates/merchant_marketplace/index.html:55
+msgid "未上架"
+msgstr "未販売"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:72
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:13
+msgid "編輯商品"
+msgstr "商品編集"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:77
+msgid "確定要刪除這個商品嗎？此操作無法復原。"
+msgstr "この商品を削除してもよろしいですか？この操作は元に戻すことができません。"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:80
+msgid "刪除商品"
+msgstr "商品削除"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:95
+msgid "開啟收款頁面"
+msgstr "決済ページを開く"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:107
+msgid "確定要上架這個商品嗎？上架後顧客就能購買。"
+msgstr "この商品を公開してもよろしいですか？公開後、お客様が購入できるようになります。"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:112
+msgid "商品上架"
+msgstr "商品を公開"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:120
+msgid "確定要下架這個商品嗎？下架後顧客將無法購買。"
+msgstr "この商品を非公開にしてもよろしいですか？非公開後、お客様は購入できなくなります。"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:125
+msgid "商品下架"
+msgstr "商品を非公開"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:164
+msgid "聯絡商家購買此商品"
+msgstr "この商品を購入するために店舗にお問い合わせ"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:172
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:57
+#: merchant_marketplace/templates/merchant_marketplace/new.html:39
+#: templates/payments/payment_status.html:60
+msgid "商品描述"
+msgstr "商品説明"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:183
+msgid "嵌入代碼"
+msgstr "埋め込みコード"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:185
+msgid ""
+"將以下代碼複製到您的 Google Blogger、WordPress 或其他網站中，讓顧客可以直接購"
+"買商品。"
+msgstr "以下のコードをGoogle Blogger、WordPress、またはその他のウェブサイトにコピーして、お客様が直接商品を購入できるようにします。"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:190
+msgid "iframe 嵌入代碼"
+msgstr "iframe埋め込みコード"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:191
+msgid "適用於大部分網站平台"
+msgstr "ほとんどのウェブサイトプラットフォームに対応"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:204
+msgid "複製 iframe 代碼"
+msgstr "iframeコードをコピー"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:212
+msgid "使用說明："
+msgstr "使用方法："
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:214
+msgid "• iframe 代碼：直接貼到網頁 HTML 中，支援大部分平台"
+msgstr "• iframeコード：ウェブページのHTMLに直接貼り付け、ほとんどのプラットフォームに対応"
+
+#: merchant_marketplace/templates/merchant_marketplace/detail.html:215
+msgid "• 顧客點擊購買後會導向到您的 TruePay 收款頁面"
+msgstr "• お客様が購入をクリックすると、TruePayの決済ページにリダイレクトされます"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:8
+msgid "返回商品詳情"
+msgstr "商品詳細に戻る"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:15
+msgid "此商品已售出票券，資訊已鎖定"
+msgstr "この商品はすでにチケットが売れており、情報がロックされています"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:34
+msgid "商品資訊已鎖定"
+msgstr "商品情報がロックされています"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:37
+msgid ""
+"此商品已有售出票券，為確保票券真實性和消費者權益，商品資訊已完全鎖定無法修"
+"改。"
+msgstr "この商品はすでにチケットが売れており、チケットの真正性と消費者の権益を保護するため、商品情報が完全にロックされており、変更できません。"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:38
+msgid "包含商品名稱、描述、價格、聯絡電話及驗證方式等所有資訊均無法變更。"
+msgstr "商品名、説明、価格、連絡先電話番号、認証方法など、すべての情報を変更することはできません。"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:66
+#: merchant_marketplace/templates/merchant_marketplace/new.html:48
+msgid "商品價格"
+msgstr "商品価格"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:78
+#: merchant_marketplace/templates/merchant_marketplace/new.html:60
+msgid "庫存數量"
+msgstr "在庫数量"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:83
+#: merchant_marketplace/templates/merchant_marketplace/new.html:64
+msgid "請輸入庫存數量"
+msgstr "在庫数量を入力してください"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:85
+msgid "目前庫存："
+msgstr "現在の在庫："
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:85
+msgid "件"
+msgstr "個"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:87
+#: pages/templates/pages/marketplace.html:65
+#: pages/templates/pages/marketplace.html:90
+msgid "已售完"
+msgstr "売り切れ"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:89
+#: templates/payments/stock_insufficient_error.html:11
+msgid "庫存不足"
+msgstr "在庫不足"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:96
+#: merchant_marketplace/templates/merchant_marketplace/new.html:70
+msgid "商品圖片"
+msgstr "商品画像"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:106
+msgid "商品已有售出票券，無法修改圖片"
+msgstr "商品はすでにチケットが売れており、画像を変更できません"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:108
+msgid "選擇新圖片將覆蓋現有圖片，支援 JPG、PNG、GIF、WebP 格式，最大 5MB"
+msgstr "新しい画像を選択すると現在の画像が上書きされます。JPG、PNG、GIF、WebP形式に対応、最大5MBまで"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:114
+msgid "目前圖片："
+msgstr "現在の画像："
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:128
+#: merchant_marketplace/templates/merchant_marketplace/new.html:92
+msgid "聯絡電話"
+msgstr "連絡先電話番号"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:139
+msgid "使用商家電話"
+msgstr "店舗の電話番号を使用"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:147
+#: merchant_marketplace/templates/merchant_marketplace/new.html:102
+msgid "商品票券有效期限"
+msgstr "商品チケットの有効期限"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:153
+#: merchant_marketplace/templates/merchant_marketplace/new.html:107
+msgid "請選擇票券到期日與時間（最小單位：分鐘）。票券將於此時間自動失效。"
+msgstr "チケットの有効期限日時を選択してください（最小単位：分）。チケットはこの時刻に自動的に無効になります。"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:153
+#: merchant_marketplace/templates/merchant_marketplace/new.html:107
+msgid "請注意：不能設定過去的時間。"
+msgstr "注意：過去の時間は設定できません。"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:158
+#: merchant_marketplace/templates/merchant_marketplace/new.html:112
+msgid "交易驗證時間點"
+msgstr "取引認証のタイミング"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:160
+msgid "已鎖定"
+msgstr "ロック済み"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:171
+msgid "驗證方式已鎖定"
+msgstr "認証方法がロックされています"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:173
+msgid "此商品已有售出票券，無法修改驗證方式以保護消費者權益。"
+msgstr "この商品はすでにチケットが売れており、消費者の権益を保護するため認証方法を変更できません。"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:183
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:211
+#: merchant_marketplace/templates/merchant_marketplace/new.html:119
+msgid "付款前驗證"
+msgstr "決済前認証"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:184
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:212
+#: merchant_marketplace/templates/merchant_marketplace/new.html:120
+msgid "消費者需先完成驗證才能付款"
+msgstr "お客様は認証を完了してから決済できます"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:193
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:221
+#: merchant_marketplace/templates/merchant_marketplace/new.html:128
+msgid "核銷前驗證"
+msgstr "利用前認証"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:194
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:222
+#: merchant_marketplace/templates/merchant_marketplace/new.html:129
+msgid "消費者可先付款，但核銷時需驗證"
+msgstr "お客様は先に決済できますが、利用時に認証が必要です"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:231
+msgid "此設定在商品首次售出後即無法修改，以確保票券使用條件的一致性"
+msgstr "この設定は商品が初めて売れた後は変更できません。チケットの使用条件の一貫性を保つためです。"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:233
+#: merchant_marketplace/templates/merchant_marketplace/new.html:134
+msgid "選擇交易驗證的時機點，影響消費者的購買和使用流程"
+msgstr "取引認証のタイミングを選択し、お客様の購入と利用のフローに影響します"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:239
+msgid "編輯提醒："
+msgstr "編集時の注意："
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:241
+msgid "修改後的資訊將立即生效"
+msgstr "変更後の情報はすぐに有効になります"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:242
+msgid "請確保所有資訊都是最新且正確的"
+msgstr "すべての情報が最新で正確であることを確認してください"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:243
+#: merchant_marketplace/templates/merchant_marketplace/new.html:142
+msgid "圖片檔案限制：JPG/PNG/GIF/WebP 格式，最大 5MB"
+msgstr "画像ファイルの制限：JPG/PNG/GIF/WebP形式、最大5MB"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:245
+msgid "注意：此商品已售出票券，資訊已鎖定無法修改"
+msgstr "注意：この商品はすでにチケットが売れており、情報がロックされており変更できません"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:254
+msgid "商品已鎖定"
+msgstr "商品はロック済み"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:254
+msgid "更新商品"
+msgstr "商品を更新"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:257
+#: merchant_marketplace/templates/merchant_marketplace/new.html:153
+msgid "取消"
+msgstr "キャンセル"
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:264
+msgid "商品資訊："
+msgstr "商品情報："
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:266
+#: templates/payments/payment_status.html:36
+msgid "建立時間："
+msgstr "作成日時："
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:267
+msgid "最後更新："
+msgstr "最終更新："
+
+#: merchant_marketplace/templates/merchant_marketplace/edit.html:268
+#: templates/payments/payment_status.html:56
+msgid "商家："
+msgstr "店舗："
+
+#: merchant_marketplace/templates/merchant_marketplace/index.html:14
+msgid "篩選狀態："
+msgstr "ステータスで絞り込み："
+
+#: merchant_marketplace/templates/merchant_marketplace/index.html:16
+msgid "全部"
+msgstr "すべて"
+
+#: merchant_marketplace/templates/merchant_marketplace/index.html:20
+msgid "重設"
+msgstr "リセット"
+
+#: merchant_marketplace/templates/merchant_marketplace/index.html:21
+msgid "確認"
+msgstr "確認"
+
+#: merchant_marketplace/templates/merchant_marketplace/index.html:59
+msgid "查看詳情"
+msgstr "詳細を見る"
+
+#: merchant_marketplace/templates/merchant_marketplace/index.html:67
+msgid "無商品"
+msgstr "商品なし"
+
+#: merchant_marketplace/templates/merchant_marketplace/index.html:72
+#: pages/templates/pages/marketplace.html:104
+msgid "目前沒有商品"
+msgstr "現在商品はありません"
+
+#: merchant_marketplace/templates/merchant_marketplace/index.html:73
+msgid "成為第一個新增商品的商家吧！"
+msgstr "最初の商品を追加する店舗になりましょう！"
+
+#: merchant_marketplace/templates/merchant_marketplace/index.html:75
+msgid "新增第一個商品"
+msgstr "最初の商品を追加"
+
+#: merchant_marketplace/templates/merchant_marketplace/new.html:34
+msgid "請輸入商品名稱"
+msgstr "商品名を入力してください"
+
+#: merchant_marketplace/templates/merchant_marketplace/new.html:43
+msgid "請詳細描述您的商品..."
+msgstr "商品の詳細を記述してください..."
+
+#: merchant_marketplace/templates/merchant_marketplace/new.html:54
+msgid "請輸入商品價格（元）"
+msgstr "商品価格を入力してください（円）"
+
+#: merchant_marketplace/templates/merchant_marketplace/new.html:65
+msgid "商品上架時至少需要 1 件庫存"
+msgstr "商品公開時には少なくとも1個の在庫が必要です"
+
+#: merchant_marketplace/templates/merchant_marketplace/new.html:79
+msgid "必填："
+msgstr "必須："
+
+#: merchant_marketplace/templates/merchant_marketplace/new.html:80
+msgid "支援 JPG、PNG、GIF、WebP 格式，檔案大小不超過 5MB"
+msgstr "JPG、PNG、GIF、WebP形式に対応、ファイルサイズは5MB以下"
+
+#: merchant_marketplace/templates/merchant_marketplace/new.html:86
+msgid "圖片預覽"
+msgstr "画像プレビュー"
+
+#: merchant_marketplace/templates/merchant_marketplace/new.html:96
+msgid "請輸入聯絡電話"
+msgstr "連絡先電話番号を入力してください"
+
+#: merchant_marketplace/templates/merchant_marketplace/new.html:138
+msgid "注意事項："
+msgstr "注意事項："
+
+#: merchant_marketplace/templates/merchant_marketplace/new.html:140
+msgid "請確保商品資訊真實準確"
+msgstr "商品情報が真実で正確であることを確認してください"
+
+#: merchant_marketplace/templates/merchant_marketplace/new.html:141
+msgid "商品圖片為必填項目"
+msgstr "商品画像は必須項目です"
+
+#: merchant_marketplace/templates/merchant_marketplace/new.html:141
+msgid "，會自動上傳至 AWS S3，建議使用高品質照片"
+msgstr "、AWS S3に自動アップロードされます。高品質な写真の使用をお勧めします"
+
+#: merchant_marketplace/templates/merchant_marketplace/new.html:143
+msgid "聯絡電話請確保可以正常接聽"
+msgstr "連絡先電話番号は正常に受信できることを確認してください"
+
+#: merchant_marketplace/templates/merchant_marketplace/new.html:144
+msgid "商品價格請合理定價"
+msgstr "商品価格は適正に設定してください"
+
+#: pages/templates/pages/marketplace.html:6
+#: pages/templates/pages/marketplace.html:12 templates/layouts/default.html:35
+#: templates/layouts/default.html:75
+#: templates/merchant_layout/dashboard_base.html:75
+msgid "商品總覽"
+msgstr "商品一覧"
+
+#: pages/templates/pages/marketplace.html:13
+msgid "探索各大商家的精選商品"
+msgstr "各店舗の厳選された商品を探してみましょう"
+
+#: pages/templates/pages/marketplace.html:20
+#, python-format
+msgid "共找到 %(count)s 個商品"
+msgstr "合計%(count)s個の商品が見つかりました"
+
+#: pages/templates/pages/marketplace.html:23
+#: templates/shared/order_table.html:166
+#, python-format
+msgid "第 %(current)s 頁，共 %(total)s 頁"
+msgstr "第%(current)sページ、全%(total)sページ"
+
+#: pages/templates/pages/marketplace.html:61
+#, python-format
+msgid "庫存 %(stock)s"
+msgstr "在庫%(stock)s"
+
+#: pages/templates/pages/marketplace.html:81
+msgid "前往商家"
+msgstr "店舗へ"
+
+#: pages/templates/pages/marketplace.html:85
+msgid "商家未設定"
+msgstr "店舗未設定"
+
+#: pages/templates/pages/marketplace.html:105
+msgid "請稍後再來查看，或許會有新商品上架！"
+msgstr "後でまた確認してください。新しい商品が公開されるかもしれません！"
+
+#: pages/templates/pages/marketplace.html:115 templates/layouts/default.html:33
+#: templates/layouts/default.html:73
+msgid "首頁"
+msgstr "ホーム"
+
+#: pages/templates/pages/marketplace.html:139
+msgid "最後頁"
+msgstr "最終ページ"
+
+#: pages/templates/pages/selectrole.html:9
+msgid "選擇您的身份"
+msgstr "あなたの身分を選択してください"
+
+#: pages/templates/pages/selectrole.html:10
+msgid "請選擇適合您的登入方式"
+msgstr "あなたに適したログイン方法を選択してください"
+
+#: pages/templates/pages/selectrole.html:21
+msgid "我是消費者"
+msgstr "私は消費者です"
+
+#: pages/templates/pages/selectrole.html:22
+msgid "查詢交易、管理付款方式、查看回饋。"
+msgstr "取引照会、支払方法管理、リワード確認。"
+
+#: pages/templates/pages/selectrole.html:26
+msgid "消費者登入"
+msgstr "消費者ログイン"
+
+#: pages/templates/pages/selectrole.html:40
+msgid "我是商家"
+msgstr "私は店舗です"
+
+#: pages/templates/pages/selectrole.html:41
+msgid "查看訂單、對帳、管理金流與退款。"
+msgstr "注文確認、照合、決済・返金管理。"
+
+#: templates/customers_layout/dashboard_base.html:7
+msgid "TruePay 消費者儀表板"
+msgstr "TruePayお客様ダッシュボード"
+
+#: templates/customers_layout/dashboard_base.html:16
+#: templates/customers_layout/dashboard_base.html:27
+#: templates/merchant_layout/dashboard_base.html:18
+#: templates/merchant_layout/dashboard_base.html:29
+msgid "關閉選單"
+msgstr "メニューを閉じる"
+
+#: templates/customers_layout/dashboard_base.html:35
+msgid "消費者總覽"
+msgstr "お客様概要"
+
+#: templates/customers_layout/dashboard_base.html:78
+#: templates/layouts/default.html:42 templates/layouts/default.html:82
+#: templates/merchant_layout/dashboard_base.html:124
+msgid "登出"
+msgstr "ログアウト"
+
+#: templates/customers_layout/dashboard_base.html:88
+#: templates/merchant_layout/dashboard_base.html:134
+msgid "開啟選單"
+msgstr "メニューを開く"
+
+#: templates/customers_layout/dashboard_base.html:96
+#: templates/merchant_layout/dashboard_base.html:142
+msgid "子頁面會注入這裡"
+msgstr "サブページがここに挿入されます"
+
+#: templates/customers_layout/dashboard_base.html:105
+#: templates/merchant_layout/dashboard_base.html:153
+msgid "使用條款"
+msgstr "利用規約"
+
+#: templates/customers_layout/dashboard_base.html:106
+#: templates/merchant_layout/dashboard_base.html:154
+msgid "隱私權政策"
+msgstr "プライバシーポリシー"
+
+#: templates/layouts/default.html:34 templates/layouts/default.html:74
+msgid "特色"
+msgstr "特徴"
+
+#: templates/layouts/default.html:38 templates/layouts/default.html:78
+msgid "商家後台"
+msgstr "店舗管理"
+
+#: templates/layouts/default.html:40 templates/layouts/default.html:80
+msgid "我的帳戶"
+msgstr "マイアカウント"
+
+#: templates/layouts/default.html:44 templates/layouts/default.html:84
+msgid "登入/註冊"
+msgstr "ログイン/登録"
+
+#: templates/merchant_layout/dashboard_base.html:7
+msgid "TruePay 廠商儀表板"
+msgstr "TruePay店舗ダッシュボード"
+
+#: templates/merchant_layout/dashboard_base.html:37
+msgid "廠商總覽"
+msgstr "店舗概要"
+
+#: templates/merchant_layout/dashboard_base.html:55
+msgid "交易紀錄"
+msgstr "取引履歴"
+
+#: templates/merchant_layout/dashboard_base.html:61
+msgid "售出票券"
+msgstr "販売したチケット"
+
+#: templates/merchant_layout/dashboard_base.html:68
+msgid "子網域設定"
+msgstr "サブドメイン設定"
+
+#: templates/merchant_layout/dashboard_base.html:81
+msgid "票券驗證"
+msgstr "チケット認証"
+
+#: templates/merchant_layout/dashboard_base.html:87
+msgid "票券使用紀錄"
+msgstr "チケット使用履歴"
+
+#: templates/payments/confirm.html:12
+msgid "登入成功！"
+msgstr "ログイン成功！"
+
+#: templates/payments/confirm.html:18
+msgid "付款資訊"
+msgstr "支払情報"
+
+#: templates/payments/confirm.html:22 templates/payments/payment_status.html:52
+msgid "商品名稱："
+msgstr "商品名："
+
+#: templates/payments/confirm.html:27 templates/payments/payment_status.html:32
+msgid "付款金額："
+msgstr "支払金額："
+
+#: templates/payments/confirm.html:32 templates/payments/payment_status.html:16
+msgid "付款方式："
+msgstr "支払方法："
+
+#: templates/payments/confirm.html:35
+msgid "藍新金流"
+msgstr "ブルーペイメント"
+
+#: templates/payments/confirm.html:55
+msgid "確認付款"
+msgstr "支払を確認"
+
+#: templates/payments/confirm.html:62
+#: templates/payments/order_limit_error.html:34
+#: templates/payments/payment_status.html:172
+msgid "返回首頁"
+msgstr "ホームに戻る"
+
+#: templates/payments/order_limit_error.html:11
+msgid "訂單數量超過限制"
+msgstr "注文数が制限を超えています"
+
+#: templates/payments/order_limit_error.html:16
+#, python-format
+msgid ""
+"您在過去 %(time_window)s 分鐘內已有 <span class=\"font-semibold text-"
+"orange-600\">%(pending_count)s 筆</span>待付款訂單，"
+msgstr "過去%(time_window)s分間で<span class=\"font-semibold text-orange-600\">%(pending_count)s件</span>の未決済注文があります。"
+
+#: templates/payments/order_limit_error.html:19
+#, python-format
+msgid ""
+"目前共有 <span class=\"font-semibold text-orange-600\">%(total_pending)s 筆</"
+"span>待付款訂單。"
+msgstr "現在合計<span class=\"font-semibold text-orange-600\">%(total_pending)s件</span>の未決済注文があります。"
+
+#: templates/payments/order_limit_error.html:23
+msgid "請前往購買記錄重新付款現有訂單，或等待後再試。"
+msgstr "購入履歴から既存の注文の決済を行うか、しばらくお待ちいただいてから再度お試しください。"
+
+#: templates/payments/order_limit_error.html:30
+msgid "前往購買記錄"
+msgstr "購入履歴へ"
+
+#: templates/payments/order_limit_error.html:39
+msgid "如有疑問，請聯繫客服人員"
+msgstr "ご不明な点がございましたら、カスタマーサポートにお問い合わせください"
+
+#: templates/payments/payment_status.html:7
+msgid "付款狀態查詢"
+msgstr "支払ステータス照会"
+
+#: templates/payments/payment_status.html:12
+msgid "訂單編號："
+msgstr "注文番号："
+
+#: templates/payments/payment_status.html:20
+msgid "付款狀態："
+msgstr "支払ステータス："
+
+#: templates/payments/payment_status.html:41
+msgid "付款時間："
+msgstr "決済日時："
+
+#: templates/payments/payment_status.html:49
+msgid "商品資訊"
+msgstr "商品情報"
+
+#: templates/payments/payment_status.html:70
+msgid "藍新金流詳情"
+msgstr "ブルーペイメント詳細"
+
+#: templates/payments/payment_status.html:74
+msgid "交易序號："
+msgstr "取引番号："
+
+#: templates/payments/payment_status.html:80
+msgid "付款類型："
+msgstr "決済方法："
+
+#: templates/payments/payment_status.html:86
+msgid "信用卡號："
+msgstr "クレジットカード番号："
+
+#: templates/payments/payment_status.html:97
+msgid "LINE Pay 詳情"
+msgstr "LINE Pay詳細"
+
+#: templates/payments/payment_status.html:100
+msgid "LINE Pay 交易ID："
+msgstr "LINE Pay取引ID："
+
+#: templates/payments/payment_status.html:115
+#, python-format
+msgid "您的票券代碼 (%(counter)s 張)"
+msgstr "あなたのチケットコード (%(counter)s 枚)"
+
+#: templates/payments/payment_status.html:125
+msgid "票券"
+msgstr "チケット"
+
+#: templates/payments/payment_status.html:131
+msgid "票券狀態："
+msgstr "チケットステータス："
+
+#: templates/payments/payment_status.html:136
+msgid "可使用"
+msgstr "使用可能"
+
+#: templates/payments/payment_status.html:142
+msgid "有效期限："
+msgstr "有効期限："
+
+#: templates/payments/payment_status.html:148
+msgid "使用時間："
+msgstr "使用日時："
+
+#: templates/payments/payment_status.html:165
+msgid "請將各票券代碼分別提供給商家進行驗證"
+msgstr "各チケットコードを別々店舗に提供して認証を受けてください"
+
+#: templates/payments/stock_insufficient_error.html:17
+#, python-format
+msgid ""
+"目前庫存：<span class=\"font-semibold text-orange-600\">%(stock)s 件</span>"
+msgstr "現在の在庫：<span class=\"font-semibold text-orange-600\">%(stock)s個</span>"
+
+#: templates/payments/stock_insufficient_error.html:20
+#, python-format
+msgid "您想購買：<span class=\"font-semibold text-red-600\">%(qty)s 件</span>"
+msgstr "ご購入希望数：<span class=\"font-semibold text-red-600\">%(qty)s個</span>"
+
+#: templates/payments/stock_insufficient_error.html:27
+msgid "建議選項："
+msgstr "推奨選択肢："
+
+#: templates/payments/stock_insufficient_error.html:30
+#, python-format
+msgid "• 調整購買數量為 %(stock)s 件或更少"
+msgstr "• 購入数量を%(stock)s個以下に調整してください"
+
+#: templates/payments/stock_insufficient_error.html:31
+msgid "• 商品可能被其他用戶購買，請重新整理頁面查看最新庫存"
+msgstr "• 商品が他のユーザーに購入された可能性があります。ページを更新して最新の在庫を確認してください"
+
+#: templates/payments/stock_insufficient_error.html:37
+msgid "很抱歉，此商品目前已售完"
+msgstr "申し訳ございません、この商品は現在売り切れです"
+
+#: templates/payments/stock_insufficient_error.html:40
+msgid "您可以瀏覽其他商品或聯繫商家了解補貨時間"
+msgstr "他の商品をご覧いただくか、店舗にお問い合わせして再入荷時期をご確認ください"
+
+#: templates/payments/stock_insufficient_error.html:50
+msgid "重新整理商品頁面"
+msgstr "商品ページを更新"
+
+#: templates/payments/stock_insufficient_error.html:56
+#, python-format
+msgid "如有疑問，請聯繫商家客服：%(phone)s"
+msgstr "ご不明な点がございましたら、店舗カスタマーサポートにお問い合わせください：%(phone)s"
+
+#: templates/shared/order_table.html:14
+msgid "交易序號"
+msgstr "取引番号"
+
+#: templates/shared/order_table.html:17
+msgid "消費者"
+msgstr "お客様"
+
+#: templates/shared/order_table.html:29
+msgid "數量"
+msgstr "数量"
+
+#: templates/shared/order_table.html:32
+msgid "總金額"
+msgstr "合計金額"
+
+#: templates/shared/order_table.html:35
+msgid "訂單狀態"
+msgstr "注文ステータス"
+
+#: templates/shared/order_table.html:38
+msgid "付款方式"
+msgstr "決済方法"
+
+#: templates/shared/order_table.html:41
+msgid "建立時間"
+msgstr "作成日時"
+
+#: templates/shared/order_table.html:45
+msgid "操作"
+msgstr "操作"
+
+#: templates/shared/order_table.html:110
+msgid "確認要重新付款此訂單嗎？"
+msgstr "この注文を再決済してもよろしいですか？"
+
+#: templates/shared/order_table.html:114
+msgid "重新付款"
+msgstr "再決済"
+
+#: templates/shared/order_table.html:118
+msgid "確認要取消此訂單嗎？取消後將無法恢復。"
+msgstr "この注文をキャンセルしてもよろしいですか？キャンセル後は復元できません。"
+
+#: templates/shared/order_table.html:122
+msgid "取消訂單"
+msgstr "注文をキャンセル"
+
+#: templates/shared/order_table.html:127
+msgid "已完成"
+msgstr "完了"
+
+#: templates/shared/order_table.html:129
+msgid "已取消"
+msgstr "キャンセル済み"
+
+#: templates/shared/order_table.html:131
+msgid "付款失敗"
+msgstr "決済失敗"

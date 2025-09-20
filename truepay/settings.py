@@ -168,6 +168,7 @@ LANGUAGE_CODE = "zh-hant"
 LANGUAGES = [
     ("zh-hant", "繁體中文"),
     ("en", "English"),
+    ("ja", "日本語"),
 ]
 
 LOCALE_PATHS = [
