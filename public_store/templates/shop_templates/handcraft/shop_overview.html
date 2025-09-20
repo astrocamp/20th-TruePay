@@ -1,40 +1,12 @@
 {% extends "layouts/default.html" %}
 {% block title %}{{ merchant.ShopName }} - 手工藝術{% endblock %}
 
+{% block main_container_classes %}paper-texture{% endblock %}
+
 {% block content %}
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-    .handcraft-font { font-family: 'Caveat', cursive; }
 
-    .paper-texture {
-        background-image:
-            radial-gradient(circle at 1px 1px, rgba(139,69,19,0.1) 1px, transparent 0),
-            radial-gradient(circle at 15px 15px, rgba(217,119,6,0.05) 1px, transparent 0);
-        background-size: 20px 20px, 30px 30px;
-    }
-
-    /* 縮短進場動畫時間，使其更流暢 */
-    @keyframes rotateIn {
-        from { opacity: 0; transform: rotate(-10deg) scale(0.8); }
-        to { opacity: 1; transform: rotate(0deg) scale(1); }
-    }
-
-    /* 縮短搖擺動畫時間，使其更輕快 */
-    @keyframes wiggle {
-        0%, 7% { transform: rotateZ(0); }
-        15% { transform: rotateZ(-15deg); }
-        20% { transform: rotateZ(10deg); }
-        25% { transform: rotateZ(-10deg); }
-        30% { transform: rotateZ(6deg); }
-        35% { transform: rotateZ(-4deg); }
-        40%, 100% { transform: rotateZ(0); }
-    }
-
-    .handcraft-container { animation: rotateIn 1s ease-out; } 
-    .wiggle:hover { animation: wiggle 0.8s ease-in-out; } 
-</style>
-
-<div class="min-h-screen bg-orange-25 paper-texture">
+<div class="min-h-screen">
   <div class="container mx-auto px-4 py-8">
     <div class="max-w-6xl mx-auto">
 
@@ -56,9 +28,6 @@
 
       <!-- 商品區 -->
       <div class="mb-6">
-        <!-- 加深標題顏色 -->
-        <h2 class="text-4xl font-bold text-center mb-12 text-orange-600 handcraft-font transform -rotate-3">手工創作</h2>
-
         {% if products %}
           <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {% for product in products %}
@@ -71,9 +40,6 @@
                     <span class="text-6xl">🎨</span>
                   </div>
                 {% endif %}
-                <div class="absolute top-4 left-4 bg-orange-200 text-orange-700 px-3 py-1 rounded-full handcraft-font font-bold transform rotate-12">
-                  手工
-                </div>
               </div>
 
               <div class="p-6">

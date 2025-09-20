@@ -1,32 +1,9 @@
 {% extends "layouts/default.html" %}
 {% block title %}{{ product.name }} - 現代淡色系{% endblock %}
 
+{% block main_container_classes %}bg-gray-50{% endblock %}
+
 {% block content %}
-<style>
-    .modern-light-font { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
-
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    .modern-light-container {
-        animation: fadeIn 1s ease-out;
-    }
-
-    .modern-light-accent {
-        transition: all 0.3s ease-in-out;
-    }
-    .modern-light-accent:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(255, 216, 3, 0.2);
-    }
-
-    .modern-light-pattern {
-        background: #fffffe;
-        min-height: 100vh;
-    }
-</style>
 
 <div class="modern-light-pattern">
 <div class="container mx-auto px-4 py-8">
@@ -237,10 +214,6 @@
                         <div class="flex items-center">
                             {% include 'components/icons.html' with icon='verified' class='w-5 h-5 mr-3 text-blue-600' %}
                             <span class="font-medium modern-light-font" style="color: #2d334a;">TruePay 認證</span>
-                        </div>
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 mr-3 text-purple-600" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
-                            <span class="font-medium modern-light-font" style="color: #2d334a;">24小時客服</span>
                         </div>
                         {% if is_customer and customer.totp_enabled and product.verification_timing == 'before_payment' %}
                         <div class="flex items-center">

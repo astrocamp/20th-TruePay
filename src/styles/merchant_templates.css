@@ -1,0 +1,227 @@
+/* ===============================================
+   商店模板樣式管理
+   =============================================== */
+
+/* ===============================================
+   共用樣式 (Shared Styles)
+   =============================================== */
+
+/* 通用動畫 */
+@keyframes rotateIn {
+    from { opacity: 0; transform: rotate(-10deg) scale(0.8); }
+    to { opacity: 1; transform: rotate(0deg) scale(1); }
+}
+
+@keyframes wiggle {
+    0%, 7% { transform: rotateZ(0); }
+    15% { transform: rotateZ(-15deg); }
+    20% { transform: rotateZ(10deg); }
+    25% { transform: rotateZ(-10deg); }
+    30% { transform: rotateZ(6deg); }
+    35% { transform: rotateZ(-4deg); }
+    40%, 100% { transform: rotateZ(0); }
+}
+
+/* ===============================================
+   Handcraft Template (手工藝術模板)
+   =============================================== */
+
+.handcraft-font {
+    font-family: 'Caveat', cursive;
+}
+
+.paper-texture {
+    background-color: #fefbf3; /* 溫暖的奶茶色底色 */
+    background-image:
+        radial-gradient(circle at 1px 1px, rgba(139,69,19,0.15) 1px, transparent 0),
+        radial-gradient(circle at 15px 15px, rgba(217,119,6,0.08) 1px, transparent 0);
+    background-size: 20px 20px, 30px 30px;
+}
+
+.handcraft-container {
+    animation: rotateIn 1s ease-out;
+}
+
+.wiggle:hover {
+    animation: wiggle 0.8s ease-in-out;
+}
+
+/* Handcraft 顏色覆蓋 (移除通用規則，讓 Tailwind 類別正常工作) */
+
+/* Handcraft 文字顏色 */
+.paper-texture .handcraft-orange-600 { color: #ea580c; }
+.paper-texture .handcraft-orange-700 { color: #c2410c; }
+.paper-texture .handcraft-orange-800 { color: #9a3412; }
+.paper-texture .handcraft-blue-600 { color: #2563eb; }
+.paper-texture .handcraft-blue-700 { color: #1d4ed8; }
+.paper-texture .handcraft-blue-800 { color: #1e40af; }
+.paper-texture .handcraft-green-600 { color: #16a34a; }
+.paper-texture .handcraft-green-700 { color: #15803d; }
+.paper-texture .handcraft-green-800 { color: #166534; }
+.paper-texture .handcraft-white { color: #ffffff; }
+
+/* Handcraft 背景顏色 */
+.paper-texture .handcraft-bg-blue-600 { background-color: #2563eb; }
+.paper-texture .handcraft-bg-blue-700 { background-color: #1d4ed8; }
+.paper-texture .handcraft-bg-green-600 { background-color: #16a34a; }
+.paper-texture .handcraft-bg-green-700 { background-color: #15803d; }
+.paper-texture .handcraft-bg-orange-500 { background-color: #f97316; }
+.paper-texture .handcraft-bg-orange-600 { background-color: #ea580c; }
+
+/* Handcraft Hover 效果 */
+.paper-texture .handcraft-hover-blue-700:hover { background-color: #1d4ed8; }
+.paper-texture .handcraft-hover-green-700:hover { background-color: #15803d; }
+.paper-texture .handcraft-hover-orange-600:hover { background-color: #ea580c; }
+
+/* ===============================================
+   Tech Template (科技數位模板)
+   =============================================== */
+
+.tech-font {
+    font-family: 'Courier New', monospace;
+}
+
+.tech-grid {
+    background-image:
+        linear-gradient(rgba(34,197,94,0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34,197,94,0.1) 1px, transparent 1px);
+    background-size: 30px 30px;
+}
+
+/* Tech 進場動畫 */
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.tech-container {
+    animation: scaleIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Tech 光暈效果 */
+.tech-glow {
+    transition: all 0.4s ease-in-out;
+}
+
+.tech-glow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.6), 0 0 25px rgba(34, 197, 94, 0.4);
+}
+
+/* Tech 文字顏色 */
+.tech-cyan-200 { color: #a7f3d0; }
+.tech-cyan-300 { color: #67e8f9; }
+.tech-cyan-400 { color: #22d3ee; }
+.tech-cyan-500 { color: #06b6d4; }
+.tech-green-400 { color: #4ade80; }
+.tech-green-200 { color: #bbf7d0; }
+.tech-green-300 { color: #86efac; }
+.tech-orange-200 { color: #fed7aa; }
+.tech-orange-300 { color: #fdba74; }
+.tech-orange-400 { color: #fb923c; }
+.tech-red-200 { color: #fecaca; }
+.tech-red-300 { color: #fca5a5; }
+.tech-yellow-200 { color: #fef08a; }
+.tech-yellow-300 { color: #fde047; }
+.tech-teal-200 { color: #99f6e4; }
+.tech-teal-400 { color: #2dd4bf; }
+
+/* Tech 背景顏色 */
+.tech-bg-cyan-600 { background-color: #0891b2; }
+.tech-bg-cyan-500 { background-color: #06b6d4; }
+.tech-bg-teal-600 { background-color: #0d9488; }
+.tech-bg-teal-500 { background-color: #14b8a6; }
+.tech-bg-orange-600 { background-color: #ea580c; }
+.tech-bg-orange-700 { background-color: #c2410c; }
+
+/* Tech Hover 效果 */
+.tech-hover-cyan-500:hover { background-color: #06b6d4; }
+.tech-hover-teal-500:hover { background-color: #14b8a6; }
+.tech-hover-orange-700:hover { background-color: #c2410c; }
+
+/* Tech 深色背景文字對比優化 */
+.tech-card-text { color: #e2e8f0; }
+.tech-card-text-muted { color: #94a3b8; }
+.tech-card-text-bright { color: #f1f5f9; }
+
+/* ===============================================
+   Modern Template (現代簡約模板)
+   =============================================== */
+
+/* Modern 進場動畫 */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modern-container {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+/* Modern 卡片效果 */
+.modern-card {
+    transition: all 0.3s ease-in-out;
+}
+
+.modern-card:hover {
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Modern 漸層背景 */
+.modern-gradient {
+    background: linear-gradient(135deg, #6A4C9C 0%, #B28FCE 100%);
+}
+
+/* ===============================================
+   Vintage Template (復古典雅模板)
+   =============================================== */
+
+.vintage-font {
+    font-family: 'Times New Roman', serif;
+}
+
+.vintage-pattern {
+    background: #96632E;
+    background-image:
+        /* 垂直格線 */
+        linear-gradient(90deg, transparent 0px, rgba(252,250,242,0.3) 1px, transparent 2px),
+        /* 水平格線 */
+        linear-gradient(0deg, transparent 0px, rgba(252,250,242,0.3) 1px, transparent 2px),
+        /* 粗垂直格線 */
+        linear-gradient(90deg, transparent 0px, rgba(252,250,242,0.4) 2px, transparent 4px),
+        /* 粗水平格線 */
+        linear-gradient(0deg, transparent 0px, rgba(252,250,242,0.4) 2px, transparent 4px),
+        /* 格紋交織效果 */
+        linear-gradient(45deg, rgba(252,250,242,0.1) 25%, transparent 25%, transparent 75%, rgba(252,250,242,0.1) 75%),
+        linear-gradient(-45deg, rgba(252,250,242,0.1) 25%, transparent 25%, transparent 75%, rgba(252,250,242,0.1) 75%);
+    background-size: 30px 30px, 30px 30px, 120px 120px, 120px 120px, 60px 60px, 60px 60px;
+}
+
+/* ===============================================
+   Modern Light Template (現代淺色模板)
+   =============================================== */
+
+.modern-light-font {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Modern Light 進場動畫 */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modern-light-container {
+    animation: fadeIn 1s ease-out;
+}
+
+/* Modern Light 強調效果 */
+.modern-light-accent {
+    transition: all 0.3s ease-in-out;
+}
+
+.modern-light-accent:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 216, 3, 0.2);
+}

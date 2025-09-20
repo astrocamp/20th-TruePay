@@ -1,52 +1,11 @@
 {% extends "layouts/default.html" %}
 {% block title %}{{ merchant.ShopName }} - 復古經典{% endblock %}
 
+{% block main_container_classes %}vintage-pattern{% endblock %}
+
 {% block content %}
-<style>
-    .vintage-font { font-family: 'Times New Roman', serif; }
 
-    .vintage-pattern {
-        background: #96632E;
-        background-image:
-            /* 垂直格線 */
-            linear-gradient(90deg, transparent 0px, rgba(252,250,242,0.3) 1px, transparent 2px),
-            /* 水平格線 */
-            linear-gradient(0deg, transparent 0px, rgba(252,250,242,0.3) 1px, transparent 2px),
-            /* 粗垂直格線 */
-            linear-gradient(90deg, transparent 0px, rgba(252,250,242,0.4) 2px, transparent 4px),
-            /* 粗水平格線 */
-            linear-gradient(0deg, transparent 0px, rgba(252,250,242,0.4) 2px, transparent 4px),
-            /* 格紋交織效果 */
-            linear-gradient(45deg, rgba(252,250,242,0.1) 25%, transparent 25%, transparent 75%, rgba(252,250,242,0.1) 75%),
-            linear-gradient(-45deg, rgba(252,250,242,0.1) 25%, transparent 25%, transparent 75%, rgba(252,250,242,0.1) 75%);
-        background-size: 30px 30px, 30px 30px, 120px 120px, 120px 120px, 60px 60px, 60px 60px;
-    }
-
-    /* 改為更柔和的淡入動畫 */
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    .vintage-container {
-        /* 套用新的淡入動畫，並縮短時間 */
-        animation: fadeIn 1.2s ease-in-out;
-        filter: sepia(0.2);
-    }
-
-    /* 將hover特效從animation改為更流暢的transition */
-    .vintage-card {
-        transition: all 0.4s ease-in-out;
-    }
-
-    .vintage-card:hover {
-        transform: scale(1.03);
-        filter: sepia(0.4);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    }
-</style>
-
-<div class="min-h-screen vintage-pattern">
+<div class="min-h-screen">
   <div class="container mx-auto px-4 py-8">
     <div class="max-w-6xl mx-auto">
 

@@ -1,6 +1,6 @@
 @import "tailwindcss";
-@import "./navigation.css";
-@import "./home.css";
+@import "./customer.css";
+@import "./merchant_templates.css";
 @import "./custom.css";
 @import "./style.css";
 

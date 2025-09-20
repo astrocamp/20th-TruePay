@@ -23,7 +23,7 @@
   </head>
    <body class="bg-gray-50 text-brand-text font-sans flex flex-col min-h-screen" x-data="{ scrolled: false }" @scroll.window="scrolled = (window.pageYOffset > 50)">
     <!-- 導覽列 -->
-    <nav class="nav-bar" x-data="{ mobileMenuOpen: false }" :class="{ 'scrolled': scrolled }">
+    <nav class="nav-bar" x-data="{ mobileMenuOpen: false }" :class="{ 'scrolled': scrolled }" @resize.window="if (window.innerWidth >= 768) { mobileMenuOpen = false }">
         <div class="nav-container">
             <div class="logo-section flex items-center">
                 <img src="{% static 'favicon.ico' %}" alt="TruePay Logo" class="h-10 mr-3">
