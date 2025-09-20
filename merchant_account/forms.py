@@ -211,9 +211,9 @@ class SubdomainChangeForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "class": "form-control",
-                "placeholder": "例如：mystore",
+                "placeholder": _("例如：mystore"),
                 "pattern": "[a-zA-Z0-9-]+",
-                "title": "只能使用英文字母、數字和連字號",
+                "title": _("只能使用英文字母、數字和連字號"),
             }
         ),
         label="新的子網域名稱",

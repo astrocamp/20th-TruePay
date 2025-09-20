@@ -1,4 +1,5 @@
 {% extends "merchant_layout/dashboard_base.html" %}
+{% load i18n %}
 
 {% block title %}網域設定 - TruePay{% endblock %}
 
@@ -7,8 +8,8 @@
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">網域設定</h1>
-                <p class="text-gray-600">管理您的商店子網域設定</p>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">{% trans "網域設定" %}</h1>
+                <p class="text-gray-600">{% trans "管理您的商店子網域設定" %}</p>
             </div>
         </div>
     </div>
@@ -26,11 +27,11 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-            <h2 class="text-xl font-semibold text-gray-900 mb-6">修改子網域</h2>
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">{% trans "修改子網域" %}</h2>
             
             <!-- 目前網址顯示 -->
             <div class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                <label class="block text-sm font-medium text-gray-700 mb-2">目前商店網址</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">{% trans "目前商店網址" %}</label>
                 <div class="text-sm text-gray-600 mb-2">
                     <a href="https://{{ merchant.subdomain }}.{{ base_domain }}/" target="_blank" 
                        class="text-[#0056B3] hover:underline font-mono">
@@ -46,7 +47,7 @@
                             {{ status_message }}
                         </p>
                         <p class="text-xs mt-1 {% if can_change %}text-green-600{% else %}text-yellow-600{% endif %}">
-                            本年度已修改 {{ merchant.subdomain_change_count }} / {{ merchant.max_subdomains_change_per_year }} 次
+                            {% blocktrans with count=merchant.subdomain_change_count max=merchant.max_subdomains_change_per_year %}本年度已修改 {{ count }} / {{ max }} 次{% endblocktrans %}
                         </p>
                     </div>
                     {% if can_change %}
@@ -67,7 +68,7 @@
                 <!-- 新子網域欄位 -->
                 <div>
                     <label for="{{ form.new_subdomain.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                        {{ form.new_subdomain.label }}
+                        {% trans "新的子網域名稱" %}
                     </label>
                     <div class="flex items-center">
                         <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
@@ -91,7 +92,7 @@
                 <!-- 修改原因欄位 -->
                 <div>
                     <label for="{{ form.reason.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                        {{ form.reason.label }}
+                        {% trans "修改原因" %}
                     </label>
                     {{ form.reason }}
                     {% if form.reason.help_text %}
@@ -109,7 +110,7 @@
                             class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-[#0056B3] hover:bg-[#00408A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0056B3] transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed" 
                             {% if not can_change %}disabled{% endif %}>
                         {% include 'components/icons.html' with icon='save' class='w-4 h-4 mr-2' %}
-                        申請變更
+                        {% trans "申請變更" %}
                     </button>
                 </div>
             </form>
@@ -120,7 +121,7 @@
             <!-- 修改歷史 -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold text-gray-900">修改歷史</h2>
+                    <h2 class="text-xl font-semibold text-gray-900">{% trans "修改歷史" %}</h2>
                     <div class="p-2 bg-blue-50 rounded-full">
                         {% include 'components/icons.html' with icon='clock' class='w-5 h-5 text-[#0056B3]' %}
                     </div>
@@ -139,7 +140,7 @@
                                 </div>
                                 <div class="mt-2 text-xs text-gray-500">
                                     <div>{{ record.changed_at|date:"Y-m-d H:i" }}</div>
-                                    <div>原因：{{ record.reason|default:"未提供" }}</div>
+                                    <div>{% trans "原因：" %}{% if record.reason %}{{ record.reason }}{% else %}{% trans "未提供" %}{% endif %}</div>
                                 </div>
                             </div>
                         {% endfor %}
@@ -149,7 +150,7 @@
                         <div class="text-gray-400 mb-2">
                             {% include 'components/icons.html' with icon='document' class='w-12 h-12 mx-auto' %}
                         </div>
-                        <p class="text-sm text-gray-500">沒有修改紀錄</p>
+                        <p class="text-sm text-gray-500">{% trans "沒有修改紀錄" %}</p>
                     </div>
                 {% endif %}
             </div>
@@ -157,7 +158,7 @@
             <!-- 有效重導向 -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold text-gray-900">有效重導向</h2>
+                    <h2 class="text-xl font-semibold text-gray-900">{% trans "有效重導向" %}</h2>
                     <div class="p-2 bg-green-50 rounded-full">
                         {% include 'components/icons.html' with icon='arrow-right' class='w-5 h-5 text-green-600' %}
                     </div>
@@ -175,7 +176,7 @@
                                     </div>
                                 </div>
                                 <div class="mt-2 text-xs text-gray-500">
-                                    到期日：{{ redirect.expires_at|date:"Y-m-d" }}
+                                    {% trans "到期日：" %}{{ redirect.expires_at|date:"Y-m-d" }}
                                 </div>
                             </div>
                         {% endfor %}
@@ -185,7 +186,7 @@
                         <div class="text-gray-400 mb-2">
                             {% include 'components/icons.html' with icon='arrow-right' class='w-12 h-12 mx-auto' %}
                         </div>
-                        <p class="text-sm text-gray-500">沒有有效重導向</p>
+                        <p class="text-sm text-gray-500">{% trans "沒有有效重導向" %}</p>
                     </div>
                 {% endif %}
             </div>

@@ -1,32 +1,33 @@
 {% extends 'merchant_layout/dashboard_base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}報表分析 - {{ merchant.ShopName }} - TruePay{% endblock %}
+{% block title %}{% trans "報表分析" %} - {{ merchant.ShopName }} - TruePay{% endblock %}
 
 
 {% block content %}
 <!-- 頁面標題 -->
 <div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-900">報表分析</h1>
-    <p class="text-gray-600">查看商店營運數據與趨勢分析</p>
+    <h1 class="text-3xl font-bold text-gray-900">{% trans "報表分析" %}</h1>
+    <p class="text-gray-600">{% trans "查看商店營運數據與趨勢分析" %}</p>
 </div>
 
 <!-- 時間範圍選擇器 -->
 <div class="mb-6 bg-white rounded-lg shadow-md p-4">
     <div class="flex items-center justify-between">
-        <h2 class="text-lg font-medium text-gray-900">統計期間</h2>
+        <h2 class="text-lg font-medium text-gray-900">{% trans "統計期間" %}</h2>
         <div class="flex space-x-2">
             <a href="?days=7"
                 class="px-4 py-2 text-sm rounded-md transition-colors duration-200 {% if days == 7 %}bg-blue-500 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
-                最近 7 天
+                {% trans "最近 7 天" %}
             </a>
             <a href="?days=30"
                 class="px-4 py-2 text-sm rounded-md transition-colors duration-200 {% if days == 30 %}bg-blue-500 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
-                最近 30 天
+                {% trans "最近 30 天" %}
             </a>
             <a href="?days=90"
                 class="px-4 py-2 text-sm rounded-md transition-colors duration-200 {% if days == 90 %}bg-blue-500 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
-                最近 90 天
+                {% trans "最近 90 天" %}
             </a>
         </div>
     </div>
@@ -38,9 +39,9 @@
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-gray-600 text-sm font-medium">總營收</p>
+                <p class="text-gray-600 text-sm font-medium">{% trans "總營收" %}</p>
                 <p class="text-3xl font-bold text-green-600 mt-2">NT$ {{ total_revenue|floatformat:0 }}</p>
-                <p class="text-gray-500 text-sm mt-1">累計金額</p>
+                <p class="text-gray-500 text-sm mt-1">{% trans "累計金額" %}</p>
             </div>
             <div class="p-3 bg-green-50 rounded-full">
                 <span class="text-2xl">💰</span>
@@ -52,9 +53,9 @@
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-gray-600 text-sm font-medium">總訂單數</p>
+                <p class="text-gray-600 text-sm font-medium">{% trans "總訂單數" %}</p>
                 <p class="text-3xl font-bold text-[#0056B3] mt-2">{{ total_orders }}</p>
-                <p class="text-gray-500 text-sm mt-1">交易訂單</p>
+                <p class="text-gray-500 text-sm mt-1">{% trans "交易訂單" %}</p>
             </div>
             <div class="p-3 bg-blue-50 rounded-full">
                 <span class="text-2xl">📋</span>
@@ -66,9 +67,9 @@
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-gray-600 text-sm font-medium">發行票券</p>
+                <p class="text-gray-600 text-sm font-medium">{% trans "發行票券" %}</p>
                 <p class="text-3xl font-bold text-yellow-600 mt-2">{{ total_tickets }}</p>
-                <p class="text-gray-500 text-sm mt-1">使用率 {{ ticket_usage_rate }}%</p>
+                <p class="text-gray-500 text-sm mt-1">{% trans "使用率" %} {{ ticket_usage_rate }}%</p>
             </div>
             <div class="p-3 bg-yellow-50 rounded-full">
                 <span class="text-2xl">🎫</span>
@@ -80,9 +81,9 @@
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-gray-600 text-sm font-medium">商品總數</p>
+                <p class="text-gray-600 text-sm font-medium">{% trans "商品總數" %}</p>
                 <p class="text-3xl font-bold text-purple-600 mt-2">{{ total_products }}</p>
-                <p class="text-gray-500 text-sm mt-1">活躍商品</p>
+                <p class="text-gray-500 text-sm mt-1">{% trans "活躍商品" %}</p>
             </div>
             <div class="p-3 bg-purple-50 rounded-full">
                 <span class="text-2xl">📦</span>
@@ -100,26 +101,26 @@
             <div class="p-6 border-b border-gray-200">
                 <div class="flex items-center">
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900">銷售分析報表</h3>
-                        <p class="text-sm text-gray-600">營收趨勢、訂單狀態、金流分析</p>
+                        <h3 class="text-lg font-medium text-gray-900">{% trans "銷售分析報表" %}</h3>
+                        <p class="text-sm text-gray-600">{% trans "營收趨勢、訂單狀態、金流分析" %}</p>
                     </div>
                 </div>
             </div>
             <div class="p-6">
                 <ul class="text-sm text-gray-600 space-y-2 mb-4">
-                    <li>• 營收總覽與趨勢分析</li>
-                    <li>• 訂單成功率統計</li>
-                    <li>• 金流方式使用比例</li>
-                    <li>• 平均訂單金額分析</li>
+                    <li>• {% trans "營收總覽與趨勢分析" %}</li>
+                    <li>• {% trans "訂單成功率統計" %}</li>
+                    <li>• {% trans "金流方式使用比例" %}</li>
+                    <li>• {% trans "平均訂單金額分析" %}</li>
                 </ul>
                 <div class="flex space-x-2">
                     <button @click="openModal('sales')"
                         class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center cursor-pointer">
-                        <i class="fas fa-chart-pie mr-2"></i> 預覽
+                        <i class="fas fa-chart-pie mr-2"></i> {% trans "預覽" %}
                     </button>
                     <a href="{% url 'merchant_account:export_sales' subdomain=merchant.subdomain %}?days={{ days }}"
                         class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200 inline-block text-center">
-                        <i class="fas fa-download mr-2"></i>下載 Excel
+                        <i class="fas fa-download mr-2"></i>{% trans "下載 Excel" %}
                     </a>
                 </div>
             </div>
@@ -130,26 +131,26 @@
             <div class="p-6 border-b border-gray-200">
                 <div class="flex items-center">
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900">票券營運報表</h3>
-                        <p class="text-sm text-gray-600">使用率、驗證記錄、過期分析</p>
+                        <h3 class="text-lg font-medium text-gray-900">{% trans "票券營運報表" %}</h3>
+                        <p class="text-sm text-gray-600">{% trans "使用率、驗證記錄、過期分析" %}</p>
                     </div>
                 </div>
             </div>
             <div class="p-6">
                 <ul class="text-sm text-gray-600 space-y-2 mb-4">
-                    <li>• 票券使用率統計</li>
-                    <li>• 驗證成功率分析</li>
-                    <li>• 過期票券損失統計</li>
-                    <li>• 使用時間分佈分析</li>
+                    <li>• {% trans "票券使用率統計" %}</li>
+                    <li>• {% trans "驗證成功率分析" %}</li>
+                    <li>• {% trans "過期票券損失統計" %}</li>
+                    <li>• {% trans "使用時間分佈分析" %}</li>
                 </ul>
                 <div class="flex space-x-2">
                     <button @click="openModal('tickets')"
                         class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center cursor-pointer">
-                        <i class="fas fa-chart-pie mr-2"></i> 預覽
+                        <i class="fas fa-chart-pie mr-2"></i> {% trans "預覽" %}
                     </button>
                     <a href="{% url 'merchant_account:export_tickets' subdomain=merchant.subdomain %}?days={{ days }}"
                         class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200 inline-block text-center">
-                        <i class="fas fa-download mr-2"></i>下載 Excel
+                        <i class="fas fa-download mr-2"></i>{% trans "下載 Excel" %}
                     </a>
                 </div>
             </div>
@@ -160,26 +161,26 @@
             <div class="p-6 border-b border-gray-200">
                 <div class="flex items-center">
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900">商品表現報表</h3>
-                        <p class="text-sm text-gray-600">銷量排行、收入貢獻、庫存分析</p>
+                        <h3 class="text-lg font-medium text-gray-900">{% trans "商品表現報表" %}</h3>
+                        <p class="text-sm text-gray-600">{% trans "銷量排行、收入貢獻、庫存分析" %}</p>
                     </div>
                 </div>
             </div>
             <div class="p-6">
                 <ul class="text-sm text-gray-600 space-y-2 mb-4">
-                    <li>• 商品銷售排行榜</li>
-                    <li>• 營收貢獻度分析</li>
-                    <li>• 庫存狀況統計</li>
-                    <li>• 商品定價效率分析</li>
+                    <li>• {% trans "商品銷售排行榜" %}</li>
+                    <li>• {% trans "營收貢獻度分析" %}</li>
+                    <li>• {% trans "庫存狀況統計" %}</li>
+                    <li>• {% trans "商品定價效率分析" %}</li>
                 </ul>
                 <div class="flex space-x-2">
                     <button @click="openModal('products')"
                         class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 text-center cursor-pointer">
-                        <i class="fas fa-chart-pie mr-2"></i> 預覽
+                        <i class="fas fa-chart-pie mr-2"></i> {% trans "預覽" %}
                     </button>
                     <a href="{% url 'merchant_account:export_products' subdomain=merchant.subdomain %}?days={{ days }}"
                         class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200 inline-block text-center">
-                        <i class="fas fa-download mr-2"></i>下載 Excel
+                        <i class="fas fa-download mr-2"></i>{% trans "下載 Excel" %}
                     </a>
                 </div>
             </div>
@@ -205,7 +206,7 @@
                     <!-- 載入動畫 -->
                     <div x-show="loading" class="flex justify-center items-center py-12">
                         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-                        <span class="ml-3 text-gray-600">載入圖表中...</span>
+                        <span class="ml-3 text-gray-600">{% trans "載入圖表中..." %}</span>
                     </div>
 
                     <!-- 圖表分頁 -->
@@ -215,13 +216,13 @@
                                 :class="activeTab === 1
                                     ? 'py-2 px-4 text-sm font-medium text-center text-blue-600 bg-gray-50 border-b-2 border-blue-600 rounded-t-lg'
                                     : 'py-2 px-4 ml-1 text-sm font-medium text-center text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-50'">
-                                主要分析
+                                {% trans "主要分析" %}
                             </button>
                             <button @click="switchTab(2)"
                                 :class="activeTab === 2
                                     ? 'py-2 px-4 ml-1 text-sm font-medium text-center text-blue-600 bg-gray-50 border-b-2 border-blue-600 rounded-t-lg'
                                     : 'py-2 px-4 ml-1 text-sm font-medium text-center text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-50'">
-                                詳細分佈
+                                {% trans "詳細分佈" %}
                             </button>
                         </div>
 
@@ -239,9 +240,9 @@
                     <!-- 錯誤訊息 -->
                     <div x-show="error" class="text-center py-12">
                         <div class="text-red-500 text-lg mb-2">
-                            <i class="fas fa-exclamation-triangle"></i> 載入失敗
+                            <i class="fas fa-exclamation-triangle"></i> {% trans "載入失敗" %}
                         </div>
-                        <p class="text-gray-600">無法載入圖表數據，請稍後再試</p>
+                        <p class="text-gray-600">{% trans "無法載入圖表數據，請稍後再試" %}</p>
                     </div>
                 </div>
             </div>
@@ -250,24 +251,24 @@
 
     <!-- 使用說明 -->
     <div class="mt-8 bg-blue-50 rounded-lg p-6">
-        <h3 class="text-lg font-medium text-blue-900 mb-6">📋 報表使用說明</h3>
+        <h3 class="text-lg font-medium text-blue-900 mb-6">📋 {% trans "報表使用說明" %}</h3>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 text-sm text-blue-800">
             <div>
-                <h4 class="font-medium mb-3 text-base">報表功能</h4>
+                <h4 class="font-medium mb-3 text-base">{% trans "報表功能" %}</h4>
                 <ul class="space-y-2">
-                    <li>• 支援多種時間範圍選擇（7天、30天、90天）</li>
-                    <li>• 自動生成詳細統計圖表與視覺化分析</li>
-                    <li>• Excel 格式匯出，方便後續數據分析</li>
-                    <li>• 即時預覽功能，快速檢視報表內容</li>
+                    <li>• {% trans "支援多種時間範圍選擇（7天、30天、90天）" %}</li>
+                    <li>• {% trans "自動生成詳細統計圖表與視覺化分析" %}</li>
+                    <li>• {% trans "Excel 格式匯出，方便後續數據分析" %}</li>
+                    <li>• {% trans "即時預覽功能，快速檢視報表內容" %}</li>
                 </ul>
             </div>
             <div>
-                <h4 class="font-medium mb-3 text-base">更新與建議</h4>
+                <h4 class="font-medium mb-3 text-base">{% trans "更新與建議" %}</h4>
                 <ul class="space-y-2">
-                    <li>• 數據即時更新，確保資訊準確性</li>
-                    <li>• 建議定期下載分析，追蹤營運趨勢</li>
-                    <li>• 可用於制定營運決策與策略規劃</li>
-                    <li>• 支援多種圖表格式，滿足不同需求</li>
+                    <li>• {% trans "數據即時更新，確保資訊準確性" %}</li>
+                    <li>• {% trans "建議定期下載分析，追蹤營運趨勢" %}</li>
+                    <li>• {% trans "可用於制定營運決策與策略規劃" %}</li>
+                    <li>• {% trans "支援多種圖表格式，滿足不同需求" %}</li>
                 </ul>
             </div>
         </div>

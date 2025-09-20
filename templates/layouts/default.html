@@ -29,7 +29,7 @@
                 <img src="{% static 'favicon.ico' %}" alt="TruePay Logo" class="h-10 mr-3">
                 <span class="font-bold text-xl">TRUEPAY</span>
             </div>
-            <ul class="nav-links">
+            <ul class="nav-links flex items-center">
                 <li><a href="{% url 'pages:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">{% trans "首頁" %}</a></li>
                 <li><a href="{% url 'pages:home' %}#features">{% trans "特色" %}</a></li>
                 <li><a href="{% url 'pages:marketplace' %}">{% trans "商品總覽" %}</a></li>
@@ -43,6 +43,21 @@
                 {% else %}
                     <li><a href="{% url 'pages:selectrole' %}">{% trans "登入/註冊" %}</a></li>
                 {% endif %}
+                
+                <div class="language-switcher ml-4">
+                  <form action="{% url 'set_language' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <select name="language" onchange="this.form.submit()" class="language-select">
+                      {% get_current_language as LANGUAGE_CODE %}
+                      {% get_available_languages as LANGUAGES %}
+                      {% for lang_code, lang_name in LANGUAGES %}
+                      <option value="{{ lang_code }}" {% if lang_code == LANGUAGE_CODE %}selected{% endif %}>
+                        {{ lang_name }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </form>
+                </div>
             </ul>
 
             <!-- 手機版漢堡選單 -->

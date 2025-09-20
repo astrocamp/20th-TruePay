@@ -1,17 +1,18 @@
 {% extends "merchant_layout/dashboard_base.html" %}
+{% load i18n %}
 {% block content %}
 <div class="max-w-2xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
     <div class="mb-6">
         <a href="{% url 'merchant_marketplace:detail' request.merchant.subdomain product.id %}" class="text-blue-600 hover:text-blue-800 flex items-center">
             {% include 'components/icons.html' with icon='arrow-left' class='w-5 h-5 mr-2' %}
-            返回商品詳情
+            {% trans "返回商品詳情" %}
         </a>
     </div>
-    
+
     <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">
-        編輯商品
+        {% trans "編輯商品" %}
         {% if has_tickets %}
-        <span class="block text-sm font-normal text-yellow-600 mt-2">此商品已售出票券，資訊已鎖定</span>
+        <span class="block text-sm font-normal text-yellow-600 mt-2">{% trans "此商品已售出票券，資訊已鎖定" %}</span>
         {% endif %}
     </h1>
     
@@ -30,11 +31,11 @@
             <svg class="w-6 h-6 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-4-2v2m8-2v2M5 10l7-7 7 7M5 10v10a1 1 0 001 1h3m-4-11h4m0 0V7a1 1 0 011-1h2m-3 4h3m0 0v3.5M15 10h4m-4 0V7a1 1 0 011-1h2m-3 4v10a1 1 0 001 1h3m-4-11z"/>
             </svg>
-            <h2 class="text-lg font-bold text-red-800">🔒 商品資訊已鎖定</h2>
+            <h2 class="text-lg font-bold text-red-800">🔒 {% trans "商品資訊已鎖定" %}</h2>
         </div>
         <div class="text-red-700">
-            <p class="mb-2">此商品已有售出票券，為確保票券真實性和消費者權益，商品資訊已完全鎖定無法修改。</p>
-            <p class="text-sm">包含商品名稱、描述、價格、聯絡電話及驗證方式等所有資訊均無法變更。</p>
+            <p class="mb-2">{% trans "此商品已有售出票券，為確保票券真實性和消費者權益，商品資訊已完全鎖定無法修改。" %}</p>
+            <p class="text-sm">{% trans "包含商品名稱、描述、價格、聯絡電話及驗證方式等所有資訊均無法變更。" %}</p>
         </div>
     </div>
     {% endif %}
@@ -44,7 +45,7 @@
         
         <div>
             <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                商品名稱 <span class="text-red-500">*</span>
+                {% trans "商品名稱" %} <span class="text-red-500">*</span>
             </label>
             <input type="text" id="name" name="name" value="{{ product.name }}" required
                    {% if has_tickets %}disabled{% endif %}
@@ -53,7 +54,7 @@
         
         <div>
             <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
-                商品描述 <span class="text-red-500">*</span>
+                {% trans "商品描述" %} <span class="text-red-500">*</span>
             </label>
             <textarea id="description" name="description" rows="5" required
                       {% if has_tickets %}disabled{% endif %}
@@ -62,7 +63,7 @@
         
         <div>
             <label for="price" class="block text-sm font-medium text-gray-700 mb-2">
-                商品價格 <span class="text-red-500">*</span>
+                {% trans "商品價格" %} <span class="text-red-500">*</span>
             </label>
             <div class="relative">
                 <span class="absolute left-3 top-2 text-gray-500">$</span>
@@ -74,25 +75,25 @@
         
         <div>
             <label for="stock" class="block text-sm font-medium text-gray-700 mb-2">
-                庫存數量 <span class="text-red-500">*</span>
+                {% trans "庫存數量" %} <span class="text-red-500">*</span>
             </label>
             <input type="number" id="stock" name="stock" min="0" value="{{ product.stock }}" required
                    {% if has_tickets %}disabled{% endif %}
                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent {% if has_tickets %}bg-gray-100 text-gray-500{% endif %}"
-                   placeholder="請輸入庫存數量">
+                   placeholder="{% trans '請輸入庫存數量' %}">
             <p class="text-sm text-gray-500 mt-1">
-                目前庫存：{{ product.stock }} 件
+                {% trans "目前庫存：" %}{{ product.stock }} {% trans "件" %}
                 {% if product.stock == 0 %}
-                    <span class="text-red-600 font-medium">（已售完）</span>
+                    <span class="text-red-600 font-medium">（{% trans "已售完" %}）</span>
                 {% elif product.stock <= 5 %}
-                    <span class="text-orange-600 font-medium">（庫存不足）</span>
+                    <span class="text-orange-600 font-medium">（{% trans "庫存不足" %}）</span>
                 {% endif %}
             </p>
         </div>
         
         <div x-data="createImagePreview()">
             <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
-                商品圖片 <span class="text-red-500">*</span>
+                {% trans "商品圖片" %} <span class="text-red-500">*</span>
             </label>
             <input type="file" id="image" name="image"
                    accept=".jpg,.jpeg,.png,.gif,.webp"
@@ -102,15 +103,15 @@
                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent {% if has_tickets %}bg-gray-100 text-gray-500{% endif %}">
             <p class="text-sm text-gray-500 mt-1">
                 {% if has_tickets %}
-                商品已有售出票券，無法修改圖片
+                {% trans "商品已有售出票券，無法修改圖片" %}
                 {% else %}
-                選擇新圖片將覆蓋現有圖片，支援 JPG、PNG、GIF、WebP 格式，最大 5MB
+                {% trans "選擇新圖片將覆蓋現有圖片，支援 JPG、PNG、GIF、WebP 格式，最大 5MB" %}
                 {% endif %}
             </p>
             
             {% if product.image %}
                 <div class="mt-2">
-                    <p class="text-sm text-gray-600 mb-2">目前圖片：</p>
+                    <p class="text-sm text-gray-600 mb-2">{% trans "目前圖片：" %}</p>
                     <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-32 h-32 object-cover rounded-lg border">
                 </div>
             {% endif %}
@@ -124,7 +125,7 @@
         
         <div>
             <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-2">
-                聯絡電話 <span class="text-red-500">*</span>
+                {% trans "聯絡電話" %} <span class="text-red-500">*</span>
             </label>
             <div class="flex gap-2">
                 <input type="tel" id="phone_number" name="phone_number" value="{{ product.phone_number }}" required
@@ -135,7 +136,7 @@
                         data-phone="{{ merchant_phone|default:'' }}"
                         {% if has_tickets %}disabled{% endif %}
                         class="px-3 py-2 text-sm bg-gray-100 text-gray-700 border border-gray-300 rounded-lg {% if not has_tickets %}hover:bg-gray-200{% endif %} transition duration-200 whitespace-nowrap {% if has_tickets %}opacity-50 cursor-not-allowed{% endif %}">
-                    使用商家電話
+                    {% trans "使用商家電話" %}
                 </button>
             </div>
         </div>
@@ -143,20 +144,20 @@
         <!-- 商品票券有效期限 -->
         <div>
             <label for="ticket_expiry" class="block text-sm font-medium text-gray-700 mb-2">
-                商品票券有效期限 <span class="text-red-500">*</span>
+                {% trans "商品票券有效期限" %} <span class="text-red-500">*</span>
             </label>
             <input type="datetime-local" id="ticket_expiry" name="ticket_expiry" required value="{{ product.ticket_expiry|date:'Y-m-d\\TH:i' }}"
                    {% if has_tickets %}disabled{% endif %}
                    {% if not has_tickets %}min="{{ current_datetime }}"{% endif %}
                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent {% if has_tickets %}bg-gray-100 text-gray-500{% endif %}">
-            <p class="text-sm text-gray-500 mt-1">請選擇票券到期日與時間（最小單位：分鐘）。票券將於此時間自動失效。{% if not has_tickets %}<strong>請注意：不能設定過去的時間。</strong>{% endif %}</p>
+            <p class="text-sm text-gray-500 mt-1">{% trans "請選擇票券到期日與時間（最小單位：分鐘）。票券將於此時間自動失效。" %}{% if not has_tickets %}<strong>{% trans "請注意：不能設定過去的時間。" %}</strong>{% endif %}</p>
         </div>
         
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-4">
-                交易驗證時間點 <span class="text-red-500">*</span>
+                {% trans "交易驗證時間點" %} <span class="text-red-500">*</span>
                 {% if has_tickets %}
-                <span class="ml-2 px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">已鎖定</span>
+                <span class="ml-2 px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">{% trans "已鎖定" %}</span>
                 {% endif %}
             </label>
             
@@ -167,9 +168,9 @@
                     <svg class="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m0 0h3m0 0h-3m3 0l-1-1m-2 1v-2m0-3V9m0 0h3m-3 0V5.5M9 3v16.5"/>
                     </svg>
-                    <h3 class="text-sm font-medium text-yellow-800">驗證方式已鎖定</h3>
+                    <h3 class="text-sm font-medium text-yellow-800">{% trans "驗證方式已鎖定" %}</h3>
                 </div>
-                <p class="text-sm text-yellow-700">此商品已有售出票券，無法修改驗證方式以保護消費者權益。</p>
+                <p class="text-sm text-yellow-700">{% trans "此商品已有售出票券，無法修改驗證方式以保護消費者權益。" %}</p>
             </div>
             
             <!-- 顯示當前設定（唯讀） -->
@@ -179,8 +180,8 @@
                            {% if product.verification_timing == 'before_payment' %}checked{% endif %} disabled
                            class="w-4 h-4 text-gray-400 bg-gray-200 border-gray-300">
                     <label for="verify_before_payment_readonly" class="ml-3 text-sm text-gray-500">
-                        <span class="font-medium">付款前驗證</span>
-                        <span class="block text-xs text-gray-400 mt-1">消費者需先完成驗證才能付款</span>
+                        <span class="font-medium">{% trans "付款前驗證" %}</span>
+                        <span class="block text-xs text-gray-400 mt-1">{% trans "消費者需先完成驗證才能付款" %}</span>
                     </label>
                 </div>
                 
@@ -189,8 +190,8 @@
                            {% if product.verification_timing == 'before_redeem' %}checked{% endif %} disabled
                            class="w-4 h-4 text-gray-400 bg-gray-200 border-gray-300">
                     <label for="verify_before_redeem_readonly" class="ml-3 text-sm text-gray-500">
-                        <span class="font-medium">核銷前驗證</span>
-                        <span class="block text-xs text-gray-400 mt-1">消費者可先付款，但核銷時需驗證</span>
+                        <span class="font-medium">{% trans "核銷前驗證" %}</span>
+                        <span class="block text-xs text-gray-400 mt-1">{% trans "消費者可先付款，但核銷時需驗證" %}</span>
                     </label>
                 </div>
                 
@@ -207,8 +208,8 @@
                            {% if product.verification_timing == 'before_payment' %}checked{% endif %}
                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-600 focus:ring-2">
                     <label for="verify_before_payment" class="ml-3 text-sm text-gray-700">
-                        <span class="font-medium">付款前驗證</span>
-                        <span class="block text-xs text-gray-500 mt-1">消費者需先完成驗證才能付款</span>
+                        <span class="font-medium">{% trans "付款前驗證" %}</span>
+                        <span class="block text-xs text-gray-500 mt-1">{% trans "消費者需先完成驗證才能付款" %}</span>
                     </label>
                 </div>
                 
@@ -217,8 +218,8 @@
                            {% if product.verification_timing == 'before_redeem' %}checked{% endif %}
                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-600 focus:ring-2">
                     <label for="verify_before_redeem" class="ml-3 text-sm text-gray-700">
-                        <span class="font-medium">核銷前驗證</span>
-                        <span class="block text-xs text-gray-500 mt-1">消費者可先付款，但核銷時需驗證</span>
+                        <span class="font-medium">{% trans "核銷前驗證" %}</span>
+                        <span class="block text-xs text-gray-500 mt-1">{% trans "消費者可先付款，但核銷時需驗證" %}</span>
                     </label>
                 </div>
                 
@@ -227,21 +228,21 @@
             
             <p class="text-sm text-gray-500 mt-2">
                 {% if has_tickets %}
-                此設定在商品首次售出後即無法修改，以確保票券使用條件的一致性
+                {% trans "此設定在商品首次售出後即無法修改，以確保票券使用條件的一致性" %}
                 {% else %}
-                選擇交易驗證的時機點，影響消費者的購買和使用流程
+                {% trans "選擇交易驗證的時機點，影響消費者的購買和使用流程" %}
                 {% endif %}
             </p>
         </div>
         
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h3 class="text-sm font-medium text-blue-800 mb-2">編輯提醒：</h3>
+            <h3 class="text-sm font-medium text-blue-800 mb-2">{% trans "編輯提醒：" %}</h3>
             <ul class="text-sm text-blue-700 space-y-1">
-                <li>• 修改後的資訊將立即生效</li>
-                <li>• 請確保所有資訊都是最新且正確的</li>
-                <li>• 圖片檔案限制：JPG/PNG/GIF/WebP 格式，最大 5MB</li>
+                <li>• {% trans "修改後的資訊將立即生效" %}</li>
+                <li>• {% trans "請確保所有資訊都是最新且正確的" %}</li>
+                <li>• {% trans "圖片檔案限制：JPG/PNG/GIF/WebP 格式，最大 5MB" %}</li>
                 {% if has_tickets %}
-                <li>• <strong class="text-red-600">注意：此商品已售出票券，資訊已鎖定無法修改</strong></li>
+                <li>• <strong class="text-red-600">{% trans "注意：此商品已售出票券，資訊已鎖定無法修改" %}</strong></li>
                 {% endif %}
             </ul>
         </div>
@@ -250,22 +251,22 @@
             <button type="submit" 
                     {% if has_tickets %}disabled{% endif %}
                     class="flex-1 {% if has_tickets %}bg-gray-400 cursor-not-allowed{% else %}bg-blue-600 hover:bg-blue-700{% endif %} text-white py-3 px-4 rounded-lg transition duration-200">
-                {% if has_tickets %}商品已鎖定{% else %}更新商品{% endif %}
+                {% if has_tickets %}{% trans "商品已鎖定" %}{% else %}{% trans "更新商品" %}{% endif %}
             </button>
             <a href="{% url 'merchant_marketplace:detail' request.merchant.subdomain product.id %}" class="flex-1 text-center bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition duration-200">
-                取消
+                {% trans "取消" %}
             </a>
         </div>
     </form>
     
     <!-- 商品資訊預覽 -->
     <div class="mt-8 p-4 bg-gray-50 rounded-lg">
-        <h3 class="text-sm font-medium text-gray-700 mb-2">商品資訊：</h3>
+        <h3 class="text-sm font-medium text-gray-700 mb-2">{% trans "商品資訊：" %}</h3>
         <div class="text-sm text-gray-600 space-y-1">
-            <p>建立時間：{{ product.created_at|date:"Y/m/d H:i" }}</p>
-            <p>最後更新：{{ product.updated_at|date:"Y/m/d H:i" }}</p>
-            <p>商家：{{ product.merchant.ShopName }}</p>
-            <p>狀態：{% if product.is_active %}上架中{% else %}未上架{% endif %}</p>
+            <p>{% trans "建立時間：" %}{{ product.created_at|date:"Y/m/d H:i" }}</p>
+            <p>{% trans "最後更新：" %}{{ product.updated_at|date:"Y/m/d H:i" }}</p>
+            <p>{% trans "商家：" %}{{ product.merchant.ShopName }}</p>
+            <p>{% trans "狀態：" %}{% if product.is_active %}{% trans "上架中" %}{% else %}{% trans "未上架" %}{% endif %}</p>
         </div>
     </div>
 </div>

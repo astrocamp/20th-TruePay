@@ -57,17 +57,16 @@
           </ul>
         </nav>
         <!-- 語言切換器 -->
-        <div class="p-4 border-t border-[#D2D2D7]">
-          <form action="{% url 'set_language' %}" method="post">
+        <div class="language-switcher">
+          <form action="{% url 'set_language' %}" method="post" class="w-full">
             {% csrf_token %}
-            <select name="language" onchange="this.form.submit()"
-                    class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select name="language" onchange="this.form.submit()" class="language-select w-full text-center">
               {% get_current_language as LANGUAGE_CODE %}
               {% get_available_languages as LANGUAGES %}
               {% for lang_code, lang_name in LANGUAGES %}
-                <option value="{{ lang_code }}" {% if lang_code == LANGUAGE_CODE %}selected{% endif %}>
-                  {{ lang_name }}
-                </option>
+              <option value="{{ lang_code }}" {% if lang_code == LANGUAGE_CODE %}selected{% endif %}>
+                {{ lang_name }}
+              </option>
               {% endfor %}
             </select>
           </form>
