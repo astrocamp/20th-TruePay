@@ -13,7 +13,7 @@
       <div class="modern-container bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
         <div class="p-8 modern-gradient text-white">
           <div class="flex items-center space-x-6">
-            <div class="w-16 h-16 rounded-2xl flex items-center justify-center font-bold text-2xl" style="background: white; color: #6A4C9C;">
+            <div class="w-16 h-16 rounded-2xl flex items-center justify-center font-bold text-2xl modern-primary-text" style="background: white;">
               {{ merchant.ShopName|first }}
             </div>
             <div>
@@ -44,10 +44,10 @@
 
               <div class="p-6">
                 <h3 class="text-lg font-bold text-gray-800 mb-2">{{ product.name }}</h3>
-                <p class="text-2xl font-bold mb-4" style="color: #6A4C9C;">NT$ {{ product.price }}</p>
+                <p class="text-2xl font-bold mb-4 modern-primary-text">NT$ {{ product.price }}</p>
 
                 <a href="{% url 'public_store:payment_page' id=product.id %}"
-                   class="w-full font-medium py-3 px-6 rounded-xl transition-all duration-200 ease-in-out flex items-center justify-center shadow-md hover:shadow-lg hover:-translate-y-0.5" style="background: #B28FCE; color: white;" onmouseover="this.style.background='#6A4C9C'" onmouseout="this.style.background='#B28FCE'">
+                   class="w-full font-medium py-3 px-6 rounded-xl transition-all duration-200 ease-in-out flex items-center justify-center shadow-md hover:shadow-lg hover:-translate-y-0.5 modern-button">
                    立即購買
                 </a>
               </div>

@@ -173,6 +173,48 @@
     background: linear-gradient(135deg, #6A4C9C 0%, #B28FCE 100%);
 }
 
+/* Modern 連結樣式 */
+.modern-link {
+    color: #6A4C9C;
+    transition: color 0.2s ease;
+}
+
+.modern-link:hover {
+    color: #B28FCE;
+}
+
+/* Modern 主色調文字 */
+.modern-primary-text {
+    color: #6A4C9C;
+}
+
+/* Modern 按鈕樣式 */
+.modern-button {
+    background: #B28FCE;
+    color: white;
+    transition: background-color 0.2s ease;
+}
+
+.modern-button:hover {
+    background: #6A4C9C;
+}
+
+/* Modern 刷新按鈕 */
+.modern-refresh-btn {
+    color: #B28FCE;
+    transition: color 0.2s ease;
+}
+
+.modern-refresh-btn:hover {
+    color: #6A4C9C;
+}
+
+/* Modern 複選框 */
+.modern-checkbox {
+    color: #6A4C9C;
+    --tw-ring-color: #B28FCE;
+}
+
 /* ===============================================
    Vintage Template (復古典雅模板)
    =============================================== */
