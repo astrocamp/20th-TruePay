@@ -12,7 +12,7 @@
         <!-- 導覽列 -->
         <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-6" aria-label="Breadcrumb">
             <a href="{% url 'public_store:shop_overview' product.merchant.subdomain %}"
-               class="transition duration-200 flex items-center" style="color: #6A4C9C;" onmouseover="this.style.color='#B28FCE'" onmouseout="this.style.color='#6A4C9C'"
+               class="modern-link flex items-center"
                 {% include 'components/icons.html' with icon='home' class='w-4 h-4 mr-1' %}
                 {{ product.merchant.ShopName }}
             </a>
@@ -45,7 +45,7 @@
                      ">
                     <div class="mb-6">
                         <h1 class="text-2xl font-bold text-gray-800 mb-4">{{ product.name }}</h1>
-                        <p class="text-3xl font-bold mb-6" style="color: #6A4C9C;">NT$ {{ product.price }}</p>
+                        <p class="text-3xl font-bold mb-6 modern-primary-text">NT$ {{ product.price }}</p>
                     </div>
 
                     <div class="space-y-4 mb-8">
@@ -69,7 +69,7 @@
                                     {% endif %}
                                 </span>
                             </span>
-                            <button @click="refreshStock()" :disabled="stockCheckLoading" class="ml-2 text-sm transition" style="color: #B28FCE;" onmouseover="this.style.color='#6A4C9C'" onmouseout="this.style.color='#B28FCE'" :class="{ 'opacity-50 cursor-not-allowed': stockCheckLoading }">
+                            <button @click="refreshStock()" :disabled="stockCheckLoading" class="ml-2 text-sm transition modern-refresh-btn" :class="{ 'opacity-50 cursor-not-allowed': stockCheckLoading }">
                                 <span x-show="!stockCheckLoading">刷新</span>
                                 <span x-show="stockCheckLoading" class="animate-spin">◌</span>
                             </button>
@@ -93,7 +93,7 @@
                                 </div>
                                 <div class="flex justify-between items-center mt-1">
                                     <span class="text-gray-600">總價</span>
-                                    <span class="text-xl font-bold" style="color: #6A4C9C;" x-text="formattedTotalPrice">NT$ {{ product.price }}</span>
+                                    <span class="text-xl font-bold modern-primary-text" x-text="formattedTotalPrice">NT$ {{ product.price }}</span>
                                 </div>
                             </div>
                         </div>
@@ -104,14 +104,14 @@
                             <div x-show="needsVerification && !isVerified" class="mb-6">
                                 <div class="bg-white border-2 rounded-xl p-6" style="border-color: #B28FCE;">
                                     <div class="flex items-center mb-4">
-                                        <svg class="w-6 h-6 mr-2" style="color: #6A4C9C;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.818-4.954A9.959 9.959 0 0121 12c0 5.523-4.477 10-10 10S1 17.523 1 12 5.477 2 11 2a9.959 9.959 0 014.954 1.818"/></svg>
-                                        <h3 class="text-lg font-bold" style="color: #6A4C9C;">需要身份驗證</h3>
+                                        <svg class="w-6 h-6 mr-2 modern-primary-text" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.818-4.954A9.959 9.959 0 0121 12c0 5.523-4.477 10-10 10S1 17.523 1 12 5.477 2 11 2a9.959 9.959 0 014.954 1.818"/></svg>
+                                        <h3 class="text-lg font-bold modern-primary-text">需要身份驗證</h3>
                                     </div>
-                                    <p class="mb-6" style="color: #6A4C9C;">此商品需要身份驗證，請先完成設置。</p>
+                                    <p class="mb-6 modern-primary-text">此商品需要身份驗證，請先完成設置。</p>
                                     <div class="space-y-4">
                                         <div>
                                             <label class="flex items-start">
-                                                <input type="checkbox" x-model="verificationData.terms" class="mt-1 mr-3 rounded focus:ring-2" style="color: #6A4C9C; --tw-ring-color: #B28FCE;">
+                                                <input type="checkbox" x-model="verificationData.terms" class="mt-1 mr-3 rounded focus:ring-2 modern-checkbox">
                                                 <span class="text-sm text-gray-700">我已閱讀並同意購買條款及使用政策。</span>
                                             </label>
                                         </div>
@@ -143,7 +143,7 @@
 
                             <div x-show="!needsVerification || isVerified">
                             <div class="bg-white border rounded-xl p-6 mb-4 modern-card" style="border-color: #B28FCE;">
-                                <h3 class="text-lg font-bold mb-4" style="color: #6A4C9C;">使用藍新金流</h3>
+                                <h3 class="text-lg font-bold mb-4 modern-primary-text">使用藍新金流</h3>
                                 <form method="post" action="{% url 'payments:create_payment' %}" id="newebpay-form">
                                     {% csrf_token %}
                                     <input type="hidden" name="provider" value="newebpay">
@@ -151,7 +151,7 @@
                                     <input type="hidden" name="quantity" :value="quantity">
                                     <button type="submit" class="w-full text-white py-3 px-6 rounded-xl transition-all duration-300 ease-in-out hover:-translate-y-0.5 font-medium text-lg cursor-pointer shadow-md hover:shadow-lg" style="background: #B28FCE;" onmouseover="this.style.background='#6A4C9C'" onmouseout="this.style.background='#B28FCE'">立即購買 <span x-text="formattedTotalPrice">NT$ {{ product.price }}</span></button>
                                 </form>
-                                <p class="text-sm text-center mt-3" style="color: #6A4C9C;">安全交易 | 24小時客服</p>
+                                <p class="text-sm text-center mt-3 modern-primary-text">安全交易 | 24小時客服</p>
                             </div>
 
                             <div class="bg-green-50 border border-green-200 rounded-xl p-6 mb-4 modern-card">
@@ -214,7 +214,7 @@
                             <span class="text-gray-700 font-medium">SSL 加密連線</span>
                         </div>
                         <div class="flex items-center">
-                            <svg class="w-5 h-5 mr-3" style="color: #6A4C9C;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                            <svg class="w-5 h-5 mr-3 modern-primary-text" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                             <span class="text-gray-700 font-medium">TruePay 認證</span>
                         </div>
                         {% if is_customer and customer.totp_enabled and product.verification_timing == 'before_payment' %}
