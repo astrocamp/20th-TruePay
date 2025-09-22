@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-20 20:41+0800\n"
+"POT-Creation-Date: 2025-09-22 11:34+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -100,10 +100,10 @@ msgid "最近購買記錄"
 msgstr "Purchase History"
 
 #: customers_account/templates/customers/dashboard.html:40
-#: merchant_account/templates/merchant_account/dashboard.html:67
-#: merchant_account/templates/merchant_account/dashboard.html:126
-#: merchant_account/templates/merchant_account/dashboard.html:166
-#: merchant_account/templates/merchant_account/dashboard.html:197
+#: merchant_account/templates/merchant_account/dashboard.html:81
+#: merchant_account/templates/merchant_account/dashboard.html:144
+#: merchant_account/templates/merchant_account/dashboard.html:186
+#: merchant_account/templates/merchant_account/dashboard.html:220
 msgid "查看全部"
 msgstr "View All"
 
@@ -149,10 +149,16 @@ msgstr "No purchase records currently"
 msgid "開始購物"
 msgstr "Start Shopping"
 
+#: customers_account/templates/customers/login.html:7
+#: pages/templates/pages/selectrole.html:25
+msgid "消費者登入"
+msgstr "Customer Login"
+
 #: customers_account/templates/customers/login.html:25
 #: customers_account/templates/customers/profile_settings.html:62
 #: customers_account/templates/customers/register.html:22
 #: merchant_account/templates/merchant_account/Register.html:73
+#: merchant_account/templates/merchant_account/login.html:21
 #: merchant_account/templates/merchant_account/profile_settings.html:54
 msgid "電子郵件"
 msgstr "Email"
@@ -160,6 +166,7 @@ msgstr "Email"
 #: customers_account/templates/customers/login.html:37
 #: customers_account/templates/customers/register.html:82
 #: merchant_account/templates/merchant_account/Register.html:133
+#: merchant_account/templates/merchant_account/login.html:33
 msgid "密碼"
 msgstr "Password"
 
@@ -323,7 +330,7 @@ msgid "檢視最近的登入活動"
 msgstr "View recent login activity"
 
 #: customers_account/templates/customers/purchase_history.html:5
-#: templates/customers_layout/dashboard_base.html:41
+#: templates/customers_layout/dashboard_base.html:44
 #: templates/payments/payment_status.html:175
 msgid "購買記錄"
 msgstr "Purchase History"
@@ -338,7 +345,7 @@ msgid "回到首頁購物"
 msgstr "Back to Home Shopping"
 
 #: customers_account/templates/customers/register.html:7
-#: pages/templates/pages/selectrole.html:30
+#: pages/templates/pages/selectrole.html:29
 msgid "消費者註冊"
 msgstr "Customer Registration"
 
@@ -362,7 +369,7 @@ msgid "點此登入"
 msgstr "Sign in here"
 
 #: customers_account/templates/customers/ticket_wallet.html:10
-#: templates/customers_layout/dashboard_base.html:47
+#: templates/customers_layout/dashboard_base.html:50
 msgid "票券錢包"
 msgstr "Ticket Wallet"
 
@@ -377,8 +384,8 @@ msgstr "Total Tickets"
 #: customers_account/templates/customers/ticket_wallet.html:24
 #: customers_account/templates/customers/ticket_wallet.html:44
 #: customers_account/templates/customers/ticket_wallet.html:100
-#: merchant_account/templates/merchant_account/dashboard.html:87
-#: merchant_account/templates/merchant_account/dashboard.html:210
+#: merchant_account/templates/merchant_account/dashboard.html:103
+#: merchant_account/templates/merchant_account/dashboard.html:235
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:28
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:114
 msgid "未使用"
@@ -388,8 +395,8 @@ msgstr "Unused"
 #: customers_account/templates/customers/ticket_wallet.html:45
 #: customers_account/templates/customers/ticket_wallet.html:104
 #: customers_account/templates/customers/ticket_wallet.html:159
-#: merchant_account/templates/merchant_account/dashboard.html:96
-#: merchant_account/templates/merchant_account/dashboard.html:212
+#: merchant_account/templates/merchant_account/dashboard.html:112
+#: merchant_account/templates/merchant_account/dashboard.html:237
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:32
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:118
 #: templates/payments/payment_status.html:134
@@ -398,8 +405,8 @@ msgstr "Used"
 
 #: customers_account/templates/customers/ticket_wallet.html:32
 #: customers_account/templates/customers/ticket_wallet.html:102
-#: merchant_account/templates/merchant_account/dashboard.html:105
-#: merchant_account/templates/merchant_account/dashboard.html:214
+#: merchant_account/templates/merchant_account/dashboard.html:121
+#: merchant_account/templates/merchant_account/dashboard.html:239
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:36
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:122
 msgid "已過期"
@@ -469,19 +476,27 @@ msgstr "Show QR Code"
 
 #: customers_account/templates/customers/ticket_wallet.html:185
 msgid "此票券需要二階段驗證才能查看 QR Code，請先完成安全設定"
-msgstr "This ticket requires two-factor authentication to view QR Code, please complete security setup first"
+msgstr ""
+"This ticket requires two-factor authentication to view QR Code, please "
+"complete security setup first"
 
 #: customers_account/templates/customers/ticket_wallet.html:192
 msgid "我已閱讀並同意相關使用條款，了解票券兌換方式及相關規範"
-msgstr "I have read and agree to the relevant terms of use, and understand the ticket redemption methods and related regulations"
+msgstr ""
+"I have read and agree to the relevant terms of use, and understand the "
+"ticket redemption methods and related regulations"
 
 #: customers_account/templates/customers/ticket_wallet.html:206
 msgid "您已完成二階段驗證設定，點擊下方按鈕進行驗證"
-msgstr "You have completed two-factor authentication setup, click the button below to verify"
+msgstr ""
+"You have completed two-factor authentication setup, click the button below "
+"to verify"
 
 #: customers_account/templates/customers/ticket_wallet.html:217
 msgid "此票券需要二階段驗證才能查看 QR Code，請先完成安全設定："
-msgstr "This ticket requires two-factor authentication to view QR Code, please complete security setup first:"
+msgstr ""
+"This ticket requires two-factor authentication to view QR Code, please "
+"complete security setup first:"
 
 #: customers_account/templates/customers/ticket_wallet.html:221
 msgid "📱 首次設定需要下載應用程式："
@@ -624,7 +639,7 @@ msgid "可以修改"
 msgstr "Changes allowed"
 
 #: merchant_account/templates/merchant_account/Register.html:6
-#: pages/templates/pages/selectrole.html:49
+#: pages/templates/pages/selectrole.html:48
 msgid "商家註冊"
 msgstr "Merchant Registration"
 
@@ -652,100 +667,85 @@ msgstr "Address"
 msgid "手機號碼"
 msgstr "Mobile Phone"
 
-#: merchant_account/templates/merchant_account/dashboard.html:11
+#: merchant_account/templates/merchant_account/dashboard.html:12
 msgid "歡迎回來"
 msgstr "Welcome back"
 
-#: merchant_account/templates/merchant_account/dashboard.html:12
+#: merchant_account/templates/merchant_account/dashboard.html:13
 msgid "這裡是您的商家經營概況"
 msgstr "Here is your business overview"
 
-#: merchant_account/templates/merchant_account/dashboard.html:23
+#: merchant_account/templates/merchant_account/dashboard.html:31
 #: merchant_account/templates/merchant_account/reports.html:84
 msgid "商品總數"
 msgstr "Total Products"
 
-#: merchant_account/templates/merchant_account/dashboard.html:25
-#: merchant_account/templates/merchant_account/reports.html:86
-msgid "活躍商品"
-msgstr "Active Products"
-
-#: merchant_account/templates/merchant_account/dashboard.html:37
+#: merchant_account/templates/merchant_account/dashboard.html:47
 #: merchant_account/templates/merchant_account/reports.html:58
 msgid "交易訂單"
 msgstr "Transaction Orders"
 
-#: merchant_account/templates/merchant_account/dashboard.html:39
-#: merchant_account/templates/merchant_account/reports.html:56
-msgid "總訂單數"
-msgstr "Total Orders"
-
-#: merchant_account/templates/merchant_account/dashboard.html:51
+#: merchant_account/templates/merchant_account/dashboard.html:63
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:44
 msgid "總收入"
 msgstr "Total Revenue"
 
-#: merchant_account/templates/merchant_account/dashboard.html:53
-#: merchant_account/templates/merchant_account/reports.html:44
-msgid "累計金額"
-msgstr "Total Amount"
-
-#: merchant_account/templates/merchant_account/dashboard.html:65
+#: merchant_account/templates/merchant_account/dashboard.html:79
 msgid "票券統計"
 msgstr "Ticket Statistics"
 
-#: merchant_account/templates/merchant_account/dashboard.html:78
+#: merchant_account/templates/merchant_account/dashboard.html:94
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:24
 msgid "總售出"
 msgstr "Total Sold"
 
-#: merchant_account/templates/merchant_account/dashboard.html:114
+#: merchant_account/templates/merchant_account/dashboard.html:130
 #: merchant_account/templates/merchant_account/sold_tickets_list.html:40
 msgid "將到期"
 msgstr "Expiring Soon"
 
-#: merchant_account/templates/merchant_account/dashboard.html:124
+#: merchant_account/templates/merchant_account/dashboard.html:142
 msgid "最新商品"
 msgstr "Latest Products"
 
-#: merchant_account/templates/merchant_account/dashboard.html:139
+#: merchant_account/templates/merchant_account/dashboard.html:158
 msgid "無圖"
 msgstr "No Image"
 
-#: merchant_account/templates/merchant_account/dashboard.html:153
+#: merchant_account/templates/merchant_account/dashboard.html:172
 msgid "尚無商品"
 msgstr "No products yet"
 
-#: merchant_account/templates/merchant_account/dashboard.html:155
+#: merchant_account/templates/merchant_account/dashboard.html:174
 msgid "立即新增"
 msgstr "Add Now"
 
-#: merchant_account/templates/merchant_account/dashboard.html:164
+#: merchant_account/templates/merchant_account/dashboard.html:184
 msgid "最新訂單"
 msgstr "Latest Orders"
 
-#: merchant_account/templates/merchant_account/dashboard.html:176
-#: merchant_account/templates/merchant_account/dashboard.html:207
+#: merchant_account/templates/merchant_account/dashboard.html:198
+#: merchant_account/templates/merchant_account/dashboard.html:232
 msgid "顧客"
 msgstr "Customer"
 
-#: merchant_account/templates/merchant_account/dashboard.html:187
+#: merchant_account/templates/merchant_account/dashboard.html:209
 msgid "尚無訂單"
 msgstr "No orders yet"
 
-#: merchant_account/templates/merchant_account/dashboard.html:195
+#: merchant_account/templates/merchant_account/dashboard.html:218
 msgid "最新票券"
 msgstr "Latest Tickets"
 
-#: merchant_account/templates/merchant_account/dashboard.html:227
+#: merchant_account/templates/merchant_account/dashboard.html:252
 msgid "尚無售出票券"
 msgstr "No tickets sold yet"
 
-#: merchant_account/templates/merchant_account/dashboard.html:235
+#: merchant_account/templates/merchant_account/dashboard.html:261
 msgid "快速操作"
 msgstr "Quick Actions"
 
-#: merchant_account/templates/merchant_account/dashboard.html:239
+#: merchant_account/templates/merchant_account/dashboard.html:267
 #: merchant_marketplace/templates/merchant_marketplace/index.html:8
 #: merchant_marketplace/templates/merchant_marketplace/new.html:15
 #: merchant_marketplace/templates/merchant_marketplace/new.html:150
@@ -753,19 +753,19 @@ msgstr "Quick Actions"
 msgid "新增商品"
 msgstr "Add Product"
 
-#: merchant_account/templates/merchant_account/dashboard.html:244
+#: merchant_account/templates/merchant_account/dashboard.html:272
 #: merchant_marketplace/templates/merchant_marketplace/index.html:6
 #: templates/merchant_layout/dashboard_base.html:43
 msgid "商品列表"
 msgstr "Product List"
 
-#: merchant_account/templates/merchant_account/dashboard.html:249
+#: merchant_account/templates/merchant_account/dashboard.html:277
 #: merchant_account/templates/merchant_account/transaction_history.html:5
 msgid "交易記錄"
 msgstr "Transaction Records"
 
-#: merchant_account/templates/merchant_account/dashboard.html:254
-#: templates/customers_layout/dashboard_base.html:54
+#: merchant_account/templates/merchant_account/dashboard.html:282
+#: templates/customers_layout/dashboard_base.html:57
 #: templates/merchant_layout/dashboard_base.html:100
 msgid "設定"
 msgstr "Settings"
@@ -832,7 +832,7 @@ msgid "沒有有效重導向"
 msgstr "No active redirects"
 
 #: merchant_account/templates/merchant_account/login.html:6
-#: pages/templates/pages/selectrole.html:45
+#: pages/templates/pages/selectrole.html:44
 msgid "商家登入"
 msgstr "Merchant Login"
 
@@ -916,6 +916,14 @@ msgstr "Last 90 days"
 msgid "總營收"
 msgstr "Total Revenue"
 
+#: merchant_account/templates/merchant_account/reports.html:44
+msgid "累計金額"
+msgstr "Total Amount"
+
+#: merchant_account/templates/merchant_account/reports.html:56
+msgid "總訂單數"
+msgstr "Total Orders"
+
 #: merchant_account/templates/merchant_account/reports.html:70
 msgid "發行票券"
 msgstr "Issued Tickets"
@@ -923,6 +931,10 @@ msgstr "Issued Tickets"
 #: merchant_account/templates/merchant_account/reports.html:72
 msgid "使用率"
 msgstr "Usage Rate"
+
+#: merchant_account/templates/merchant_account/reports.html:86
+msgid "活躍商品"
+msgstr "Active Products"
 
 #: merchant_account/templates/merchant_account/reports.html:104
 msgid "銷售分析報表"
@@ -1615,6 +1627,118 @@ msgstr "Please ensure contact phone can be answered normally"
 msgid "商品價格請合理定價"
 msgstr "Please price products reasonably"
 
+#: pages/templates/pages/home.html:6
+msgid "非實體商品金流解決方案"
+msgstr "Digital Goods Payment Solutions"
+
+#: pages/templates/pages/home.html:14
+msgid "TRUEPAY致力於"
+msgstr "TRUEPAY is committed to"
+
+#: pages/templates/pages/home.html:16
+msgid "創造非實體商品"
+msgstr "Creating digital goods"
+
+#: pages/templates/pages/home.html:17
+msgid "流通的金流平台"
+msgstr "circulation payment platform"
+
+#: pages/templates/pages/home.html:20
+msgid "讓你的線上課程、會員制服務、活動票券，都能快速完成收款。"
+msgstr "Enable fast payment collection for your online courses, membership services, and event tickets."
+
+#: pages/templates/pages/home.html:21
+msgid "支援所有非實體商品上架，從銷售到交付一站式完成。"
+msgstr "Support all digital products listing, from sales to delivery in one complete solution."
+
+#: pages/templates/pages/home.html:24
+msgid "開始使用！"
+msgstr "Get Started!"
+
+#: pages/templates/pages/home.html:31
+msgid "核心功能"
+msgstr "Core Features"
+
+#: pages/templates/pages/home.html:32
+msgid "我們專注於解決非實體商品交易的每一個環節"
+msgstr "We focus on solving every aspect of digital goods transactions"
+
+#: pages/templates/pages/home.html:41
+msgid "驗證交易真實性"
+msgstr "Verify Transaction Authenticity"
+
+#: pages/templates/pages/home.html:42
+msgid "打造安全透明的支付流程"
+msgstr "Build secure and transparent payment processes"
+
+#: pages/templates/pages/home.html:44
+msgid ""
+"每筆票券都能依需求自訂驗證方式，從線上核銷到現場兌換，保障買賣雙方權益。透過"
+"清楚的驗證紀錄，有效降低消費糾紛，讓交易更安心。"
+msgstr ""
+"Each ticket can be customized with verification methods based on needs, from online redemption to on-site exchange, protecting both buyer and seller rights. Through clear verification records, effectively reduce consumer disputes and make transactions more secure."
+
+#: pages/templates/pages/home.html:54
+msgid "多元收款方式"
+msgstr "Multiple Payment Methods"
+
+#: pages/templates/pages/home.html:55
+msgid "一站式金流集中管理"
+msgstr "One-stop payment centralized management"
+
+#: pages/templates/pages/home.html:57
+msgid ""
+"支援藍新、LINE Pay 等多種金流串接，所有交易狀況都能在後台即時掌握。不必再登入"
+"各家金流後台，一個平台就能完整查看收付款紀錄。"
+msgstr ""
+"Support various payment gateway integrations like NewPay and LINE Pay, with real-time transaction monitoring in the backend. No need to log into multiple payment gateways - one platform provides complete payment records overview."
+
+#: pages/templates/pages/home.html:68
+msgid "分鐘快速設定"
+msgstr "Minutes Quick Setup"
+
+#: pages/templates/pages/home.html:72
+msgid "安全保障"
+msgstr "Security Guarantee"
+
+#: pages/templates/pages/home.html:76
+msgid "可能性"
+msgstr "Possibilities"
+
+#: pages/templates/pages/home.html:83
+msgid "關於我們"
+msgstr "About Us"
+
+#: pages/templates/pages/home.html:84
+msgid "TruePay 是專為非實體商品交易打造的完整解決方案"
+msgstr "TruePay is a complete solution designed specifically for digital goods transactions"
+
+#: pages/templates/pages/home.html:87
+msgid ""
+"我們深刻理解非實體商品的特殊需求，從線上課程的內容保護、活動票券的核銷驗證以"
+"及各項購買的數據，每一個環節都需要專業的技術支持。"
+msgstr ""
+"We deeply understand the unique needs of digital goods, from content protection for online courses, verification of event tickets, to purchase data management - every aspect requires professional technical support."
+
+#: pages/templates/pages/home.html:88
+msgid ""
+"TruePay 提供完整的服務，讓商家可以專注於商品的內容豐富度，而不需要擔心架設網"
+"站以及創建賣場的複雜度。"
+msgstr ""
+"TruePay provides comprehensive services, allowing merchants to focus on product content richness without worrying about the complexity of website setup and marketplace creation."
+
+#: pages/templates/pages/home.html:92
+msgid "準備開始了嗎？"
+msgstr "Ready to Get Started?"
+
+#: pages/templates/pages/home.html:93
+msgid "加入數千位商家的行列，體驗最簡單的非實體商品平台創建"
+msgstr "Join thousands of merchants and experience the simplest digital goods platform creation"
+
+#: pages/templates/pages/home.html:97
+msgid "免費註冊帳號"
+msgstr "Free Registration"
+
 #: pages/templates/pages/marketplace.html:6
 #: pages/templates/pages/marketplace.html:12 templates/layouts/default.html:35
 #: templates/layouts/default.html:75
@@ -1663,74 +1787,37 @@ msgstr "Home"
 msgid "最後頁"
 msgstr "Last"
 
-#: pages/templates/pages/selectrole.html:9
+#: pages/templates/pages/selectrole.html:8
 msgid "選擇您的身份"
 msgstr "Choose Your Role"
 
-#: pages/templates/pages/selectrole.html:10
+#: pages/templates/pages/selectrole.html:9
 msgid "請選擇適合您的登入方式"
 msgstr "Please choose the login method that suits you"
 
-#: pages/templates/pages/selectrole.html:21
+#: pages/templates/pages/selectrole.html:20
 msgid "我是消費者"
 msgstr "I'm a Customer"
 
-#: pages/templates/pages/selectrole.html:22
+#: pages/templates/pages/selectrole.html:21
 msgid "查詢交易、管理付款方式、查看回饋。"
 msgstr "View transactions, manage payment methods, and check rewards."
 
-#: pages/templates/pages/selectrole.html:26
-msgid "消費者登入"
-msgstr "Customer Login"
-
-#: pages/templates/pages/selectrole.html:40
+#: pages/templates/pages/selectrole.html:39
 msgid "我是商家"
 msgstr "I'm a Merchant"
 
-#: pages/templates/pages/selectrole.html:41
+#: pages/templates/pages/selectrole.html:40
 msgid "查看訂單、對帳、管理金流與退款。"
 msgstr "View orders, reconciliation, manage payments and refunds."
 
-#: templates/customers_layout/dashboard_base.html:7
-msgid "TruePay 消費者儀表板"
-msgstr "TruePay Customer Dashboard"
-
-#: templates/customers_layout/dashboard_base.html:16
-#: templates/customers_layout/dashboard_base.html:27
-#: templates/merchant_layout/dashboard_base.html:18
-#: templates/merchant_layout/dashboard_base.html:29
-msgid "關閉選單"
-msgstr "Close Menu"
-
-#: templates/customers_layout/dashboard_base.html:35
+#: templates/customers_layout/dashboard_base.html:38
 msgid "消費者總覽"
 msgstr "Customer Overview"
 
-#: templates/customers_layout/dashboard_base.html:78
-#: templates/layouts/default.html:42 templates/layouts/default.html:82
-#: templates/merchant_layout/dashboard_base.html:124
-msgid "登出"
-msgstr "Logout"
-
-#: templates/customers_layout/dashboard_base.html:88
-#: templates/merchant_layout/dashboard_base.html:134
-msgid "開啟選單"
-msgstr "Open Menu"
-
-#: templates/customers_layout/dashboard_base.html:96
-#: templates/merchant_layout/dashboard_base.html:142
+#: templates/customers_layout/dashboard_base.html:100
 msgid "子頁面會注入這裡"
 msgstr "Child pages will be injected here"
-
-#: templates/customers_layout/dashboard_base.html:105
-#: templates/merchant_layout/dashboard_base.html:153
-msgid "使用條款"
-msgstr "Terms of Service"
-
-#: templates/customers_layout/dashboard_base.html:106
-#: templates/merchant_layout/dashboard_base.html:154
-msgid "隱私權政策"
-msgstr "Privacy Policy"
 
 #: templates/layouts/default.html:34 templates/layouts/default.html:74
 msgid "特色"
@@ -1744,6 +1831,11 @@ msgstr "Merchant Dashboard"
 msgid "我的帳戶"
 msgstr "My Account"
 
+#: templates/layouts/default.html:42 templates/layouts/default.html:82
+#: templates/merchant_layout/dashboard_base.html:124
+msgid "登出"
+msgstr "Logout"
+
 #: templates/layouts/default.html:44 templates/layouts/default.html:84
 msgid "登入/註冊"
 msgstr "Login/Register"
@@ -1751,6 +1843,10 @@ msgstr "Login/Register"
 #: templates/merchant_layout/dashboard_base.html:7
 msgid "TruePay 廠商儀表板"
 msgstr "TruePay Merchant Dashboard"
+
+#: templates/merchant_layout/dashboard_base.html:29
+msgid "關閉選單"
+msgstr "Close Menu"
 
 #: templates/merchant_layout/dashboard_base.html:37
 msgid "廠商總覽"
@@ -1775,6 +1871,14 @@ msgstr "Ticket Validation"
 #: templates/merchant_layout/dashboard_base.html:87
 msgid "票券使用紀錄"
 msgstr "Ticket Usage Records"
+
+#: templates/merchant_layout/dashboard_base.html:152
+msgid "使用條款"
+msgstr "Terms of Service"
+
+#: templates/merchant_layout/dashboard_base.html:153
+msgid "隱私權政策"
+msgstr "Privacy Policy"
 
 #: templates/payments/confirm.html:12
 msgid "登入成功！"
@@ -2027,6 +2131,12 @@ msgstr "Cancelled"
 #: templates/shared/order_table.html:131
 msgid "付款失敗"
 msgstr "Payment Failed"
+
+#~ msgid "TruePay 消費者儀表板"
+#~ msgstr "TruePay Customer Dashboard"
+
+#~ msgid "開啟選單"
+#~ msgstr "Open Menu"
 
 #~ msgid "顯示"
 #~ msgstr "Show"

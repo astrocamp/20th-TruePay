@@ -4,16 +4,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}{% trans "TruePay 消費者儀表板" %}{% endblock %}</title>
+  <title>{% block title %}TruePay 消費者儀表板{% endblock %}</title>
   <!-- 使用專案編譯後的 Tailwind CSS -->
   {% load static %}
   <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
   <link href="{% static 'styles/app.css' %}" rel="stylesheet" type="text/css" />
   <script src="{% static 'scripts/app.js' %}" defer></script>
 </head>
-<body class="bg-green-100 text-black font-sans scrollbar-apple" x-data="createMobileMenu()">
-  <!-- 背景遮罩層（手機版點擊關閉側邊選單） -->
-  <div x-show="isOpen" @click="close()" class="fixed inset-0 z-40 bg-black/50 md:hidden transition-opacity" x-transition:enter="transition-opacity ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" aria-label="關閉選單"></div>
+
+<body class="customer-dashboard font-sans scrollbar-apple" x-data="createMobileMenu()">
+  <!-- 背景遮罩層（手機版） -->
+  <div class="dashboard-overlay" :class="{ 'open': isOpen }" @click="close()"></div>
 
   <!-- 整體容器：側欄 + 內容區 -->
   <div class="min-h-screen grid grid-cols-1 md:grid-cols-[260px_1fr]">
@@ -22,9 +23,11 @@
     <aside class="dashboard-sidebar" :class="{ 'open': isOpen }">
       <div class="h-full flex flex-col">
         <!-- Logo -->
-        <div class="px-6 h-16 flex items-center border-b border-brand-grayBorder">
-          <a href="{% url 'pages:marketplace' %}" class="text-xl font-bold text-brand-blue">TruePay</a>
-          <button @click="close()" class="ml-auto md:hidden cursor-pointer p-2 rounded-lg hover:bg-brand-grayLight touch-manipulation" aria-label="關閉選單">✕</button>
+        <div class="logo-section px-6 h-16 flex items-center">
+          <a href="{% url 'pages:marketplace' %}">TruePay</a>
+          <button @click="close()"
+            class="ml-auto md:hidden cursor-pointer p-2 rounded-lg hover:bg-gray-700 touch-manipulation text-gray-300"
+            aria-label="關閉選單">✕</button>
         </div>
         <!-- 導覽選單 -->
         <nav class="dashboard-nav flex-1 overflow-y-auto" x-data="NavigationManager.createAlpineData()" @click="$parent.handleLinkClick($event)">
