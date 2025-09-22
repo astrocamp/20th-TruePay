@@ -26,16 +26,16 @@
                 </div>
             </div>
             
-            <form method="post" action="{{ gateway_url }}" id="newebpay-form">
+            <form method="post" action="{{ gateway_url }}" id="newebpay-form"
+                  x-on:submit="isSubmitting = true">
                 {% for key, value in form_data.items %}
                     <input type="hidden" name="{{ key }}" value="{{ value }}">
                 {% endfor %}
-                
+
                 <button type="submit"
                         x-bind:disabled="isSubmitting"
-                        x-on:click="isSubmitting = true"
                         x-bind:class="isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#0056B3] hover:bg-[#00408A]'"
-                        class="w-full text-white py-3 px-6 rounded-lg transition duration-200 font-medium">
+                        class="w-full text-white py-3 px-6 rounded-lg transition duration-200 font-medium cursor-pointer">
                     <span x-show="!isSubmitting">按下按鈕付款</span>
                     <span x-show="isSubmitting" class="flex items-center justify-center">
                         {% include 'components/icons.html' with icon='spinner' class='-ml-1 mr-3 h-5 w-5 text-white' %}
