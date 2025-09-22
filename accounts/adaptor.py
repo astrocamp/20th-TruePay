@@ -148,3 +148,16 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             raise ValidationError(f"資料庫完整性錯誤: {str(e)}")
         except Exception as e:
             raise ValidationError(f"創建用戶時發生未預期的錯誤: {str(e)}")
+
+    def pre_social_login(self, request, sociallogin):
+        super().pre_social_login(request, sociallogin)
+
+        next_url = request.GET.get('next')
+        if next_url:
+            request.session['socialaccount_login_next'] = next_url
+
+    def get_login_redirect_url(self, request):
+        next_url = request.session.pop('socialaccount_login_next', None)
+        if next_url:
+            return next_url
+        return '/marketplace/'

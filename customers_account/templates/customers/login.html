@@ -72,7 +72,7 @@
         {% get_providers as socialaccount_providers %}
         {% for provider in socialaccount_providers %}
             {% if provider.id == "google" %}
-                <a href="{% provider_login_url 'google' process='login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" 
+                <a href="{% provider_login_url 'google' process='login' next=request.GET.next %}"
                    class="w-full flex justify-center items-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#0056B3] focus:ring-offset-2 transition duration-200">
                     {% include 'components/icons.html' with icon='google' class='w-5 h-5 mr-3' %}
                     {% trans "使用 Google 帳號登入" %}

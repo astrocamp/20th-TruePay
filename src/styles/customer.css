@@ -371,6 +371,52 @@
     padding: 0.5rem;
 }
 
+/* 首頁手機版語言選擇器 */
+.mobile-language-switcher-home {
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+.mobile-language-select-home {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1e3a8a;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    min-width: 120px;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%233b82f6" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.mobile-language-select-home:hover {
+    border-color: #3b82f6;
+    background-color: #f8fafc;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.mobile-language-select-home:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background-color: #f8fafc;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.mobile-language-select-home option {
+    background: white;
+    color: #1e3a8a;
+    font-weight: 500;
+    padding: 0.5rem;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     /* Navigation responsive */
