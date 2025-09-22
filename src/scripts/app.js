@@ -6,6 +6,7 @@ import './functions.js'
 import './chart.js'
 import './custom.js'
 import './navigation.js'
+import './copy.js'
 import jsQR from 'jsqr'
 import Chart from 'chart.js/auto' 
 

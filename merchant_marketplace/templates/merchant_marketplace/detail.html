@@ -198,7 +198,7 @@
             <div class="p-3 bg-white border-t border-gray-200">
               <button
                 onclick="copyToClipboard('iframe-code')"
-                class="bg-[#0056B3] text-white px-4 py-2 rounded hover:bg-[#00408A] transition duration-200 text-sm font-medium">
+                class="bg-[#0056B3] text-white px-4 py-2 rounded hover:bg-[#00408A] transition duration-200 text-sm font-medium cursor-pointer">
                 {% include 'components/icons.html' with icon='clipboard' class='w-4 h-4 inline mr-1' %}
                 {% trans "複製 iframe 代碼" %}
               </button>
@@ -220,53 +220,4 @@
   </div>
 </div>
 
-<script>
-// 複製到剪貼簿功能（優先用 clipboard API，舊瀏覽器 fallback execCommand）
-async function copyToClipboard(elementId) {
-  const element = document.getElementById(elementId);
-  const textToCopy = element.value;
-
-  // 取得按鈕
-  const button = element.parentElement.querySelector('button');
-  const originalContent = button.innerHTML;
-
-  // 成功 UI
-  function showCopySuccess() {
-    button.innerHTML = '{% include "components/icons.html" with icon="check-mark" class="w-4 h-4 inline mr-1" %}已複製！';
-    button.classList.remove('bg-[#0056B3]', 'hover:bg-[#00408A]');
-    button.classList.add('bg-green-500', 'hover:bg-green-600');
-    setTimeout(() => {
-      button.innerHTML = originalContent;
-      button.classList.remove('bg-green-500', 'hover:bg-green-600');
-      button.classList.add('bg-[#0056B3]', 'hover:bg-[#00408A]');
-    }, 2000);
-  }
-  // 失敗 UI
-  function showCopyFail() {
-    alert('複製失敗，請手動選取代碼');
-  }
-
-  if (navigator.clipboard && window.isSecureContext) {
-    // 現代瀏覽器，且 HTTPS
-    try {
-      await navigator.clipboard.writeText(textToCopy);
-      showCopySuccess();
-    } catch (err) {
-      console.error('複製失敗:', err);
-      showCopyFail();
-    }
-  } else {
-    // 備用方案
-    element.select();
-    element.setSelectionRange(0, 99999); // 支援手機
-    try {
-      document.execCommand('copy');
-      showCopySuccess();
-    } catch (err) {
-      console.error('複製失敗:', err);
-      showCopyFail();
-    }
-  }
-}
-</script>
 {% endblock %}
