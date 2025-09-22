@@ -2,10 +2,10 @@
 {% block content %}
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-md mx-auto">
-        <div class="bg-white rounded-lg shadow-lg p-6" x-data="createPaymentTimer({ duration: 5, formId: 'newebpay-form' })">
+        <div class="bg-white rounded-lg shadow-lg p-6" x-data="{ isSubmitting: false }">
             <div class="text-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-800 mb-2">藍新金流付款</h1>
-                <p class="text-gray-600">安全付款 | 即將跳轉到付款頁面</p>
+                <p class="text-gray-600">安全付款 | 請點擊下方按鈕進行付款</p>
             </div>
             
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
@@ -31,28 +31,27 @@
                     <input type="hidden" name="{{ key }}" value="{{ value }}">
                 {% endfor %}
                 
-                <button type="submit" class="w-full bg-[#0056B3] text-white py-3 px-6 rounded-lg hover:bg-[#00408A] transition duration-200 font-medium">
-                    前往藍新金流付款
+                <button type="submit"
+                        x-bind:disabled="isSubmitting"
+                        x-on:click="isSubmitting = true"
+                        x-bind:class="isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#0056B3] hover:bg-[#00408A]'"
+                        class="w-full text-white py-3 px-6 rounded-lg transition duration-200 font-medium">
+                    <span x-show="!isSubmitting">按下按鈕付款</span>
+                    <span x-show="isSubmitting" class="flex items-center justify-center">
+                        {% include 'components/icons.html' with icon='spinner' class='-ml-1 mr-3 h-5 w-5 text-white' %}
+                        處理中...
+                    </span>
                 </button>
             </form>
             
-            <div class="mt-6 text-center">
-                <p class="text-sm text-gray-500">
-                    頁面將在 <span x-text="countdown">5</span> 秒後自動跳轉
-                </p>
-            </div>
             
             <div class="mt-4 flex justify-center items-center space-x-4 text-gray-500 text-sm">
                 <div class="flex items-center">
-                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                    </svg>
+                    {% include 'components/icons.html' with icon='security' class='w-4 h-4 mr-1' %}
                     SSL 加密
                 </div>
                 <div class="flex items-center">
-                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                    </svg>
+                    {% include 'components/icons.html' with icon='verified' class='w-4 h-4 mr-1' %}
                     安全認證
                 </div>
             </div>
