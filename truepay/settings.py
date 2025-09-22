@@ -140,6 +140,7 @@ def get_db_host():
     return os.getenv("DB_HOST", "localhost")
 
 
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",

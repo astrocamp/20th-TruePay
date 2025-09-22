@@ -396,7 +396,9 @@ def totp_verify(request):
             # TOTP 驗證成功，繼續處理付款
             try:
                 # 獲取商品資訊
-                product = Product.objects.get(id=pending_payment["product_id"])
+                product = Product.objects.get(
+                    id=pending_payment["product_id"], is_active=True
+                )
 
                 # 創建訂單
                 order = _create_order_for_payment(
@@ -428,7 +430,7 @@ def totp_verify(request):
 
     # 獲取產品資訊用於顯示
     try:
-        product = Product.objects.get(id=pending_payment["product_id"])
+        product = Product.objects.get(id=pending_payment["product_id"], is_active=True)
         total_amount = product.price * int(pending_payment["quantity"])
     except Product.DoesNotExist:
         del request.session["pending_payment"]

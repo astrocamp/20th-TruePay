@@ -14,7 +14,9 @@ from payments.models import OrderItem
 @no_cache_required
 def index(request, subdomain):
     status = request.GET.get("status")
-    products = Product.objects.filter(merchant=request.merchant, is_deleted=False)  # 預設排除已刪除
+    products = Product.objects.filter(
+        merchant=request.merchant, is_deleted=False
+    )  # 預設排除已刪除
     if status == "active":
         products = products.filter(is_active=True)
     elif status == "inactive":
@@ -29,22 +31,26 @@ def index(request, subdomain):
 @merchant_verified_required
 def detail(request, subdomain, id):
     product = get_object_or_404(Product, id=id, merchant=request.merchant)
-    
+
     if request.method == "POST":
         action = request.POST.get("action")
-        
+
         if action == "activate":
             product.is_active = True
             product.save()
             messages.success(request, "商品已上架")
-            return redirect("merchant_marketplace:detail", request.merchant.subdomain, product.id)
-            
+            return redirect(
+                "merchant_marketplace:detail", request.merchant.subdomain, product.id
+            )
+
         elif action == "deactivate":
             product.is_active = False
             product.save()
             messages.success(request, "商品未上架")
-            return redirect("merchant_marketplace:detail", request.merchant.subdomain, product.id)
-            
+            return redirect(
+                "merchant_marketplace:detail", request.merchant.subdomain, product.id
+            )
+
         elif action == "delete":
             # 檢查是否有已售出的票券
             has_tickets = OrderItem.objects.filter(product=product).exists()
@@ -55,27 +61,33 @@ def detail(request, subdomain, id):
                 product.is_active = False  # 刪除的商品也要下架
                 product.save()
                 messages.success(request, "商品已刪除")
-                return redirect("merchant_marketplace:index", request.merchant.subdomain)
+                return redirect(
+                    "merchant_marketplace:index", request.merchant.subdomain
+                )
 
     # 生成嵌入代碼（使用與 embed_system 相同的邏輯）
-    ENV = os.getenv('ENV', 'development')
-    if ENV == 'production':
+    ENV = os.getenv("ENV", "development")
+    if ENV == "production":
         base_url = "https://truepay.tw"
     else:
-        base_url = f"https://{os.getenv('NGROK_URL')}" if os.getenv('NGROK_URL') else "http://localhost:8000"
+        base_url = (
+            f"https://{os.getenv('NGROK_URL')}"
+            if os.getenv("NGROK_URL")
+            else "http://localhost:8000"
+        )
 
     # iframe 嵌入代碼（與 embed_system/views.py:357 相同格式）
     iframe_code = f'<iframe src="{base_url}/embed/product/{product.id}/" width="400" height="600" frameborder="0" style="border: 1px solid #ddd; border-radius: 8px;"></iframe>'
 
     # JavaScript 嵌入代碼（與 embed_system/views.py:359-360 相同格式）
-    script_code = f'''<div class="truepay-widget" data-id="{product.id}"></div>
-<script src="{base_url}/embed/embed.js"></script>'''
+    script_code = f"""<div class="truepay-widget" data-id="{product.id}"></div>
+<script src="{base_url}/embed/embed.js"></script>"""
 
     context = {
         "product": product,
         "base_domain": os.getenv("NGROK_URL", settings.BASE_DOMAIN),
         "iframe_code": iframe_code,
-        "script_code": script_code
+        "script_code": script_code,
     }
     return render(request, "merchant_marketplace/detail.html", context)
 
@@ -97,7 +109,9 @@ def new(request, subdomain):
                 product.save()
 
                 messages.success(request, "商品新增成功！")
-                return redirect("merchant_marketplace:index", request.merchant.subdomain)
+                return redirect(
+                    "merchant_marketplace:index", request.merchant.subdomain
+                )
 
             except Exception as e:
                 messages.error(request, f"新增失敗：{str(e)}")
@@ -105,7 +119,9 @@ def new(request, subdomain):
             # 表單驗證失敗時顯示錯誤
             for field, errors in form.errors.items():
                 for error in errors:
-                    field_label = form.fields[field].label if field in form.fields else field
+                    field_label = (
+                        form.fields[field].label if field in form.fields else field
+                    )
                     messages.error(request, f"{field_label}: {error}")
     else:
         form = ProductForm()
@@ -113,7 +129,7 @@ def new(request, subdomain):
     context = {
         "form": form,
         "merchant_phone": request.merchant.Cellphone,
-        "current_datetime": min_datetime.strftime('%Y-%m-%dT%H:%M')
+        "current_datetime": min_datetime.strftime("%Y-%m-%dT%H:%M"),
     }
     return render(request, "merchant_marketplace/new.html", context)
 
@@ -136,21 +152,28 @@ def edit(request, subdomain, id):
     if request.method == "POST":
         # 如果已有票券，完全禁止修改
         if has_tickets:
-            messages.error(request, "此商品已有售出票券，為確保票券真實性和消費者權益，所有商品資訊已鎖定無法修改")
+            messages.error(
+                request,
+                "此商品已有售出票券，為確保票券真實性和消費者權益，所有商品資訊已鎖定無法修改",
+            )
         else:
             form = ProductEditForm(request.POST, request.FILES, instance=product)
             if form.is_valid():
                 try:
                     form.save()
                     messages.success(request, "商品更新成功！")
-                    return redirect("merchant_marketplace:index", request.merchant.subdomain)
+                    return redirect(
+                        "merchant_marketplace:index", request.merchant.subdomain
+                    )
                 except Exception as e:
                     messages.error(request, f"更新失敗：{str(e)}")
             else:
                 # 表單驗證失敗時顯示錯誤
                 for field, errors in form.errors.items():
                     for error in errors:
-                        field_label = form.fields[field].label if field in form.fields else field
+                        field_label = (
+                            form.fields[field].label if field in form.fields else field
+                        )
                         messages.error(request, f"{field_label}: {error}")
     else:
         form = ProductEditForm(instance=product)
@@ -160,6 +183,6 @@ def edit(request, subdomain, id):
         "product": product,
         "merchant_phone": product.merchant.Cellphone,
         "has_tickets": has_tickets,
-        "current_datetime": min_datetime.strftime('%Y-%m-%dT%H:%M')
+        "current_datetime": min_datetime.strftime("%Y-%m-%dT%H:%M"),
     }
     return render(request, "merchant_marketplace/edit.html", context)

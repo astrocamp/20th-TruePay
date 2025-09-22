@@ -66,3 +66,4 @@ docker-compose.prod.yml
 truepay-key-new.pem
 .editorconfig
 .prettierignore
+claude.md
