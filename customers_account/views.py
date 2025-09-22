@@ -121,7 +121,8 @@ def logout(request):
     # 完全清除 session 並重新生成 session key
     request.session.flush()
 
-    messages.success(request, "已成功登出")
+    # 注意：由於已經清除了 session，登出訊息將無法儲存
+    # 改為在目標頁面使用 URL 參數或其他方式顯示登出訊息
 
     # 建立重導向回應並設定防快取 headers
     response = redirect("pages:home")
@@ -294,6 +295,15 @@ def ticket_wallet(request):
 
     # 檢查是否需要自動展開特定票券的QR Code
     show_qr_ticket_id = request.GET.get("show_qr")
+
+    # 檢查是否來自TOTP驗證成功
+    verified_success = request.GET.get("verified") == "success"
+    if verified_success and show_qr_ticket_id:
+        messages.success(
+            request, "✅ 驗證成功！正在跳轉到票券錢包查看 QR Code..."
+        )
+    elif verified_success:
+        messages.success(request, "✅ 驗證成功！正在跳轉到票券錢包...")
 
     context = {
         "customer": customer,
@@ -753,16 +763,17 @@ def totp_verify_for_redemption(request):
             request.session["redemption_verified_time"] = timezone.now().timestamp()
 
             if ticket_id:
-                messages.success(
-                    request, "✅ 驗證成功！正在跳轉到票券錢包查看 QR Code..."
-                )
-                # 安全地添加查詢參數
+                # 安全地添加查詢參數，包含驗證成功狀態
                 if "?" in next_url:
-                    next_url += f"&show_qr={ticket_id}"
+                    next_url += f"&show_qr={ticket_id}&verified=success"
                 else:
-                    next_url += f"?show_qr={ticket_id}"
+                    next_url += f"?show_qr={ticket_id}&verified=success"
             else:
-                messages.success(request, "✅ 驗證成功！正在跳轉到票券錢包...")
+                # 添加驗證成功狀態參數
+                if "?" in next_url:
+                    next_url += "&verified=success"
+                else:
+                    next_url += "?verified=success"
 
             return redirect(next_url)
         else:
