@@ -22,7 +22,7 @@ RUN uv sync --frozen --no-dev
 # ==================== 第二階段：最終運行映像 ====================
 FROM python:3.13-slim AS runtime
 
-# 設定環境變數 (移除 UTF-8 編碼設定以測試簽名問題)
+# 設定環境變數
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PATH="/app/.venv/bin:$PATH"
@@ -36,10 +36,8 @@ RUN apt-get update && apt-get install -y \
     && apt-get autoremove -y \
     && apt-get autoclean
 
-# 安裝 uv（運行時需要）
-RUN pip install --no-cache-dir uv
-
 WORKDIR /app
+RUN pip install --no-cache-dir uv
 
 # 建立非 root 用戶
 RUN adduser --disabled-password --gecos '' --uid 1000 appuser
@@ -76,12 +74,13 @@ RUN rm -rf \
 USER appuser
 
 # 收集靜態檔案（設定臨時環境變數）
-RUN NGROK_URL=dummy /app/.venv/bin/python manage.py collectstatic --noinput
+ENV NGROK_URL="http://localhost:8000"
+RUN /app/.venv/bin/python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
 # 健康檢查
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD /app/.venv/bin/python -c "import requests; requests.get('http://localhost:8000/').raise_for_status()" || exit 1
+    CMD curl -f http://localhost:8000/ || exit 1
 # 生產環境使用 Gunicorn
 CMD ["/app/.venv/bin/gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120", "truepay.wsgi:application"]

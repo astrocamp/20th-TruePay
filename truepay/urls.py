@@ -2,8 +2,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 
-urlpatterns = [
-    path("admin/", admin.site.urls),
+urlpatterns = []
+
+# 開發環境啟用 admin
+if settings.DEBUG:
+    urlpatterns += [
+        path("admin/", admin.site.urls),
+    ]
+
+urlpatterns += [
     path("merchant/", include("merchant_account.urls")),
     path("customers/", include("customers_account.urls")),
     path("marketplace/shop/<slug:subdomain>/", include("merchant_marketplace.urls")),

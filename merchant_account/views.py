@@ -10,6 +10,7 @@ from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.db.models import Sum
 from django.http import HttpResponse, JsonResponse
+from django.conf import settings
 from datetime import datetime, timedelta
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
@@ -619,10 +620,11 @@ def subdomain_management(request, subdomain):
         "merchant": merchant,
         "can_change": can_change,
         "status_message": status_message,
-        "history": history[-3:],  # 三筆
+        "history": history[-2:],
         "redirects": redirects,
         "current_subdomain": merchant.subdomain,
         "form": form,
+        "base_domain": settings.BASE_DOMAIN,
     }
     return render(request, "merchant_account/domain_settings.html", context)
 

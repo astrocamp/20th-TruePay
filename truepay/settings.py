@@ -32,7 +32,7 @@ TICKET_VALIDITY_DAYS = 180  # 票券有效期（天數）
 SECRET_KEY = "django-insecure-iip1xgbl_eh&cl1p81i9*nuvl)qlb$#gj1e+f1it-a!xu1qjio"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # 從環境變數讀取 ngrok URL (必須在 .env 中設定)
 NGROK_URL = os.getenv("NGROK_URL")
@@ -45,8 +45,12 @@ ALLOWED_HOSTS = [
     ".trycloudflare.com",
     "127.0.0.1",
     "localhost",
+    "truepay.tw",
+    "*.truepay.tw",
+    ".truepay.tw",
+    "www.truepay.tw",
 ]
-BASE_DOMAIN = "highland-activities-editing-nitrogen.trycloudflare.com"
+BASE_DOMAIN = "truepay.tw"
 
 # Application definition
 
@@ -89,7 +93,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    # "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 子網域必需
+    "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 子網域必需
     "django.contrib.messages.middleware.MessageMiddleware",
     # "django.middleware.clickjacking.XFrameOptionsMiddleware",  # 已改用 CSP frame-ancestors
     "django.middleware.cache.FetchFromCacheMiddleware",
@@ -118,16 +122,23 @@ WSGI_APPLICATION = "truepay.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+
 def get_db_host():
-    # 若偵測到本地 runserver、migrate、makemigrations，則用 localhost，否則用 .env 設定
+    # 檢查是否在 Docker 容器中
+    if os.path.exists("/.dockerenv"):
+        return os.getenv("DB_HOST", "postgres")
+
+    # 若偵測到本地命令，則用 localhost
     import sys
+
     local_cmds = {"runserver", "migrate", "makemigrations"}
-    if (
-        os.getenv("DJANGO_DEVELOPMENT") == "True"
-        or (len(sys.argv) > 1 and sys.argv[1] in local_cmds)
+    if os.getenv("DJANGO_DEVELOPMENT") == "True" or (
+        len(sys.argv) > 1 and sys.argv[1] in local_cmds
     ):
         return "localhost"
-    return os.getenv("DB_HOST")
+
+    return os.getenv("DB_HOST", "localhost")
+
 
 DATABASES = {
     "default": {
@@ -314,8 +325,8 @@ SESSION_COOKIE_SAMESITE = "Lax"  # CSRF 保護
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 瀏覽器關閉時清除 Session
 SESSION_COOKIE_AGE = 3600  # Session 1小時後過期
 
-# SESSION_COOKIE_DOMAIN = f".{BASE_DOMAIN}"
-# CSRF_COOKIE_DOMAIN = f".{BASE_DOMAIN}"
+SESSION_COOKIE_DOMAIN = f".{BASE_DOMAIN}"
+CSRF_COOKIE_DOMAIN = f".{BASE_DOMAIN}"
 
 
 # 快取設定（防止敏感頁面被快取）
@@ -345,9 +356,11 @@ ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_UNIQUE_EMAIL = True
 
+
 # 登入重導向設定
 LOGIN_REDIRECT_URL = "/marketplace/"
 LOGOUT_REDIRECT_URL = "/"
+
 
 # Social Account 配置
 SOCIALACCOUNT_ADAPTER = "accounts.adaptor.CustomSocialAccountAdapter"

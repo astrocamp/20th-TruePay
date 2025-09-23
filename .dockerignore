@@ -1,135 +1,29 @@
-# Git 相關
-.git
-.gitignore
-
-# Python 相關
-.venv
-__pycache__
-*.pyc
-*.pyo
-*.pyd
-.Python
-env
-pip-log.txt
-pip-delete-this-directory.txt
-.tox
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.pytest_cache/
-
-# Django 相關
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-media/
-
-# Node.js (如果有前端工具)
-node_modules
-node_modules/
-npm-debug.log
-npm-debug.log*
-
 # 開發工具
-.vscode
+.git*
 .vscode/
-.idea
 .idea/
 *.swp
-*.swo
-*~
 
-# 環境變數
-.env
-.env.local
-.env.production
-.env.*.local
+#Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
 
-# Node.js 開發相關（但保留生產構建結果）
-node_modules
-npm-debug.log
-.npm
-
-# 前端開發檔案（但保留已建置的 static/）
-src/
-.prettierignore
-.editorconfig
-tailwind.config.js
-vite.config.js
-
-# 大型檔案和映像檔案（重要優化）
-*.tar.gz
-*.tar
-*.zip
-*.rar
-*.7z
-
-# 新增的動態 ALLOWED_HOSTS 日誌
+# 環境和日誌
+.env*
 *.log
+logs/
+
+# 前端開發檔案（保留已建置的 static/）
+node_modules/
+src/
+*.config.js
+
+# 大檔案
+*.tar.gz
+*.zip
+*.pem
 
 # 作業系統
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Docker 相關
-Dockerfile*
-.dockerignore
-docker-compose.yml
-docker-compose*.yml
-
-# 前端編譯輸出（使用本地已編譯的版本）
-# static/scripts/
-# static/styles/
-
-# 日誌檔案
-logs/
-*.log
-celery.log
-
-# 臨時檔案
-tmp/
-temp/
-
-# Python 緩存和臨時檔案
-__pycache__/
-*.py[cod]
-*$py.class
-.pytest_cache/
-.coverage
-.cache/
-
-# 虛擬環境（如果意外包含）
-.venv/
-venv/
-env/
-
-# 測試和文檔
-README.md
-*.md
-tests/
-coverage/
-docs/
-
-# IDE 和編輯器
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# 其他開發檔案
-.claude/
-ngrok.exe
-config.yml
-truepay-key-new.pem
-makefile
-Makefile
