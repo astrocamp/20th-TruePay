@@ -30,7 +30,6 @@
                     <div class="">
                         <p class="stat-card-label">{% trans "商品總數" %}</p>
                         <p class="stat-card-value">{{ total_products }}</p>
-                        <p class="stat-card-change positive">+12% 本月</p>
                     </div>
                     <div class="stat-card-icon">
                         {% include 'components/icons.html' with icon='box' class='w-6 h-6' %}
@@ -46,7 +45,6 @@
                     <div class="">
                         <p class="stat-card-label">{% trans "交易訂單" %}</p>
                         <p class="stat-card-value text-green-600">{{ total_orders }}</p>
-                        <p class="stat-card-change positive">+8% 本月</p>
                     </div>
                     <div class="stat-card-icon bg-green-100 text-green-600">
                         {% include 'components/icons.html' with icon='document' class='w-6 h-6' %}
@@ -62,7 +60,6 @@
                     <div class="">
                         <p class="stat-card-label">{% trans "總收入" %}</p>
                         <p class="stat-card-value text-yellow-600">NT$ {{ total_revenue|floatformat:0 }}</p>
-                        <p class="stat-card-change positive">+15% 本月</p>
                     </div>
                     <div class="stat-card-icon bg-yellow-100 text-yellow-600">
                         {% include 'components/icons.html' with icon='money' class='w-6 h-6' %}
