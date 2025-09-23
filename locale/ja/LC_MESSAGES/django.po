@@ -48,6 +48,10 @@ msgstr "電話番号を入力してください（形式：09xxxxxxxx）"
 msgid "請輸入密碼"
 msgstr "パスワードを入力してください"
 
+#: customers_account/forms.py:60
+msgid "請輸入身分證字號(ex:A123456789)，交易認證用"
+msgstr "身分証番号を入力してください（例：A123456789）取引認証用"
+
 #: customers_account/forms.py:227 merchant_account/forms.py:313
 msgid "請輸入身分證字號"
 msgstr "身分証番号を入力してください"

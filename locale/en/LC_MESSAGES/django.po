@@ -48,6 +48,10 @@ msgstr "Enter phone number (format: 09xxxxxxxx)"
 msgid "請輸入密碼"
 msgstr "Enter password"
 
+#: customers_account/forms.py:60
+msgid "請輸入身分證字號(ex:A123456789)，交易認證用"
+msgstr "Enter ID number (ex:A123456789) for transaction verification"
+
 #: customers_account/forms.py:227 merchant_account/forms.py:313
 msgid "請輸入身分證字號"
 msgstr "Enter ID number"

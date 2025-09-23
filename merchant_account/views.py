@@ -34,14 +34,28 @@ from datetime import datetime
 
 
 def register(req):
+    # 檢查用戶是否已經登入
+    if (
+        req.user.is_authenticated
+        and hasattr(req.user, "member_type")
+        and req.user.member_type == "merchant"
+    ):
+        try:
+            merchant = Merchant.objects.get(member=req.user)
+            messages.info(req, "您已經註冊並登入了")
+            return redirect("merchant_account:dashboard", merchant.subdomain)
+        except Merchant.DoesNotExist:
+            pass
+
     if req.method == "POST":
         form = RegisterForm(req.POST)
 
         if form.is_valid():
             try:
                 merchant = form.save()
-                messages.success(req, "註冊成功！")
-                return redirect("merchant_account:login")
+                django_login(req, merchant.member, backend="django.contrib.auth.backends.ModelBackend")
+                messages.success(req, "註冊成功！歡迎加入 TruePay！")
+                return redirect("merchant_account:dashboard", subdomain=merchant.subdomain)
             except Exception as e:
                 messages.error(req, "註冊失敗，請重新再試")
         else:

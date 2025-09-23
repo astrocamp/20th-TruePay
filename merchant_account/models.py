@@ -24,7 +24,7 @@ class Merchant(models.Model):
         verbose_name="會員帳號",
     )
     ShopName = models.CharField(max_length=50, null=False)
-    UnifiedNumber = models.CharField(max_length=8, null=False)
+    UnifiedNumber = models.CharField(max_length=8, null=False, unique=True)
     NationalNumber = models.CharField(max_length=10, null=False)
     Name = models.CharField(max_length=30, null=False)
     Address = models.CharField(max_length=50, null=False)
