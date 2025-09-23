@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
+from django.utils import timezone
+from django.db.models import Q
 from merchant_marketplace.models import Product
 
 
@@ -8,9 +10,13 @@ def home(req):
 
 
 def marketplace(req):
-    # 取得所有已發布的商品，排除已刪除的商品，按照建立時間排序
+    # 取得所有已發布的商品，排除已刪除的商品和過期商品，按照建立時間排序
     product_list = (
-        Product.objects.filter(is_active=True, is_deleted=False)
+        Product.objects.filter(
+            Q(ticket_expiry__isnull=True) | Q(ticket_expiry__gt=timezone.now()),
+            is_active=True,
+            is_deleted=False,
+        )
         .select_related("merchant")
         .order_by("-created_at")
     )
