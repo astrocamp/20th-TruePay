@@ -244,6 +244,19 @@ class SubdomainRedirectMiddleware:
                 return None
 
             except Merchant.DoesNotExist:
+                try:
+                    redirect = SubdomainRedirect.objects.select_related("merchant").get(
+                        old_subdomain=subdomain, is_active=True
+                    )
+                    if redirect.is_valid():
+                        scheme = "https" if request.is_secure() else "http"
+                        new_url = f"{scheme}://{redirect.new_subdomain}.{settings.BASE_DOMAIN}{request.path_info}"
+                        query_string = request.META.get("QUERY_STRING")
+                        if query_string:
+                            new_url += f"?{query_string}"
+                        redirect.use_redirect()
+                        return HttpResponsePermanentRedirect(new_url)
+                except SubdomainRedirect.DoesNotExist:
+                    pass
                 raise Http404("商店不存在")
-
         return None
