@@ -20,9 +20,16 @@
             {% trans "讓你的線上課程、會員制服務、活動票券，都能快速完成收款。" %}<br>
             {% trans "支援所有非實體商品上架，從銷售到交付一站式完成。" %}
         </p>
-        <a href="{% url 'merchant_account:register' %}" class="hero-button">
-            {% trans "開始使用！" %}
-        </a>
+        {% if user.is_authenticated and user.member_type == 'merchant' %}
+            {% load merchant_tags %}
+            <a href="{% get_current_merchant %}" class="hero-button">
+                {% trans "進入控制台" %}
+            </a>
+        {% else %}
+            <a href="{% url 'merchant_account:register' %}" class="hero-button">
+                {% trans "開始使用！" %}
+            </a>
+        {% endif %}
     </div>
 </section>
 
@@ -93,9 +100,15 @@
     <p class="section-subtitle">{% trans "加入數千位商家的行列，體驗最簡單的非實體商品平台創建" %}</p>
 
     <div class="mt-8 text-center">
-        <a href="{% url 'merchant_account:register' %}" class="hero-button inline-block">
-            {% trans "免費註冊帳號" %}
-        </a>
+        {% if user.is_authenticated and user.member_type == 'merchant' %}
+            <a href="{% get_current_merchant %}" class="hero-button inline-block">
+                {% trans "進入控制台" %}
+            </a>
+        {% else %}
+            <a href="{% url 'merchant_account:register' %}" class="hero-button inline-block">
+                {% trans "免費註冊帳號" %}
+            </a>
+        {% endif %}
     </div>
 </section>
 {% endblock %}

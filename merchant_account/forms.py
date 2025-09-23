@@ -129,6 +129,17 @@ class RegisterForm(ModelForm):
 
         return email
 
+    def clean_UnifiedNumber(self):
+        unified_number = self.cleaned_data.get("UnifiedNumber")
+        if unified_number and len(unified_number) != 8:
+            raise ValidationError("統一編號必須為8位數字")
+
+        # 檢查是否已有商家使用此統一編號
+        if unified_number and Merchant.objects.filter(UnifiedNumber=unified_number).exists():
+            raise ValidationError("此統一編號已被使用")
+
+        return unified_number
+
     def save(self, commit=True):
         email = self.cleaned_data["email"]
 

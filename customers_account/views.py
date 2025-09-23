@@ -37,6 +37,15 @@ from merchant_account.models import Merchant
 
 
 def register(request):
+    # 檢查用戶是否已經登入
+    if (
+        request.user.is_authenticated
+        and hasattr(request.user, "member_type")
+        and request.user.member_type == "customer"
+    ):
+        messages.info(request, "您已經註冊並登入了")
+        return redirect("pages:marketplace")
+
     if request.method == "POST":
         form = CustomerRegistrationForm(request.POST)
         if form.is_valid():
