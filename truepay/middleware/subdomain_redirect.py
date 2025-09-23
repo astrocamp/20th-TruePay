@@ -226,8 +226,6 @@ class SubdomainRedirectMiddleware:
                             next_url = next_param
                         else:
                             next_url = f"{scheme}://{subdomain}.{main_domain}/"
-
-                        print(f"DEBUG: Final next_url = {next_url}")
                         redirect_url = (
                             f"{scheme}://{main_domain}/customers/login/?next={next_url}"
                         )
