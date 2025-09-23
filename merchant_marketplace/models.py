@@ -39,6 +39,7 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="創建時間")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="更新時間")
     is_active = models.BooleanField(default=True, verbose_name="是否上架")
+    is_deleted = models.BooleanField(default=False, verbose_name="是否已刪除")
 
     class Meta:
         verbose_name = "商品"

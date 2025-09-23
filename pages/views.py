@@ -8,9 +8,9 @@ def home(req):
 
 
 def marketplace(req):
-    # 取得所有已發布的商品，按照建立時間排序
+    # 取得所有已發布的商品，排除已刪除的商品，按照建立時間排序
     product_list = (
-        Product.objects.filter(is_active=True)
+        Product.objects.filter(is_active=True, is_deleted=False)
         .select_related("merchant")
         .order_by("-created_at")
     )
