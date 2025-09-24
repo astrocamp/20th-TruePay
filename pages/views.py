@@ -31,3 +31,11 @@ def marketplace(req):
 
 def selectrole(req):
     return render(req, "pages/selectrole.html")
+
+
+def terms(req):
+    return render(req, "pages/terms.html")
+
+
+def privacy(req):
+    return render(req, "pages/privacy.html")

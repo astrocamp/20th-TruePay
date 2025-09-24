@@ -2151,5 +2151,323 @@ msgstr "Payment Failed"
 #~ msgid "開始掃描"
 #~ msgstr "Start Scanning"
 
+# Terms of Service and Privacy Policy translations - New additions only
+msgid "最後更新日期：2025年1月"
+msgstr "Last updated: January 2025"
+
+msgid "服務定義"
+msgstr "Service Definition"
+
+msgid "TruePay 是一個電子商務平台，為商家和消費者提供線上交易服務。我們的服務包括商品展示、線上支付、訂單管理等功能。"
+msgstr "TruePay is an e-commerce platform that provides online transaction services for merchants and consumers. Our services include product display, online payment, order management and other functions."
+
+msgid "用戶責任"
+msgstr "User Responsibilities"
+
+msgid "商家責任"
+msgstr "Merchant Responsibilities"
+
+msgid "提供真實、準確的商品資訊"
+msgstr "Provide authentic and accurate product information"
+
+msgid "確保商品品質符合描述"
+msgstr "Ensure product quality matches description"
+
+msgid "及時處理訂單和客戶服務"
+msgstr "Process orders and customer service in a timely manner"
+
+msgid "遵守相關法律法規"
+msgstr "Comply with relevant laws and regulations"
+
+msgid "消費者責任"
+msgstr "Consumer Responsibilities"
+
+msgid "提供準確的購買資訊"
+msgstr "Provide accurate purchase information"
+
+msgid "按時付款"
+msgstr "Make payments on time"
+
+msgid "合理使用平台服務"
+msgstr "Use platform services reasonably"
+
+msgid "交易規則"
+msgstr "Transaction Rules"
+
+msgid "付款"
+msgstr "Payment"
+
+msgid "支援多種付款方式，付款成功後訂單生效"
+msgstr "Support multiple payment methods, orders become effective after successful payment"
+
+msgid "退款"
+msgstr "Refund"
+
+msgid "依據商家退款政策，合理退款申請將在7個工作日內處理"
+msgstr "According to merchant refund policy, reasonable refund requests will be processed within 7 business days"
+
+msgid "爭議處理"
+msgstr "Dispute Resolution"
+
+msgid "平台提供爭議調解服務，促進雙方達成合理解決方案"
+msgstr "Platform provides dispute mediation services to facilitate reasonable solutions between parties"
+
+msgid "禁止行為"
+msgstr "Prohibited Behavior"
+
+msgid "發布違法、欺詐或誤導性內容"
+msgstr "Publishing illegal, fraudulent or misleading content"
+
+msgid "銷售違禁商品或服務"
+msgstr "Selling prohibited goods or services"
+
+msgid "侵犯他人智慧財產權"
+msgstr "Infringing on others' intellectual property rights"
+
+msgid "進行任何可能損害平台安全的行為"
+msgstr "Engaging in any behavior that may harm platform security"
+
+msgid "使用自動化程式干擾平台正常運作"
+msgstr "Using automated programs to interfere with platform normal operation"
+
+msgid "智慧財產權"
+msgstr "Intellectual Property Rights"
+
+msgid "TruePay 平台的軟體、設計、商標等智慧財產權歸本公司所有。用戶上傳的內容仍歸用戶所有，但用戶授權我們在提供服務範圍內使用。"
+msgstr "The intellectual property rights of TruePay platform's software, design, trademarks, etc. belong to our company. Content uploaded by users still belongs to users, but users authorize us to use it within the scope of providing services."
+
+msgid "服務變更"
+msgstr "Service Changes"
+
+msgid "我們保留修改服務內容和使用條款的權利。重要變更將提前30天通知用戶。繼續使用服務視為同意修改後的條款。"
+msgstr "We reserve the right to modify service content and terms of use. Important changes will be notified to users 30 days in advance. Continued use of the service is deemed as agreement to the modified terms."
+
+msgid "責任限制"
+msgstr "Limitation of Liability"
+
+msgid "TruePay 作為平台服務提供者，不對用戶間的交易承擔直接責任。我們致力於提供安全可靠的服務，但不保證服務無中斷或完全無錯誤。"
+msgstr "TruePay as a platform service provider does not assume direct responsibility for transactions between users. We are committed to providing safe and reliable services, but do not guarantee uninterrupted or completely error-free service."
+
+msgid "聯絡方式"
+msgstr "Contact Information"
+
+msgid "如對本使用條款有疑問，請聯絡我們："
+msgstr "If you have any questions about these terms of service, please contact us:"
+
+msgid "台灣台北市信義區信義路五段7號"
+msgstr "No. 7, Section 5, Xinyi Road, Xinyi District, Taipei City, Taiwan"
+
+# Privacy Policy translations - Additional content
+
+msgid "資料收集範圍"
+msgstr "Data Collection Scope"
+
+msgid "我們收集以下類型的個人資料："
+msgstr "We collect the following types of personal data:"
+
+msgid "帳戶資料"
+msgstr "Account Data"
+
+msgid "姓名、電子郵件、電話號碼"
+msgstr "Name, email, phone number"
+
+msgid "交易資料"
+msgstr "Transaction Data"
+
+msgid "購買記錄、付款資訊、收貨地址"
+msgstr "Purchase records, payment information, delivery address"
+
+msgid "技術資料"
+msgstr "Technical Data"
+
+msgid "IP位址、瀏覽器類型、使用習慣"
+msgstr "IP address, browser type, usage habits"
+
+msgid "公司資訊、銀行帳戶、營業執照"
+msgstr "Company information, bank account, business license"
+
+msgid "資料使用目的"
+msgstr "Data Usage Purpose"
+
+msgid "我們使用您的個人資料用於："
+msgstr "We use your personal data for:"
+
+msgid "提供和改善我們的服務"
+msgstr "Providing and improving our services"
+
+msgid "處理交易和訂單"
+msgstr "Processing transactions and orders"
+
+msgid "客戶服務和支援"
+msgstr "Customer service and support"
+
+msgid "防範詐欺和確保安全"
+msgstr "Fraud prevention and security assurance"
+
+msgid "法律合規和爭議處理"
+msgstr "Legal compliance and dispute resolution"
+
+msgid "發送重要通知（非行銷）"
+msgstr "Sending important notifications (non-marketing)"
+
+msgid "資料分享政策"
+msgstr "Data Sharing Policy"
+
+msgid "我們不會出售您的個人資料。在以下情況下，我們可能會分享您的資料："
+msgstr "We do not sell your personal data. We may share your data under the following circumstances:"
+
+msgid "服務提供商"
+msgstr "Service Providers"
+
+msgid "支付處理商、物流公司等"
+msgstr "Payment processors, logistics companies, etc."
+
+msgid "法律要求"
+msgstr "Legal Requirements"
+
+msgid "依法律規定或政府機關要求"
+msgstr "As required by law or government agencies"
+
+msgid "商業轉讓"
+msgstr "Business Transfer"
+
+msgid "在公司合併或收購時"
+msgstr "During company mergers or acquisitions"
+
+msgid "用戶同意"
+msgstr "User Consent"
+
+msgid "在取得您明確同意的情況下"
+msgstr "With your explicit consent"
+
+msgid "資料安全保護"
+msgstr "Data Security Protection"
+
+msgid "我們採取多重安全措施保護您的資料："
+msgstr "We implement multiple security measures to protect your data:"
+
+msgid "SSL 加密傳輸"
+msgstr "SSL encrypted transmission"
+
+msgid "資料庫加密存儲"
+msgstr "Encrypted database storage"
+
+msgid "存取權限控制"
+msgstr "Access control"
+
+msgid "定期安全檢測"
+msgstr "Regular security testing"
+
+msgid "員工隱私權訓練"
+msgstr "Employee privacy training"
+
+msgid "事件監控和回應"
+msgstr "Event monitoring and response"
+
+msgid "您的資料權利"
+msgstr "Your Data Rights"
+
+msgid "依據個人資料保護法，您有以下權利："
+msgstr "According to personal data protection law, you have the following rights:"
+
+msgid "查閱權"
+msgstr "Right to Access"
+
+msgid "查詢我們持有的您的個人資料"
+msgstr "Inquire about personal data we hold about you"
+
+msgid "更正權"
+msgstr "Right to Rectification"
+
+msgid "要求更正不正確的資料"
+msgstr "Request correction of incorrect data"
+
+msgid "刪除權"
+msgstr "Right to Erasure"
+
+msgid "要求刪除您的個人資料"
+msgstr "Request deletion of your personal data"
+
+msgid "停止處理權"
+msgstr "Right to Restrict Processing"
+
+msgid "要求停止處理您的資料"
+msgstr "Request to stop processing your data"
+
+msgid "資料可攜權"
+msgstr "Right to Data Portability"
+
+msgid "要求提供可攜式格式的資料"
+msgstr "Request data in portable format"
+
+msgid "如需行使這些權利，請聯絡我們的客服團隊。"
+msgstr "To exercise these rights, please contact our customer service team."
+
+msgid "Cookie 使用政策"
+msgstr "Cookie Usage Policy"
+
+msgid "我們使用 Cookie 和類似技術來："
+msgstr "We use cookies and similar technologies to:"
+
+msgid "維持登入狀態"
+msgstr "Maintain login status"
+
+msgid "記住使用偏好"
+msgstr "Remember user preferences"
+
+msgid "分析網站使用情況"
+msgstr "Analyze website usage"
+
+msgid "改善用戶體驗"
+msgstr "Improve user experience"
+
+msgid "您可以通過瀏覽器設定管理 Cookie 偏好。"
+msgstr "You can manage cookie preferences through browser settings."
+
+msgid "資料保存期限"
+msgstr "Data Retention Period"
+
+msgid "我們會按照以下原則保存您的資料："
+msgstr "We retain your data according to the following principles:"
+
+msgid "帳戶資料：帳戶存續期間"
+msgstr "Account data: Duration of account existence"
+
+msgid "交易記錄：依法律要求保存7年"
+msgstr "Transaction records: 7 years as required by law"
+
+msgid "技術日誌：保存1年"
+msgstr "Technical logs: 1 year"
+
+msgid "行銷資料：取消訂閱後立即刪除"
+msgstr "Marketing data: Deleted immediately after unsubscribing"
+
+msgid "未成年人保護"
+msgstr "Minor Protection"
+
+msgid "我們的服務不針對13歲以下兒童。如發現收集了未成年人資料，我們將立即刪除並採取適當措施。"
+msgstr "Our services are not directed at children under 13. If we discover we have collected data from minors, we will immediately delete it and take appropriate measures."
+
+msgid "政策更新"
+msgstr "Policy Updates"
+
+msgid "我們可能會定期更新此隱私權政策。重大變更將透過電子郵件或網站公告通知您。建議您定期查看最新版本。"
+msgstr "We may periodically update this privacy policy. Major changes will be notified to you via email or website announcements. We recommend that you regularly check the latest version."
+
+msgid "聯絡我們"
+msgstr "Contact Us"
+
+msgid "如對隱私權政策有疑問或需要協助，請聯絡我們："
+msgstr "If you have questions about the privacy policy or need assistance, please contact us:"
+
+msgid "隱私權諮詢窗口"
+msgstr "Privacy Consultation"
+
+msgid "服務時間"
+msgstr "Service Hours"
+
+msgid "週一至週五 09:00-18:00"
+msgstr "Monday to Friday 09:00-18:00"
+
 #~ msgid "TruePay 首頁"
 #~ msgstr "TruePay Home"
