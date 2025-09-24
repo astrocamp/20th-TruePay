@@ -57,7 +57,7 @@ class CustomerRegistrationForm(forms.ModelForm):
             "id_number": forms.TextInput(
                 attrs={
                     "class": "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": _("請輸入身分證字號（格式：A123456789）"),
+                    "placeholder": _("請輸入身分證字號(ex:A123456789)，交易認證用"),
                 }
             ),
             "birth_date": forms.DateInput(

@@ -14,11 +14,13 @@ from payments.models import OrderItem
 @no_cache_required
 def index(request, subdomain):
     status = request.GET.get("status")
-    products = Product.objects.filter(merchant=request.merchant)
+    products = Product.objects.filter(merchant=request.merchant, is_deleted=False)  # 預設排除已刪除
     if status == "active":
         products = products.filter(is_active=True)
     elif status == "inactive":
         products = products.filter(is_active=False)
+    elif status == "deleted":
+        products = Product.objects.filter(merchant=request.merchant, is_deleted=True)
     products = products.order_by("-created_at")
     return render(request, "merchant_marketplace/index.html", {"products": products})
 
@@ -44,10 +46,16 @@ def detail(request, subdomain, id):
             return redirect("merchant_marketplace:detail", request.merchant.subdomain, product.id)
             
         elif action == "delete":
-            product.is_active = False
-            product.save()
-            messages.success(request, "商品已刪除")
-            return redirect("merchant_marketplace:index", request.merchant.subdomain)
+            # 檢查是否有已售出的票券
+            has_tickets = OrderItem.objects.filter(product=product).exists()
+            if has_tickets:
+                messages.error(request, "此商品已有售出票券，無法刪除")
+            else:
+                product.is_deleted = True
+                product.is_active = False  # 刪除的商品也要下架
+                product.save()
+                messages.success(request, "商品已刪除")
+                return redirect("merchant_marketplace:index", request.merchant.subdomain)
 
     # 生成嵌入代碼（使用與 embed_system 相同的邏輯）
     ENV = os.getenv('ENV', 'development')

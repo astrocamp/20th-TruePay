@@ -22,15 +22,15 @@ class SubdomainRedirectMiddleware:
         if path_redirect_response:
             return path_redirect_response
 
-        # 檢查子域名（如 shop1.ushionagisa.work）
-        subdomain_response = self.check_truepay_subdomain(request)
-        if subdomain_response:
-            return subdomain_response
-
-        # 檢查舊的子域名重導向
+        # 先檢查舊的子域名重導向（優先級最高）
         redirect_response = self.check_subdomain_redirect(request)
         if redirect_response:
             return redirect_response
+
+        # 再檢查子域名（如 shop1.ushionagisa.work）
+        subdomain_response = self.check_truepay_subdomain(request)
+        if subdomain_response:
+            return subdomain_response
 
         response = self.get_response(request)
         return response
@@ -85,9 +85,24 @@ class SubdomainRedirectMiddleware:
         return None, None
 
     def check_subdomain_redirect(self, request):
+        # 先嘗試從路徑提取子網域
         current_slug, url_type = self.extract_slug_from_path(request)
-        if not current_slug or not url_type:
+
+        # 如果路徑無法提取，從 HTTP_HOST 提取子網域
+        if not current_slug:
+            host = request.META.get("HTTP_HOST", "").lower()
+            if ":" in host:
+                host = host.split(":")[0]
+
+            base_domain_with_dot = f".{settings.BASE_DOMAIN}"
+            if host.endswith(base_domain_with_dot):
+                current_slug = host.removesuffix(base_domain_with_dot)
+                if current_slug and current_slug != "www":
+                    url_type = "subdomain"
+
+        if not current_slug:
             return None
+
         try:
             redirect = SubdomainRedirect.objects.select_related("merchant").get(
                 old_subdomain=current_slug, is_active=True
@@ -112,18 +127,22 @@ class SubdomainRedirectMiddleware:
             return None
 
     def build_redirect_url(self, request, new_subdomain, url_type):
-        original_path = request.path_info.strip("/")
-
-        current_slug, _ = self.extract_slug_from_path(request)
-        if current_slug:
-            new_path = original_path.replace(current_slug, new_subdomain, 1)
-        else:
-            new_path = original_path
-
         scheme = "https" if request.is_secure() else "http"
-        host = request.META.get("HTTP_HOST", "")
         query_string = request.META.get("QUERY_STRING", "")
-        new_url = f"{scheme}://{host}/{new_path}"
+
+        if url_type == "subdomain":
+            new_host = f"{new_subdomain}.{settings.BASE_DOMAIN}"
+            new_url = f"{scheme}://{new_host}{request.path_info}"
+        else:
+            original_path = request.path_info.strip("/")
+            current_slug, _ = self.extract_slug_from_path(request)
+            if current_slug:
+                new_path = original_path.replace(current_slug, new_subdomain, 1)
+            else:
+                new_path = original_path
+            host = request.META.get("HTTP_HOST", "")
+            new_url = f"{scheme}://{host}/{new_path}"
+
         if query_string:
             new_url += f"?{query_string}"
         return new_url
@@ -207,7 +226,6 @@ class SubdomainRedirectMiddleware:
                             next_url = next_param
                         else:
                             next_url = f"{scheme}://{subdomain}.{main_domain}/"
-
                         redirect_url = (
                             f"{scheme}://{main_domain}/customers/login/?next={next_url}"
                         )
@@ -216,7 +234,6 @@ class SubdomainRedirectMiddleware:
                         redirect_url = (
                             f"{scheme}://{main_domain}{request.get_full_path()}"
                         )
-
                     return HttpResponsePermanentRedirect(redirect_url)
 
                 if request.path_info == "/":
@@ -227,6 +244,19 @@ class SubdomainRedirectMiddleware:
                 return None
 
             except Merchant.DoesNotExist:
+                try:
+                    redirect = SubdomainRedirect.objects.select_related("merchant").get(
+                        old_subdomain=subdomain, is_active=True
+                    )
+                    if redirect.is_valid():
+                        scheme = "https" if request.is_secure() else "http"
+                        new_url = f"{scheme}://{redirect.new_subdomain}.{settings.BASE_DOMAIN}{request.path_info}"
+                        query_string = request.META.get("QUERY_STRING")
+                        if query_string:
+                            new_url += f"?{query_string}"
+                        redirect.use_redirect()
+                        return HttpResponsePermanentRedirect(new_url)
+                except SubdomainRedirect.DoesNotExist:
+                    pass
                 raise Http404("商店不存在")
-
         return None

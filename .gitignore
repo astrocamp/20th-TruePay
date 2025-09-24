@@ -55,6 +55,7 @@ static/
 # Claude files
 CLAUDE.local.md
 COMPONENT_SYSTEM.md
+claude.md
 
 # pip install log/暫存檔
 =*

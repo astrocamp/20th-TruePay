@@ -25,13 +25,15 @@
     <!-- 導覽列 -->
     <nav class="nav-bar" x-data="{ mobileMenuOpen: false }" :class="{ 'scrolled': scrolled }" @resize.window="if (window.innerWidth >= 768) { mobileMenuOpen = false }">
         <div class="nav-container">
-            <div class="logo-section flex items-center">
+            <a href="{%url 'pages:home' %}">
+              <div class="logo-section flex items-center">
                 <img src="{% static 'favicon.ico' %}" alt="TruePay Logo" class="h-10 mr-3">
                 <span class="font-bold text-xl">TRUEPAY</span>
-            </div>
+              </div>
+            </a>
             <ul class="nav-links flex items-center">
-                <li><a href="{% url 'pages:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">{% trans "首頁" %}</a></li>
-                <li><a href="{% url 'pages:home' %}#features">{% trans "特色" %}</a></li>
+                <li><a href="{% if request.merchant %}https://truepay.tw/{% else %}{% url 'pages:home' %}{% endif %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">{% trans "首頁" %}</a></li>
+                <li><a href="{% if request.merchant %}https://truepay.tw/#features{% else %}{% url 'pages:home' %}#features{% endif %}">{% trans "特色" %}</a></li>
                 <li><a href="{% url 'pages:marketplace' %}">{% trans "商品總覽" %}</a></li>
                 {% if user.is_authenticated %}
                     {% if user.member_type == "merchant" %}
@@ -70,8 +72,8 @@
             <!-- 手機版選單 -->
             <div class="mobile-menu" :class="{ 'show': mobileMenuOpen }">
                 <ul>
-                    <li><a href="{% url 'pages:home' %}" @click="mobileMenuOpen = false">{% trans "首頁" %}</a></li>
-                    <li><a href="{% url 'pages:home' %}#features" @click="mobileMenuOpen = false">{% trans "特色" %}</a></li>
+                    <li><a href="{% if request.merchant %}https://truepay.tw/{% else %}{% url 'pages:home' %}{% endif %}" @click="mobileMenuOpen = false">{% trans "首頁" %}</a></li>
+                    <li><a href="{% if request.merchant %}https://truepay.tw/#features{% else %}{% url 'pages:home' %}#features{% endif %}" @click="mobileMenuOpen = false">{% trans "特色" %}</a></li>
                     <li><a href="{% url 'pages:marketplace' %}" @click="mobileMenuOpen = false">{% trans "商品總覽" %}</a></li>
                     {% if user.is_authenticated %}
                         {% if user.member_type == "merchant" %}

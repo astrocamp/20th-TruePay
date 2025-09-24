@@ -113,76 +113,6 @@ window.createImagePreview = createImagePreview;
 
 
 
-// 付款倒數計時功能
-// Alpine.js 付款倒數計時組件
-function createPaymentTimer(config = {}) {
-  const initialDuration = config.duration || 5;
-  return {
-    countdown: initialDuration,
-    initialDuration: initialDuration,
-    formId: config.formId || 'newebpay-form',
-    timer: null,
-    isRunning: false,
-    
-    init() {
-      // 自動開始計時
-      this.startTimer();
-    },
-    
-    startTimer() {
-      if (this.isRunning) return;
-      
-      this.isRunning = true;
-      this.timer = setInterval(() => {
-        this.countdown--;
-        
-        if (this.countdown <= 0) {
-          this.completeTimer();
-        }
-      }, 1000);
-    },
-    
-    pauseTimer() {
-      if (this.timer) {
-        clearInterval(this.timer);
-        this.timer = null;
-        this.isRunning = false;
-      }
-    },
-    
-    resumeTimer() {
-      if (!this.isRunning && this.countdown > 0) {
-        this.startTimer();
-      }
-    },
-    
-    resetTimer() {
-      this.pauseTimer();
-      this.countdown = this.initialDuration;
-    },
-    
-    completeTimer() {
-      this.pauseTimer();
-      
-      // 提交表單
-      const form = document.getElementById(this.formId);
-      if (form) {
-        form.submit();
-      } else {
-        this.showError(`無法提交表單，找不到 ID 為 ${this.formId} 的表單`);
-      }
-    },
-    
-    destroy() {
-      this.pauseTimer();
-    },
-    
-    showError(message) {
-      console.error('PaymentTimer:', message);
-      alert(message);
-    }
-  };
-}
 
 // TOTP 管理頁面函數
 function createTotpManage() {
@@ -215,7 +145,6 @@ function createTotpSetup() {
 }
 
 // 將函數掛載到全域供 Alpine.js 使用
-window.createPaymentTimer = createPaymentTimer;
 window.createTotpManage = createTotpManage;
 window.createTotpSetup = createTotpSetup;
 
@@ -1106,9 +1035,8 @@ window.getTemplateDisplayName = getTemplateDisplayName;
 window.buildPreviewUrl = buildPreviewUrl;
 
 // 導出 Alpine.js 組件創建函數和 NavigationManager
-export { 
+export {
   createImagePreview,
-  createPaymentTimer, 
   createMobileMenu,
   createQuantityManager,
   createTicketScanManager,

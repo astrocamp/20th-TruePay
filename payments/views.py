@@ -106,7 +106,7 @@ def _create_order_for_payment(customer, provider, product_id, quantity, product=
     if product is None:
         if not product_id:
             raise ValueError("缺少商品ID")
-        product = get_object_or_404(Product, id=int(product_id), is_active=True)
+        product = get_object_or_404(Product, id=int(product_id), is_active=True, is_deleted=False)
 
     # 統一由後端計算總金額（安全處理）
     amount = product.price * quantity
@@ -165,7 +165,7 @@ def create_payment(request):
         # 獲取商品資訊以檢查驗證需求
         if not product_id:
             raise ValueError("缺少商品ID")
-        product = get_object_or_404(Product, id=int(product_id), is_active=True)
+        product = get_object_or_404(Product, id=int(product_id), is_active=True, is_deleted=False)
 
         # 檢查是否需要 TOTP 驗證（商品要求付款前驗證 + 用戶已啟用TOTP + 尚未通過驗證）
         if (
@@ -459,7 +459,7 @@ def stock_insufficient_error(request):
         return redirect("pages:home")
 
     try:
-        product = get_object_or_404(Product, id=int(product_id), is_active=True)
+        product = get_object_or_404(Product, id=int(product_id), is_active=True, is_deleted=False)
 
         # 構建商品頁面 URL - 根據 public_store URLs 的實際格式
         # 格式為 /shop/{subdomain}/pay/{id}/
@@ -495,7 +495,7 @@ def check_stock_api(request):
             return JsonResponse({"error": "數量必須大於 0"}, status=400)
 
         # 取得商品資訊
-        product = get_object_or_404(Product, id=int(product_id), is_active=True)
+        product = get_object_or_404(Product, id=int(product_id), is_active=True, is_deleted=False)
 
         # 檢查庫存狀態
         is_available = product.stock >= requested_quantity

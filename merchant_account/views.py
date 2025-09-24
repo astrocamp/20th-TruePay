@@ -10,6 +10,7 @@ from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.db.models import Sum
 from django.http import HttpResponse, JsonResponse
+from django.conf import settings
 from datetime import datetime, timedelta
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
@@ -33,14 +34,28 @@ from datetime import datetime
 
 
 def register(req):
+    # 檢查用戶是否已經登入
+    if (
+        req.user.is_authenticated
+        and hasattr(req.user, "member_type")
+        and req.user.member_type == "merchant"
+    ):
+        try:
+            merchant = Merchant.objects.get(member=req.user)
+            messages.info(req, "您已經註冊並登入了")
+            return redirect("merchant_account:dashboard", merchant.subdomain)
+        except Merchant.DoesNotExist:
+            pass
+
     if req.method == "POST":
         form = RegisterForm(req.POST)
 
         if form.is_valid():
             try:
                 merchant = form.save()
-                messages.success(req, "註冊成功！")
-                return redirect("merchant_account:login")
+                django_login(req, merchant.member, backend="django.contrib.auth.backends.ModelBackend")
+                messages.success(req, "註冊成功！歡迎加入 TruePay！")
+                return redirect("merchant_account:dashboard", subdomain=merchant.subdomain)
             except Exception as e:
                 messages.error(req, "註冊失敗，請重新再試")
         else:
@@ -619,10 +634,11 @@ def subdomain_management(request, subdomain):
         "merchant": merchant,
         "can_change": can_change,
         "status_message": status_message,
-        "history": history[-3:],  # 三筆
+        "history": history[-2:],
         "redirects": redirects,
         "current_subdomain": merchant.subdomain,
         "form": form,
+        "base_domain": settings.BASE_DOMAIN,
     }
     return render(request, "merchant_account/domain_settings.html", context)
 

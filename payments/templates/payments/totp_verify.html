@@ -1,5 +1,20 @@
-{% extends "layouts/default.html" %}
-{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交易安全驗證 - TruePay</title>
+
+    <!-- CSS -->
+    <link href="{% static 'styles/app.css' %}" rel="stylesheet" type="text/css" />
+
+    <!-- JavaScript -->
+    <script src="{% static 'scripts/app.js' %}" defer></script>
+</head>
+<body class="bg-gray-50 text-brand-text font-sans min-h-screen flex items-center justify-center">
+
+<main class="w-full">
 <div class="max-w-md mx-auto mt-16 p-6 bg-white rounded-lg shadow-lg" x-data="createTotpVerifyPayment()">
     <div class="text-center mb-8">
         <div class="mx-auto mb-4 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
@@ -119,4 +134,7 @@
         </p>
     </div>
 </div>
-{% endblock %}
+
+</main>
+</body>
+</html>

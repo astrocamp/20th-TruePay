@@ -45,8 +45,12 @@ ALLOWED_HOSTS = [
     ".trycloudflare.com",
     "127.0.0.1",
     "localhost",
+    "truepay.tw",
+    "*.truepay.tw",
+    ".truepay.tw",
+    "www.truepay.tw",
 ]
-BASE_DOMAIN = "highland-activities-editing-nitrogen.trycloudflare.com"
+BASE_DOMAIN = "truepay.tw"
 
 # Application definition
 
@@ -118,16 +122,23 @@ WSGI_APPLICATION = "truepay.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+
 def get_db_host():
-    # 若偵測到本地 runserver、migrate、makemigrations，則用 localhost，否則用 .env 設定
+    # 檢查是否在 Docker 容器中
+    if os.path.exists("/.dockerenv"):
+        return os.getenv("DB_HOST", "postgres")
+
+    # 若偵測到本地命令，則用 localhost
     import sys
+
     local_cmds = {"runserver", "migrate", "makemigrations"}
-    if (
-        os.getenv("DJANGO_DEVELOPMENT") == "True"
-        or (len(sys.argv) > 1 and sys.argv[1] in local_cmds)
+    if os.getenv("DJANGO_DEVELOPMENT") == "True" or (
+        len(sys.argv) > 1 and sys.argv[1] in local_cmds
     ):
         return "localhost"
-    return os.getenv("DB_HOST")
+
+    return os.getenv("DB_HOST", "localhost")
+
 
 DATABASES = {
     "default": {
@@ -345,9 +356,11 @@ ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_UNIQUE_EMAIL = True
 
+
 # 登入重導向設定
 LOGIN_REDIRECT_URL = "/marketplace/"
 LOGOUT_REDIRECT_URL = "/"
+
 
 # Social Account 配置
 SOCIALACCOUNT_ADAPTER = "accounts.adaptor.CustomSocialAccountAdapter"

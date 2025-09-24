@@ -25,7 +25,7 @@ class ProductDetailAPIView(APIView):
     """
     def get(self, request, product_id):
         try:
-            product = get_object_or_404(Product, id=product_id, is_active=True)
+            product = get_object_or_404(Product, id=product_id, is_active=True, is_deleted=False)
 
             # 構建購買連結
             purchase_url = request.build_absolute_uri(
@@ -378,7 +378,7 @@ class EmbedProductView(TemplateView):
         product_id = kwargs.get('product_id')
 
         try:
-            product = get_object_or_404(Product, id=product_id, is_active=True)
+            product = get_object_or_404(Product, id=product_id, is_active=True, is_deleted=False)
             context['product'] = product
 
             # 檢查是否有管理權限
