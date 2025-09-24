@@ -7,6 +7,7 @@ import './chart.js'
 import './custom.js'
 import './navigation.js'
 import './copy.js'
+import './toggle.js'
 import jsQR from 'jsqr'
 import Chart from 'chart.js/auto' 
 

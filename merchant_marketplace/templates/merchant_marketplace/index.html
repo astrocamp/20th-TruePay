@@ -50,14 +50,24 @@
                         <div class="flex justify-between items-center mb-3">
                             <span class="text-sm text-gray-600">
                                 {% if product.is_active %}
-                                    <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded">{% trans "上架中" %}</span>
+                                    <span id="status-{{ product.id }}" class="bg-green-100 text-green-700 px-2 py-0.5 rounded">{% trans "上架中" %}</span>
                                 {% else %}
-                                    <span class="bg-red-100 text-red-700 px-2 py-0.5 rounded">{% trans "未上架" %}</span>
+                                    <span id="status-{{ product.id }}" class="bg-red-100 text-red-700 px-2 py-0.5 rounded">{% trans "未上架" %}</span>
                                 {% endif %}
                             </span>
-                            <a href="{% url 'merchant_marketplace:detail' request.merchant.subdomain product.id %}" class="text-blue-600 hover:text-blue-800">
-                                {% trans "查看詳情" %}
-                            </a>
+                            <div class="flex gap-2 items-center">
+                                <button
+                                    x-data="productToggle"
+                                    x-init="init({{ product.is_active|yesno:'true,false' }})"
+                                    @click="toggle({{ product.id }}, '{{ request.merchant.subdomain }}')"
+                                    :disabled="loading"
+                                    :class="buttonClass"
+                                    x-text="buttonText">
+                                </button>
+                                <a href="{% url 'merchant_marketplace:detail' request.merchant.subdomain product.id %}" class="text-blue-600 hover:text-blue-800">
+                                    {% trans "查看詳情" %}
+                                </a>
+                            </div>
                         </div>
                     </div>
                 {% endfor %}

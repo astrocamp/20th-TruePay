@@ -2,6 +2,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.http import JsonResponse
 from django.conf import settings
 import os
 from .models import Product
@@ -186,3 +187,31 @@ def edit(request, subdomain, id):
         "current_datetime": min_datetime.strftime("%Y-%m-%dT%H:%M"),
     }
     return render(request, "merchant_marketplace/edit.html", context)
+
+
+@no_cache_required
+@merchant_verified_required
+def toggle_status(request, subdomain, id):
+    if request.method != "POST":
+        return JsonResponse({"success": False, "message": "只允許 POST 請求"}, status=405)
+
+    try:
+        product = get_object_or_404(Product, id=id, merchant=request.merchant)
+
+        # 切換上下架狀態
+        product.is_active = not product.is_active
+        product.save()
+
+        status_text = "上架" if product.is_active else "下架"
+        message = f"商品已成功{status_text}"
+
+        return JsonResponse({
+            "success": True,
+            "is_active": product.is_active,
+            "message": message
+        })
+
+    except Product.DoesNotExist:
+        return JsonResponse({"success": False, "message": "商品不存在"}, status=404)
+    except Exception as e:
+        return JsonResponse({"success": False, "message": f"操作失敗: {str(e)}"}, status=500)
