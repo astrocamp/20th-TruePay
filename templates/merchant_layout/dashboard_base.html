@@ -106,7 +106,7 @@
         <div class="language-switcher">
           <form action="{% url 'set_language' %}" method="post" class="w-full">
             {% csrf_token %}
-            <select name="language" onchange="this.form.submit()" class="language-select w-full text-center">
+            <select name="language" @change="$el.form.submit()" class="language-select w-full text-center">
               {% get_current_language as LANGUAGE_CODE %}
               {% get_available_languages as LANGUAGES %}
               {% for lang_code, lang_name in LANGUAGES %}
