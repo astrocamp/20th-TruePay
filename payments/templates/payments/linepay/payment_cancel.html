@@ -16,7 +16,7 @@
                 <a href="{% url 'customers_account:dashboard' %}" class="block w-full bg-gray-500 text-white py-3 px-6 rounded-lg hover:bg-gray-600 transition duration-200 font-medium">
                     返回首頁
                 </a>
-                <button onclick="history.back()" class="block w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-200 transition duration-200 font-medium">
+                <button @click="history.back()" class="block w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-200 transition duration-200 font-medium">
                     返回上頁
                 </button>
             </div>
