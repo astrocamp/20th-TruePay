@@ -95,7 +95,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 子網域必需
     "django.contrib.messages.middleware.MessageMiddleware",
-    # "django.middleware.clickjacking.XFrameOptionsMiddleware",  # 已改用 CSP frame-ancestors
     "django.middleware.cache.FetchFromCacheMiddleware",
 ]
 
@@ -440,6 +439,10 @@ CELERY_BEAT_SCHEDULE = {
         "options": {
             "expires": 3300,  # 55分鐘後過期
         },
+    },
+    "auto-deactivate-expired-products": {
+        "task": "merchant_marketplace.auto_deactivate_expired_products",
+        "schedule": crontab(minute="*/10"),  # 10分鐘一次
     },
 }
 
