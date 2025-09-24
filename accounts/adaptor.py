@@ -76,8 +76,10 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         """
         在社群登入之前檢查是否有相同 email 的用戶。如果有，就連結現有帳號；如果沒有，允許創建新帳號
         """
+        print("=== pre_social_login called ===")
 
         if sociallogin.is_existing:
+            print("=== sociallogin.is_existing is True, returning ===")
             return
 
         email = self._get_email_from_sociallogin(sociallogin)
@@ -105,7 +107,17 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                 logger.error(f"帳號連結失敗 - 未知錯誤: {e}, email: {email}")
                 raise ValidationError("系統異常，請稍後再試或聯繫客服")
 
-        return super().pre_social_login(request, sociallogin)
+        existing_merchant = (
+            Member.objects.filter(email=email)
+            .exclude(member_type=CUSTOMER_TYPE)
+            .first()
+        )
+
+        if existing_merchant:
+            sociallogin.state["process"] = "signup"
+            user = self.save_user(request, sociallogin)
+            sociallogin.connect(request, user)
+            return
 
     def save_user(self, request, sociallogin, form=None):
         """
@@ -148,16 +160,3 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             raise ValidationError(f"資料庫完整性錯誤: {str(e)}")
         except Exception as e:
             raise ValidationError(f"創建用戶時發生未預期的錯誤: {str(e)}")
-
-    def pre_social_login(self, request, sociallogin):
-        super().pre_social_login(request, sociallogin)
-
-        next_url = request.GET.get('next')
-        if next_url:
-            request.session['socialaccount_login_next'] = next_url
-
-    def get_login_redirect_url(self, request):
-        next_url = request.session.pop('socialaccount_login_next', None)
-        if next_url:
-            return next_url
-        return '/marketplace/'

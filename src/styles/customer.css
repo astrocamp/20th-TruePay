@@ -1,8 +1,4 @@
 /* ===============================================
-   客戶相關樣式管理
-   =============================================== */
-
-/* ===============================================
    Navigation Styles (導航樣式)
    =============================================== */
 
@@ -127,20 +123,21 @@
    =============================================== */
 
 .hero-section {
-    min-height: 100vh;
+    min-height: 80vh;
     background-size: cover;
     background-position: center;
-    background-attachment: fixed;
+    background-attachment: scroll;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
+    padding: 2rem 0;
 }
 
 .hero-card {
     background: rgba(59, 130, 246, 0.95);
     backdrop-filter: blur(10px);
-    border-radius: 0;
+    border-radius: 1.5rem;
     padding: 4rem 3rem;
     color: white;
     text-align: center;
@@ -149,17 +146,6 @@
     position: relative;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
 }
-
-.hero-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #60a5fa, #3b82f6, #1d4ed8);
-}
-
 .hero-title {
     font-size: 2.5rem;
     font-weight: 900;
@@ -190,6 +176,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    border-radius: 1.5rem;
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
