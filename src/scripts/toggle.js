@@ -71,6 +71,10 @@ function ProductToggle() {
     }
 }
 
+document.addEventListener('alpine:init', () => {
+    Alpine.data('productToggle', ProductToggle);
+});
+
 if (typeof Alpine !== 'undefined') {
     Alpine.data('productToggle', ProductToggle);
 }
