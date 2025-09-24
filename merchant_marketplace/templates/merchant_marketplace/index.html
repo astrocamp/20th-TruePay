@@ -62,7 +62,8 @@
                                     @click="toggle({{ product.id }}, '{{ request.merchant.subdomain }}')"
                                     :disabled="loading"
                                     :class="buttonClass"
-                                    x-text="buttonText">
+                                    x-text="buttonText"
+                                    class="cursor-pointer">
                                 </button>
                                 <a href="{% url 'merchant_marketplace:detail' request.merchant.subdomain product.id %}" class="text-blue-600 hover:text-blue-800">
                                     {% trans "查看詳情" %}
