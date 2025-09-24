@@ -1,7 +1,7 @@
 # Standard library imports
 import json
 from functools import wraps
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 
 # Third party imports
 import pyotp
@@ -785,18 +785,21 @@ def totp_verify_for_redemption(request):
             request.session["redemption_verified"] = True
             request.session["redemption_verified_time"] = timezone.now().timestamp()
 
+            # 使用 urllib.parse 安全地處理 URL 查詢參數
+            parsed_url = urlparse(next_url)
+            query_params = parse_qs(parsed_url.query)
+
+            # 添加驗證成功參數
+            query_params['verified'] = ['success']
             if ticket_id:
-                # 安全地添加查詢參數，包含驗證成功狀態
-                if "?" in next_url:
-                    next_url += f"&show_qr={ticket_id}&verified=success"
-                else:
-                    next_url += f"?show_qr={ticket_id}&verified=success"
-            else:
-                # 添加驗證成功狀態參數
-                if "?" in next_url:
-                    next_url += "&verified=success"
-                else:
-                    next_url += "?verified=success"
+                query_params['show_qr'] = [str(ticket_id)]
+
+            # 重建 URL
+            new_query_string = urlencode(query_params, doseq=True)
+            next_url = urlunparse((
+                parsed_url.scheme, parsed_url.netloc, parsed_url.path,
+                parsed_url.params, new_query_string, parsed_url.fragment
+            ))
 
             return redirect(next_url)
         else:
