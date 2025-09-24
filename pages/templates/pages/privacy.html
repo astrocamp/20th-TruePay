@@ -1,0 +1,121 @@
+{% extends 'layouts/default.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "隱私權政策" %} - TruePay{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6">{% trans "隱私權政策" %}</h1>
+        <p class="text-gray-600 mb-8">{% trans "最後更新日期：2025年1月" %}</p>
+
+        <div class="prose max-w-none text-gray-700 space-y-6">
+            <section>
+                <h2 class="text-xl font-semibold text-gray-900 mb-3">1. {% trans "資料收集範圍" %}</h2>
+                <p>{% trans "我們收集以下類型的個人資料：" %}</p>
+                <ul class="list-disc list-inside space-y-1 mt-2">
+                    <li><strong>{% trans "帳戶資料" %}：</strong>{% trans "姓名、電子郵件、電話號碼" %}</li>
+                    <li><strong>{% trans "交易資料" %}：</strong>{% trans "購買記錄、付款資訊、收貨地址" %}</li>
+                    <li><strong>{% trans "技術資料" %}：</strong>{% trans "IP位址、瀏覽器類型、使用習慣" %}</li>
+                    <li><strong>{% trans "商家資料" %}：</strong>{% trans "公司資訊、銀行帳戶、營業執照" %}</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-semibold text-gray-900 mb-3">2. {% trans "資料使用目的" %}</h2>
+                <p>{% trans "我們使用您的個人資料用於：" %}</p>
+                <ul class="list-disc list-inside space-y-1 mt-2">
+                    <li>{% trans "提供和改善我們的服務" %}</li>
+                    <li>{% trans "處理交易和訂單" %}</li>
+                    <li>{% trans "客戶服務和支援" %}</li>
+                    <li>{% trans "防範詐欺和確保安全" %}</li>
+                    <li>{% trans "法律合規和爭議處理" %}</li>
+                    <li>{% trans "發送重要通知（非行銷）" %}</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-semibold text-gray-900 mb-3">3. {% trans "資料分享政策" %}</h2>
+                <p>{% trans "我們不會出售您的個人資料。在以下情況下，我們可能會分享您的資料：" %}</p>
+                <ul class="list-disc list-inside space-y-1 mt-2">
+                    <li><strong>{% trans "服務提供商" %}：</strong>{% trans "支付處理商、物流公司等" %}</li>
+                    <li><strong>{% trans "法律要求" %}：</strong>{% trans "依法律規定或政府機關要求" %}</li>
+                    <li><strong>{% trans "商業轉讓" %}：</strong>{% trans "在公司合併或收購時" %}</li>
+                    <li><strong>{% trans "用戶同意" %}：</strong>{% trans "在取得您明確同意的情況下" %}</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-semibold text-gray-900 mb-3">4. {% trans "資料安全保護" %}</h2>
+                <p>{% trans "我們採取多重安全措施保護您的資料：" %}</p>
+                <ul class="list-disc list-inside space-y-1 mt-2">
+                    <li>{% trans "SSL 加密傳輸" %}</li>
+                    <li>{% trans "資料庫加密存儲" %}</li>
+                    <li>{% trans "存取權限控制" %}</li>
+                    <li>{% trans "定期安全檢測" %}</li>
+                    <li>{% trans "員工隱私權訓練" %}</li>
+                    <li>{% trans "事件監控和回應" %}</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-semibold text-gray-900 mb-3">5. {% trans "您的資料權利" %}</h2>
+                <p>{% trans "依據個人資料保護法，您有以下權利：" %}</p>
+                <ul class="list-disc list-inside space-y-1 mt-2">
+                    <li><strong>{% trans "查閱權" %}：</strong>{% trans "查詢我們持有的您的個人資料" %}</li>
+                    <li><strong>{% trans "更正權" %}：</strong>{% trans "要求更正不正確的資料" %}</li>
+                    <li><strong>{% trans "刪除權" %}：</strong>{% trans "要求刪除您的個人資料" %}</li>
+                    <li><strong>{% trans "停止處理權" %}：</strong>{% trans "要求停止處理您的資料" %}</li>
+                    <li><strong>{% trans "資料可攜權" %}：</strong>{% trans "要求提供可攜式格式的資料" %}</li>
+                </ul>
+                <p class="mt-2">{% trans "如需行使這些權利，請聯絡我們的客服團隊。" %}</p>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-semibold text-gray-900 mb-3">6. {% trans "Cookie 使用政策" %}</h2>
+                <p>{% trans "我們使用 Cookie 和類似技術來：" %}</p>
+                <ul class="list-disc list-inside space-y-1 mt-2">
+                    <li>{% trans "維持登入狀態" %}</li>
+                    <li>{% trans "記住使用偏好" %}</li>
+                    <li>{% trans "分析網站使用情況" %}</li>
+                    <li>{% trans "改善用戶體驗" %}</li>
+                </ul>
+                <p class="mt-2">{% trans "您可以通過瀏覽器設定管理 Cookie 偏好。" %}</p>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-semibold text-gray-900 mb-3">7. {% trans "資料保存期限" %}</h2>
+                <p>{% trans "我們會按照以下原則保存您的資料：" %}</p>
+                <ul class="list-disc list-inside space-y-1 mt-2">
+                    <li>{% trans "帳戶資料：帳戶存續期間" %}</li>
+                    <li>{% trans "交易記錄：依法律要求保存7年" %}</li>
+                    <li>{% trans "技術日誌：保存1年" %}</li>
+                    <li>{% trans "行銷資料：取消訂閱後立即刪除" %}</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-semibold text-gray-900 mb-3">8. {% trans "未成年人保護" %}</h2>
+                <p>{% trans "我們的服務不針對13歲以下兒童。如發現收集了未成年人資料，我們將立即刪除並採取適當措施。" %}</p>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-semibold text-gray-900 mb-3">9. {% trans "政策更新" %}</h2>
+                <p>{% trans "我們可能會定期更新此隱私權政策。重大變更將透過電子郵件或網站公告通知您。建議您定期查看最新版本。" %}</p>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-semibold text-gray-900 mb-3">10. {% trans "聯絡我們" %}</h2>
+                <p>{% trans "如對隱私權政策有疑問或需要協助，請聯絡我們：" %}</p>
+                <div class="bg-gray-50 p-4 rounded-lg mt-3">
+                    <p><strong>{% trans "隱私權諮詢窗口" %}</strong></p>
+                    <p>{% trans "電子郵件" %}：privacy@truepay.tw</p>
+                    <p>{% trans "電話" %}：(02) 1234-5678</p>
+                    <p>{% trans "地址" %}：{% trans "台灣台北市信義區信義路五段7號" %}</p>
+                    <p>{% trans "服務時間" %}：{% trans "週一至週五 09:00-18:00" %}</p>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}

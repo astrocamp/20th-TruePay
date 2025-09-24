@@ -164,8 +164,8 @@
         <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4 text-xs text-gray-500 flex items-center justify-between">
           <p>© 2025 TruePay</p>
           <nav class="flex items-center gap-4">
-            <a href="#" class="hover:text-blue-600">{% trans '使用條款' %}</a>
-            <a href="#" class="hover:text-blue-600">{% trans '隱私權政策' %}</a>
+            <a href="{% url 'pages:terms' %}" class="hover:text-blue-600">{% trans '使用條款' %}</a>
+            <a href="{% url 'pages:privacy' %}" class="hover:text-blue-600">{% trans '隱私權政策' %}</a>
           </nav>
         </div>
       </footer>
