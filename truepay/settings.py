@@ -441,6 +441,10 @@ CELERY_BEAT_SCHEDULE = {
             "expires": 3300,  # 55分鐘後過期
         },
     },
+    "auto-deactivate-expired-products": {
+        "task": "merchant_marketplace.auto_deactivate_expired_products",
+        "schedule": crontab(minute="*/10"),  # 10分鐘一次
+    },
 }
 
 # 任務路由（可選）

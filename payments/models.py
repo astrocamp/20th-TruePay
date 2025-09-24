@@ -184,7 +184,9 @@ class OrderItem(models.Model):
 
     # === 票券有效性 ===
     valid_until = models.DateTimeField("有效期限", null=True, blank=True)
-    expiry_notification_sent = models.DateTimeField("到期通知發送時間", null=True, blank=True)
+    expiry_notification_sent = models.DateTimeField(
+        "到期通知發送時間", null=True, blank=True
+    )
 
     # === 外鍵關聯 ===
     order = models.ForeignKey(
@@ -243,65 +245,73 @@ class OrderItem(models.Model):
 
         return True, "票券使用成功"
 
-    def should_send_expiry_notification(self, minutes_before=5):
+    def should_send_expiry_notification(self, minutes_before=30):
         """
         檢查是否應該發送到期通知
-        
+
         Args:
             minutes_before (int): 到期前幾分鐘發送通知
-            
+
         Returns:
             bool: 是否應該發送通知
         """
         # 檢查基本條件
         if not self.valid_until:
             return False
-            
+
         if self.status not in ["unused", "expired"]:
             return False
-            
+
         if not self.order.is_paid():
             return False
-            
-        if not self.customer or not self.customer.member or not self.customer.member.email:
+
+        if (
+            not self.customer
+            or not self.customer.member
+            or not self.customer.member.email
+        ):
             return False
-            
+
         # 檢查是否已經發送過通知
         if self.expiry_notification_sent:
             return False
-            
+
         # 檢查是否在通知時間範圍內
         now = timezone.now()
-        notification_time = self.valid_until - timezone.timedelta(minutes=minutes_before)
-        
+        notification_time = self.valid_until - timezone.timedelta(
+            minutes=minutes_before
+        )
+
         # 定義通知時間窗口：到期前6分鐘到過期後30分鐘
-        window_start = notification_time - timezone.timedelta(minutes=1)  # 到期前6分鐘開始
-        window_end = self.valid_until + timezone.timedelta(minutes=30)    # 過期後30分鐘內
-        
+        window_start = notification_time - timezone.timedelta(
+            minutes=1
+        )  # 到期前6分鐘開始
+        window_end = self.valid_until + timezone.timedelta(minutes=30)  # 過期後30分鐘內
+
         # 只在合理的時間窗口內發送通知
         if window_start <= now <= window_end:
             return True
-            
+
         return False
-    
+
     def send_expiry_notification(self):
         """
         發送到期通知郵件
-        
+
         Returns:
             bool: 發送是否成功
         """
         from django.core.mail import send_mail
         from django.conf import settings
         from django.urls import reverse
-        
+
         if not self.should_send_expiry_notification():
             return False
-            
+
         try:
             customer_email = self.customer.member.email
             customer_name = self.customer.name or "親愛的用戶"
-            
+
             # 根據票券是否已過期調整標題和內容
             now = timezone.now()
             if now > self.valid_until:
@@ -312,9 +322,13 @@ class OrderItem(models.Model):
                 subject = "🚨 TruePay 緊急提醒 - 您的票券即將到期！"
                 timing_message = "您的票券即將到期"
                 urgency_level = "緊急提醒"
-            
+
             # 生成消費者登入和票券錢包連結
-            base_url = f"https://{settings.NGROK_URL}" if hasattr(settings, 'NGROK_URL') else "https://truepay.tw"
+            base_url = (
+                f"https://{settings.NGROK_URL}"
+                if hasattr(settings, "NGROK_URL")
+                else "https://truepay.tw"
+            )
             login_url = f"{base_url}/customers/login/"
             wallet_url = f"{base_url}/customers/ticket-wallet/"
 
@@ -388,13 +402,13 @@ TruePay 客服團隊
                 fail_silently=False,
                 html_message=html_message,  # HTML 版本
             )
-            
+
             # 記錄通知發送時間
             self.expiry_notification_sent = timezone.now()
-            self.save(update_fields=['expiry_notification_sent'])
-            
+            self.save(update_fields=["expiry_notification_sent"])
+
             return True
-            
+
         except Exception as e:
             # 這裡可以記錄錯誤日誌
             return False
@@ -407,18 +421,14 @@ TruePay 客服團隊
             dict: 執行結果統計
         """
         tickets_to_notify = cls.objects.filter(
-            status__in=['unused', 'expired'],
-            order__status='paid',
+            status__in=["unused", "expired"],
+            order__status="paid",
             valid_until__isnull=False,
             expiry_notification_sent__isnull=True,
             customer__isnull=False,
             customer__member__email__isnull=False,
         ).select_related(
-            'customer',
-            'customer__member',
-            'product',
-            'product__merchant',
-            'order'
+            "customer", "customer__member", "product", "product__merchant", "order"
         )
 
         notifications_sent = 0
@@ -433,10 +443,12 @@ TruePay 客服團隊
             else:
                 errors_count += 1
         result = {
-            'total_checked': total_checked,
-            'notifications_sent': notifications_sent,
-            'errors_count': errors_count,
-            'success_rate': (notifications_sent / total_checked * 100) if total_checked > 0 else 0
+            "total_checked": total_checked,
+            "notifications_sent": notifications_sent,
+            "errors_count": errors_count,
+            "success_rate": (
+                (notifications_sent / total_checked * 100) if total_checked > 0 else 0
+            ),
         }
         return result
 
@@ -451,9 +463,10 @@ TruePay 客服團隊
             "is_used": self.status == "used",
             "used_at": self.used_at,
             "verification_timing": self.product.verification_timing,
-            "requires_post_verification": self.product.verification_timing == 'after_redeem',
+            "requires_post_verification": self.product.verification_timing
+            == "after_redeem",
         }
-    
+
     def generate_qr_code_data(self):
         """生成QR code資料內容"""
         qr_data = {
@@ -461,10 +474,10 @@ TruePay 客服團隊
             "type": "ticket_voucher",
             "version": "1.0",
             "product_id": self.product.id,
-            "merchant_id": self.product.merchant.id
+            "merchant_id": self.product.merchant.id,
         }
         return json.dumps(qr_data)
-    
+
     def generate_qr_code_image(self):
         """生成帶有 TruePay logo 的票券 QR code"""
 
@@ -475,10 +488,8 @@ TruePay 客服團隊
         return generate_qr_code_with_logo(
             data=qr_data,
             error_correction=qrcode.constants.ERROR_CORRECT_M,  # 票券需要中等錯誤修正
-            logo_size_ratio=0.2  # logo 稍微小一點，確保掃描穩定性
+            logo_size_ratio=0.2,  # logo 稍微小一點，確保掃描穩定性
         )
-    
-
 
     @classmethod
     def get_ticket_from_qr_data(cls, qr_data):
@@ -576,8 +587,10 @@ def create_tickets(sender, instance, **kwargs):
                 if order.product.ticket_expiry:
                     valid_until = order.product.ticket_expiry
                 else:
-                    valid_until = timezone.now() + timezone.timedelta(days=settings.TICKET_VALIDITY_DAYS)
-                
+                    valid_until = timezone.now() + timezone.timedelta(
+                        days=settings.TICKET_VALIDITY_DAYS
+                    )
+
                 items_to_create.append(
                     OrderItem(
                         order=order,
