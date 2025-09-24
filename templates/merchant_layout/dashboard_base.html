@@ -14,6 +14,9 @@
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 </head>
 <body class="merchant-dashboard font-sans scrollbar-apple" x-data="createMobileMenu()">
+  <!-- Flash Messages -->
+  {% include "components/message_content.html" %}
+
   <!-- 背景遮罩層（手機版） -->
   <div class="dashboard-overlay" :class="{ 'open': isOpen }" @click="close()"></div>
 

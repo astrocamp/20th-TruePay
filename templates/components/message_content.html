@@ -1,0 +1,10 @@
+<!-- Flash Messages Container -->
+<div x-data="messagesControl" x-init="showAllFrom($refs.msgsJson)">
+    <script x-ref="msgsJson" type="application/json">
+      {% if messages %}[
+      {% for message in messages %}{"text": "{{ message|escapejs }}", "tag": "{{ message.tags|default:'info' }}"}{% if not forloop.last %},{% endif %}
+      {% endfor %}]
+      {% else %}[]
+      {% endif %}
+    </script>
+</div>
