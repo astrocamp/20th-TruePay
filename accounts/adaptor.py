@@ -76,10 +76,8 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         """
         在社群登入之前檢查是否有相同 email 的用戶。如果有，就連結現有帳號；如果沒有，允許創建新帳號
         """
-        print("=== pre_social_login called ===")
 
         if sociallogin.is_existing:
-            print("=== sociallogin.is_existing is True, returning ===")
             return
 
         email = self._get_email_from_sociallogin(sociallogin)
