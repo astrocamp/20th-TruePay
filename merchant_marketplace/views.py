@@ -173,11 +173,11 @@ def toggle_status(request, subdomain, id):
         return JsonResponse({"success": False, "message": "只允許 POST 請求"}, status=405)
 
     try:
-        product = get_object_or_404(Product, id=id, merchant=request.merchant)
+        product = Product.objects.get(id=id, merchant=request.merchant)
 
         # 切換上下架狀態
         product.is_active = not product.is_active
-        product.save()
+        product.save(update_fields=["is_active"])
 
         status_text = "上架" if product.is_active else "下架"
         message = f"商品已成功{status_text}"
