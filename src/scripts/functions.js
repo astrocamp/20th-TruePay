@@ -797,7 +797,27 @@ ${codesText}
         
         goToDashboard(nextUrl, dashboardUrl) {
             if (this.confirmed) {
-                window.location.href = nextUrl || dashboardUrl;
+                // 額外的前端安全驗證（雖然後端已經驗證，但雙重保護）
+                let targetUrl = dashboardUrl; // 預設安全的URL
+
+                if (nextUrl && nextUrl.trim() !== '') {
+                    // 只允許相對路徑或同網域的URL
+                    try {
+                        const url = new URL(nextUrl, window.location.origin);
+                        if (url.origin === window.location.origin) {
+                            targetUrl = nextUrl;
+                        }
+                        // 如果是外部URL，使用預設的儀表板URL
+                    } catch (e) {
+                        // 如果URL解析失敗，使用相對路徑
+                        if (nextUrl.startsWith('/') && !nextUrl.startsWith('//')) {
+                            targetUrl = nextUrl;
+                        }
+                        // 否則使用預設的儀表板URL
+                    }
+                }
+
+                window.location.href = targetUrl;
             }
         }
     };

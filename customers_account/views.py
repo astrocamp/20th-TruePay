@@ -1,7 +1,7 @@
 # Standard library imports
 import json
 from functools import wraps
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 
 # Third party imports
 import pyotp
@@ -130,7 +130,8 @@ def logout(request):
     # 完全清除 session 並重新生成 session key
     request.session.flush()
 
-    messages.success(request, "已成功登出")
+    # 注意：由於已經清除了 session，登出訊息將無法儲存
+    # 改為在目標頁面使用 URL 參數或其他方式顯示登出訊息
 
     # 建立重導向回應並設定防快取 headers
     response = redirect("pages:home")
@@ -304,6 +305,15 @@ def ticket_wallet(request):
     # 檢查是否需要自動展開特定票券的QR Code
     show_qr_ticket_id = request.GET.get("show_qr")
 
+    # 檢查是否來自TOTP驗證成功
+    verified_success = request.GET.get("verified") == "success"
+    if verified_success and show_qr_ticket_id:
+        messages.success(
+            request, "✅ 驗證成功！正在跳轉到票券錢包查看 QR Code..."
+        )
+    elif verified_success:
+        messages.success(request, "✅ 驗證成功！正在跳轉到票券錢包...")
+
     context = {
         "customer": customer,
         "tickets": page_obj,
@@ -398,8 +408,15 @@ def totp_setup(request):
     customer.generate_totp_secret()
     qr_code = customer.generate_qr_code()
 
-    # 檢查是否有next參數
+    # 檢查是否有next參數並驗證URL安全性
     next_url = request.GET.get("next")
+    if next_url:
+        parsed_url = urlparse(next_url)
+        # 只允許相對路徑和同網域的絕對路徑
+        if parsed_url.netloc and not parsed_url.netloc.endswith(
+            settings.BASE_DOMAIN
+        ):
+            next_url = None  # 重置為安全的預設值
 
     context = {
         "customer": customer,
@@ -439,8 +456,15 @@ def totp_enable(request):
                 backup_tokens = customer.generate_backup_tokens()
                 customer.save()
 
-                # 檢查是否有next參數
+                # 檢查是否有next參數並驗證URL安全性
                 next_url = request.GET.get("next") or request.POST.get("next")
+                if next_url:
+                    parsed_url = urlparse(next_url)
+                    # 只允許相對路徑和同網域的絕對路徑
+                    if parsed_url.netloc and not parsed_url.netloc.endswith(
+                        settings.BASE_DOMAIN
+                    ):
+                        next_url = None  # 重置為安全的預設值
 
                 messages.success(
                     request, "二階段驗證已成功啟用！請保存您的備用恢復代碼。"
@@ -761,17 +785,21 @@ def totp_verify_for_redemption(request):
             request.session["redemption_verified"] = True
             request.session["redemption_verified_time"] = timezone.now().timestamp()
 
+            # 使用 urllib.parse 安全地處理 URL 查詢參數
+            parsed_url = urlparse(next_url)
+            query_params = parse_qs(parsed_url.query)
+
+            # 添加驗證成功參數
+            query_params['verified'] = ['success']
             if ticket_id:
-                messages.success(
-                    request, "✅ 驗證成功！正在跳轉到票券錢包查看 QR Code..."
-                )
-                # 安全地添加查詢參數
-                if "?" in next_url:
-                    next_url += f"&show_qr={ticket_id}"
-                else:
-                    next_url += f"?show_qr={ticket_id}"
-            else:
-                messages.success(request, "✅ 驗證成功！正在跳轉到票券錢包...")
+                query_params['show_qr'] = [str(ticket_id)]
+
+            # 重建 URL
+            new_query_string = urlencode(query_params, doseq=True)
+            next_url = urlunparse((
+                parsed_url.scheme, parsed_url.netloc, parsed_url.path,
+                parsed_url.params, new_query_string, parsed_url.fragment
+            ))
 
             return redirect(next_url)
         else:
@@ -825,8 +853,16 @@ def authenticator_guide(request):
         messages.info(request, "您已經啟用二階段驗證")
         return redirect("customers_account:totp_manage")
 
-    # 檢查是否有 next 參數，決定是否顯示「稍後再做設定」按鈕
+    # 檢查是否有 next 參數並驗證URL安全性，決定是否顯示「稍後再做設定」按鈕
     next_url = request.GET.get("next")
+    if next_url:
+        parsed_url = urlparse(next_url)
+        # 只允許相對路徑和同網域的絕對路徑
+        if parsed_url.netloc and not parsed_url.netloc.endswith(
+            settings.BASE_DOMAIN
+        ):
+            next_url = None  # 重置為安全的預設值
+
     is_required = bool(next_url)  # 如果有 next 參數，表示是必須設定的
 
     context = {
