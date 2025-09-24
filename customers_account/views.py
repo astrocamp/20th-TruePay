@@ -408,8 +408,15 @@ def totp_setup(request):
     customer.generate_totp_secret()
     qr_code = customer.generate_qr_code()
 
-    # 檢查是否有next參數
+    # 檢查是否有next參數並驗證URL安全性
     next_url = request.GET.get("next")
+    if next_url:
+        parsed_url = urlparse(next_url)
+        # 只允許相對路徑和同網域的絕對路徑
+        if parsed_url.netloc and not parsed_url.netloc.endswith(
+            settings.BASE_DOMAIN
+        ):
+            next_url = None  # 重置為安全的預設值
 
     context = {
         "customer": customer,
@@ -449,8 +456,15 @@ def totp_enable(request):
                 backup_tokens = customer.generate_backup_tokens()
                 customer.save()
 
-                # 檢查是否有next參數
+                # 檢查是否有next參數並驗證URL安全性
                 next_url = request.GET.get("next") or request.POST.get("next")
+                if next_url:
+                    parsed_url = urlparse(next_url)
+                    # 只允許相對路徑和同網域的絕對路徑
+                    if parsed_url.netloc and not parsed_url.netloc.endswith(
+                        settings.BASE_DOMAIN
+                    ):
+                        next_url = None  # 重置為安全的預設值
 
                 messages.success(
                     request, "二階段驗證已成功啟用！請保存您的備用恢復代碼。"
@@ -836,8 +850,16 @@ def authenticator_guide(request):
         messages.info(request, "您已經啟用二階段驗證")
         return redirect("customers_account:totp_manage")
 
-    # 檢查是否有 next 參數，決定是否顯示「稍後再做設定」按鈕
+    # 檢查是否有 next 參數並驗證URL安全性，決定是否顯示「稍後再做設定」按鈕
     next_url = request.GET.get("next")
+    if next_url:
+        parsed_url = urlparse(next_url)
+        # 只允許相對路徑和同網域的絕對路徑
+        if parsed_url.netloc and not parsed_url.netloc.endswith(
+            settings.BASE_DOMAIN
+        ):
+            next_url = None  # 重置為安全的預設值
+
     is_required = bool(next_url)  # 如果有 next 參數，表示是必須設定的
 
     context = {
