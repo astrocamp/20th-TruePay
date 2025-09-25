@@ -1,184 +1,101 @@
-# TruePay 專案設置指南
+# TruePay
 
-## 系統需求
+<div align="center">
+    <img src="https://test-django-images-marchung.s3.ap-northeast-1.amazonaws.com/TP/logo.png" alt="TruePay Logo">
+</div>
 
-- macOS（推薦）或 Linux
-- Python 3.8+
-- PostgreSQL 15+
+[![Django](https://img.shields.io/badge/Django-5.2-green.svg)](https://djangoproject.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)](https://postgresql.org/)
+[![Alpine.js](https://img.shields.io/badge/Alpine.js-3.14-8BC0D0.svg)](https://alpinejs.dev/)
+[![Chart.js](https://img.shields.io/badge/Chart.js-4.5-FF6384.svg)](https://www.chartjs.org/)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind-4.1-06B6D4.svg)](https://tailwindcss.com/)
+[![Celery](https://img.shields.io/badge/Celery-5.3-green.svg)](https://celeryproject.org/)
+[![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3.12-orange.svg)](https://www.rabbitmq.com/)
+[![DaisyUI](https://img.shields.io/badge/DaisyUI-5.0-5A0EF8.svg)](https://daisyui.com/)
+[![HTMX](https://img.shields.io/badge/HTMX-2.0-3366CC.svg)](https://htmx.org/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg)](https://docker.com/)
 
-## 安裝步驟
+## 簡介
 
-### 1. 安裝 uv（Python 套件管理器）
+**厭倦了繁瑣的開店流程與不安全的交易？**
 
-```bash
-# macOS/Linux
-curl -LsSf https://astral.sh/uv/install.sh | sh
+**[TruePay](https://truepay.tw/) 整合了商店建立、票券販售與信任支付，為你的事業開啟無限可能。無論是課程、活動、或入場券，都能在這裡找到最完美的銷售方式。**
 
-# 或使用 Homebrew
-brew install uv
-```
+• **你的品牌，你作主**：支援子網域，打造獨一無二的品牌形象。
+• **從銷售到驗證**：完整電子票券生命週期管理，提升營運效率。
+• **交易最安心**：多平台安全支付整合，保障買賣雙方的每一筆交易。
+• **絕佳顧客體驗**：方便的數位票券錢包，讓顧客輕鬆管理每一次購買。
 
-### 2. 安裝 PostgreSQL
+**收款用 TruePay，筆筆都 PayTrue。**
 
-**macOS（推薦使用 Homebrew）：**
-```bash
-# 安裝 Homebrew（如果尚未安裝）
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+<div align="center">
+    <img src="https://test-django-images-marchung.s3.ap-northeast-1.amazonaws.com/TP/home.png" alt="TruePay Banner">
+</div>
 
-# 安裝 PostgreSQL 17
-brew install postgresql@17
+## 技術架構
 
-# 啟動 PostgreSQL 服務
-brew services start postgresql@17
-```
+### 前端技術
 
-**Ubuntu/Debian：**
-```bash
-sudo apt update
-sudo apt install postgresql postgresql-contrib
-sudo systemctl start postgresql
-sudo systemctl enable postgresql
-```
+- **JavaScript**: Alpine.js, Chart.js, HTMX
+- **CSS Framework**: TailwindCSS
 
-### 3. 設置資料庫
+### 後端技術
 
-```bash
-# 創建專案資料庫
-createdb truepay_db
+- **LANGUAGE**: Python
+- **Framework**: Django 5.2.5
+- **Database**: PostgreSQL
+- **Task Queue**: Celery, RabbitMQ
+- **Storage**: AWS S3
 
-# 如果遇到權限問題，可能需要先創建用戶（替換 your_username）
-sudo -u postgres createuser --createdb your_username
-createdb truepay_db
-```
 
-### 4. 複製專案並設置環境
+### 部署與基礎設施
 
-```bash
-# 複製專案
-git clone <repository-url>
-cd 20th-TruePay
+- **Containerization**: Docker
+- **雲端服務**: AWS EC2
+- **Email**: Resend
 
-# 複製環境變數範本
-cp .env.example .env
+## 功能簡介
 
-# 編輯 .env 檔案設定你的資料庫資訊
-nano .env
-```
+(這裡放功能流程)
 
-### 5. 環境變數設定
+## 安裝設定
 
-編輯 `.env` 檔案：
+1. **安裝依賴套件**
 
-```bash
-DB_NAME=truepay_db
-DB_USER=your_username        # 替換為你的系統用戶名
-DB_PASSWORD=                 # 如果有設密碼則填入
-DB_HOST=localhost
-DB_PORT=5432
-```
-
-### 6. 安裝 Python 依賴並執行遷移
-
-```bash
-# 安裝所有依賴
-uv sync
-
-# 執行資料庫遷移
-uv run python manage.py migrate
-
-# 創建超級用戶（可選）
-uv run python manage.py createsuperuser
-```
-
-### 7. 啟動開發服務器
-
-```bash
-uv run python manage.py runserver
-```
-
-專案應該會在 `http://127.0.0.1:8000` 啟動。
-
-## 常見問題解決
-
-### PostgreSQL 連線問題
-
-1. **確認 PostgreSQL 正在運行：**
    ```bash
-   # macOS
-   brew services list | grep postgresql
-   
-   # Linux
-   sudo systemctl status postgresql
+   # 使用 pip
+   pip install -r requirements.txt
+   # 或使用 uv
+   uv pip install -r requirements.txt
    ```
 
-2. **檢查端口是否可用：**
+2. **設定環境變數**
+
    ```bash
-   lsof -i :5432
+   cp .env.example .env
+   # 編輯 .env 檔案，填入必要的設定
    ```
 
-3. **測試資料庫連線：**
+3. **資料庫遷移**
+
    ```bash
-   psql -h localhost -U your_username -d truepay_db
+   make migrate
+   # 或
+   uv run python manage.py migrate
    ```
 
-### 權限問題
+4. **運行開發伺服器**
+   ```bash
+   make runserver
+   # 或
+   uv run python manage.py runserver
+   ```
 
-如果遇到資料庫權限問題：
+## 團隊成員
 
-```bash
-# macOS/Linux - 設定 PostgreSQL 用戶權限
-sudo -u postgres psql
-CREATE USER your_username WITH CREATEDB;
-ALTER USER your_username CREATEDB;
-```
-
-### Python 依賴問題
-
-如果 uv 無法使用，可以使用 pip：
-
-```bash
-# 創建虛擬環境
-python -m venv .venv
-source .venv/bin/activate  # macOS/Linux
-# 或 .venv\Scripts\activate  # Windows
-
-# 安裝依賴
-pip install -r requirements.txt  # 如果有 requirements.txt
-```
-
-## 開發工具
-
-### 執行測試
-```bash
-uv run python manage.py test
-```
-
-### 代碼檢查
-```bash
-uv run python manage.py check
-```
-
-### 收集靜態檔案（生產環境）
-```bash
-uv run python manage.py collectstatic
-```
-
-## 生產部署注意事項
-
-1. 設定 `DEBUG=False`
-2. 配置適當的 `ALLOWED_HOSTS`
-3. 使用環境變數管理敏感資訊
-4. 設定適當的資料庫連線池
-5. 配置靜態檔案服務
-
-## 支援
-
-如有問題，請檢查：
-1. Python 版本是否符合需求
-2. PostgreSQL 是否正確安裝並運行
-3. 環境變數是否正確設定
-4. 資料庫權限是否充足
-
----
-
-**注意：** 請勿將 `.env` 檔案提交到版本控制系統中，這個檔案包含敏感資訊。
+| 成員名稱 | GitHub | 負責內容 |
+|----------|--------|----------|
+| 張文琳 | [WenLin](https://github.com/WENLIN-CHANG/) | 藍新金流串接、第三方登入功能、消費者會員系統、商家報表分析功能 |
+| 魏綸廷 | [LunTing](https://github.com/LunTing-Wei/) | 商家子網域功能、AWS EC2部署、資料庫欄位設計、網站視覺/商家模板設計 |
+| 洪政佑 | [Mark](https://github.com/marcpikachu/) | 圖片上傳功能、商家建立商品CRUD、票券QR code生成/核銷、二階段驗證功能 |
+| 曾俊琳 | [ett-et](https://github.com/ett-et/) | Line pay金流串接、自動排程寄信功能、票券生成功能、一鍵嵌入功能 |
