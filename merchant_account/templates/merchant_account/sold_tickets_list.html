@@ -1,10 +1,10 @@
 {% extends "merchant_layout/dashboard_base.html" %}
 {% load i18n %}
 {% block content %}
-<div class="max-w-7xl mx-auto mt-8 p-6 bg-brand-white rounded-lg shadow-md">
-    <div class="flex justify-between items-center mb-6">
+<div class="max-w-7xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
+    <div class="mb-6 text-center">
         <h1 class="text-2xl font-bold text-brand-black">{% trans "售出票券管理" %}</h1>
-        <div class="text-sm text-gray-600">
+        <div class="text-lg text-gray-600">
             {% trans "總計" %}:{{ stats.total_tickets }} {% trans "張票券" %}
         </div>
     </div>

@@ -11,13 +11,13 @@
     <div class="mb-8">
         <div class="border-b border-gray-200">
             <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-                <button @click="activeTab = 'profile'" :class="activeTab === 'profile' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'" class="hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                <button @click="activeTab = 'profile'" :class="activeTab === 'profile' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'" class="hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-lg">
                     {% trans "商家資料" %}
                 </button>
-                <button @click="activeTab = 'password'" :class="activeTab === 'password' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'" class="hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                <button @click="activeTab = 'password'" :class="activeTab === 'password' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'" class="hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-lg">
                     {% trans "修改密碼" %}
                 </button>
-                <button @click="activeTab = 'template'" :class="activeTab === 'template' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'" class="hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                <button @click="activeTab = 'template'" :class="activeTab === 'template' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'" class="hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-lg">
                     {% trans "模板設定" %}
                 </button>
             </nav>
@@ -165,8 +165,7 @@
                                class="block cursor-pointer rounded-xl border-2 border-gray-200 p-6 hover:border-gray-300 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-200 transition-all duration-200">
 
                             <!-- 模板預覽圖 -->
-                            <div class="h-32 rounded-lg mb-4 flex items-center justify-center text-4xl"
-                                 style="background: linear-gradient(135deg, {{ template_info|get_item:choice_value|get_item:'color' }}22, {{ template_info|get_item:choice_value|get_item:'color' }}44);">
+                            <div class="h-32 rounded-lg mb-4 flex items-center justify-center text-4xl {{ template_info|get_item:choice_value|get_item:'preview_class' }}">
                             </div>
 
                             <!-- 模板信息 -->
@@ -178,11 +177,6 @@
                                 {% for feature in template_info|get_item:choice_value|get_item:'features' %}
                                 <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">{{ feature }}</span>
                                 {% endfor %}
-                            </div>
-
-                            <!-- 選中指示器 -->
-                            <div class="absolute top-4 right-4 w-4 h-4 rounded-full border-2 border-gray-300 peer-checked:border-blue-500 peer-checked:bg-blue-500 transition-all duration-200">
-                                <div class="w-2 h-2 rounded-full bg-white m-0.5 opacity-0 peer-checked:opacity-100 transition-opacity duration-200"></div>
                             </div>
                         </label>
                     </div>

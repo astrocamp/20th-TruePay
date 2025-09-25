@@ -20,14 +20,29 @@
   <div class="dashboard-overlay" :class="{ 'open': isOpen }" @click="close()"></div>
 
   <!-- 整體容器：側欄 + 內容區 -->
-  <div class="min-h-screen grid grid-cols-1 md:grid-cols-[260px_1fr]">
+  <div class="min-h-screen grid grid-cols-1 md:grid-cols-[260px_1fr] bg-gray-100">
 
     <!-- 側欄（Dashly 風格） -->
     <aside class="dashboard-sidebar" :class="{ 'open': isOpen }">
       <div class="h-full flex flex-col">
         <!-- Logo -->
-        <div class="logo-section px-6 h-16 flex items-center">
+        <div class="logo-section px-6 h-16 flex items-center justify-between">
           <a href="{% url 'pages:marketplace' %}">TruePay</a>
+          <!-- 語言切換器 -->
+          <div class="language-switcher hidden md:block">
+            <form action="{% url 'set_language' %}" method="post">
+              {% csrf_token %}
+              <select name="language" @change="$el.form.submit()" class="language-select text-xs">
+                {% get_current_language as LANGUAGE_CODE %}
+                {% get_available_languages as LANGUAGES %}
+                {% for lang_code, lang_name in LANGUAGES %}
+                <option value="{{ lang_code }}" {% if lang_code == LANGUAGE_CODE %}selected{% endif %}>
+                  {{ lang_name }}
+                </option>
+                {% endfor %}
+              </select>
+            </form>
+          </div>
           <button @click="close()"
             class="ml-auto md:hidden cursor-pointer p-2 rounded-lg hover:bg-gray-700 touch-manipulation text-gray-300"
             aria-label="關閉選單">✕</button>
@@ -62,21 +77,6 @@
             </li>
           </ul>
         </nav>
-        <!-- 語言切換器 -->
-        <div class="language-switcher">
-          <form action="{% url 'set_language' %}" method="post" class="w-full">
-            {% csrf_token %}
-            <select name="language" @change="$el.form.submit()" class="language-select w-full text-center">
-              {% get_current_language as LANGUAGE_CODE %}
-              {% get_available_languages as LANGUAGES %}
-              {% for lang_code, lang_name in LANGUAGES %}
-              <option value="{{ lang_code }}" {% if lang_code == LANGUAGE_CODE %}selected{% endif %}>
-                {{ lang_name }}
-              </option>
-              {% endfor %}
-            </select>
-          </form>
-        </div>
         <!-- 登出 -->
         <div class="dashboard-logout">
           <a href="{% url 'customers_account:logout' %}" @click="$root.close()">

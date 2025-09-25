@@ -13,19 +13,19 @@
                 <button 
                     @click="activeTab = 'profile'" 
                     :class="activeTab === 'profile' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'" 
-                    class="hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                    class="hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-lg">
                     {% trans "個人資料" %}
                 </button>
                 <button 
                     @click="activeTab = 'password'" 
                     :class="activeTab === 'password' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'" 
-                    class="hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                    class="hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-lg">
                     {% trans "修改密碼" %}
                 </button>
                 <button 
                     @click="activeTab = 'security'" 
                     :class="activeTab === 'security' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'" 
-                    class="hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                    class="hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-lg">
                     {% trans "安全設定" %}
                 </button>
             </nav>
@@ -228,13 +228,6 @@
                                 class="text-blue-600 hover:text-blue-700 text-sm font-medium">
                             {% trans "修改密碼" %} →
                         </button>
-                    </div>
-                    
-                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div>
-                            <h4 class="font-medium text-gray-900">{% trans "登入記錄" %}</h4>
-                            <p class="text-sm text-gray-600">{% trans "檢視最近的登入活動" %}</p>
-                        </div>
                     </div>
                 </div>
             </div>

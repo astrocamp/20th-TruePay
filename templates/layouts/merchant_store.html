@@ -1,0 +1,145 @@
+{% load static %} {% load merchant_tags %} {% load i18n %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+
+    <link
+      href="{% static 'styles/app.css' %}"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="{% static 'scripts/app.js' %}" defer></script>
+
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>{% block title %}{{ merchant.ShopName }} - TruePay{% endblock %}</title>
+  </head>
+   <body class="bg-gray-50 text-brand-text font-sans flex flex-col min-h-screen {% block body_class %}template-modern{% endblock %}" x-data="{ scrolled: false }" @scroll.window="scrolled = (window.pageYOffset > 50)">
+    <!-- 商家專屬導覽列 -->
+    {% get_page_merchant as page_merchant %}
+    <nav class="merchant-nav-bar" x-data="{ mobileMenuOpen: false }" :class="{ 'scrolled': scrolled }" @resize.window="if (window.innerWidth >= 768) { mobileMenuOpen = false }">
+        <div class="nav-container">
+            <!-- 商家品牌區域 -->
+            <a href="{% url 'public_store:shop_overview' page_merchant.subdomain %}">
+              <div class="logo-section flex items-center">
+                <div class="merchant-logo-circle">
+                  {{ page_merchant.ShopName|first }}
+                </div>
+                <span class="font-bold text-xl">{{ page_merchant.ShopName }}</span>
+              </div>
+            </a>
+
+            <!-- 桌面版選單 -->
+            <ul class="nav-links flex items-center">
+                <li><a href="{% url 'public_store:shop_overview' page_merchant.subdomain %}" class="{% if request.resolver_match.url_name == 'shop_overview' %}active{% endif %}">{% trans "首頁" %}</a></li>
+
+                {% if user.is_authenticated and user.member_type == "merchant" and user.merchant == page_merchant %}
+                    <li><a href="{% url 'merchant_account:dashboard' page_merchant.subdomain %}">{% trans "商家後台" %}</a></li>
+                {% endif %}
+
+                <div class="language-switcher ml-4">
+                  <form action="{% url 'set_language' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <select name="language" @change="$el.form.submit()" class="language-select">
+                      {% get_current_language as LANGUAGE_CODE %}
+                      {% get_available_languages as LANGUAGES %}
+                      {% for lang_code, lang_name in LANGUAGES %}
+                      <option value="{{ lang_code }}" {% if lang_code == LANGUAGE_CODE %}selected{% endif %}>
+                        {{ lang_name }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </form>
+                </div>
+            </ul>
+
+            <!-- 手機版語言選擇器 -->
+            <div class="mobile-language-switcher-home md:hidden" style="position: absolute; right: 65px; top: 50%; transform: translateY(-50%);">
+                <form action="{% url 'set_language' %}" method="post">
+                    {% csrf_token %}
+                    <select name="language" onchange="this.form.submit()" class="mobile-language-select-home text-sm">
+                        {% get_current_language as LANGUAGE_CODE %}
+                        {% get_available_languages as LANGUAGES %}
+                        {% for lang_code, lang_name in LANGUAGES %}
+                        <option value="{{ lang_code }}" {% if lang_code == LANGUAGE_CODE %}selected{% endif %}>
+                            {{ lang_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+
+            <!-- 手機版漢堡選單 -->
+            <div class="hamburger" @click="mobileMenuOpen = !mobileMenuOpen">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <!-- 手機版選單 -->
+            <div class="mobile-menu" :class="{ 'show': mobileMenuOpen }">
+                <ul>
+                    <li><a href="{% url 'public_store:shop_overview' page_merchant.subdomain %}" @click="mobileMenuOpen = false">{% trans "首頁" %}</a></li>
+                    {% if user.is_authenticated and user.member_type == "merchant" and user.merchant == page_merchant %}
+                        <li><a href="{% url 'merchant_account:dashboard' page_merchant.subdomain %}" @click="mobileMenuOpen = false">{% trans "商家後台" %}</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要內容區域 -->
+    <main class="{% block main_container_classes %}flex-grow{% endblock %}">
+      {% block content %}
+      {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-row">
+                <div class="footer-column">
+                    <div class="footer-brand">
+                        <h3 class="footer-brand-title">{{ page_merchant.ShopName }}</h3>
+                        <p class="footer-brand-description">{{ page_merchant.Address }}</p>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <div class="footer-links">
+                        <h4 class="footer-links-title">{% trans "聯絡資訊" %}</h4>
+                        <ul>
+                            <li><a href="tel:{{ page_merchant.Cellphone }}">{{ page_merchant.Cellphone }}</a></li>
+                            <li><a href="mailto:{{ page_merchant.Email }}">{{ page_merchant.Email }}</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <div class="footer-links">
+                        <h4 class="footer-links-title">{% trans "快速連結" %}</h4>
+                        <ul>
+                            <li><a href="{% url 'public_store:shop_overview' page_merchant.subdomain %}">{% trans "所有商品" %}</a></li>
+                            <li><a href="https://truepay.tw/">{% trans "TruePay平台" %}</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <p class="footer-copyright">© 2025 {{ page_merchant.ShopName }} - Powered by TruePay</p>
+                    <div class="footer-bottom-links">
+                        <a href="{% url 'pages:terms' %}" class="footer-link">{% trans "使用條款" %}</a>
+                        <a href="{% url 'pages:privacy' %}" class="footer-link">{% trans "隱私權政策" %}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+ </body>
+</html>

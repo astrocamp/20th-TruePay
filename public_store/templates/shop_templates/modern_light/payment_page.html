@@ -1,5 +1,7 @@
-{% extends "layouts/default.html" %}
+{% extends "layouts/merchant_store.html" %}
 {% block title %}{{ product.name }} - 現代淡色系{% endblock %}
+
+{% block body_class %}template-modern-light{% endblock %}
 
 {% block main_container_classes %}bg-gray-50{% endblock %}
 
@@ -44,8 +46,8 @@
                          verificationData = { terms: false, identity: '', phone: '' };
                      ">
                     <div class="mb-6">
-                        <h1 class="text-2xl font-bold mb-4 modern-light-font" style="color: #272343;">{{ product.name }}</h1>
-                        <p class="text-3xl font-bold mb-6 modern-light-font" style="color: #2d334a;">NT$ {{ product.price }}</p>
+                        <h1 class="text-3xl font-bold mb-4 modern-light-font" style="color: #272343;">{{ product.name }}</h1>
+                        <p class="text-4xl font-bold mb-6 modern-light-font" style="color: #2d334a;">NT$ {{ product.price }}</p>
                     </div>
 
                     <div class="space-y-4 mb-8">
@@ -189,12 +191,12 @@
             </div>
 
             <div class="p-8 border-t border-slate-200" style="background: #e3f6f5;">
-                <h3 class="text-lg font-bold mb-4 modern-light-font" style="color: #272343;">商品描述</h3>
+                <h3 class="text-xl font-bold mb-4 modern-light-font" style="color: #272343;">商品描述</h3>
                 <div class="leading-relaxed whitespace-pre-line modern-light-font" style="color: #2d334a;">{{ product.description }}</div>
             </div>
 
             <div class="p-8 border-t border-slate-200 bg-white">
-                <h3 class="text-lg font-bold mb-6 modern-light-font" style="color: #272343;">賣家資訊</h3>
+                <h3 class="text-xl font-bold mb-6 modern-light-font" style="color: #272343;">賣家資訊</h3>
                 <div class="flex items-start space-x-4">
                     <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-base flex-shrink-0 modern-light-font" style="background: #ffd803; color: #272343;">{{ product.merchant.ShopName|first }}</div>
                     <div class="flex-1">
