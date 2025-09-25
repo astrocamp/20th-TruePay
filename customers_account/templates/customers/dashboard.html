@@ -6,14 +6,6 @@
 <div class="max-w-7xl mx-auto">
     <h1 class="text-3xl font-bold text-gray-900 mb-8">{% blocktrans with name=customer.name %}歡迎回來，{{ name }}！{% endblocktrans %}</h1>
     
-    {% if messages %}
-        {% for message in messages %}
-            <div class="mb-4 p-3 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% endif %}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-    
     <!-- 快速統計 -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white p-6 rounded-xl border border-gray-200">

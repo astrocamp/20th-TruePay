@@ -10,13 +10,6 @@
                 {% trans "返回商品列表" %}
             </a>
         </div>
-    {% if messages %} {% for message in messages %}
-    <div
-      class="mb-4 p-3 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% endif %}"
-    >
-      {{ message }}
-    </div>
-    {% endfor %} {% endif %}
 
     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
       <div class="md:flex">

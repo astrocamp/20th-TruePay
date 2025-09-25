@@ -3,15 +3,6 @@
 {% block content %}
 <div class="max-w-7xl mx-auto mt-8 p-6 bg-brand-white rounded-lg shadow-md">
     <h1 class="text-2xl font-bold text-center text-brand-black mb-6">{% trans "交易記錄" %}</h1>
-    
-    {% if messages %}
-        {% for message in messages %}
-            <div class="mb-4 p-3 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% endif %}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-    
     {% if order_items %}
         {% include 'shared/order_table.html' with role='merchant' %}
         

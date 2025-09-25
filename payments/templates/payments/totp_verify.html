@@ -46,15 +46,6 @@
             </div>
         </div>
     </div>
-    
-    {% if messages %}
-        {% for message in messages %}
-            <div class="mb-4 p-3 rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-    
     <!-- 驗證表單 -->
     <form method="post" class="space-y-6">
         {% csrf_token %}
