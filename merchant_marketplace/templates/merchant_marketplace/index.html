@@ -20,15 +20,7 @@
         <button type="button" onclick="window.location.href=window.location.pathname" class="bg-gray-200 text-gray-700 px-4 py-1 rounded hover:bg-gray-300 ml-2">{% trans "重設" %}</button>
         <button type="submit" class="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600 ml-2">{% trans "確認" %}</button>
     </form>
-    
-    {% if messages %}
-        {% for message in messages %}
-            <div class="mb-4 p-3 rounded {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% endif %}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-    
+
     {% if products %}
         {% if products|length > 0 %}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
