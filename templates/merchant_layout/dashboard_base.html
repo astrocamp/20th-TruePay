@@ -14,21 +14,31 @@
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 </head>
 <body class="merchant-dashboard font-sans scrollbar-apple" x-data="createMobileMenu()">
-  <!-- Flash Messages -->
-  {% include "components/message_content.html" %}
+  <div class="relative md:flex">
+    <!-- 背景遮罩層（手機版） -->
+    <div class="dashboard-overlay" :class="{ 'open': isOpen }" @click="close()"></div>
 
-  <!-- 背景遮罩層（手機版） -->
-  <div class="dashboard-overlay" :class="{ 'open': isOpen }" @click="close()"></div>
-
-  <!-- 整體容器：側欄 + 內容區 -->
-  <div class="min-h-screen flex flex-col md:flex-row">
-
-    <!-- 側欄（Dashly 風格） -->
-    <aside class="dashboard-sidebar w-full md:w-64 md:flex-shrink-0" :class="{ 'open': isOpen }">
-      <div class="h-full flex flex-col">
+    <!-- 側欄（固定定位） -->
+    <aside class="dashboard-sidebar w-full md:w-64 md:flex-shrink-0 md:h-screen md:sticky md:top-0" :class="{ 'open': isOpen }">
+      <div class="flex flex-col h-full">
         <!-- Logo -->
-        <div class="logo-section px-6 h-16 flex items-center">
+        <div class="logo-section px-6 h-16 flex items-center justify-between">
           <a href="{% url 'merchant_account:dashboard' request.merchant.subdomain %}">TruePay</a>
+          <!-- 語言切換器 -->
+          <div class="language-switcher hidden md:block">
+            <form action="{% url 'set_language' %}" method="post">
+              {% csrf_token %}
+              <select name="language" @change="$el.form.submit()" class="language-select text-xs">
+                {% get_current_language as LANGUAGE_CODE %}
+                {% get_available_languages as LANGUAGES %}
+                {% for lang_code, lang_name in LANGUAGES %}
+                <option value="{{ lang_code }}" {% if lang_code == LANGUAGE_CODE %}selected{% endif %}>
+                  {{ lang_name }}
+                </option>
+                {% endfor %}
+              </select>
+            </form>
+          </div>
           <button @click="close()" class="ml-auto md:hidden cursor-pointer p-2 rounded-lg hover:bg-gray-700 touch-manipulation text-gray-300" aria-label="{% trans '關閉選單' %}">✕</button>
         </div>
         <!-- 導覽選單 -->
@@ -43,13 +53,13 @@
             <li>
               <a href="{% url 'merchant_marketplace:index' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)" @click="$root.close()">
                 {% include 'components/icons.html' with icon='menu' %}
-                {% trans "商品列表" %} 
+                {% trans "商品列表" %}
               </a>
             </li>
             <li>
               <a href="{% url 'merchant_marketplace:new' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)" @click="$root.close()">
                 {% include 'components/icons.html' with icon='plus' %}
-                {% trans "新增商品" %} 
+                {% trans "新增商品" %}
               </a>
             </li>
             <li>
@@ -64,15 +74,15 @@
                 {% trans "售出票券" %}
               </a>
             </li>
-            
+
             <li>
               <a href="{% url 'merchant_account:subdomain_management' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)" @click="$root.close()">
                 {% include 'components/icons.html' with icon='check-circle' %}
-                {% trans "子網域設定" %} 
+                {% trans "子網域設定" %}
               </a>
             </li>
             <li>
-              <a href="{% url 'public_store:shop_overview' request.merchant.subdomain %}" 
+              <a href="{% url 'public_store:shop_overview' request.merchant.subdomain %}"
                 target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F5F5F7]">
                 {% include 'components/icons.html' with icon='cube' %}
                 {% trans "商品總覽" %}
@@ -81,7 +91,7 @@
             <li>
               <a href="{% url 'merchant_account:ticket_validation' request.merchant.subdomain %}" class="flex items-center gap-3" x-bind="navLinkBinding($el)" @click="$root.close()">
                 {% include 'components/icons.html' with icon='scan-frame' %}
-                {% trans "票券驗證" %} 
+                {% trans "票券驗證" %}
               </a>
             </li>
             <li>
@@ -105,33 +115,18 @@
             </li>
           </ul>
         </nav>
-        <!-- 語言切換器 -->
-        <div class="language-switcher">
-          <form action="{% url 'set_language' %}" method="post" class="w-full">
-            {% csrf_token %}
-            <select name="language" @change="$el.form.submit()" class="language-select w-full text-center">
-              {% get_current_language as LANGUAGE_CODE %}
-              {% get_available_languages as LANGUAGES %}
-              {% for lang_code, lang_name in LANGUAGES %}
-              <option value="{{ lang_code }}" {% if lang_code == LANGUAGE_CODE %}selected{% endif %}>
-                {{ lang_name }}
-              </option>
-              {% endfor %}
-            </select>
-          </form>
-        </div>
         <!-- 登出 -->
         <div class="dashboard-logout">
           <a href="{%url 'merchant_account:logout'%}" @click="$root.close()">
             {% include 'components/icons.html' with icon='logout' %}
-            {% trans "登出" %} 
+            {% trans "登出" %}
           </a>
         </div>
       </div>
     </aside>
 
-    <!-- 右側主要區域 -->
-    <main class="dashboard-main flex flex-col min-h-screen flex-1">
+    <!-- 主內容區域 -->
+    <main class="dashboard-main-container flex-1 md:h-screen md:overflow-y-auto flex flex-col bg-gray-100">
       <!-- 手機版頂部導航 -->
       <div class="dashboard-mobile-header md:hidden">
         <button @click="toggle()" class="dashboard-mobile-toggle" aria-label="開啟選單">
@@ -156,15 +151,15 @@
       </div>
 
       <!-- 主內容 -->
-      <div class="flex-1 max-w-7xl mx-auto w-full px-4 md:px-6 lg:px-8 py-6">
+      <div class="w-full px-4 md:px-6 lg:px-8 py-6 flex-grow">
         {% block content %}
         <!-- 子頁面會注入這裡 -->
         {% endblock %}
       </div>
 
       <!-- Footer -->
-      <footer class="mt-auto border-t border-gray-200 bg-white">
-        <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4 text-xs text-gray-500 flex items-center justify-between">
+      <footer class="border-t border-gray-200 bg-white">
+        <div class="px-4 md:px-6 lg:px-8 py-4 text-xs text-gray-500 flex items-center justify-between">
           <p>© 2025 TruePay</p>
           <nav class="flex items-center gap-4">
             <a href="{% url 'pages:terms' %}" class="hover:text-blue-600">{% trans '使用條款' %}</a>

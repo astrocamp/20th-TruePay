@@ -1,5 +1,7 @@
-{% extends "layouts/default.html" %}
+{% extends "layouts/merchant_store.html" %}
 {% block title %}{{ product.name }} - 科技數位{% endblock %}
+
+{% block body_class %}template-tech{% endblock %}
 
 {% block main_container_classes %}bg-gray-800 tech-grid{% endblock %}
 
@@ -44,8 +46,8 @@
                          verificationData = { terms: false, identity: '', phone: '' };
                      ">
                     <div class="mb-6">
-                        <h1 class="text-3xl font-bold tech-card-text-bright mb-4 tech-font">&gt; {{ product.name }}</h1>
-                        <p class="text-4xl font-bold tech-cyan-300 mb-6 tech-font">價格: NT$ {{ product.price }}</p>
+                        <h1 class="text-4xl font-bold tech-card-text-bright mb-4 tech-font">&gt; {{ product.name }}</h1>
+                        <p class="text-5xl font-bold tech-cyan-300 mb-6 tech-font">價格: NT$ {{ product.price }}</p>
                     </div>
 
                     <div class="space-y-4 mb-8 tech-font">
@@ -190,12 +192,12 @@
             </div>
 
             <div class="p-8 border-t border-cyan-500/50 bg-gray-800/80">
-                <h3 class="text-xl font-bold tech-card-text-bright mb-4 tech-font">&gt; 商品描述</h3>
+                <h3 class="text-2xl font-bold tech-card-text-bright mb-4 tech-font">&gt; 商品描述</h3>
                 <div class="tech-card-text leading-relaxed whitespace-pre-line tech-font">{{ product.description }}</div>
             </div>
 
             <div class="p-8 border-t border-cyan-500/50 bg-gray-900/50">
-                <h3 class="text-xl font-bold tech-card-text-bright mb-6 tech-font">&gt; 賃家資訊</h3>
+                <h3 class="text-2xl font-bold tech-card-text-bright mb-6 tech-font">&gt; 賃家資訊</h3>
                 <div class="flex items-start space-x-4">
                     <div class="bg-cyan-400 text-gray-900 w-12 h-12 rounded flex items-center justify-center font-bold text-lg flex-shrink-0 tech-font">{{ product.merchant.ShopName|first }}</div>
                     <div class="flex-1">

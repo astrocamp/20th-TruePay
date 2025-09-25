@@ -10,7 +10,7 @@
     <!-- 頁面標題 -->
     <div class="mb-8">
         <div class="flex justify-between items-center mb-2">
-            <h1 class="text-3xl font-bold text-gray-900">{% trans "商品總覽" %}</h1>
+            <h1 class="text-4xl font-bold text-gray-900">{% trans "商品總覽" %}</h1>
             {% if user.is_authenticated and user.member_type == "merchant" %}
                 <a href="{% url 'merchant_marketplace:new' user.merchant.subdomain %}"
                    class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium">
@@ -21,7 +21,7 @@
                 </a>
             {% endif %}
         </div>
-        <p class="text-gray-600">{% trans "探索各大商家的精選商品" %}</p>
+        <p class="text-lg text-gray-600">{% trans "探索各大商家的精選商品" %}</p>
     </div>
 
     <!-- 商品篩選 -->
@@ -40,7 +40,7 @@
     {% if products %}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {% for product in products %}
-        <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all group">
+        <div class="marketplace-product-card group">
             <!-- 商品圖片 -->
             <div class="aspect-square overflow-hidden bg-gray-50">
                 {% if product.image %}
@@ -57,22 +57,22 @@
             <!-- 商品資訊 -->
             <div class="p-4">
                 <div class="mb-2">
-                    <h3 class="font-semibold text-gray-900 text-lg truncate mb-1">{{ product.name }}</h3>
-                    <p class="text-sm text-gray-500 mb-2">{{ product.merchant.ShopName }}</p>
+                    <h3 class="product-title text-xl truncate mb-1">{{ product.name }}</h3>
+                    <p class="product-merchant text-sm mb-2">{{ product.merchant.ShopName }}</p>
                 </div>
 
                 <div class="flex items-center justify-between">
-                    <div class="text-2xl font-bold text-cis-primary">
+                    <div class="product-price text-3xl">
                         NT$ {{ product.price|floatformat:0 }}
                     </div>
                     
                     <!-- 庫存狀態 -->
                     {% if product.stock > 0 %}
-                        <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                        <span class="stock-badge-available text-xs px-2 py-1 rounded-full">
                             {% blocktrans with stock=product.stock %}庫存 {{ stock }}{% endblocktrans %}
                         </span>
                     {% else %}
-                        <span class="text-xs text-red-600 bg-red-50 px-2 py-1 rounded-full">
+                        <span class="stock-badge-soldout text-xs px-2 py-1 rounded-full">
                             {% trans "已售完" %}
                         </span>
                     {% endif %}
@@ -80,18 +80,18 @@
 
                 <!-- 商品描述 -->
                 {% if product.description %}
-                <p class="text-sm text-gray-600 mt-3 line-clamp-2">{{ product.description }}</p>
+                <p class="product-description text-sm mt-3 line-clamp-2">{{ product.description }}</p>
                 {% endif %}
 
                 <!-- 購買按鈕 -->
                 <div class="mt-4">
                     {% if product.stock > 0 %}
                         <a href="{% url 'public_store:payment_page' product.merchant.subdomain product.id %}"
-                           class="block w-full bg-cis-primary text-white text-center py-2 px-4 rounded-xl hover:bg-cis-primaryHover transition-all font-medium">
+                           class="product-button block w-full text-center py-2 px-4 rounded-xl transition-all">
                             {% trans "前往商品" %}
                         </a>
                     {% else %}
-                        <button class="block w-full bg-gray-300 text-gray-500 text-center py-2 px-4 rounded-xl cursor-not-allowed font-medium">
+                        <button class="product-button-disabled block w-full text-center py-2 px-4 rounded-xl cursor-not-allowed">
                             {% trans "已售完" %}
                         </button>
                     {% endif %}
@@ -106,7 +106,7 @@
         <div class="mb-4">
             {% include 'components/icons.html' with icon='warning' class='w-16 h-16 text-gray-300 mx-auto' %}
         </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">{% trans "目前沒有商品" %}</h3>
+        <h3 class="text-xl font-medium text-gray-900 mb-2">{% trans "目前沒有商品" %}</h3>
         <p class="text-gray-500">{% trans "請稍後再來查看，或許會有新商品上架！" %}</p>
     </div>
     {% endif %}

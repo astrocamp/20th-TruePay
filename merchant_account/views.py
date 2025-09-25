@@ -53,9 +53,15 @@ def register(req):
         if form.is_valid():
             try:
                 merchant = form.save()
-                django_login(req, merchant.member, backend="django.contrib.auth.backends.ModelBackend")
+                django_login(
+                    req,
+                    merchant.member,
+                    backend="django.contrib.auth.backends.ModelBackend",
+                )
                 messages.success(req, "註冊成功！歡迎加入 TruePay！")
-                return redirect("merchant_account:dashboard", subdomain=merchant.subdomain)
+                return redirect(
+                    "merchant_account:dashboard", subdomain=merchant.subdomain
+                )
             except Exception as e:
                 messages.error(req, "註冊失敗，請重新再試")
         else:
@@ -559,31 +565,31 @@ def profile_settings(request, subdomain):
             "name": "現代簡約淡色系",
             "description": "簡潔明亮的設計，採用淡色系的配置去呈現",
             "features": ["簡約設計", "淡色不刺眼", "配置清爽"],
-            "color": "#ffffff",
+            "preview_class": "bg-[#fde047]",
         },
         "modern": {
             "name": "現代簡約風",
             "description": "簡潔明亮的設計，符合現代審美",
             "features": ["簡約設計", "流暢動畫", "清爽界面"],
-            "color": "#3b82f6",
+            "preview_class": "bg-[#6A4C9C]",
         },
         "tech": {
             "name": "科技數位風",
             "description": "科技感十足，適合數位產品或服務",
             "features": ["終端機風格", "螢光特效", "數位化體驗"],
-            "color": "#06b6d4",
+            "preview_class": "bg-gray-800 tech-grid",
         },
         "handcraft": {
             "name": "手工藝術風",
             "description": "溫馨手工感，適合藝術創作或手工商品",
             "features": ["手寫字體", "溫暖色調", "創作氛圍"],
-            "color": "#ea580c",
+            "preview_class": "paper-texture",
         },
         "vintage": {
             "name": "復古經典風",
             "description": "經典復古設計，傳達傳統品牌價值",
             "features": ["復古濾鏡", "經典字體", "懷舊氛圍"],
-            "color": "#d97706",
+            "preview_class": "vintage-pattern",
         },
     }
 

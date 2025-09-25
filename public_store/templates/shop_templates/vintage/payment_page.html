@@ -1,5 +1,7 @@
-{% extends "layouts/default.html" %}
+{% extends "layouts/merchant_store.html" %}
 {% block title %}{{ product.name }} - 復古{% endblock %}
+
+{% block body_class %}template-vintage{% endblock %}
 
 {% block main_container_classes %}vintage-pattern{% endblock %}
 
@@ -44,8 +46,8 @@
                          verificationData = { terms: false, identity: '', phone: '' };
                      ">
                     <div class="mb-6">
-                        <h1 class="text-3xl font-bold mb-4 vintage-font" style="color: #96632E;">{{ product.name }}</h1>
-                        <p class="text-4xl font-bold mb-6 vintage-font" style="color: #96632E;">NT$ {{ product.price }}</p>
+                        <h1 class="text-4xl font-bold mb-4 vintage-font" style="color: #96632E;">{{ product.name }}</h1>
+                        <p class="text-5xl font-bold mb-6 vintage-font" style="color: #96632E;">NT$ {{ product.price }}</p>
                     </div>
 
                     <div class="space-y-4 mb-8">
@@ -206,12 +208,12 @@
             </div>
 
             <div class="p-8 border-t-2" style="background: #F7C242; border-color: #ffd803;">
-                <h3 class="text-xl font-bold mb-4 vintage-font" style="color: #96632E;">商品描述</h3>
+                <h3 class="text-2xl font-bold mb-4 vintage-font" style="color: #96632E;">商品描述</h3>
                 <div class="leading-relaxed whitespace-pre-line vintage-font" style="color: #96632E;">{{ product.description }}</div>
             </div>
 
             <div class="p-8 border-t-2" style="background: #FCFAF2; border-color: #ffd803;">
-                <h3 class="text-xl font-bold mb-6 vintage-font" style="color: #96632E;">賣家資訊</h3>
+                <h3 class="text-2xl font-bold mb-6 vintage-font" style="color: #96632E;">賣家資訊</h3>
                 <div class="flex items-start space-x-4">
                     <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0 vintage-font border-2" style="background: #F7C242; color: #96632E; border-color: #ffd803;">
                         {{ product.merchant.ShopName|first }}

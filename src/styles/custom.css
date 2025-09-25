@@ -28,45 +28,240 @@ html {
 
 /* Marketplace Page Background */
 .marketplace-bg {
-    background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.5)),
-                      url('https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=2000&q=80');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    background: white;
+}
+
+/* Marketplace Product Cards */
+.marketplace-product-card {
+    background: linear-gradient(135deg,rgba(59, 130, 246, 0.95) 50%,#93c5fd 100%);
+    color: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.marketplace-product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4);
+}
+
+.marketplace-product-card .product-title {
+    color: white;
+    font-weight: 600;
+}
+
+.marketplace-product-card .product-merchant {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.marketplace-product-card .product-price {
+    color: #f5c815;
+    font-weight: 700;
+}
+
+.marketplace-product-card .product-description {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.marketplace-product-card .stock-badge-available {
+    background-color: rgba(34, 197, 94, 0.9);
+    color: white;
+}
+
+.marketplace-product-card .stock-badge-soldout {
+    background-color: rgba(239, 68, 68, 0.9);
+    color: white;
+}
+
+.marketplace-product-card .product-button {
+    background: rgba(255, 255, 255, 0.9);
+    color: #1d4ed8;
+    font-weight: 600;
+    border: 2px solid transparent;
+}
+
+.marketplace-product-card .product-button:hover {
+    background: white;
+    color: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+}
+
+.marketplace-product-card .product-button-disabled {
+    background: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.7);
 }
 
 /* SelectRole Page Background */
 .selectrole-bg {
-    background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.5)),
-                      url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2000&q=80');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    background: white;
 }
 
-/* SelectRole Card Hover Effects */
-.merchant-card:hover {
-    border-color: #7a9ef5;
+/* SelectRole Card Styles */
+.customer-card {
+    background: linear-gradient(135deg, rgba(0, 170, 144, 0.95) 50%, #4fd1c7 100%);
+    color: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 170, 144, 0.3);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    border: none !important;
 }
 
 .customer-card:hover {
-    border-color: #00AA90;
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 170, 144, 0.4);
 }
 
-/* Merchant Authentication Pages Background */
-.merchant-auth-bg {
-    background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.5)),
-                      url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=2000&q=80');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+.customer-card .role-title {
+    color: white;
+    font-weight: 700;
 }
 
-/* Customer Authentication Pages Background */
+.customer-card .role-description {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.customer-card .role-button-primary {
+    background: rgba(255, 255, 255, 0.9);
+    color: #00AA90;
+    font-weight: 600;
+    border: 2px solid transparent;
+}
+
+.customer-card .role-button-primary:hover {
+    background: white;
+    color: #00AA90;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+}
+
+.customer-card .role-button-secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.customer-card .role-button-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: white;
+}
+
+.merchant-card {
+    background: linear-gradient(135deg, rgba(122, 158, 245, 0.95) 50%, #a5b4fc 100%);
+    color: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(122, 158, 245, 0.3);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    border: none !important;
+}
+
+.merchant-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(122, 158, 245, 0.4);
+}
+
+.merchant-card .role-title {
+    color: white;
+    font-weight: 700;
+}
+
+.merchant-card .role-description {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.merchant-card .role-button-primary {
+    background: rgba(255, 255, 255, 0.9);
+    color: #7a9ef5;
+    font-weight: 600;
+    border: 2px solid transparent;
+}
+
+.merchant-card .role-button-primary:hover {
+    background: white;
+    color: #7a9ef5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+}
+
+.merchant-card .role-button-secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.merchant-card .role-button-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: white;
+}
+
+/* Authentication Pages Background */
+.merchant-auth-bg,
 .customer-auth-bg {
-    background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.5)),
-                      url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=2000&q=80');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    background: white;
+}
+
+/* Authentication Form Cards */
+.merchant-auth-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(122, 158, 245, 0.15);
+    border-top: 4px solid #7a9ef5;
+    transition: all 0.3s ease;
+}
+
+.merchant-auth-card:hover {
+    box-shadow: 0 20px 40px rgba(122, 158, 245, 0.2);
+    transform: translateY(-2px);
+}
+
+.merchant-auth-card .auth-title {
+    color: #7a9ef5;
+    font-weight: 700;
+}
+
+.merchant-auth-card .auth-button-primary {
+    background: linear-gradient(135deg, #7a9ef5 0%, #6366f1 100%);
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.merchant-auth-card .auth-button-primary:hover {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(122, 158, 245, 0.3);
+}
+
+.customer-auth-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 170, 144, 0.15);
+    border-top: 4px solid #00AA90;
+    transition: all 0.3s ease;
+}
+
+.customer-auth-card:hover {
+    box-shadow: 0 20px 40px rgba(0, 170, 144, 0.2);
+    transform: translateY(-2px);
+}
+
+.customer-auth-card .auth-title {
+    color: #00AA90;
+    font-weight: 700;
+}
+
+.customer-auth-card .auth-button-primary {
+    background: linear-gradient(135deg, #00AA90 0%, #059669 100%);
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.customer-auth-card .auth-button-primary:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 170, 144, 0.3);
 }

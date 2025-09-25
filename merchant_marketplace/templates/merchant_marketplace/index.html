@@ -4,7 +4,7 @@
 <div class="max-w-6xl mx-auto">
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-gray-800">{% trans "商品列表" %}</h1>
-        <a href="{% url 'merchant_marketplace:new' request.merchant.subdomain %}" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+        <a href="{% url 'merchant_marketplace:new' request.merchant.subdomain %}" class="bg-indigo-600 text-white font-semibold px-6 py-2 rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             {% trans "新增商品" %}
         </a>
     </div>
@@ -17,15 +17,15 @@
             <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>{% trans "上架中" %}</option>
             <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>{% trans "未上架" %}</option>
         </select>
-        <button type="button" onclick="window.location.href=window.location.pathname" class="bg-gray-200 text-gray-700 px-4 py-1 rounded hover:bg-gray-300 ml-2">{% trans "重設" %}</button>
-        <button type="submit" class="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600 ml-2">{% trans "確認" %}</button>
+        <button type="button" onclick="window.location.href=window.location.pathname" class="bg-gray-400 border border-gray-400 text-white  font-semibold px-4 py-1 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ml-2">{% trans "重設" %}</button>
+        <button type="submit" class="bg-green-600 text-white font-semibold px-4 py-1 rounded-lg shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ml-2">{% trans "確認" %}</button>
     </form>
 
     {% if products %}
         {% if products|length > 0 %}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {% for product in products %}
-                    <div class="bg-white border rounded-lg p-4 shadow hover:shadow-md">
+                    <div class="bg-white rounded-xl p-4 transition-all shadow-sm hover:shadow-lg border border-transparent hover:border-gray-200">
                         {% if product.image %}
                             <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-48 object-cover rounded mb-4">
                         {% else %}
@@ -57,7 +57,7 @@
                                     x-text="buttonText"
                                     class="cursor-pointer">
                                 </button>
-                                <a href="{% url 'merchant_marketplace:detail' request.merchant.subdomain product.id %}" class="text-blue-600 hover:text-blue-800">
+                                <a href="{% url 'merchant_marketplace:detail' request.merchant.subdomain product.id %}" class="text-sm font-medium text-indigo-600 hover:text-indigo-800">
                                     {% trans "查看詳情" %}
                                 </a>
                             </div>
@@ -74,7 +74,7 @@
         <div class="text-center py-12">
             <h3 class="text-xl text-gray-600 mb-2">{% trans "目前沒有商品" %}</h3>
             <p class="text-gray-500 mb-4">{% trans "成為第一個新增商品的商家吧！" %}</p>
-            <a href="{% url 'merchant_marketplace:new' request.merchant.subdomain %}" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+            <a href="{% url 'merchant_marketplace:new' request.merchant.subdomain %}" class="bg-indigo-600 text-white font-semibold px-6 py-2 rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 {% trans "新增第一個商品" %}
             </a>
         </div>

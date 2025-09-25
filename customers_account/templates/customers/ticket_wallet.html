@@ -11,26 +11,42 @@
     <p class="text-gray-600">{% trans "管理您的所有票券，查看使用狀態和有效期限" %}</p>
   </div>
 
-  <!-- 篩選和統計 -->
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <!-- 統計卡片 -->
-      <div class="text-center">
-        <div class="text-2xl font-bold text-blue-600">{{ ticket_stats.total }}</div>
-        <div class="text-sm text-gray-600">{% trans "總票券數" %}</div>
+  <!-- 票券統計卡片 -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+    <!-- 總票券數 -->
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
+      <div class="p-2 bg-blue-100 rounded-full w-fit mx-auto mb-2">
+        {% include 'components/icons.html' with icon='ticket' class='w-6 h-6 text-blue-600' %}
       </div>
-      <div class="text-center">
-        <div class="text-2xl font-bold text-green-600">{{ ticket_stats.unused }}</div>
-        <div class="text-sm text-gray-600">{% trans "未使用" %}</div>
+      <div class="text-2xl font-bold text-blue-600">{{ ticket_stats.total }}</div>
+      <div class="text-sm text-blue-800">{% trans "總票券數" %}</div>
+    </div>
+
+    <!-- 未使用 -->
+    <div class="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
+      <div class="p-2 bg-green-100 rounded-full w-fit mx-auto mb-2">
+        {% include 'components/icons.html' with icon='check-circle' class='w-6 h-6 text-green-600' %}
       </div>
-      <div class="text-center">
-        <div class="text-2xl font-bold text-gray-600">{{ ticket_stats.used }}</div>
-        <div class="text-sm text-gray-600">{% trans "已使用" %}</div>
+      <div class="text-2xl font-bold text-green-600">{{ ticket_stats.unused }}</div>
+      <div class="text-sm text-green-800">{% trans "未使用" %}</div>
+    </div>
+
+    <!-- 已使用 -->
+    <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 text-center">
+      <div class="p-2 bg-gray-100 rounded-full w-fit mx-auto mb-2">
+        {% include 'components/icons.html' with icon='check-circle' class='w-6 h-6 text-gray-600' %}
       </div>
-      <div class="text-center">
-        <div class="text-2xl font-bold text-red-600">{{ ticket_stats.expired }}</div>
-        <div class="text-sm text-gray-600">{% trans "已過期" %}</div>
+      <div class="text-2xl font-bold text-gray-600">{{ ticket_stats.used }}</div>
+      <div class="text-sm text-gray-800">{% trans "已使用" %}</div>
+    </div>
+
+    <!-- 已過期 -->
+    <div class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+      <div class="p-2 bg-red-100 rounded-full w-fit mx-auto mb-2">
+        {% include 'components/icons.html' with icon='x-circle' class='w-6 h-6 text-red-600' %}
       </div>
+      <div class="text-2xl font-bold text-red-600">{{ ticket_stats.expired }}</div>
+      <div class="text-sm text-red-800">{% trans "已過期" %}</div>
     </div>
   </div>
 
