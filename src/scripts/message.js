@@ -10,8 +10,6 @@ const infoColor = bgList["info"];
 
 const messagesControl = () => {
   return {
-    modal: { show: false, title: "", text: "", type: "" },
-    hasShownVerify: false,
 
     showAllFrom(jsonRef) {
       if (!jsonRef) {
