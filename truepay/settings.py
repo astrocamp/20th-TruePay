@@ -32,7 +32,7 @@ TICKET_VALIDITY_DAYS = 180  # 票券有效期（天數）
 SECRET_KEY = "django-insecure-iip1xgbl_eh&cl1p81i9*nuvl)qlb$#gj1e+f1it-a!xu1qjio"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # 從環境變數讀取 ngrok URL (必須在 .env 中設定)
 NGROK_URL = os.getenv("NGROK_URL")
@@ -93,7 +93,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    # "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 子網域必需
+    "truepay.middleware.subdomain_redirect.SubdomainRedirectMiddleware",  # 子網域必需
     "django.contrib.messages.middleware.MessageMiddleware",
     # "django.middleware.clickjacking.XFrameOptionsMiddleware",  # 已改用 CSP frame-ancestors
     "django.middleware.cache.FetchFromCacheMiddleware",
@@ -325,8 +325,8 @@ SESSION_COOKIE_SAMESITE = "Lax"  # CSRF 保護
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 瀏覽器關閉時清除 Session
 SESSION_COOKIE_AGE = 3600  # Session 1小時後過期
 
-# SESSION_COOKIE_DOMAIN = f".{BASE_DOMAIN}"
-# CSRF_COOKIE_DOMAIN = f".{BASE_DOMAIN}"
+SESSION_COOKIE_DOMAIN = f".{BASE_DOMAIN}"
+CSRF_COOKIE_DOMAIN = f".{BASE_DOMAIN}"
 
 
 # 快取設定（防止敏感頁面被快取）
@@ -440,6 +440,10 @@ CELERY_BEAT_SCHEDULE = {
         "options": {
             "expires": 3300,  # 55分鐘後過期
         },
+    },
+    "auto-deactivate-expired-products": {
+        "task": "merchant_marketplace.auto_deactivate_expired_products",
+        "schedule": crontab(minute="*/10"),  # 10分鐘一次
     },
 }
 

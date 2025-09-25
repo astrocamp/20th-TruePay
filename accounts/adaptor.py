@@ -105,7 +105,17 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                 logger.error(f"帳號連結失敗 - 未知錯誤: {e}, email: {email}")
                 raise ValidationError("系統異常，請稍後再試或聯繫客服")
 
-        return super().pre_social_login(request, sociallogin)
+        existing_merchant = (
+            Member.objects.filter(email=email)
+            .exclude(member_type=CUSTOMER_TYPE)
+            .first()
+        )
+
+        if existing_merchant:
+            sociallogin.state["process"] = "signup"
+            user = self.save_user(request, sociallogin)
+            sociallogin.connect(request, user)
+            return
 
     def save_user(self, request, sociallogin, form=None):
         """

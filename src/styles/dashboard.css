@@ -201,6 +201,96 @@
     margin: 0;
 }
 
+/* 商家版本手機版導航 */
+.merchant-dashboard .dashboard-mobile-header {
+    background: var(--merchant-primary);
+    border-bottom: 1px solid var(--merchant-primary-hover);
+}
+
+.merchant-dashboard .dashboard-mobile-header h1 {
+    color: var(--sidebar-text-color);
+}
+
+.merchant-dashboard .dashboard-mobile-toggle {
+    color: #d1d5db;
+}
+
+.merchant-dashboard .dashboard-mobile-toggle:hover {
+    background: var(--merchant-primary-hover);
+    color: var(--sidebar-text-color);
+}
+
+/* 消費者版本手機版導航 */
+.customer-dashboard .dashboard-mobile-header {
+    background: var(--customer-primary);
+    border-bottom: 1px solid var(--customer-primary-hover);
+}
+
+.customer-dashboard .dashboard-mobile-header h1 {
+    color: var(--sidebar-text-color);
+}
+
+.customer-dashboard .dashboard-mobile-toggle {
+    color: #d1d5db;
+}
+
+.customer-dashboard .dashboard-mobile-toggle:hover {
+    background: var(--customer-primary-hover);
+    color: var(--sidebar-text-color);
+}
+
+/* 手機版語言選擇器 */
+.mobile-language-switcher {
+    margin-left: auto;
+}
+
+.mobile-language-select {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1e3a8a;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    min-width: 100px;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%233b82f6" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.mobile-language-select:hover {
+    border-color: #3b82f6;
+    background-color: #f8fafc;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.mobile-language-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background-color: #f8fafc;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.mobile-language-select option {
+    background: white;
+    color: #1e3a8a;
+    font-weight: 500;
+    padding: 0.5rem;
+}
+
+/* 手機版時隱藏側邊欄中的語言選擇器 */
+@media (max-width: 767px) {
+    .dashboard-sidebar .language-switcher {
+        display: none;
+    }
+}
+
 .dashboard-mobile-toggle {
     padding: 0.5rem;
     border-radius: 0.5rem;
