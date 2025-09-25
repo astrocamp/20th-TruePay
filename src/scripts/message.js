@@ -1,10 +1,10 @@
 import Toastify from "toastify-js";
 
 const bgList = {
-  success: "#06890a",
-  warning: "#e57d0d",
-  error: "#c10007",
-  info: "#1e1f24",
+  success: "#00a651", 
+  warning: "#ff6b35", 
+  error: "#dc2626",   
+  info: "#0056B3",    
 };
 const infoColor = bgList["info"];
 
@@ -15,29 +15,19 @@ const messagesControl = () => {
 
     showAllFrom(jsonRef) {
       if (!jsonRef) {
-        // DEVLOG: DOM 元素沒抓到
-        // console.log("DOM 元素沒抓到");
         return;
       }
 
       try {
         const content = jsonRef.textContent.trim();
-        // DEVLOG: 訊息內容
-        // console.log("訊息內容:", content);
 
         if (!content) {
-          // DEVLOG: 訊息內容為空
-          // console.log("訊息內容為空");
           return;
         }
 
         const messages = JSON.parse(content);
-        // DEVLOG: JSON 解析結果
-        // console.log("訊息內容JSON:", messages);
 
         if (!Array.isArray(messages)) {
-          // DEVLOG: 格式錯誤
-          // console.log("訊息格式錯誤");
           return;
         }
 
@@ -47,9 +37,6 @@ const messagesControl = () => {
           const tagsStr = String(tag || "");
           const type = tagsStr.split(" ")[0] || "info";
           const bg = bgList[type] || infoColor;
-
-          // DEVLOG: Toastify 內容
-          // console.log("Showing toast:", text, tag);
 
           // 創建通知元素
           const toast = Toastify({
@@ -112,8 +99,6 @@ const messagesControl = () => {
           toast.showToast();
         });
       } catch (error) {
-        // DEVLOG: 解析錯誤
-        // console.log("解析訊息時發生錯誤:", error);
         return;
       }
     },
