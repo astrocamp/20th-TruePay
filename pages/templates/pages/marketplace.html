@@ -86,7 +86,7 @@
                 <!-- 購買按鈕 -->
                 <div class="mt-4">
                     {% if product.stock > 0 %}
-                        <a href="{% url 'public_store:payment_page' product.merchant.subdomain product.id %}"
+                        <a href="{% url 'public_store:payment_page' id=product.id %}"
                            class="product-button block w-full text-center py-2 px-4 rounded-xl transition-all">
                             {% trans "前往商品" %}
                         </a>

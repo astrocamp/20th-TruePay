@@ -4,15 +4,6 @@
 {% block content %}
 <div class="merchant-auth-card w-full max-w-md mx-auto p-8 mt-8" style="width: 40%; min-width: 400px;">
     <h1 class="auth-title text-2xl text-center mb-6">{% trans "商家登入" %}</h1>
-    
-    {% if messages %}
-        {% for message in messages %}
-            <div class="mb-4 p-3 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% endif %}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-    
     <form action="{% url 'merchant_account:login' %}" method="post" class="space-y-4">
         {% csrf_token %}
         
