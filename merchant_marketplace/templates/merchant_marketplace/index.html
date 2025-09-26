@@ -17,7 +17,7 @@
             <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>{% trans "上架中" %}</option>
             <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>{% trans "未上架" %}</option>
         </select>
-        <button type="button" onclick="window.location.href=window.location.pathname" class="bg-gray-400 border border-gray-400 text-white  font-semibold px-4 py-1 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ml-2">{% trans "重設" %}</button>
+        <button type="button" onclick="window.location.href=window.location.pathname" class="bg-gray-400 border border-gray-400 text-white  font-semibold px-4 py-1 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ml-2">{% trans "重設" %}</button>
         <button type="submit" class="bg-green-600 text-white font-semibold px-4 py-1 rounded-lg shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ml-2">{% trans "確認" %}</button>
     </form>
 
@@ -25,7 +25,7 @@
         {% if products|length > 0 %}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {% for product in products %}
-                    <div class="bg-white rounded-xl p-4 transition-all shadow-sm hover:shadow-lg border border-transparent hover:border-gray-200">
+                    <div class="bg-white rounded-xl p-4 transition-all shadow-sm hover:shadow-lg border border-transparent hover:border-gray-200 flex flex-col h-full">
                         {% if product.image %}
                             <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-48 object-cover rounded mb-4">
                         {% else %}
@@ -34,12 +34,12 @@
                             </div>
                         {% endif %}
                         <h3 class="text-lg font-semibold mb-2">{{ product.name }}</h3>
-                        <p class="text-gray-600 text-sm mb-3">{{ product.description|truncatewords:15 }}</p>
+                        <p class="text-gray-600 text-sm mb-3 flex-grow">{{ product.description|truncatewords:15 }}</p>
                         <div class="flex justify-between items-center mb-2">
                             <span class="text-xl font-bold text-blue-600">${{ product.price }}</span>
                             <span class="text-sm text-gray-500">{{ product.merchant.ShopName }}</span>
                         </div>
-                        <div class="flex justify-between items-center mb-3">
+                        <div class="flex justify-between items-center mb-3 mt-auto">
                             <span class="text-sm text-gray-600">
                                 {% if product.is_active %}
                                     <span id="status-{{ product.id }}" class="bg-green-100 text-green-700 px-2 py-0.5 rounded">{% trans "上架中" %}</span>

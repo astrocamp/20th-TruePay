@@ -9,4 +9,5 @@ urlpatterns = [
     path("selectrole/", views.selectrole, name="selectrole"),
     path("terms/", views.terms, name="terms"),
     path("privacy/", views.privacy, name="privacy"),
+    path("api/csrf-token/", views.get_csrf_token_api, name="csrf_token_api"),
 ]
