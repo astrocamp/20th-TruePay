@@ -97,12 +97,32 @@
                 <input type="hidden" name="form_type" value="password">
                 
                 <div class="space-y-4">
-                    <div>
-                        <label for="{{ password_form.old_password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                            {% trans "目前密碼" %}
-                        </label>
-                        {{ password_form.old_password }}
-                    </div>
+                    {% if not user.has_usable_password %}
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-blue-800">
+                                        {% trans "第三方登入帳號" %}
+                                    </h3>
+                                    <div class="mt-1 text-sm text-blue-700">
+                                        <p>{% trans "您使用第三方登入（如 Google），可以直接設置新密碼，無需輸入舊密碼。" %}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div>
+                            <label for="{{ password_form.old_password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {% trans "目前密碼" %}
+                            </label>
+                            {{ password_form.old_password }}
+                        </div>
+                    {% endif %}
                     
                     <div>
                         <label for="{{ password_form.new_password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">

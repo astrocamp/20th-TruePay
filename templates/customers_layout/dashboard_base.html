@@ -12,7 +12,7 @@
   <script src="{% static 'scripts/app.js' %}" defer></script>
 </head>
 
-<body class="customer-dashboard font-sans scrollbar-apple" x-data="createMobileMenu()">
+<body class="customer-dashboard font-sans scrollbar-apple bg-gray-100" x-data="createMobileMenu()">
   <!-- Flash Messages -->
   {% include "components/message_content.html" %}
 
@@ -20,7 +20,7 @@
   <div class="dashboard-overlay" :class="{ 'open': isOpen }" @click="close()"></div>
 
   <!-- 整體容器：側欄 + 內容區 -->
-  <div class="min-h-screen grid grid-cols-1 md:grid-cols-[260px_1fr] bg-gray-100">
+  <div class="min-h-screen grid grid-cols-1 md:grid-cols-[260px_1fr]">
 
     <!-- 側欄（Dashly 風格） -->
     <aside class="dashboard-sidebar" :class="{ 'open': isOpen }">
@@ -81,7 +81,7 @@
         <div class="dashboard-logout">
           <a href="{% url 'customers_account:logout' %}" @click="$root.close()">
             {% include 'components/icons.html' with icon='logout' %}
-            登出 
+            {% trans "登出" %} 
           </a>
         </div>
       </div>

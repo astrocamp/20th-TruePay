@@ -152,7 +152,7 @@
 
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                     {% for choice_value, choice_label in template_form.store_template_id.field.choices %}
-                    <div class="relative">
+                    <div class="relative h-full">
                         <input type="radio"
                                name="{{ template_form.store_template_id.name }}"
                                value="{{ choice_value }}"
@@ -162,21 +162,23 @@
                                {% if template_form.store_template_id.value == choice_value %}checked{% endif %}>
 
                         <label for="template_{{ choice_value }}"
-                               class="block cursor-pointer rounded-xl border-2 border-gray-200 p-6 hover:border-gray-300 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-200 transition-all duration-200">
+                               class="flex flex-col h-full cursor-pointer rounded-xl border-2 border-gray-200 p-6 hover:border-gray-300 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-200 transition-all duration-200 min-h-[320px]">
 
                             <!-- 模板預覽圖 -->
                             <div class="h-32 rounded-lg mb-4 flex items-center justify-center text-4xl {{ template_info|get_item:choice_value|get_item:'preview_class' }}">
                             </div>
 
                             <!-- 模板信息 -->
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ template_info|get_item:choice_value|get_item:'name' }}</h3>
-                            <p class="text-sm text-gray-600 mb-3">{{ template_info|get_item:choice_value|get_item:'description' }}</p>
+                            <div class="flex-grow flex flex-col">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ template_info|get_item:choice_value|get_item:'name' }}</h3>
+                                <p class="text-sm text-gray-600 mb-3 flex-grow">{{ template_info|get_item:choice_value|get_item:'description' }}</p>
 
-                            <!-- 特色標籤 -->
-                            <div class="flex flex-wrap gap-1">
-                                {% for feature in template_info|get_item:choice_value|get_item:'features' %}
-                                <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">{{ feature }}</span>
-                                {% endfor %}
+                                <!-- 特色標籤 -->
+                                <div class="flex flex-wrap gap-1 mt-auto">
+                                    {% for feature in template_info|get_item:choice_value|get_item:'features' %}
+                                    <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">{{ feature }}</span>
+                                    {% endfor %}
+                                </div>
                             </div>
                         </label>
                     </div>

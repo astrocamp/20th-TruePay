@@ -13,7 +13,6 @@
             </div>
         </div>
     </div>
-    {% endif %}
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
@@ -24,7 +23,7 @@
             <div class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
                 <label class="block text-sm font-medium text-gray-700 mb-2">{% trans "目前商店網址" %}</label>
                 <div class="text-sm text-gray-600 mb-2">
-                    <a href="https://{{ merchant.subdomain }}.{{ BASE_DOMAIN }}/" target="_blank" 
+                    <a href="https://{{ merchant.subdomain }}.{{ base_domain }}/" target="_blank" 
                        class="text-[#0056B3] hover:underline font-mono">
                         https://{{ merchant.subdomain }}.truepay.tw
                     </a>

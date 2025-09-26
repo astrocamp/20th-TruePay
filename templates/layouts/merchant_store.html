@@ -27,14 +27,19 @@
     <nav class="merchant-nav-bar" x-data="{ mobileMenuOpen: false }" :class="{ 'scrolled': scrolled }" @resize.window="if (window.innerWidth >= 768) { mobileMenuOpen = false }">
         <div class="nav-container">
             <!-- 商家品牌區域 -->
-            <a href="{% url 'public_store:shop_overview' page_merchant.subdomain %}">
-              <div class="logo-section flex items-center">
-                <div class="merchant-logo-circle">
-                  {{ page_merchant.ShopName|first }}
-                </div>
-                <span class="font-bold text-xl">{{ page_merchant.ShopName }}</span>
-              </div>
-            </a>
+            <div class="flex items-center">
+                <a href="{% url 'public_store:shop_overview' page_merchant.subdomain %}">
+                  <div class="logo-section flex items-center">
+                    <div class="merchant-logo-circle">
+                      {{ page_merchant.ShopName|first }}
+                    </div>
+                    <span class="font-bold text-xl">{{ page_merchant.ShopName }}</span>
+                  </div>
+                </a>
+                <a href="https://truepay.tw/" class="ml-5 inline-flex items-center" title="返回 TruePay 平台">
+                    <img src="{% static 'favicon.ico' %}" alt="TruePay" class="w-10 h-10 opacity-60 hover:opacity-100 transition-opacity">
+                </a>
+            </div>
 
             <!-- 桌面版選單 -->
             <ul class="nav-links flex items-center">

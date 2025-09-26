@@ -324,8 +324,20 @@ class PasswordChangeForm(forms.Form):
         self.user = user
         super().__init__(*args, **kwargs)
 
+        # 如果用戶沒有設置密碼（第三方登入），隱藏舊密碼字段
+        if not user.has_usable_password():
+            self.fields['old_password'].widget = forms.HiddenInput()
+            self.fields['old_password'].required = False
+            self.fields['old_password'].label = ""
+            self.fields['old_password'].help_text = "您是通過第三方登入，直接設置新密碼即可"
+
     def clean_old_password(self):
         old_password = self.cleaned_data.get("old_password")
+
+        # 如果用戶沒有可用密碼（第三方登入），跳過驗證
+        if not self.user.has_usable_password():
+            return old_password
+
         if not self.user.check_password(old_password):
             raise ValidationError("目前密碼錯誤")
         return old_password

@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.utils import timezone
 from django.db.models import Q
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
+from django.conf import settings
 from merchant_marketplace.models import Product
 
 
@@ -25,7 +28,11 @@ def marketplace(req):
     page_number = req.GET.get("page")
     products = paginator.get_page(page_number)
 
-    context = {"products": products, "page_title": "商品總覽"}
+    context = {
+        "products": products,
+        "page_title": "商品總覽",
+        "BASE_DOMAIN": settings.BASE_DOMAIN
+    }
     return render(req, "pages/marketplace.html", context)
 
 
@@ -39,3 +46,8 @@ def terms(req):
 
 def privacy(req):
     return render(req, "pages/privacy.html")
+
+
+def get_csrf_token_api(request):
+    """提供新的 CSRF token API 端點"""
+    return JsonResponse({'csrf_token': get_token(request)})

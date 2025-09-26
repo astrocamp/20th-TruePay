@@ -1,18 +1,34 @@
 import Toastify from "toastify-js";
 
 const bgList = {
-  success: "#00a651", 
-  warning: "#ff6b35", 
-  error: "#dc2626",   
-  info: "#0056B3",    
+  success: "#00a651",
+  warning: "#ff6b35",
+  error: "#dc2626",
+  info: "#0056B3",
 };
 const infoColor = bgList["info"];
 
+// 全局去重機制
+const globalDisplayedMessages = new Set();
+let globalIsProcessing = false;
+
+// 定期清理機制
+setInterval(() => {
+  if (globalDisplayedMessages.size > 5) {
+    globalDisplayedMessages.clear();
+  }
+}, 10000); // 10秒檢查一次
+
 const messagesControl = () => {
+
   return {
 
     showAllFrom(jsonRef) {
+      // 防止重複處理
+      if (globalIsProcessing) return;
+      globalIsProcessing = true;
       if (!jsonRef) {
+        globalIsProcessing = false;
         return;
       }
 
@@ -20,17 +36,22 @@ const messagesControl = () => {
         const content = jsonRef.textContent.trim();
 
         if (!content) {
+          globalIsProcessing = false;
           return;
         }
 
         const messages = JSON.parse(content);
 
         if (!Array.isArray(messages)) {
+          globalIsProcessing = false;
           return;
         }
 
-        messages.forEach(({ text, tag }) => {
-          if (!text) return;
+        // 限制顯示數量並去重
+        messages.slice(0, 5).forEach(({ text, tag }) => {
+          const messageId = `${text}-${tag}`;
+          if (globalDisplayedMessages.has(messageId)) return;
+          globalDisplayedMessages.add(messageId);
 
           const tagsStr = String(tag || "");
           const type = tagsStr.split(" ")[0] || "info";
@@ -96,7 +117,10 @@ const messagesControl = () => {
           // 顯示通知
           toast.showToast();
         });
+
+        globalIsProcessing = false;
       } catch (error) {
+        globalIsProcessing = false;
         return;
       }
     },
