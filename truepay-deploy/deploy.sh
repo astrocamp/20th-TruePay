@@ -2,11 +2,14 @@
 echo "Loading Docker image..."
 docker load -i truepay-web-optimized.tar
 
-echo "Starting database and message queue..."
+echo "Stopping existing services..."
+docker-compose down
+
+echo "Starting infrastructure services..."
 docker-compose up -d postgres rabbitmq
 
 echo "Waiting for database to be ready..."
-sleep 10
+sleep 15
 
 echo "Running database migrations..."
 docker-compose run --rm web uv run python manage.py migrate
@@ -14,9 +17,11 @@ docker-compose run --rm web uv run python manage.py migrate
 echo "Collecting static files..."
 docker-compose run --rm web uv run python manage.py collectstatic --noinput
 
-echo "Starting all services..."
-docker-compose down
-docker-compose up -d
+echo "Starting application services..."
+docker-compose up -d web nginx celery-worker
+
+echo "Starting monitoring services..."
+docker-compose up -d celery-flower
 
 echo "Checking status..."
 docker-compose ps
