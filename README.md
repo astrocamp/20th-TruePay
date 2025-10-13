@@ -36,8 +36,6 @@
 
 [![TruePay Demo](https://img.youtube.com/vi/8kIEo-F54Wg/maxresdefault.jpg)](https://www.youtube.com/watch?v=8kIEo-F54Wg)
 
-**[🎬 點擊觀看完整影片](https://www.youtube.com/watch?v=8kIEo-F54Wg)**
-
 ## 技術架構
 
 ### 前端技術
