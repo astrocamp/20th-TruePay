@@ -32,6 +32,12 @@
     <img src="https://test-django-images-marchung.s3.ap-northeast-1.amazonaws.com/TP/home.png" alt="TruePay Banner">
 </div>
 
+## Demo Day 影片
+
+[![TruePay Demo](https://img.youtube.com/vi/8kIEo-F54Wg/maxresdefault.jpg)](https://www.youtube.com/watch?v=8kIEo-F54Wg)
+
+**[🎬 點擊觀看完整影片](https://www.youtube.com/watch?v=8kIEo-F54Wg)**
+
 ## 技術架構
 
 ### 前端技術
